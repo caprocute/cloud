@@ -728,6 +728,7 @@ export default Vue.extend({
 
                 input {
                     cursor: initial;
+                    z-index: 0; // needed so that the input is editable when active
                 }
             }
 
@@ -743,6 +744,7 @@ export default Vue.extend({
                 text-overflow: ellipsis;
                 width: 100%;
                 cursor: pointer;
+                z-index: -1; // allows module list toggle to work
             }
         }
 
