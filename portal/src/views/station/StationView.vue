@@ -230,7 +230,7 @@
             </section>
 
             <section v-if="notes && !isCustomizationEnabled()" class="section-notes container-box">
-                <NotesForm v-bind:key="station.id" :station="station" :readonly="station.readOnly" @change="dirtyNotes = true" />
+                <NotesForm v-bind:key="station.id" :station="station" :readonly="station.readOnly" @change="dirtyNotes = true" @saved="dirtyNotes = false" />
             </section>
 
             <section class="section-notes container-box">
@@ -296,6 +296,7 @@ export default Vue.extend({
         isMobileView: boolean;
         loading: boolean;
         dirtyNotes: boolean;
+        dirtyModules: boolean;
         sensorDataQuerier: SensorDataQuerier;
         editModuleIndex: number | null;
         editingDescription: boolean;
@@ -309,6 +310,7 @@ export default Vue.extend({
             isMobileView: window.screen.availWidth <= 500,
             loading: true,
             dirtyNotes: false,
+            dirtyModules: false,
             editedModule: null,
             editModuleIndex: null,
             editingDescription: false,
@@ -391,7 +393,7 @@ export default Vue.extend({
         },
     },
     beforeRouteLeave(to: never, from: never, next: any) {
-        if (this.dirtyNotes) {
+        if (this.dirtyNotes || this.dirtyModules) {
             this.$confirm({
                 message: this.$tc("notes.confirmLeavePopupMessage"),
                 button: {
@@ -466,6 +468,7 @@ export default Vue.extend({
             if (this.editedModule) {
                 this.editedModule.label = this.$tc(this.getModuleName(module));
             }
+            this.dirtyModules = true;
         },
         saveModuleName(): void {
             if (!this.editedModule) {
@@ -474,6 +477,7 @@ export default Vue.extend({
             const payload = { stationId: this.station.id, moduleId: this.editedModule.id, label: this.editedModule.label };
             this.$store.dispatch(ActionTypes.UPDATE_STATION_MODULE, payload).then(() => {
                 this.editedModule = null;
+                this.dirtyModules = false;
             });
         },
         selectModule(module: DisplayModule) {
