@@ -35,3 +35,22 @@
 //     }
 //   }
 // }
+
+const apiUrl = 'http://127.0.0.1:8080/';
+
+Cypress.Commands.add('login', () => {
+    cy.request({
+        method: 'POST',
+        url: apiUrl + 'login',
+        body: {
+            email: 'jacob@conservify.org',
+            password: 'asdfasdfasdf',
+        },
+    }).then((response) => {
+        const token = response.headers.authorization;
+        if (typeof token === 'string') {
+            const sanitized = token.replace("Bearer ", "");
+            window.localStorage["fktoken"] = JSON.stringify(sanitized);
+        }
+    });
+});
