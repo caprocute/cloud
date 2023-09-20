@@ -8,7 +8,7 @@
             </div>
         </div>
         <div class="site-notes">
-            <form id="form">
+            <form id="form" test-id="notesForm">
                 <NoteEditor v-model="form.studyObjective" :v="$v.form.studyObjective" :readonly="readonly" @change="onChange" />
                 <NoteEditor v-model="form.sitePurpose" :v="$v.form.sitePurpose" :readonly="readonly" @change="onChange" />
                 <NoteEditor v-model="form.siteCriteria" :v="$v.form.siteCriteria" :readonly="readonly" @change="onChange" />

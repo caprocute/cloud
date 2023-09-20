@@ -5,4 +5,10 @@ describe('Station Page', () => {
         cy.login();
         cy.visit('/station/1')
     })
+
+    it('Shows Notes Form', () => {
+        cy.login();
+        cy.visit('/station/1');
+        cy.get('[test-id="notesForm"]');
+    })
 })
