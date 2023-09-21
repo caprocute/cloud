@@ -3,8 +3,6 @@
         <div class="container">
             <router-link :to="{ name: 'adminMain' }" class="link">Back to Admin</router-link>
 
-            <vue-confirm-dialog />
-
             <div class="delete-user">
                 <div v-if="deletion.failed" class="notification failed">Oops, there was a problem.</div>
 

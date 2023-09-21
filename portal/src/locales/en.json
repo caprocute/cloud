@@ -441,8 +441,8 @@
         "btn": {
             "save": "Save"
         },
-        "updateSuccess": "Field notes updated!",
-        "updateFail": "Field notes update failed!",
+        "updateSuccess": "Notes updated!",
+        "updateFail": "Notes update failed!",
         "customTitleEditLabel": "Edit",
         "stationDescriptionEditLabel": "Edit",
         "stationDescriptionSaveLabel": "Save",
