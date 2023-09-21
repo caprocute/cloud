@@ -738,6 +738,7 @@ export default Vue.extend({
 
                 input {
                     cursor: initial;
+                    z-index: 0; // needed so that the input is editable when active
                 }
             }
 
@@ -757,6 +758,7 @@ export default Vue.extend({
                 @include bp-down($sm) {
                     display: block;
                 }
+                z-index: -1; // allows module list toggle to work
             }
         }
 
