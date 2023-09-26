@@ -88,7 +88,7 @@ export class NoteForm {
     ) {}
 
     public withBody(body: string, title: string) {
-        return new NoteForm(body, this.help, this.photos, this.audio, title !== "" ? title : this.title);
+        return new NoteForm(body, this.help, this.photos, this.audio, title);
     }
 }
 
@@ -200,7 +200,6 @@ export function mergeNotes(portalNotes: PortalStationNotesReply, notesForm: Note
         })
         .values()
         .value();
-
     const creating = modifications.map((v) => v.creating).filter((v) => v !== null && (v.body.length > 0 || v.title !== NoteCustomTitleDefault)) as NewFieldNote[];
     const updating = modifications.map((v) => v.updating).filter((v) => v !== null && v.title !== NoteCustomTitleDefault) as ExistingFieldNote[];
 

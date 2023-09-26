@@ -91,14 +91,15 @@ export default Vue.extend({
             return this.$services.api
                 .patchStationNotes(this.station.id, payload)
                 .then(() => {
+                    this.$store.dispatch(ActionTypes.NEED_NOTES, { id: this.station.id });
                     this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
                         message: this.$tc("notes.updateSuccess"),
                         type: SnackbarStyle.success,
                     });
-                    this.$emit('saved');
+                    this.$emit("saved");
                 })
                 .catch(() => {
-                  this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
+                    this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
                         message: this.$tc("notes.updateFail"),
                         type: SnackbarStyle.fail,
                     });
