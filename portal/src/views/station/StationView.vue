@@ -38,11 +38,8 @@
                                     :disabled="!editingDescription"
                                 />
                                 <a
-                                    v-if="form.description === undefined"
-                                    @click="
-                                        form.description = '';
-                                        editingDescription = true;
-                                    "
+                                    v-if="!station.readOnly && form.description === undefined"
+                                    @click="form.description = ''; editingDescription = true;"
                                     class="station-description-add"
                                 >
                                     {{ $t("station.addDescription") }}
@@ -329,7 +326,7 @@ export default Vue.extend({
             editModuleIndex: null,
             editingDescription: false,
             form: {
-                description: null,
+                description: '',
             },
             sensorDataQuerier: new SensorDataQuerier(this.$services.api),
         };
