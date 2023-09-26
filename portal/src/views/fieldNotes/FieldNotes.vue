@@ -16,6 +16,7 @@
                 <div class="new-field-note-wrap">
                     <Tiptap
                         @editor-focus="checkEditingFieldNote()"
+                        @empty="onNewFieldNoteText($event, 'new')"
                         v-model="newNoteText"
                         placeholder="Join the discussion!"
                         saveLabel="Save"
@@ -76,6 +77,7 @@
                                 :ref="'note-ref-' + fieldNote.id"
                                 :value="fieldNote.body"
                                 :readonly="!editingFieldNote || editingFieldNote.id !== fieldNote.id"
+                                @empty="onNewFieldNoteText($event, 'edit')"
                             />
                         </template>
                         <div v-if="!editingFieldNote || (editingFieldNote && editingFieldNote.id !== fieldNote.id)" class="actions">
@@ -151,6 +153,7 @@ export default Vue.extend({
         newNoteText: string | null;
         errorMessage: string | null;
         editingFieldNote: PortalStationFieldNotes | null;
+        dirtyRefs: string[];
     } {
         return {
             groupedFieldNotes: null,
@@ -159,6 +162,7 @@ export default Vue.extend({
             newNoteText: null,
             errorMessage: null,
             editingFieldNote: null,
+            dirtyRefs: [],
         };
     },
     beforeMount(): void {
@@ -199,6 +203,7 @@ export default Vue.extend({
                     message: this.$tc("fieldNotes.addSuccess"),
                     type: SnackbarStyle.success,
                 });
+                this.$emit("dirtyNewNote", false);
             } catch (e) {
                 return this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
                     message: this.$tc("somethingWentWrong"),
@@ -237,6 +242,7 @@ export default Vue.extend({
                     message: this.$tc("fieldNotes.editSuccess"),
                     type: SnackbarStyle.success,
                 });
+                this.$emit("dirtyEditNote", false);
             } catch (e) {
                 return this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
                     message: this.$tc("somethingWentWrong"),
@@ -312,6 +318,7 @@ export default Vue.extend({
                         if (confirm && this.editingFieldNote) {
                             editorRef[0].editor.commands.setContent(JSON.parse(fieldNote.body));
                             this.editingFieldNote = null;
+                            this.$emit("dirtyEditNote", false);
                         }
                     },
                 });
@@ -383,6 +390,14 @@ export default Vue.extend({
                 width: 190, //target width in the PDF document
                 windowWidth: 675, //window width in CSS pixels
             });
+        },
+        onNewFieldNoteText(empty: string, type: "new" | "edit"): void {
+            if (type === "new") {
+                this.$emit("dirtyNewNote", !empty);
+            }
+            if (type === "edit") {
+                this.$emit("dirtyEditNote", true);
+            }
         },
     },
 });

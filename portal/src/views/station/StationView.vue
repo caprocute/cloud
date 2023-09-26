@@ -230,11 +230,21 @@
             </section>
 
             <section v-if="notes && !isCustomizationEnabled()" class="section-notes container-box">
-                <NotesForm v-bind:key="station.id" :station="station" :readonly="station.readOnly" @change="dirtyNotes = true" @saved="dirtyNotes = false" />
+                <NotesForm
+                    v-bind:key="station.id"
+                    :station="station"
+                    :readonly="station.readOnly"
+                    @change="dirtyNotes = true"
+                    @saved="dirtyNotes = false"
+                />
             </section>
 
             <section class="section-notes container-box">
-                <FieldNotes :stationName="station.name"></FieldNotes>
+                <FieldNotes
+                    :stationName="station.name"
+                    @dirtyNewNote="dirtyNewNote = $event"
+                    @dirtyEditNote="dirtyEditNote = $event"
+                ></FieldNotes>
             </section>
         </div>
     </StandardLayout>
@@ -297,6 +307,8 @@ export default Vue.extend({
         loading: boolean;
         dirtyNotes: boolean;
         dirtyModules: boolean;
+        dirtyNewNote: boolean;
+        dirtyEditNote: boolean;
         sensorDataQuerier: SensorDataQuerier;
         editModuleIndex: number | null;
         editingDescription: boolean;
@@ -311,6 +323,8 @@ export default Vue.extend({
             loading: true,
             dirtyNotes: false,
             dirtyModules: false,
+            dirtyNewNote: false,
+            dirtyEditNote: false,
             editedModule: null,
             editModuleIndex: null,
             editingDescription: false,
@@ -393,7 +407,7 @@ export default Vue.extend({
         },
     },
     beforeRouteLeave(to: never, from: never, next: any) {
-        if (this.dirtyNotes || this.dirtyModules) {
+        if (this.dirtyNotes || this.dirtyModules || this.dirtyNewNote || this.dirtyEditNote) {
             this.$confirm({
                 message: this.$tc("notes.confirmLeavePopupMessage"),
                 button: {
