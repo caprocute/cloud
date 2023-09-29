@@ -274,7 +274,6 @@ export default Vue.extend({
                     if (confirm) {
                         try {
                             await this.$store.dispatch(ActionTypes.DELETE_FIELD_NOTE, { stationId: this.stationId, noteId });
-                            await this.$store.dispatch(ActionTypes.NEED_FIELD_NOTES, { id: this.stationId });
                             await this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
                                 message: this.$tc("fieldNotes.deleteSuccess"),
                                 type: SnackbarStyle.success,
