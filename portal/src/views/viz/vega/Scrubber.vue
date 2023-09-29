@@ -16,6 +16,7 @@ import { ScrubberSpecFactory, ChartSettings } from "./ScrubberSpecFactory";
 import { DiscussionState } from "@/store/modules/discussion";
 import { ActionTypes } from "@/store";
 import { DataEvent } from "@/views/comments/model";
+import moment from "moment";
 
 export default Vue.extend({
     name: "Scrubber",
@@ -70,13 +71,12 @@ export default Vue.extend({
                 this.series,
                 new ChartSettings(this.visible, undefined, { w: 0, h: 0 }, false, false, isMobile()),
                 this.dataEvents.filter((event) => {
-                      return this.series.every(
-                          (seriesData) =>
-                              event.start >= seriesData.queried.timeRange[0] &&
-                              event.end <= seriesData.queried.timeRange[1]
-                      )
-                    }
-                ),
+                    return this.series.every(
+                        (seriesData) =>
+                            moment(event.start).valueOf() >= moment(seriesData.queried.timeRange[0]).utcOffset(0, true).valueOf() &&
+                            moment(event.end).valueOf() <= moment(seriesData.queried.timeRange[1]).utcOffset(0, true).valueOf()
+                    );
+                })
             );
 
             const spec = factory.create();
@@ -107,7 +107,7 @@ export default Vue.extend({
             //     console.log(evt, value);
             // });
             vegaInfo.view.addSignalListener("event_click", (_, value) => {
-              this.$emit("event-clicked", value);
+                this.$emit("event-clicked", value);
             });
             vegaInfo.view.addEventListener("mouseup", () => {
                 if (scrubbed.length == 2) {
