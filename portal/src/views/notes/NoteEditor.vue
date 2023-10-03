@@ -1,12 +1,14 @@
 <template>
     <div class="note-editor">
         <div class="title">
-            <TextAreaField v-if="editingTitle" v-model="title" />
+            <TextAreaField v-if="editingTitle" :data-cy="'customKeyTitle'" v-model="title" />
             <template v-else>{{ title }}</template>
-            <a class="edit-btn" v-if="editableTitle && !editingTitle" @click="editingTitle = !editingTitle">{{ $t("notes.customTitleEditLabel") }}</a>
+            <a class="edit-btn" data-cy="editCustomKey" v-if="editableTitle && !editingTitle" @click="editingTitle = !editingTitle">
+                {{ $t("notes.customTitleEditLabel") }}
+            </a>
         </div>
         <div class="field" v-if="!readonly">
-            <TextAreaField v-model="body" @input="v.$touch()" />
+            <TextAreaField v-model="body" @input="v.$touch()" :data-cy="dataCy" />
         </div>
         <div class="field" v-if="readonly">
             <template v-if="note.body">{{ note.body }}</template>
@@ -54,6 +56,10 @@ export default Vue.extend({
         editableTitle: {
             type: Boolean,
             default: false,
+        },
+        dataCy: {
+            type: String,
+            default: '',
         },
     },
     data() {

@@ -4,16 +4,16 @@
             <div class="name">{{ $t("notes.title") }}</div>
             <div class="completed">{{ completed }}% {{ $t("notes.complete") }}</div>
             <div class="buttons" v-if="isAuthenticated">
-                <button type="submit" class="button" @click="onSave">{{ $t("notes.btn.save") }}</button>
+                <button type="submit" class="button" @click="onSave" data-cy="saveNotes">{{ $t("notes.btn.save") }}</button>
             </div>
         </div>
         <div class="site-notes">
-            <form id="form" test-id="notesForm">
-                <NoteEditor v-model="form.studyObjective" :v="$v.form.studyObjective" :readonly="readonly" @change="onChange" />
-                <NoteEditor v-model="form.sitePurpose" :v="$v.form.sitePurpose" :readonly="readonly" @change="onChange" />
-                <NoteEditor v-model="form.siteCriteria" :v="$v.form.siteCriteria" :readonly="readonly" @change="onChange" />
-                <NoteEditor v-model="form.siteDescription" :v="$v.form.siteDescription" :readonly="readonly" @change="onChange" />
-                <NoteEditor v-model="form.customKey" :v="$v.form.customKey" :readonly="readonly" :editableTitle="true" @change="onChange" />
+            <form id="form" data-cy="notesForm">
+                <NoteEditor :dataCy="'studyObjectiveBody'" v-model="form.studyObjective" :v="$v.form.studyObjective" :readonly="readonly" @change="onChange" />
+                <NoteEditor :dataCy="'sitePurposeBody'" v-model="form.sitePurpose" :v="$v.form.sitePurpose" :readonly="readonly" @change="onChange" />
+                <NoteEditor :dataCy="'siteCriteriaBody'" v-model="form.siteCriteria" :v="$v.form.siteCriteria" :readonly="readonly" @change="onChange" />
+                <NoteEditor :dataCy="'siteDescriptionBody'" v-model="form.siteDescription" :v="$v.form.siteDescription" :readonly="readonly" @change="onChange" />
+                <NoteEditor :dataCy="'customKeyBody'" v-model="form.customKey" :v="$v.form.customKey" :readonly="readonly" :editableTitle="true" @change="onChange" />
             </form>
         </div>
     </div>
