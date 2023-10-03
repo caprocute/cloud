@@ -84,7 +84,7 @@ build:images:
     - cd ..
     - apk add wget make unzip
     - wget -q https://github.com/conservify/dev-ops/archive/refs/heads/main.zip && unzip -q main.zip && cd dev-ops-main
-    - export TAG=${CI_COMMIT_REF_NAME}
+    - export TAG=${CI_COMMIT_REF_SLUG}
     - cd amis && make clean && make portal-stack charting-stack
     - echo $DOCKER_TAG > TAG
   artifacts:
