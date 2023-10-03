@@ -98,6 +98,7 @@ export default Vue.extend({
         const saved = (editor, ...args) => {
             if (!editor.isEmpty) {
                 this.$emit("save", editor.getJSON());
+                editor.commands.clearContent();
             }
         };
 
