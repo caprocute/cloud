@@ -188,10 +188,6 @@ ci-db-tests:
 write-version:
 	echo $(VERSION) > version.txt
 
-docker-images:
-	cp portal/src/secrets.ts.aws portal/src/secrets.ts
-	WORKING_DIRECTORY=$(WORKING_DIRECTORY) DOCKER_TAG=$(DOCKER_TAG) VERSION=$(VERSION) ./build.sh
-
 sanitize: sanitizer
 	mkdir -p sanitize-data
 	rsync -zvua schema-production/* sanitize-data
