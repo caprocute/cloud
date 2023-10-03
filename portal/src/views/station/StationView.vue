@@ -32,14 +32,14 @@
                             <div v-if="!isPartnerCustomisationEnabled" class="station-description">
                                 <textarea
                                     ref="stationDescription"
-                                    v-if="form.description !== undefined"
+                                    v-if="form.description || editingDescription"
                                     class="input"
                                     @input="onStationDescriptionInput()"
                                     v-model="form.description"
                                     :disabled="!editingDescription"
                                 />
                                 <a
-                                    v-if="!station.readOnly && form.description === undefined"
+                                    v-if="!station.readOnly && !form.description && !editingDescription"
                                     @click="
                                         form.description = '';
                                         editingDescription = true;
@@ -59,7 +59,7 @@
                                     </a>
                                     <a
                                         @click="saveStationDescription()"
-                                        v-if="editingDescription && form.description"
+                                        v-if="editingDescription"
                                         class="station-description-edit"
                                         style="margin-top: 4px"
                                     >
