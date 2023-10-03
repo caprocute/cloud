@@ -31,15 +31,19 @@
 
                             <div v-if="!isPartnerCustomisationEnabled" class="station-description">
                                 <textarea
+                                    ref="stationDescription"
                                     v-if="form.description !== undefined"
                                     class="input"
-                                    oninput='this.style.height = "";this.style.height = this.scrollHeight + "px"'
+                                    @input="onStationDescriptionInput()"
                                     v-model="form.description"
                                     :disabled="!editingDescription"
                                 />
                                 <a
                                     v-if="!station.readOnly && form.description === undefined"
-                                    @click="form.description = ''; editingDescription = true;"
+                                    @click="
+                                        form.description = '';
+                                        editingDescription = true;
+                                    "
                                     class="station-description-add"
                                 >
                                     {{ $t("station.addDescription") }}
@@ -306,6 +310,7 @@ export default Vue.extend({
         dirtyModules: boolean;
         dirtyNewNote: boolean;
         dirtyEditNote: boolean;
+        dirtyStationDesc: boolean;
         sensorDataQuerier: SensorDataQuerier;
         editModuleIndex: number | null;
         editingDescription: boolean;
@@ -322,11 +327,12 @@ export default Vue.extend({
             dirtyModules: false,
             dirtyNewNote: false,
             dirtyEditNote: false,
+            dirtyStationDesc: false,
             editedModule: null,
             editModuleIndex: null,
             editingDescription: false,
             form: {
-                description: '',
+                description: "",
             },
             sensorDataQuerier: new SensorDataQuerier(this.$services.api),
         };
@@ -404,7 +410,7 @@ export default Vue.extend({
         },
     },
     beforeRouteLeave(to: never, from: never, next: any) {
-        if (this.dirtyNotes || this.dirtyModules || this.dirtyNewNote || this.dirtyEditNote) {
+        if (this.dirtyNotes || this.dirtyModules || this.dirtyNewNote || this.dirtyEditNote || this.dirtyStationDesc) {
             this.$confirm({
                 message: this.$tc("notes.confirmLeavePopupMessage"),
                 button: {
@@ -472,6 +478,7 @@ export default Vue.extend({
         saveStationDescription(): void {
             const payload = { id: this.station.id, name: this.station.name, ...this.form };
             this.$store.dispatch(ActionTypes.UPDATE_STATION, payload);
+            this.dirtyStationDesc = false;
             this.editingDescription = false;
         },
         onEditModuleNameClick(module: DisplayModule): void {
@@ -514,6 +521,17 @@ export default Vue.extend({
                     window.open(url, "_blank");
                 }
             }
+        },
+        onStationDescriptionInput() {
+            const el = this.$refs["stationDescription"] as HTMLElement;
+
+            if (!el) {
+                throw new Error("Can not find stationDescription ref");
+            }
+
+            el.style.height = "";
+            el.style.height = el.scrollHeight + "px";
+            this.dirtyStationDesc = true;
         },
     },
 });
