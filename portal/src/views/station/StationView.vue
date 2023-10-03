@@ -51,7 +51,7 @@
 
                                 <template>
                                     <a
-                                        v-if="form.description && !editingDescription"
+                                        v-if="!station.readOnly && form.description && !editingDescription"
                                         @click="editingDescription = true"
                                         class="station-description-edit"
                                     >
