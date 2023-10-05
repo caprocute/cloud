@@ -12,11 +12,31 @@ import (
 	"github.com/fieldkit/cloud/server/common/logging"
 	"github.com/fieldkit/cloud/server/common/sqlxcache"
 	"github.com/fieldkit/cloud/server/data"
+	"github.com/fieldkit/cloud/server/storage"
 )
 
 type Options struct {
 	PostgresURL  string `split_words:"true"`
 	TimeScaleURL string `split_words:"true"`
+	Commit       bool
+}
+
+func (options *Options) timeScaleConfig() *storage.TimeScaleDBConfig {
+	if options.TimeScaleURL == "" {
+		return nil
+	}
+
+	return &storage.TimeScaleDBConfig{Url: options.TimeScaleURL}
+}
+
+func (options *Options) refreshViews(ctx context.Context) error {
+	tsConfig := options.timeScaleConfig()
+
+	if tsConfig == nil {
+		return fmt.Errorf("refresh-views missing tsdb configuration")
+	}
+
+	return tsConfig.RefreshViews(ctx)
 }
 
 func process(ctx context.Context, options *Options) error {
@@ -129,8 +149,14 @@ func process(ctx context.Context, options *Options) error {
 				return err
 			}
 
-			if err := tx.Rollback(); err != nil {
-				return err
+			if options.Commit {
+				if err := tx.Commit(); err != nil {
+					return err
+				}
+			} else {
+				if err := tx.Rollback(); err != nil {
+					return err
+				}
 			}
 
 			tx, err = tsDb.Begin(ctx)
@@ -153,9 +179,22 @@ func process(ctx context.Context, options *Options) error {
 				return err
 			}
 
-			if err := tx.Rollback(); err != nil {
-				return err
+			if options.Commit {
+				if err := tx.Commit(); err != nil {
+					return err
+				}
+			} else {
+				if err := tx.Rollback(); err != nil {
+					return err
+				}
+
 			}
+		}
+	}
+
+	if options.Commit {
+		if err := options.refreshViews(ctx); err != nil {
+			return err
 		}
 	}
 
@@ -165,6 +204,8 @@ func process(ctx context.Context, options *Options) error {
 func main() {
 	ctx := context.Background()
 	options := &Options{}
+
+	flag.BoolVar(&options.Commit, "commit", false, "Commit, otherwise changes will be rolled back.")
 
 	flag.Parse()
 
