@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/kelseyhightower/envconfig"
 
@@ -163,6 +164,19 @@ func process(ctx context.Context, options *Options) error {
 			if err != nil {
 				return err
 			}
+
+			row := tx.QueryRowContext(ctx, `SELECT MAX(time) AS max_time FROM fieldkit.sensor_data WHERE station_id = $1 AND module_id = $2`, original.StationID, original.ModulePrimaryID)
+
+			if err := row.Err(); err != nil {
+				return err
+			}
+
+			before := time.Time{}
+			if err := row.Scan(&before); err != nil {
+				return err
+			}
+
+			log.Infow("original:max", "time", before, "station_id", original.StationID, "module_id", original.ModulePrimaryID)
 
 			if _, err := tx.ExecContext(ctx, `
 				DELETE FROM fieldkit.sensor_data WHERE station_id = $1 AND module_id = $2 AND time <=
