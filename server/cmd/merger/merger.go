@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/kelseyhightower/envconfig"
 
 	"github.com/fieldkit/cloud/server/backend/repositories"
@@ -40,28 +41,24 @@ func (options *Options) refreshViews(ctx context.Context) error {
 	return tsConfig.RefreshViews(ctx)
 }
 
-func process(ctx context.Context, options *Options) error {
+type StationMerger struct {
+	primaryDb     *sqlxcache.DB
+	tsDb          *sqlxcache.DB
+	queryStations *repositories.StationRepository
+}
+
+func NewStationMerger(primaryDb *sqlxcache.DB, tsDb *sqlxcache.DB) *StationMerger {
+	return &StationMerger{
+		primaryDb:     primaryDb,
+		tsDb:          tsDb,
+		queryStations: repositories.NewStationRepository(primaryDb),
+	}
+}
+
+func (s *StationMerger) ProcessModel(ctx context.Context, options *Options, modelID int32) error {
 	log := logging.Logger(ctx).Sugar()
 
-	if err := envconfig.Process("FIELDKIT", options); err != nil {
-		panic(err)
-	}
-
-	primaryDb, err := sqlxcache.Open(ctx, "postgres", options.PostgresURL)
-	if err != nil {
-		return err
-	}
-
-	tsDb, err := sqlxcache.Open(ctx, "postgres", options.TimeScaleURL)
-	if err != nil {
-		return err
-	}
-
-	log.Infow("querying stations")
-
-	queryStations := repositories.NewStationRepository(primaryDb)
-
-	stations, err := queryStations.QueryAllStationsByModelID(ctx, 7)
+	stations, err := s.queryStations.QueryAllStationsByModelID(ctx, modelID)
 	if err != nil {
 		return err
 	}
@@ -87,6 +84,7 @@ func process(ctx context.Context, options *Options) error {
 			originalID := int32(0)
 			badID := int32(0)
 
+			originalDeviceId := normalized
 			stationIDs := make([]int32, 0)
 			for _, station := range stations {
 				stationIDs = append(stationIDs, station.ID)
@@ -98,6 +96,7 @@ func process(ctx context.Context, options *Options) error {
 					badID = station.ID
 				} else {
 					originalID = station.ID
+					originalDeviceId = deviceID
 				}
 			}
 
@@ -113,7 +112,7 @@ func process(ctx context.Context, options *Options) error {
 
 			log.Infow("merging", "device_id", normalized, "original_id", originalID, "bad_id", badID)
 
-			sensors, err := queryStations.QueryStationSensors(ctx, stationIDs)
+			sensors, err := s.queryStations.QueryStationSensors(ctx, stationIDs)
 			if err != nil {
 				return err
 			}
@@ -121,89 +120,143 @@ func process(ctx context.Context, options *Options) error {
 			originalSensors := sensors[originalID]
 			badSensors := sensors[badID]
 
-			if len(originalSensors) != len(badSensors) || len(originalSensors) != 1 || len(badSensors) != 1 {
-				panic("len(originalSensors) != len(badSensors)")
+			keyed := make(map[string][]*repositories.StationSensor)
+
+			for _, sensor := range originalSensors {
+				sensors := make([]*repositories.StationSensor, 0)
+				keyed[*sensor.SensorKey] = append(sensors, sensor)
 			}
 
-			if false {
-				for _, s := range originalSensors {
-					fmt.Printf("O %v\n", s)
-				}
-				for _, s := range badSensors {
-					fmt.Printf("B %v\n", s)
-				}
+			for _, sensor := range badSensors {
+				// Key should already be there or something is wrong.
+				keyed[*sensor.SensorKey] = append(keyed[*sensor.SensorKey], sensor)
 			}
 
-			original := originalSensors[0]
-			bad := badSensors[0]
-
-			tx, err := primaryDb.Begin(ctx)
+			primaryTx, err := s.primaryDb.Begin(ctx)
 			if err != nil {
 				return err
 			}
 
-			if _, err := tx.ExecContext(ctx, "UPDATE fieldkit.station SET device_id = $1 WHERE id = $2", fmt.Sprintf("%v-DELETE", normalized), badID); err != nil {
-				return err
-			}
-
-			if _, err := tx.ExecContext(ctx, "UPDATE fieldkit.station SET device_id = $1 WHERE id = $2", normalized, originalID); err != nil {
-				return err
-			}
-
-			if options.Commit {
-				if err := tx.Commit(); err != nil {
-					return err
-				}
-			} else {
-				if err := tx.Rollback(); err != nil {
-					return err
-				}
-			}
-
-			tx, err = tsDb.Begin(ctx)
+			tsTx, err := s.tsDb.Begin(ctx)
 			if err != nil {
 				return err
 			}
 
-			row := tx.QueryRowContext(ctx, `SELECT MAX(time) AS max_time FROM fieldkit.sensor_data WHERE station_id = $1 AND module_id = $2`, original.StationID, original.ModulePrimaryID)
+			modulesDone := make(map[int64]bool)
 
-			if err := row.Err(); err != nil {
-				return err
-			}
+			for _, sensors := range keyed {
+				if len(sensors) != 2 {
+					spew.Dump(keyed)
+					panic("len(sensors) != 2")
+				}
 
-			before := time.Time{}
-			if err := row.Scan(&before); err != nil {
-				return err
-			}
+				original := sensors[0]
+				bad := sensors[1]
 
-			log.Infow("original:max", "time", before, "station_id", original.StationID, "module_id", original.ModulePrimaryID)
+				if _, ok := modulesDone[*bad.ModulePrimaryID]; ok {
+					continue
+				}
 
-			if _, err := tx.ExecContext(ctx, `
-				DELETE FROM fieldkit.sensor_data WHERE station_id = $1 AND module_id = $2 AND time <=
-					(SELECT MAX(time) FROM fieldkit.sensor_data WHERE station_id = $3 AND module_id = $4)
-				`,
-				bad.StationID, bad.ModulePrimaryID, original.StationID, original.ModulePrimaryID); err != nil {
-				return err
-			}
+				if _, err := primaryTx.ExecContext(ctx, "UPDATE fieldkit.station SET device_id = $1 WHERE id = $2", fmt.Sprintf("%v-DELETE", normalized), badID); err != nil {
+					return err
+				}
 
-			if _, err := tx.ExecContext(ctx, `
-				UPDATE fieldkit.sensor_data d SET (station_id, module_id) = ($1, $2) WHERE d.station_id = $3 AND d.module_id = $4
-				`,
-				original.StationID, original.ModulePrimaryID, bad.StationID, bad.ModulePrimaryID); err != nil {
-				return err
+				if _, err := primaryTx.ExecContext(ctx, "UPDATE fieldkit.station SET device_id = $1 WHERE id = $2", normalized, originalID); err != nil {
+					return err
+				}
+
+				if _, err := primaryTx.ExecContext(ctx, "UPDATE fieldkit.provision SET device_id = $1 WHERE device_id = $2", fmt.Sprintf("%v-DELETE", normalized), normalized); err != nil {
+					return err
+				}
+
+				if _, err := primaryTx.ExecContext(ctx, "UPDATE fieldkit.provision SET device_id = $1 WHERE device_id = $2", normalized, originalDeviceId); err != nil {
+					return err
+				}
+
+				row := tsTx.QueryRowContext(ctx, `SELECT MAX(time) AS max_time FROM fieldkit.sensor_data WHERE station_id = $1 AND module_id = $2`, original.StationID, original.ModulePrimaryID)
+
+				if err := row.Err(); err != nil {
+					return err
+				}
+
+				before := time.Time{}
+				if err := row.Scan(&before); err != nil {
+					return err
+				}
+
+				log.Infow("original:max", "time", before, "station_id", original.StationID, "module_id", original.ModulePrimaryID)
+
+				if _, err := tsTx.ExecContext(ctx, `
+					DELETE FROM fieldkit.sensor_data WHERE station_id = $1 AND module_id = $2 AND time <=
+						(SELECT MAX(time) FROM fieldkit.sensor_data WHERE station_id = $3 AND module_id = $4)
+					`,
+					bad.StationID, bad.ModulePrimaryID, original.StationID, original.ModulePrimaryID); err != nil {
+					return err
+				}
+
+				if _, err := tsTx.ExecContext(ctx, `
+					UPDATE fieldkit.sensor_data d SET (station_id, module_id) = ($1, $2) WHERE d.station_id = $3 AND d.module_id = $4
+					`,
+					original.StationID, original.ModulePrimaryID, bad.StationID, bad.ModulePrimaryID); err != nil {
+					return err
+				}
+
+				modulesDone[*bad.ModulePrimaryID] = true
 			}
 
 			if options.Commit {
-				if err := tx.Commit(); err != nil {
+				if err := primaryTx.Commit(); err != nil {
+					return err
+				}
+				if err := tsTx.Commit(); err != nil {
 					return err
 				}
 			} else {
-				if err := tx.Rollback(); err != nil {
+				if err := primaryTx.Rollback(); err != nil {
+					return err
+				}
+				if err := tsTx.Rollback(); err != nil {
+					return err
+				}
+			}
+		} else {
+			for _, station := range stations {
+				_, err := s.queryStations.QueryStationSensors(ctx, []int32{227})
+				if err != nil {
 					return err
 				}
 
+				_ = station
 			}
 		}
+	}
+
+	return nil
+}
+
+func process(ctx context.Context, options *Options) error {
+	if err := envconfig.Process("FIELDKIT", options); err != nil {
+		panic(err)
+	}
+
+	primaryDb, err := sqlxcache.Open(ctx, "postgres", options.PostgresURL)
+	if err != nil {
+		return err
+	}
+
+	tsDb, err := sqlxcache.Open(ctx, "postgres", options.TimeScaleURL)
+	if err != nil {
+		return err
+	}
+
+	merger := NewStationMerger(primaryDb, tsDb)
+
+	if err := merger.ProcessModel(ctx, options, 8); err != nil {
+		return err
+	}
+
+	if err := merger.ProcessModel(ctx, options, 7); err != nil {
+		return err
 	}
 
 	if options.Commit {
