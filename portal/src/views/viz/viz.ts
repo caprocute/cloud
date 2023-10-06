@@ -1201,6 +1201,7 @@ export class Workspace implements VizInfoFactory {
                 .value();
 
             if (associatedSensorOptions.length > 0) {
+                console.log("associated-sensor-options", associatedSensorOptions);
                 const relatedOption = new SensorTreeOption("related-sensors", "Related", associatedSensorOptions, null, null, 0, null);
                 sorted.push(relatedOption);
             }
