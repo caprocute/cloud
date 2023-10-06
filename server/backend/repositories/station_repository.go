@@ -1388,7 +1388,7 @@ type StationSensorRow struct {
 	StationID       int32          `db:"station_id" json:"stationId"`
 	StationName     string         `db:"station_name" json:"stationName"`
 	StationLocation *data.Location `db:"station_location" json:"stationLocation"`
-	ModulePrimaryID *int64         `db:"module_id" json:"-"`
+	ModulePrimaryID *int64         `db:"module_id" json:"modulePrimaryId"`
 	ModuleID        *string        `db:"module_hardware_id" json:"moduleId"`
 	ModuleKey       *string        `db:"module_key" json:"moduleKey"`
 	SensorID        *int64         `db:"sensor_id" json:"sensorId"`
@@ -1400,7 +1400,7 @@ type StationSensor struct {
 	StationID       int32          `json:"stationId"`
 	StationName     string         `json:"stationName"`
 	StationLocation *data.Location `json:"stationLocation"`
-	ModulePrimaryID *int64         `json:"-"`
+	ModulePrimaryID *int64         `json:"modulePrimaryId"`
 	ModuleID        *string        `json:"moduleId"`
 	ModuleKey       *string        `json:"moduleKey"`
 	SensorID        *int64         `json:"sensorId"`
