@@ -71,10 +71,10 @@ export default Vue.extend({
                 this.series,
                 new ChartSettings(this.visible, undefined, { w: 0, h: 0 }, false, false, isMobile()),
                 this.dataEvents.filter((event) => {
-                    return this.series.every(
+                  return this.series.every(
                         (seriesData) =>
-                            moment(event.start).valueOf() >= moment(seriesData.queried.timeRange[0]).utcOffset(0, true).valueOf() &&
-                            moment(event.end).valueOf() <= moment(seriesData.queried.timeRange[1]).utcOffset(0, true).valueOf()
+                            event.start >= seriesData.queried.timeRange[0] &&
+                            event.end <= seriesData.queried.timeRange[1]
                     );
                 })
             );
