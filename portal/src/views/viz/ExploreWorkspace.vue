@@ -95,7 +95,13 @@
                     @event-clicked="eventClicked"
                 />
 
-                <Comments :parentData="bookmark" :workspace="workspace" :user="user" @viewDataClicked="onChange" v-if="bookmark && !busy"></Comments>
+                <Comments
+                    :parentData="bookmark"
+                    :workspace="workspace"
+                    :user="user"
+                    @viewDataClicked="onChange"
+                    v-if="bookmark && !busy"
+                ></Comments>
             </div>
         </div>
     </StandardLayout>
@@ -246,6 +252,26 @@ export default Vue.extend({
                 });
         }
     },
+    beforeRouteLeave(to: never, from: never, next: any) {
+      console.log("radoi")
+        /*if (this.projectDirty) {
+            this.$confirm({
+                message: this.$tc("project.form.confirmLeavePopupMessage"),
+                button: {
+                    no: this.$tc("no"),
+                    yes: this.$tc("yes"),
+                },
+                callback: (confirm) => {
+                    if (confirm) {
+                        this.projectDirty = false;
+                        next();
+                    }
+                },
+            });
+        } else {
+            next();
+        }*/
+    },
     methods: {
         async onBack() {
             if (this.bookmark.c) {
@@ -382,7 +408,7 @@ export default Vue.extend({
             this.selectedIndex = evt;
         },
         openStationPageTab() {
-            const station = this.selectedStation ? this.selectedStation: this.currentStation;
+            const station = this.selectedStation ? this.selectedStation : this.currentStation;
             if (station) {
                 const routeData = this.$router.resolve({
                     name: "viewStationFromMap",
@@ -421,7 +447,7 @@ export default Vue.extend({
             console.log("viz:export-disabled", stationModels, anyNodeRed);
 
             return anyNodeRed.length == 0;
-        }
+        },
     },
 });
 </script>

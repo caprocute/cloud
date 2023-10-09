@@ -103,6 +103,7 @@
                                 :placeholder="$tc('comments.eventForm.title.placeholder')"
                                 :saveLabel="$tc('comments.eventForm.title.saveLabel')"
                                 :showSaveButton="false"
+                                @input="dirtyComment = true"
                                 @save="saveDataEvent(newDataEvent)"
                             />
                             <Tiptap
