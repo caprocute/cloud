@@ -91,12 +91,14 @@ export default Vue.extend({
     mounted() {
         const services = this.$services;
 
-        const changed = (value) => {
-            this.$emit("input", value);
+        const changed = (editor) => {
+            this.$emit("input", editor.getJSON());
+            this.$emit("empty", editor.isEmpty);
         };
         const saved = (editor, ...args) => {
             if (!editor.isEmpty) {
                 this.$emit("save", editor.getJSON());
+                editor.commands.clearContent();
             }
         };
 
@@ -104,17 +106,16 @@ export default Vue.extend({
             name: "newline",
             addCommands() {
                 return {
-                    addNewline: () => ({ state, dispatch }) => {
-                        const { schema, tr } = state;
-                        const paragraph = schema.nodes.paragraph;
+                    addNewline:
+                        () =>
+                        ({ state, dispatch }) => {
+                            const { schema, tr } = state;
+                            const paragraph = schema.nodes.paragraph;
 
-                        const transaction = tr
-                            .deleteSelection()
-                            .replaceSelectionWith(paragraph.create(), true)
-                            .scrollIntoView();
-                        if (dispatch) dispatch(transaction);
-                        return true;
-                    },
+                            const transaction = tr.deleteSelection().replaceSelectionWith(paragraph.create(), true).scrollIntoView();
+                            if (dispatch) dispatch(transaction);
+                            return true;
+                        },
                 } as never;
             },
             addKeyboardShortcuts() {
@@ -145,7 +146,8 @@ export default Vue.extend({
             }
             return v as JSONContent;
         }
-
+        // eslint-disable-next-line
+        const thisComp = this;
         this.editor = new Editor({
             editable: !this.readonly,
             content: asContent(this.value),
@@ -162,12 +164,12 @@ export default Vue.extend({
                     suggestion: {
                         items: (props: { query: string; editor: Editor }): any[] => {
                             if (props.query.length > 0) {
-                                return (services.api.mentionables(props.query).then((mentionables) => {
+                                return services.api.mentionables(props.query).then((mentionables) => {
                                     console.log("mentionables", mentionables);
                                     return mentionables.users;
-                                }) as unknown) as any[];
+                                }) as unknown as any[];
                             } else {
-                                return (Promise.resolve([]) as unknown) as any[];
+                                return Promise.resolve([]) as unknown as any[];
                             }
                         },
                         render: () => {
@@ -228,13 +230,14 @@ export default Vue.extend({
                 }),
             ],
             onUpdate({ editor }) {
-                changed(editor.getJSON());
+                changed(editor);
             },
             onBlur({ editor }) {
                 console.log("editor-blur");
             },
             onFocus({ editor }) {
                 console.log("editor-focus");
+                thisComp.$emit("editor-focus");
             },
         });
 

@@ -31,14 +31,15 @@
 
                             <div v-if="!isPartnerCustomisationEnabled" class="station-description">
                                 <textarea
-                                    v-if="form.description !== undefined"
+                                    ref="stationDescription"
+                                    v-if="form.description || editingDescription"
                                     class="input"
-                                    oninput='this.style.height = "";this.style.height = this.scrollHeight + "px"'
+                                    @input="onStationDescriptionInput()"
                                     v-model="form.description"
                                     :disabled="!editingDescription"
                                 />
                                 <a
-                                    v-if="form.description === undefined"
+                                    v-if="!station.readOnly && !form.description && !editingDescription"
                                     @click="
                                         form.description = '';
                                         editingDescription = true;
@@ -50,19 +51,19 @@
 
                                 <template>
                                     <a
-                                        v-if="form.description && !editingDescription"
+                                        v-if="!station.readOnly && form.description && !editingDescription"
                                         @click="editingDescription = true"
                                         class="station-description-edit"
                                     >
-                                        {{ $t("edit") }}
+                                        {{ $t("notes.stationDescriptionEditLabel") }}
                                     </a>
                                     <a
                                         @click="saveStationDescription()"
-                                        v-if="editingDescription && form.description"
+                                        v-if="editingDescription"
                                         class="station-description-edit"
-                                        style="margin-top: 4px;"
+                                        style="margin-top: 4px"
                                     >
-                                        {{ $t("save") }}
+                                        {{ $t("notes.stationDescriptionSaveLabel") }}
                                     </a>
                                 </template>
                             </div>
@@ -76,7 +77,7 @@
                                 <span>{{ $tc("station.nativeLand") }} {{ station.placeNameNative }}</span>
                             </div>
 
-                            <div v-if="station.location" class="flex">
+                            <div v-if="station.location" class="flex flex-wrap">
                                 <div class="station-coordinate">
                                     <span class="bold">{{ $tc("station.latitude") }}</span>
                                     <span>{{ station.location.latitude | prettyCoordinate }}</span>
@@ -200,10 +201,10 @@
                                     @click="onEditModuleNameClick(module)"
                                     class="module-edit-name"
                                 >
-                                    {{ $t("edit") }}
+                                    {{ $t("notes.moduleNameEditLabel") }}
                                 </a>
                                 <a v-if="editedModule && editedModule.id === module.id" @click="saveModuleName()" class="module-edit-name">
-                                    {{ $t("save") }}
+                                    {{ $t("notes.moduleNameSaveLabel") }}
                                 </a>
                             </template>
                         </li>
@@ -230,7 +231,21 @@
             </section>
 
             <section v-if="notes && !isCustomizationEnabled()" class="section-notes container-box">
-                <NotesForm v-bind:key="station.id" :station="station" :readonly="station.readOnly" @change="dirtyNotes = true" />
+                <NotesForm
+                    v-bind:key="station.id"
+                    :station="station"
+                    :readonly="station.readOnly"
+                    @change="dirtyNotes = true"
+                    @saved="dirtyNotes = false"
+                />
+            </section>
+
+            <section class="section-notes container-box">
+                <FieldNotes
+                    :stationName="station.name"
+                    @dirtyNewNote="dirtyNewNote = $event"
+                    @dirtyEditNote="dirtyEditNote = $event"
+                ></FieldNotes>
             </section>
         </div>
     </StandardLayout>
@@ -269,6 +284,7 @@ import { SensorDataQuerier } from "@/views/shared/sensor_data_querier";
 import TinyChart from "@/views/viz/TinyChart.vue";
 import { BookmarkFactory, serializeBookmark } from "@/views/viz/viz";
 import { ExploreContext } from "@/views/viz/common";
+import FieldNotes from "@/views/fieldNotes/FieldNotes.vue";
 
 export default Vue.extend({
     name: "StationView",
@@ -284,12 +300,17 @@ export default Vue.extend({
         ProjectAttributes,
         TinyChart,
         UserPhoto,
+        FieldNotes,
     },
     data(): {
         selectedModule: DisplayModule | null;
         isMobileView: boolean;
         loading: boolean;
         dirtyNotes: boolean;
+        dirtyModules: boolean;
+        dirtyNewNote: boolean;
+        dirtyEditNote: boolean;
+        dirtyStationDesc: boolean;
         sensorDataQuerier: SensorDataQuerier;
         editModuleIndex: number | null;
         editingDescription: boolean;
@@ -303,11 +324,15 @@ export default Vue.extend({
             isMobileView: window.screen.availWidth <= 500,
             loading: true,
             dirtyNotes: false,
+            dirtyModules: false,
+            dirtyNewNote: false,
+            dirtyEditNote: false,
+            dirtyStationDesc: false,
             editedModule: null,
             editModuleIndex: null,
             editingDescription: false,
             form: {
-                description: null,
+                description: "",
             },
             sensorDataQuerier: new SensorDataQuerier(this.$services.api),
         };
@@ -385,7 +410,7 @@ export default Vue.extend({
         },
     },
     beforeRouteLeave(to: never, from: never, next: any) {
-        if (this.dirtyNotes) {
+        if (this.dirtyNotes || this.dirtyModules || this.dirtyNewNote || this.dirtyEditNote || this.dirtyStationDesc) {
             this.$confirm({
                 message: this.$tc("notes.confirmLeavePopupMessage"),
                 button: {
@@ -404,10 +429,12 @@ export default Vue.extend({
         }
     },
     beforeMount(): Promise<any> {
-        this.$store.dispatch(ActionTypes.NEED_NOTES, { id: this.$route.params.stationId });
+        const stationId = this.$route.params.stationId;
+
+        this.$store.dispatch(ActionTypes.NEED_NOTES, { id: stationId });
         this.$store.dispatch(ActionTypes.NEED_PROJECTS_FOR_STATION, { id: this.$route.params.stationId });
 
-        return this.$store.dispatch(ActionTypes.NEED_STATION, { id: this.$route.params.stationId }).catch((e) => {
+        return this.$store.dispatch(ActionTypes.NEED_STATION, { id: stationId }).catch((e) => {
             if (AuthenticationRequiredError.isInstance(e)) {
                 return this.$router.push({
                     name: "login",
@@ -451,6 +478,7 @@ export default Vue.extend({
         saveStationDescription(): void {
             const payload = { id: this.station.id, name: this.station.name, ...this.form };
             this.$store.dispatch(ActionTypes.UPDATE_STATION, payload);
+            this.dirtyStationDesc = false;
             this.editingDescription = false;
         },
         onEditModuleNameClick(module: DisplayModule): void {
@@ -458,6 +486,7 @@ export default Vue.extend({
             if (this.editedModule) {
                 this.editedModule.label = this.$tc(this.getModuleName(module));
             }
+            this.dirtyModules = true;
         },
         saveModuleName(): void {
             if (!this.editedModule) {
@@ -466,6 +495,7 @@ export default Vue.extend({
             const payload = { stationId: this.station.id, moduleId: this.editedModule.id, label: this.editedModule.label };
             this.$store.dispatch(ActionTypes.UPDATE_STATION_MODULE, payload).then(() => {
                 this.editedModule = null;
+                this.dirtyModules = false;
             });
         },
         selectModule(module: DisplayModule) {
@@ -492,6 +522,17 @@ export default Vue.extend({
                 }
             }
         },
+        onStationDescriptionInput() {
+            const el = this.$refs["stationDescription"] as HTMLElement;
+
+            if (!el) {
+                throw new Error("Can not find stationDescription ref");
+            }
+
+            el.style.height = "";
+            el.style.height = el.scrollHeight + "px";
+            this.dirtyStationDesc = true;
+        },
     },
 });
 </script>
@@ -509,7 +550,7 @@ export default Vue.extend({
     border: 1px solid var(--color-border);
     border-radius: 2px;
     background-color: #fff;
-    padding: 20px;
+    padding: 15px 20px;
     font-size: 14px;
 
     @include bp-down($xs) {
@@ -630,12 +671,13 @@ export default Vue.extend({
             display: flex;
         }
 
-        &:last-of-type {
-            margin-left: 15px;
+        &:first-of-type {
+            margin-right: 15px;
         }
 
         span:nth-of-type(2) {
             margin-left: 2px;
+            min-width: 45px;
 
             @include bp-down($xs) {
                 order: -1;
@@ -685,6 +727,7 @@ export default Vue.extend({
 
         @include bp-down($xs) {
             padding-top: 54px;
+            display: block;
         }
 
         &-values {
@@ -713,7 +756,7 @@ export default Vue.extend({
 
             @include bp-down($sm) {
                 padding: 10px 20px;
-                min-width: unset;
+                width: 100%;
             }
 
             &.active {
@@ -728,6 +771,7 @@ export default Vue.extend({
 
                 input {
                     cursor: initial;
+                    z-index: 0; // needed so that the input is editable when active
                 }
             }
 
@@ -743,6 +787,11 @@ export default Vue.extend({
                 text-overflow: ellipsis;
                 width: 100%;
                 cursor: pointer;
+
+                @include bp-down($sm) {
+                    display: block;
+                }
+                z-index: -1; // allows module list toggle to work
             }
         }
 
@@ -778,7 +827,7 @@ export default Vue.extend({
             }
 
             @include bp-down($xs) {
-                padding: 15px 10px;
+                padding: 16px 10px;
                 font-size: 18px;
                 @include position(absolute, 0 null null 0);
             }
