@@ -35,8 +35,9 @@
 //     }
 //   }
 // }
+//import {Services} from "../../src/api";
 
-const apiUrl = 'http://127.0.0.1:8080/';
+export const apiUrl = 'http://127.0.0.1:8080/';
 
 Cypress.Commands.add('login', () => {
 
@@ -53,9 +54,38 @@ Cypress.Commands.add('login', () => {
         }).then((response) => {
             const token = response.headers.authorization;
             if (typeof token === 'string') {
+                console.log("saved new token", token);
                 const sanitized = token.replace("Bearer ", "");
                 window.localStorage["fktoken"] = JSON.stringify(sanitized);
             }
         });
     }
+});
+
+Cypress.Commands.add('addStation', () => {
+
+    // todo: how to import fkapi
+    // const services: Services = new Services();
+
+    const headers = {
+        "Content-Type": "application/json",
+    };
+    const token = 'Bearer ' + JSON.parse(window.localStorage["fktoken"]);
+    headers["Authorization"] = token;
+
+   /* cy.request({
+        method: 'GET',
+        headers,
+        url: apiUrl + 'stations/1',
+    });*/
+
+    cy.request({
+        method: 'POST',
+        headers,
+        url: apiUrl + 'stations',
+        body: {
+            name: 'Test Station',
+            deviceId: 'TestDeviceID',
+        },
+    });
 });

@@ -1,16 +1,23 @@
 import "cypress/support/commands";
 import {ActionTypes} from "../../src/store";
 import {SnackbarStyle} from "../../src/store/modules/snackbar";
+import {
+    getPartnerCustomizationWithDefault,
+    isCustomisationEnabled,
+    PartnerCustomization
+} from "../../src/views/shared/partners";
+import {apiUrl} from '../support/commands';
+
+//import {FKApi} from '../../src/api';
 
 const stationPageUrl = "/station/1";
 
 describe("Station Page", () => {
-    /* it("successfully loads w/ token", () => {
+    it("successfully loads w/ token", () => {
         cy.login();
         cy.visit(stationPageUrl);
     });
-
-    it(shows station details form", () => {
+    it("shows station details form", () => {
         cy.login();
         cy.visit(stationPageUrl);
         cy.get('[data-cy="notesForm"]');
@@ -20,15 +27,15 @@ describe("Station Page", () => {
         cy.login();
         cy.visit(stationPageUrl);
         cy.get('[data-cy="saveNotes"]');
-    });*/
+    });
 
-    /*    it("should not display save button if user is not authenticated", () => {
+    it("should not display save button if user is not authenticated", () => {
         cy.login();
         cy.visit(stationPageUrl);
         cy.get('[data-cy="saveNotes"]').should("not.exist");
-    });*/
+    });
 
-   /* it("should successfully save the form when valid data is entered", () => {
+    it("should successfully save the form when valid data is entered", () => {
         // Assuming that there are commands to log in a user and set up necessary preconditions.
         cy.login();
 
@@ -53,11 +60,39 @@ describe("Station Page", () => {
 
         // Assert that API call was successful
         cy.wait("@submitForm").its("response.statusCode").should("eq", 200);
-    });*/
+    });
+
+    it("go back to stations dashboard", () => {
+        cy.login();
+        cy.visit(stationPageUrl);
+        cy.get('[data-cy="backBtn"]').click();
+        cy.url().should('eq', Cypress.config('baseUrl') + '/dashboard/stations/1');
+    });
 
     it("shows Field Notes Section", () => {
         cy.login();
         cy.visit(stationPageUrl);
         cy.get('[data-cy="fieldNotes"]');
+    });
+
+    it("can edit station description", () => {
+
+        const partnerCustomization = window.location.hostname.indexOf("floodnet.") >= 0;
+
+        if (!partnerCustomization) {
+
+        }
+    });
+
+    it("create station", () => {
+        cy.login();
+        //  const api = new FKApi();
+
+
+    });
+
+    it("create station", () => {
+        cy.login();
+        cy.addStation();
     });
 });
