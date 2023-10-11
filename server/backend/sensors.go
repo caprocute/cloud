@@ -337,6 +337,7 @@ func (dq *DataQuerier) GetStationIDs(ctx context.Context, stationIDs []int32) (*
 
 func (dq *DataQuerier) GetIDs(ctx context.Context, mas []ModuleAndSensor) (*SensorDatabaseIDs, error) {
 	moduleHardwareIDs := make([][]byte, 0)
+	readableHardwareIDs := make([]string, 0)
 	sensorIDs := make([]int64, 0)
 
 	for _, mAndS := range mas {
@@ -348,6 +349,7 @@ func (dq *DataQuerier) GetIDs(ctx context.Context, mas []ModuleAndSensor) (*Sens
 		}
 
 		moduleHardwareIDs = append(moduleHardwareIDs, rawID)
+		readableHardwareIDs = append(readableHardwareIDs, mAndS.ModuleID)
 	}
 
 	moduleIDs := make([]int64, 0)
@@ -372,12 +374,12 @@ func (dq *DataQuerier) GetIDs(ctx context.Context, mas []ModuleAndSensor) (*Sens
 		WHERE m.hardware_id IN (?)
 	`, moduleHardwareIDs)
 	if err != nil {
-		return nil, fmt.Errorf("(get-ids(%v)) %w", moduleHardwareIDs, err)
+		return nil, fmt.Errorf("(get-ids(%v)) %w", readableHardwareIDs, err)
 	}
 
 	rows := []*QueriedModuleID{}
 	if err := dq.db.SelectContext(ctx, &rows, dq.db.Rebind(query), args...); err != nil {
-		return nil, fmt.Errorf("(get-ids(%v)) %w", moduleHardwareIDs, err)
+		return nil, fmt.Errorf("(get-ids(%v)) %w", readableHardwareIDs, err)
 	}
 
 	log := Logger(ctx).Sugar()

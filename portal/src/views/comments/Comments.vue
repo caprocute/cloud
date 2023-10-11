@@ -399,7 +399,6 @@ export default Vue.extend({
                 // return this.parentData;
             }
             throw new Error();
-
         },
         stationId(): number | null {
             if (this.parentData instanceof Bookmark) {
@@ -408,7 +407,10 @@ export default Vue.extend({
             return null;
         },
         isAdmin(): boolean {
-            return this.$store.getters.isAdminForProject(this.user.id, this.projectId);
+            if (this.user.id && this.projectId) {
+                return this.$store.getters.isAdminForProject(this.user.id, this.projectId);
+            }
+            return false;
         },
         // we need it in order to see if the user is an admin and can delete posts
         isProjectLoaded(): boolean {
