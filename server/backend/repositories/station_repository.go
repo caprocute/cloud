@@ -1388,7 +1388,8 @@ type StationSensorRow struct {
 	StationID       int32          `db:"station_id" json:"stationId"`
 	StationName     string         `db:"station_name" json:"stationName"`
 	StationLocation *data.Location `db:"station_location" json:"stationLocation"`
-	ModuleID        *string        `db:"module_id" json:"moduleId"`
+	ModulePrimaryID *int64         `db:"module_id" json:"modulePrimaryId"`
+	ModuleID        *string        `db:"module_hardware_id" json:"moduleId"`
 	ModuleKey       *string        `db:"module_key" json:"moduleKey"`
 	SensorID        *int64         `db:"sensor_id" json:"sensorId"`
 	SensorKey       *string        `db:"sensor_key" json:"sensorKey"`
@@ -1399,6 +1400,7 @@ type StationSensor struct {
 	StationID       int32          `json:"stationId"`
 	StationName     string         `json:"stationName"`
 	StationLocation *data.Location `json:"stationLocation"`
+	ModulePrimaryID *int64         `json:"modulePrimaryId"`
 	ModuleID        *string        `json:"moduleId"`
 	ModuleKey       *string        `json:"moduleKey"`
 	SensorID        *int64         `json:"sensorId"`
@@ -1420,6 +1422,7 @@ func (sr *StationRepository) QueryStationSensors(ctx context.Context, stations [
 			q.station_name,
 			q.station_location,
 			q.module_id,
+			q.module_hardware_id,
 			q.module_key,
 			agg_sensor.id AS sensor_id,
 			q.full_sensor_key AS sensor_key,
@@ -1427,7 +1430,8 @@ func (sr *StationRepository) QueryStationSensors(ctx context.Context, stations [
 		FROM (
 			SELECT
 				station.id AS station_id, station.name AS station_name, ST_AsBinary(station.location) AS station_location,
-				encode(station_module.hardware_id, 'base64') AS module_id,
+				station_module.id AS module_id,
+				ENCODE(station_module.hardware_id, 'base64') AS module_hardware_id,
 				station_module.name AS module_key,
 				station_module.name || '.' || module_sensor.name AS full_sensor_key,
 				module_sensor.reading_time AS sensor_read_at
@@ -1477,6 +1481,7 @@ func (sr *StationRepository) QueryStationSensors(ctx context.Context, stations [
 			StationID:       row.StationID,
 			StationName:     row.StationName,
 			StationLocation: row.StationLocation,
+			ModulePrimaryID: row.ModulePrimaryID,
 			ModuleID:        row.ModuleID,
 			ModuleKey:       moduleKey,
 			SensorID:        row.SensorID,
@@ -1563,4 +1568,17 @@ func (r *StationRepository) QueryStationModuleByID(ctx context.Context, id int32
 		return nil, err
 	}
 	return module, nil
+}
+
+func (r *StationRepository) QueryAllStationsByModelID(ctx context.Context, modelID int32) (stations []*data.Station, err error) {
+	stations = []*data.Station{}
+	if err := r.db.SelectContext(ctx, &stations, `
+		SELECT
+			id, name, device_id, model_id, owner_id, created_at, updated_at, battery, location_name, place_other, place_native, photo_id,
+			recording_started_at, memory_used, memory_available, firmware_number, firmware_time, ST_AsBinary(location) AS location, hidden, description, status
+		FROM fieldkit.station WHERE model_id = $1
+		`, modelID); err != nil {
+		return nil, err
+	}
+	return stations, nil
 }
