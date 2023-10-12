@@ -26,6 +26,7 @@ import Mention from "@tiptap/extension-mention";
 import Placeholder from "@tiptap/extension-placeholder";
 import MentionList from "../comments/MentionList.vue";
 import tippy, { Props } from "tippy.js";
+import { CharacterCount } from "@tiptap/extension-character-count";
 
 export default Vue.extend({
     name: "TipTap",
@@ -85,7 +86,7 @@ export default Vue.extend({
     },
     computed: {
         empty(): boolean {
-            return this.editor == null || this.editor.getCharacterCount() == 0;
+            return this.editor == null || this.editor.storage.characterCount.characters() == 0;
         },
     },
     mounted() {
@@ -148,6 +149,7 @@ export default Vue.extend({
                 Text,
                 ModifyEnter,
                 CustomNewLine,
+                CharacterCount,
                 Mention.configure({
                     HTMLAttributes: {
                         class: "mention",
