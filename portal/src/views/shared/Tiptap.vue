@@ -79,7 +79,7 @@ export default Vue.extend({
         value(value: string): void {
             if (this.editor) {
                 if (JSON.stringify(this.editor.getJSON()) === JSON.stringify(value)) return;
-                this.editor.commands.setContent(value);
+                this.editor.commands.setContent(this.asContent(value));
             }
         },
     },
@@ -137,20 +137,11 @@ export default Vue.extend({
             },
         });
 
-        function asContent(v: unknown): JSONContent | null {
-            if (_.isString(v)) {
-                if (v.length == 0) {
-                    return null;
-                }
-                return JSON.parse(v);
-            }
-            return v as JSONContent;
-        }
         // eslint-disable-next-line
         const thisComp = this;
         this.editor = new Editor({
             editable: !this.readonly,
-            content: asContent(this.value),
+            content: this.asContent(this.value),
             extensions: [
                 Document,
                 Paragraph,
@@ -280,6 +271,15 @@ export default Vue.extend({
             contentContainerEl.classList.toggle("truncated");
             this.seeMore = !show;
             this.seeLess = show;
+        },
+        asContent(v: unknown): JSONContent | null {
+            if (_.isString(v)) {
+                if (v.length == 0) {
+                    return null;
+                }
+                return JSON.parse(v);
+            }
+            return v as JSONContent;
         },
     },
 });
