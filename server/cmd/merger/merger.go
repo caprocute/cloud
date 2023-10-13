@@ -56,7 +56,7 @@ func NewStationMerger(primaryDb *sqlxcache.DB, tsDb *sqlxcache.DB) *StationMerge
 	}
 }
 
-func (s *StationMerger) MergeModules(ctx context.Context, options *Options, modelID int32) error {
+func (s *StationMerger) MergeProjectStations(ctx context.Context, options *Options, modelID int32) error {
 	log := logging.Logger(ctx).Sugar()
 
 	stations, err := s.queryStations.QueryAllStationsByModelID(ctx, modelID)
@@ -66,42 +66,38 @@ func (s *StationMerger) MergeModules(ctx context.Context, options *Options, mode
 
 	for _, station := range stations {
 		goodDeviceID := string(station.DeviceID)
-		if strings.HasSuffix(goodDeviceID, "-DELETED") || strings.HasSuffix(goodDeviceID, "-DELETE") {
+		if strings.HasSuffix(goodDeviceID, "-DELETED") || strings.HasSuffix(goodDeviceID, "-DELETE") || strings.Contains(goodDeviceID, "-") {
 			continue
 		}
 
 		badDeviceID := strings.ReplaceAll(string(station.DeviceID), "_", "-")
 		deletedDeviceID := fmt.Sprintf("%s-DELETED", goodDeviceID)
 
-		log.Infow("station", "good_device_id", goodDeviceID, "bad_device_id", badDeviceID, "deleted_device_id", deletedDeviceID)
+		s.primaryDb.WithNewOwnedTransaction(ctx, func(txCtx context.Context, tx *sqlx.Tx) error {
+			badStation, err := s.queryStations.QueryStationByDeviceID(txCtx, []byte(badDeviceID))
+			if err != nil {
+				return err
+			}
+			if badStation != nil {
+				log.Infow("station", "good_device_id", goodDeviceID, "bad_device_id", badDeviceID, "deleted_device_id", deletedDeviceID)
+			}
 
-		primaryTx, err := s.primaryDb.Begin(ctx)
-		if err != nil {
-			return err
-		}
+			if err := tx.Rollback(); err != nil {
+				return err
+			}
+			return nil
+		})
 
 		tsTx, err := s.tsDb.Begin(ctx)
 		if err != nil {
 			return err
 		}
 
-		modules := make([]*data.StationModule, 0)
-
-		_ = modules
-
-		// TODO Sensor Data
-
 		if options.Commit && false {
-			if err := primaryTx.Commit(); err != nil {
-				return err
-			}
 			if err := tsTx.Commit(); err != nil {
 				return err
 			}
 		} else {
-			if err := primaryTx.Rollback(); err != nil {
-				return err
-			}
 			if err := tsTx.Rollback(); err != nil {
 				return err
 			}
@@ -160,12 +156,6 @@ func (s *StationMerger) ProcessProvisions(ctx context.Context, options *Options,
 		if strings.HasSuffix(goodDeviceID, "-DELETED") || strings.HasSuffix(goodDeviceID, "-DELETE") {
 			continue
 		}
-
-		/*
-			if station.ID != 227 {
-				// continue
-			}
-		*/
 
 		log.Infow("station", "station_id", station.ID, "good_device_id", goodDeviceID, "bad_device_id", badDeviceID, "deleted_device_id", deletedDeviceID)
 
@@ -261,15 +251,6 @@ func (s *StationMerger) ProcessProvisions(ctx context.Context, options *Options,
 				if _, err := primaryTx.ExecContext(ctx, `UPDATE fieldkit.station_module SET hardware_id = $1 WHERE id = $2`, goodDeviceID, moduleID); err != nil {
 					return err
 				}
-
-				/*
-					provisions := make([]*data.Provision, 0)
-					if err := primaryTx.SelectContext(ctx, &provisions, `SELECT id, created, updated, generation, device_id FROM fieldkit.provision WHERE generation = $1 OR generation = $2`, goodDeviceID, badDeviceID); err != nil {
-						return err
-					}
-
-					spew.Dump(provisions)
-				*/
 			}
 		}
 
@@ -499,15 +480,21 @@ func process(ctx context.Context, options *Options) error {
 		if err := merger.ProcessModel(ctx, options, 7); err != nil {
 			return err
 		}
-	} else if false {
-		if err := merger.MergeModules(ctx, options, 8); err != nil {
+	}
+	if true {
+		if err := merger.MergeProjectStations(ctx, options, 8); err != nil {
 			return err
 		}
 
-		if err := merger.MergeModules(ctx, options, 7); err != nil {
+		if err := merger.MergeProjectStations(ctx, options, 7); err != nil {
 			return err
 		}
-	} else {
+
+		if err := merger.MergeProjectStations(ctx, options, 6); err != nil {
+			return err
+		}
+	}
+	if false {
 		if err := merger.ProcessProvisions(ctx, options, 8); err != nil {
 			return err
 		}
