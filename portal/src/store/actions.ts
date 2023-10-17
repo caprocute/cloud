@@ -64,3 +64,8 @@ export const HIDE_SNACKBAR = "HIDE_SNACKBAR";
 
 export const NEED_DATA_EVENTS = "NEED_DATA_EVENTS";
 export const NEW_DATA_EVENT = "NEW_DATA_EVENT";
+
+// Busy
+
+export const NEW_DIRTY_FIELD = "ADD_DIRTY_FIELD";
+export const CLEAR_DIRTY_FIELDS = "CLEAR_DIRTY_FIELDS";

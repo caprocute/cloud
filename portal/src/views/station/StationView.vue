@@ -285,9 +285,11 @@ import TinyChart from "@/views/viz/TinyChart.vue";
 import { BookmarkFactory, serializeBookmark } from "@/views/viz/viz";
 import { ExploreContext } from "@/views/viz/common";
 import FieldNotes from "@/views/fieldNotes/FieldNotes.vue";
+import dirtyInputConfirm from '@/mixins/dirtyInputConfirm';
 
 export default Vue.extend({
     name: "StationView",
+    mixins: [dirtyInputConfirm],
     components: {
         StationBattery,
         StandardLayout,
@@ -409,8 +411,10 @@ export default Vue.extend({
             return isCustomisationEnabled();
         },
     },
-    beforeRouteLeave(to: never, from: never, next: any) {
-        if (this.dirtyNotes || this.dirtyModules || this.dirtyNewNote || this.dirtyEditNote || this.dirtyStationDesc) {
+      beforeRouteLeave(to: any, from: any, next: any) {
+
+        this.confirmDirtyInputLeave();
+        /*if (this.dirtyNotes || this.dirtyModules || this.dirtyNewNote || this.dirtyEditNote || this.dirtyStationDesc) {
             this.$confirm({
                 message: this.$tc("notes.confirmLeavePopupMessage"),
                 button: {
@@ -426,7 +430,7 @@ export default Vue.extend({
             });
         } else {
             next();
-        }
+        }*/
     },
     beforeMount(): Promise<any> {
         const stationId = this.$route.params.stationId;

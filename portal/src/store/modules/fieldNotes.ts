@@ -41,7 +41,7 @@ const actions = (services: Services) => {
             { commit, dispatch, state }: { commit: any; dispatch: any; state: FieldNotesState },
             payload: { stationId: number; noteId: number }
         ) => {
-            const response = await services.api.deleteStationFieldNote(payload.stationId, payload.noteId);
+            await services.api.deleteStationFieldNote(payload.stationId, payload.noteId);
             const newNotes = state.fieldNotes.filter(note => note.id !== payload.noteId);
             commit(MutationTypes.FIELD_NOTES_UPDATE, newNotes);
         },
