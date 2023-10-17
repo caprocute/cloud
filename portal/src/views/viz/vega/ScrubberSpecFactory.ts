@@ -1,6 +1,6 @@
 import _ from "lodash";
 import { ChartSettings, SeriesData } from "./SpecFactory";
-import { TimeRange } from "../common";
+import { TimeRange, addGaps, addMinimumGap } from "../common";
 import { VisualizationSpec } from "vega-embed";
 import {Spec, Mark, Locale} from "vega";
 import {vegaEsLocale} from '@/locales/es/vega';
@@ -30,6 +30,9 @@ export class ScrubberSpecFactory {
         const allRanges = [...xDomainsAll, this.settings.timeRange.toArray()];
         // We ignore extreme ranges here because of this.settings.timeRange
         const timeRangeAll = TimeRange.mergeArraysIgnoreExtreme(allRanges).toArray();
+
+        const maybeMinimumGap = first.vizInfo.minimumGap;
+        const preparedData = addMinimumGap(addGaps(first.queried.data), maybeMinimumGap, first.queried.bucketSize);
 
         const interactiveMarks = (): Mark[] => {
             if (this.settings.mobile) {
@@ -194,7 +197,7 @@ export class ScrubberSpecFactory {
                 },
                 {
                     name: "table",
-                    values: first.queried.data,
+                    values: preparedData,
                     transform: [
                         {
                             type: "filter",
@@ -632,7 +635,7 @@ export class ScrubberSpecFactory {
                                 field: "value_start",
                             },
                             defined: {
-                                signal: 'isValid(datum["time"]) && isFinite(+datum["time"]) && isValid(datum["value"]) && isFinite(+datum["value"])',
+                                signal: 'isValid(datum["time"]) && isFinite(+datum["time"]) && isValid(datum["value"]) && isFinite(+datum["value"]) && (!datum.minimumGap || datum.gap <= datum.minimumGap)',
                             },
                         },
                     },
@@ -672,7 +675,7 @@ export class ScrubberSpecFactory {
                                 field: "value_start",
                             },
                             defined: {
-                                signal: 'isValid(datum["time"]) && isFinite(+datum["time"]) && isValid(datum["value"]) && isFinite(+datum["value"])',
+                                signal: 'isValid(datum["time"]) && isFinite(+datum["time"]) && isValid(datum["value"]) && isFinite(+datum["value"]) && (!datum.minimumGap || datum.gap <= datum.minimumGap)',
                             },
                         },
                     },
