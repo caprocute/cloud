@@ -64,20 +64,11 @@ Cypress.Commands.add('login', () => {
 
 Cypress.Commands.add('addStation', () => {
 
-    // todo: how to import fkapi
-    // const services: Services = new Services();
-
     const headers = {
         "Content-Type": "application/json",
     };
     const token = 'Bearer ' + JSON.parse(window.localStorage["fktoken"]);
     headers["Authorization"] = token;
-
-   /* cy.request({
-        method: 'GET',
-        headers,
-        url: apiUrl + 'stations/1',
-    });*/
 
     cy.request({
         method: 'POST',
@@ -85,7 +76,10 @@ Cypress.Commands.add('addStation', () => {
         url: apiUrl + 'stations',
         body: {
             name: 'Test Station',
-            deviceId: 'TestDeviceID',
+            deviceId: '706C616365686F6C646572',
         },
+    }).then((response) => {
+        cy.log(response.body);
+        cy.wrap('/station/' + response.body.id).as('stationPageUrl');
     });
 });
