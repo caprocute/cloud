@@ -195,7 +195,7 @@
                                 disabled
                                 :value="module.label ? module.label : $t(getModuleName(module))"
                             />
-                            <template v-if="!isCustomizationEnabled()">
+                            <template v-if="!isCustomizationEnabled() && !station.readOnly">
                                 <a
                                     v-if="!editedModule || (editedModule && editedModule.id !== module.id)"
                                     @click="onEditModuleNameClick(module)"
