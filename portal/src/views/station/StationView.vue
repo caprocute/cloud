@@ -215,7 +215,7 @@
                     </header>
                     <div class="station-readings-values">
                         <header v-if="!isMobileView">{{ $t(getModuleName(selectedModule)) }}</header>
-                        <LatestStationReadings :id="station.id" :moduleKey="getModuleName(selectedModule)" />
+                        <LatestStationReadings :id="station.id" :moduleKey="getModuleKey(selectedModule)" />
                     </div>
                 </div>
             </section>
@@ -459,6 +459,9 @@ export default Vue.extend({
                 return module.name.replace("modules.", "fk.");
             }
             return module.label;
+        },
+        getModuleKey(module: DisplayModule) {
+            return module.name.replace("modules.", "fk.");
         },
         partnerCustomization(): PartnerCustomization {
             return getPartnerCustomizationWithDefault();
