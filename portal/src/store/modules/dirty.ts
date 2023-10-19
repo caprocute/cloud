@@ -1,6 +1,6 @@
-import * as ActionTypes from '@/store/actions';
-import {FieldNotesState} from '@/store';
-import Vue from 'vue';
+import * as ActionTypes from "@/store/actions";
+import {FieldNotesState} from "@/store";
+import Vue from "vue";
 
 export class DirtyState {
     dirtyInputs: string[] = [];
@@ -15,13 +15,13 @@ const getters = {
 const actions = () => {
     return {
         [ActionTypes.NEW_DIRTY_FIELD]: async (
-            {commit, dispatch, state}: { commit: any; dispatch: any; state: FieldNotesState },
+            { commit, dispatch, state }: { commit: any; dispatch: any; state: FieldNotesState },
             payload: string
         ) => {
             commit("ADD_DIRTY_FIELD", payload);
         },
         [ActionTypes.CLEAR_DIRTY_FIELDS]: async (
-            {commit, dispatch, state}: { commit: any; dispatch: any; state: FieldNotesState },
+            { commit, dispatch, state }: { commit: any; dispatch: any; state: FieldNotesState },
             payload: string
         ) => {
             commit("CLEAR_DIRTY_FIELDS");
@@ -30,19 +30,14 @@ const actions = () => {
 };
 
 const mutations = {
-    ["ADD_DIRTY_FIELD"]: (
-        state: DirtyState,
-        payload: string,
-    ) => {
+    ["ADD_DIRTY_FIELD"]: (state: DirtyState, payload: string) => {
         if (!state.dirtyInputs.includes(payload)) {
             const updatedState = state.dirtyInputs.push(payload);
-            Vue.set(state, "busy", updatedState);
+            Vue.set(state, "dirty", updatedState);
         }
     },
-    ["CLEAR_DIRTY_FIELDS"]: (
-        state: DirtyState,
-    ) => {
-        Vue.set(state, "busy", {dirtyInputs: []});
+    ["CLEAR_DIRTY_FIELDS"]: (state: DirtyState) => {
+        Vue.set(state, "dirty", { dirtyInputs: [] });
     },
 };
 
@@ -57,3 +52,27 @@ export const dirty = () => {
         mutations,
     };
 };
+
+export function confirmLeaveWithDirtyCheck(
+    callback: () => void,
+    component: Vue & { $confirm(message: string, options: any): void; $store: { state: { dirty: DirtyState } } }
+) {
+    const { dirtyInputs } = component.$store.state.dirty;
+    if (dirtyInputs.length > 0) {
+        component.$confirm({
+            message: component.$tc("notes.confirmLeavePopupMessage"),
+            button: {
+                no: component.$tc("no"),
+                yes: component.$tc("yes"),
+            },
+            callback: (confirm: boolean) => {
+                if (confirm) {
+                    component.$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELDS);
+                    callback();
+                }
+            },
+        });
+    } else {
+        callback();
+    }
+}
