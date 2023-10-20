@@ -195,7 +195,7 @@
                                 disabled
                                 :value="module.label ? module.label : $t(getModuleName(module))"
                             />
-                            <template v-if="!isCustomizationEnabled()">
+                            <template v-if="isModuleNameEditable">
                                 <a
                                     v-if="!editedModule || (editedModule && editedModule.id !== module.id)"
                                     @click="onEditModuleNameClick(module)"
@@ -407,6 +407,9 @@ export default Vue.extend({
         },
         isPartnerCustomisationEnabled(): boolean {
             return isCustomisationEnabled();
+        },
+        isModuleNameEditable(): boolean {
+          return !this.isPartnerCustomisationEnabled && !this.station.readOnly;
         },
     },
     beforeRouteLeave(to: never, from: never, next: any) {
