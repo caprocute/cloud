@@ -1,5 +1,4 @@
 import * as ActionTypes from "@/store/actions";
-import {FieldNotesState} from "@/store";
 import Vue from "vue";
 
 export class DirtyState {
@@ -15,16 +14,22 @@ const getters = {
 const actions = () => {
     return {
         [ActionTypes.NEW_DIRTY_FIELD]: async (
-            { commit, dispatch, state }: { commit: any; dispatch: any; state: FieldNotesState },
+            { commit, dispatch, state }: { commit: any; dispatch: any; state: DirtyState },
             payload: string
         ) => {
             commit("ADD_DIRTY_FIELD", payload);
         },
-        [ActionTypes.CLEAR_DIRTY_FIELDS]: async (
-            { commit, dispatch, state }: { commit: any; dispatch: any; state: FieldNotesState },
+        [ActionTypes.CLEAR_DIRTY_FIELD]: async (
+            { commit, dispatch, state }: { commit: any; dispatch: any; state: DirtyState },
             payload: string
         ) => {
-            commit("CLEAR_DIRTY_FIELDS");
+            commit("CLEAR_DIRTY_FIELD", payload);
+        },
+        [ActionTypes.CLEAR_ALL_DIRTY_FIELDS]: async (
+            { commit, dispatch, state }: { commit: any; dispatch: any; state: DirtyState },
+            payload: string
+        ) => {
+            commit("CLEAR_ALL_DIRTY_FIELDS");
         },
     };
 };
@@ -33,11 +38,16 @@ const mutations = {
     ["ADD_DIRTY_FIELD"]: (state: DirtyState, payload: string) => {
         if (!state.dirtyInputs.includes(payload)) {
             const updatedState = state.dirtyInputs.push(payload);
-            Vue.set(state, "dirty", updatedState);
+            Vue.set(state, "", updatedState);
         }
     },
-    ["CLEAR_DIRTY_FIELDS"]: (state: DirtyState) => {
-        Vue.set(state, "dirty", { dirtyInputs: [] });
+    ["CLEAR_DIRTY_FIELD"]: (state: DirtyState, payload: string) => {
+        const newState = state.dirtyInputs.filter((input) => input !== payload);
+        console.log("new state", newState);
+        Vue.set(state, "dirtyInputs", newState);
+    },
+    ["CLEAR_ALL_DIRTY_FIELDS"]: (state: DirtyState) => {
+        Vue.set(state, "dirtyInputs", []);
     },
 };
 
@@ -67,7 +77,7 @@ export function confirmLeaveWithDirtyCheck(
             },
             callback: (confirm: boolean) => {
                 if (confirm) {
-                    component.$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELDS);
+                    component.$store.dispatch(ActionTypes.CLEAR_ALL_DIRTY_FIELDS);
                     callback();
                 }
             },
