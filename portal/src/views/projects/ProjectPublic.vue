@@ -141,15 +141,15 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
-import { mapGetters } from "vuex";
+import Vue, {PropType} from "vue";
+import {mapGetters} from "vuex";
 import * as utils from "../../utilities";
-import { ProjectModule, DisplayStation, Project, DisplayProject } from "@/store";
+import {DisplayProject, DisplayStation, Project, ProjectModule} from "@/store";
 import ProjectStations from "./ProjectStations.vue";
 import CommonComponents from "@/views/shared";
 import Comments from "../comments/Comments.vue";
 import FollowControl from "@/views/shared/FollowControl.vue";
-import { twitterCardMeta } from "@/social";
+import {twitterCardMeta} from "@/social";
 
 export default Vue.extend({
     name: "ProjectPublic",

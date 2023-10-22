@@ -48,6 +48,7 @@ import * as ActionTypes from "@/store/actions";
 import { GlobalState } from "@/store/modules/global";
 import { AuthenticationRequiredError, ForbiddenError } from "@/api";
 import { getPartnerCustomizationWithDefault, isCustomisationEnabled, PartnerCustomization } from "@/views/shared/partners";
+import { confirmLeaveWithDirtyCheck } from "@/store/modules/dirty";
 
 export default Vue.extend({
     name: "ProjectView",
@@ -117,6 +118,11 @@ export default Vue.extend({
                 });
             }
         });
+    },
+    beforeRouteLeave(to: any, from: any, next: any) {
+        confirmLeaveWithDirtyCheck(() => {
+            next();
+        }, this);
     },
     methods: {
         goBack() {

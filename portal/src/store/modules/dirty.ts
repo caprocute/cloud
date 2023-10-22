@@ -1,5 +1,6 @@
 import * as ActionTypes from "@/store/actions";
 import Vue from "vue";
+import {GlobalState} from '@/store';
 
 export class DirtyState {
     dirtyInputs: string[] = [];
@@ -65,7 +66,7 @@ export const dirty = () => {
 
 export function confirmLeaveWithDirtyCheck(
     callback: () => void,
-    component: Vue & { $confirm(message: string, options: any): void; $store: { state: { dirty: DirtyState } } }
+    component: Vue & { $confirm(message: string, options: any): void; $store: { state: GlobalState } }
 ) {
     const { dirtyInputs } = component.$store.state.dirty;
     if (dirtyInputs.length > 0) {

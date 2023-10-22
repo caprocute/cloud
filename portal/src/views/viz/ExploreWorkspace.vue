@@ -130,6 +130,7 @@ import Comments from "../comments/Comments.vue";
 import StationBattery from "@/views/station/StationBattery.vue";
 import InfoTooltip from "@/views/shared/InfoTooltip.vue";
 import Spinner from "@/views/shared/Spinner.vue";
+import {confirmLeaveWithDirtyCheck} from '@/store/modules/dirty';
 
 export default Vue.extend({
     name: "ExploreWorkspace",
@@ -251,26 +252,6 @@ export default Vue.extend({
                     }
                 });
         }
-    },
-    beforeRouteLeave(to: never, from: never, next: any) {
-      console.log("radoi")
-        /*if (this.projectDirty) {
-            this.$confirm({
-                message: this.$tc("project.form.confirmLeavePopupMessage"),
-                button: {
-                    no: this.$tc("no"),
-                    yes: this.$tc("yes"),
-                },
-                callback: (confirm) => {
-                    if (confirm) {
-                        this.projectDirty = false;
-                        next();
-                    }
-                },
-            });
-        } else {
-            next();
-        }*/
     },
     methods: {
         async onBack() {

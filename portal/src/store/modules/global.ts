@@ -33,7 +33,7 @@ export interface GlobalState {
     readonly fieldNotes: FieldNotesState;
     readonly snackbar: SnackbarState;
     readonly discussion: DiscussionState;
-    readonly busy: DirtyState;
+    readonly dirty: DirtyState;
 }
 
 export interface GlobalGetters {
