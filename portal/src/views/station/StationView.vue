@@ -285,6 +285,7 @@ import TinyChart from "@/views/viz/TinyChart.vue";
 import { BookmarkFactory, serializeBookmark } from "@/views/viz/viz";
 import { ExploreContext } from "@/views/viz/common";
 import FieldNotes from "@/views/fieldNotes/FieldNotes.vue";
+import { SnackbarStyle } from "@/store/modules/snackbar";
 
 export default Vue.extend({
     name: "StationView",
@@ -310,7 +311,6 @@ export default Vue.extend({
         dirtyModules: boolean;
         dirtyNewNote: boolean;
         dirtyEditNote: boolean;
-        dirtyStationDesc: boolean;
         sensorDataQuerier: SensorDataQuerier;
         editModuleIndex: number | null;
         editingDescription: boolean;
@@ -327,7 +327,6 @@ export default Vue.extend({
             dirtyModules: false,
             dirtyNewNote: false,
             dirtyEditNote: false,
-            dirtyStationDesc: false,
             editedModule: null,
             editModuleIndex: null,
             editingDescription: false,
@@ -409,11 +408,11 @@ export default Vue.extend({
             return isCustomisationEnabled();
         },
         isModuleNameEditable(): boolean {
-          return !this.isPartnerCustomisationEnabled && !this.station.readOnly;
+            return !this.isPartnerCustomisationEnabled && !this.station.readOnly;
         },
     },
     beforeRouteLeave(to: never, from: never, next: any) {
-        if (this.dirtyNotes || this.dirtyModules || this.dirtyNewNote || this.dirtyEditNote || this.dirtyStationDesc) {
+        if (this.dirtyNotes || this.dirtyModules || this.dirtyNewNote || this.dirtyEditNote) {
             this.$confirm({
                 message: this.$tc("notes.confirmLeavePopupMessage"),
                 button: {
@@ -478,11 +477,27 @@ export default Vue.extend({
             }).href;
             window.open(url, "_blank");
         },
-        saveStationDescription(): void {
+        async saveStationDescription(): Promise<void> {
             const payload = { id: this.station.id, name: this.station.name, ...this.form };
-            this.$store.dispatch(ActionTypes.UPDATE_STATION, payload);
-            this.dirtyStationDesc = false;
-            this.editingDescription = false;
+
+            this.$store
+                .dispatch(ActionTypes.UPDATE_STATION, payload)
+                .then(() => {
+                    this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
+                        message: this.$tc("station.descriptionUpdateSuccess"),
+                        type: SnackbarStyle.success,
+                    });
+                })
+                .catch(() => {
+                    this.form.description = this.station.description;
+                    this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
+                        message: this.$tc("somethingWentWrong"),
+                        type: SnackbarStyle.fail,
+                    });
+                })
+                .finally(() => {
+                    this.editingDescription = false;
+                });
         },
         onEditModuleNameClick(module: DisplayModule): void {
             this.editedModule = JSON.parse(JSON.stringify(module));
@@ -534,7 +549,6 @@ export default Vue.extend({
 
             el.style.height = "";
             el.style.height = el.scrollHeight + "px";
-            this.dirtyStationDesc = true;
         },
     },
 });
