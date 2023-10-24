@@ -340,8 +340,10 @@ export default Vue.extend({
     watch: {
         station() {
             this.loading = false;
-            this.selectedModule = this.station.modules[0];
             this.form.description = this.station.description;
+            if (!this.selectedModule) {
+                this.selectedModule = this.station.modules[0];
+            }
         },
     },
     computed: {
