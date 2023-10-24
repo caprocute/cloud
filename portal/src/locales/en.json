@@ -442,7 +442,7 @@
         "btn": {
             "save": "Save"
         },
-        "updateSuccess": "Notes updated!",
+        "updateSuccess": "Station details updated successfully!",
         "updateFail": "Notes update failed!",
         "customTitleEditLabel": "Edit",
         "stationDescriptionEditLabel": "Edit",
