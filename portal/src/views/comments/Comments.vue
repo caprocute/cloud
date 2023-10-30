@@ -328,7 +328,7 @@ export default Vue.extend({
             required: false,
         },
         parentData: {
-            type: Object as PropType<[number, Bookmark]>,
+            type: [Object, Number],
             required: true,
         },
         workspace: {
@@ -394,10 +394,7 @@ export default Vue.extend({
             if (this.parentData instanceof Bookmark) {
                 return this.parentData.p[0];
             }
-            if (this.parentData instanceof Number) {
-                // return this.parentData;
-            }
-            throw new Error();
+            return this.parentData;
         },
         stationId(): number | null {
             if (this.parentData instanceof Bookmark) {
