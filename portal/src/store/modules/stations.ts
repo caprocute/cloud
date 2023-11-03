@@ -684,7 +684,7 @@ const actions = (services: Services) => {
             { commit, dispatch, state }: { commit: any; dispatch: any; state: StationsState },
             payload: { stationId: number; moduleId: number; label: string }
         ) => {
-            await services.api.updateModule(payload).then((station) => {
+            return services.api.updateModule(payload).then((station) => {
                 commit(STATION_UPDATE, { station });
             });
         },

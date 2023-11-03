@@ -225,7 +225,8 @@
         "multipleProjectsTitle": "Projects:",
         "data": "Data",
         "exploreData": "Explore Data",
-        "descriptionUpdateSuccess": "Station description updated successfully!"
+        "descriptionUpdateSuccess": "Station description updated successfully!",
+        "moduleNameUpdateSuccess": "Module name updated successfully!"
     },
     "user": {
         "profile": {

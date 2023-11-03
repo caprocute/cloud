@@ -511,10 +511,24 @@ export default Vue.extend({
                 return;
             }
             const payload = { stationId: this.station.id, moduleId: this.editedModule.id, label: this.editedModule.label };
-            this.$store.dispatch(ActionTypes.UPDATE_STATION_MODULE, payload).then(() => {
-                this.editedModule = null;
-                this.dirtyModules = false;
-            });
+            this.$store
+                .dispatch(ActionTypes.UPDATE_STATION_MODULE, payload)
+                .then(() => {
+                    this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
+                        message: this.$tc("station.moduleNameUpdateSuccess"),
+                        type: SnackbarStyle.success,
+                    });
+                })
+                .catch(() => {
+                    this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
+                        message: this.$tc("somethingWentWrong"),
+                        type: SnackbarStyle.fail,
+                    });
+                })
+                .finally(() => {
+                    this.editedModule = null;
+                    this.dirtyModules = false;
+                });
         },
         selectModule(module: DisplayModule) {
             this.selectedModule = module;
