@@ -164,8 +164,6 @@
             </template>
         </div>
 
-        <div v-if="errorMessage" class="error">{{ errorMessage }}</div>
-
         <div v-if="!isLoading && postsAndEvents.length === 0" class="no-comments">
             {{ viewType === "data" ? $tc("comments.noEventsComments") : $tc("comments.noComments") }}
         </div>
@@ -312,6 +310,7 @@ import { TimeRange } from "@/views/viz/common";
 import { ActionTypes, DisplayProject } from "@/store";
 import { interpolatePartner, isCustomisationEnabled } from "@/views/shared/partners";
 import InfoTooltip from "@/views/shared/InfoTooltip.vue";
+import { SnackbarStyle } from "@/store/modules/snackbar";
 
 export default Vue.extend({
     name: "Comments",
@@ -359,7 +358,6 @@ export default Vue.extend({
             description: string | null;
             title: string | null;
         };
-        errorMessage: string | null;
         logMode: string;
     } {
         return {
@@ -385,7 +383,6 @@ export default Vue.extend({
                 description: "",
                 title: "",
             },
-            errorMessage: null,
             logMode: "comment",
         };
     },
@@ -491,8 +488,6 @@ export default Vue.extend({
             }
         },
         async saveDataEvent(dataEvent: NewDataEvent): Promise<void> {
-            this.errorMessage = null;
-
             const bookmark = this.parentBookmark;
             if (bookmark != null) {
                 if (this.viewType === "data") {
@@ -512,16 +507,21 @@ export default Vue.extend({
                         this.newDataEvent.description = "";
 
                         this.getDataEvents();
+                        this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
+                            message: this.$tc("comments.dataEventSuccess"),
+                            type: SnackbarStyle.success,
+                        });
                     }
                 })
                 .catch((e) => {
                     console.error(e);
-                    this.errorMessage = CommentsErrorsEnum.postComment;
+                    this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
+                        message: this.$tc("somethingWentWrong"),
+                        type: SnackbarStyle.fail,
+                    });
                 });
         },
         async save(comment: NewComment): Promise<void> {
-            this.errorMessage = null;
-
             if (this.viewType === "data") {
                 comment.bookmark = JSON.stringify(this.parentData);
             }
@@ -568,10 +568,17 @@ export default Vue.extend({
                             console.log(`posts is null`);
                         }
                     }
+                    this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
+                        message: this.$tc("comments.saveSuccess"),
+                        type: SnackbarStyle.success,
+                    });
                 })
                 .catch((e) => {
                     console.log("e", e);
-                    this.errorMessage = CommentsErrorsEnum.postComment;
+                    this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
+                        message: this.$tc("somethingWentWrong"),
+                        type: SnackbarStyle.fail,
+                    });
                 });
         },
         formatTimestamp(timestamp: number): string {
@@ -581,7 +588,6 @@ export default Vue.extend({
             if (this.newReply.body && post.id === this.newReply.threadId) {
                 return;
             }
-            this.errorMessage = null;
             this.newReply.threadId = post.id;
             this.newReply.body = "";
         },
@@ -608,7 +614,10 @@ export default Vue.extend({
                     this.highlightComment();
                 })
                 .catch(() => {
-                    this.errorMessage = CommentsErrorsEnum.getComments;
+                    this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
+                        message: this.$tc("somethingWentWrong"),
+                        type: SnackbarStyle.fail,
+                    });
                 })
                 .finally(() => {
                     this.isLoading = false;
@@ -626,12 +635,22 @@ export default Vue.extend({
                 .then((response) => {
                     if (response) {
                         this.getComments();
+                        this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
+                            message: this.$tc("comments.deleteSuccess"),
+                            type: SnackbarStyle.success,
+                        });
                     } else {
-                        this.errorMessage = CommentsErrorsEnum.deleteComment;
+                        this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
+                            message: this.$tc("somethingWentWrong"),
+                            type: SnackbarStyle.fail,
+                        });
                     }
                 })
                 .catch(() => {
-                    this.errorMessage = CommentsErrorsEnum.deleteComment;
+                    this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
+                        message: this.$tc("somethingWentWrong"),
+                        type: SnackbarStyle.fail,
+                    });
                 });
         },
         startEditing(item: Comment | DataEvent): void {
@@ -642,13 +661,23 @@ export default Vue.extend({
                 .editComment(commentID, body)
                 .then((response) => {
                     if (response) {
+                        this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
+                            message: this.$tc("comments.saveSuccess"),
+                            type: SnackbarStyle.success,
+                        });
                         this.getComments();
                     } else {
-                        this.errorMessage = CommentsErrorsEnum.deleteComment;
+                        this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
+                            message: this.$tc("somethingWentWrong"),
+                            type: SnackbarStyle.fail,
+                        });
                     }
                 })
                 .catch(() => {
-                    this.errorMessage = CommentsErrorsEnum.editComment;
+                    this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
+                        message: this.$tc("somethingWentWrong"),
+                        type: SnackbarStyle.fail,
+                    });
                 });
         },
         async getDataEvents(): Promise<void> {
@@ -660,7 +689,10 @@ export default Vue.extend({
             await this.$store
                 .dispatch(ActionTypes.NEED_DATA_EVENTS, { bookmark: JSON.stringify(this.parentData) })
                 .catch(() => {
-                    this.errorMessage = DataEventsErrorsEnum.getDataEvents;
+                    this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
+                        message: this.$tc("somethingWentWrong"),
+                        type: SnackbarStyle.fail,
+                    });
                 })
                 .finally(() => {
                     this.isLoading = false;
@@ -692,11 +724,18 @@ export default Vue.extend({
                         this.newDataEvent.title = "";
                         this.newDataEvent.description = "";
                         this.getDataEvents();
+                        this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
+                            message: this.$tc("comments.dataEventSuccess"),
+                            type: SnackbarStyle.success,
+                        });
                     }
                 })
                 .catch((e) => {
                     console.error(e);
-                    this.errorMessage = DataEventsErrorsEnum.postDataEvent;
+                    this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
+                        message: this.$tc("somethingWentWrong"),
+                        type: SnackbarStyle.fail,
+                    });
                 });
         },
         deleteDataEvent(dataEventID: number): Promise<void> {
@@ -705,12 +744,22 @@ export default Vue.extend({
                 .then((response) => {
                     if (response) {
                         this.getDataEvents();
+                        this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
+                            message: this.$tc("comments.dataEventDeleteSuccess"),
+                            type: SnackbarStyle.success,
+                        });
                     } else {
-                        this.errorMessage = DataEventsErrorsEnum.deleteDataEvent;
+                        this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
+                            message: this.$tc("somethingWentWrong"),
+                            type: SnackbarStyle.fail,
+                        });
                     }
                 })
                 .catch(() => {
-                    this.errorMessage = CommentsErrorsEnum.deleteComment;
+                    this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
+                        message: this.$tc("somethingWentWrong"),
+                        type: SnackbarStyle.fail,
+                    });
                 });
         },
         onListItemOptionClick(event: string, item: Comment | DataEvent): void {
@@ -1109,11 +1158,6 @@ header {
 .fade-enter-active,
 .fade-leave-active {
     transition: opacity 0.25s ease-in-out;
-}
-
-.error {
-    color: $color-danger;
-    margin-bottom: 10px;
 }
 
 .column-reply,

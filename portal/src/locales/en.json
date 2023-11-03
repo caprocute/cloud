@@ -429,7 +429,11 @@
         "reply": {
             "placeholder": "Reply to comment",
             "saveLabel": "Save"
-        }
+        },
+        "saveSuccess": "Comment saved successfully!",
+        "deleteSuccess": "Comment deleted successfully!",
+        "dataEventSuccess": "Data event saved successfully!",
+        "dataEventDeleteSuccess": "Data event deleted successfully!"
     },
     "seeMore": "See more",
     "seeLess": "See less",
