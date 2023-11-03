@@ -432,8 +432,8 @@
         },
         "saveSuccess": "Comment saved successfully!",
         "deleteSuccess": "Comment deleted successfully!",
-        "dataEventSuccess": "Data event saved successfully!",
-        "dataEventDeleteSuccess": "Data event deleted successfully!"
+        "dataEventSuccess": "Event saved successfully!",
+        "dataEventDeleteSuccess": "Event deleted successfully!"
     },
     "seeMore": "See more",
     "seeLess": "See less",
