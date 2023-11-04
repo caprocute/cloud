@@ -496,6 +496,7 @@ export default Vue.extend({
             }
             const payload = { stationId: this.station.id, moduleId: this.editedModule.id, label: this.editedModule.label };
             this.$store.dispatch(ActionTypes.UPDATE_STATION_MODULE, payload).then(() => {
+                this.selectedModule = this.editedModule;
                 this.editedModule = null;
                 this.dirtyModules = false;
             });
