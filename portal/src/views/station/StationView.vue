@@ -155,11 +155,11 @@
                     >
                         <h3 class="module-data-title flex flex-al-center">
                             <img alt="Module icon" :src="getModuleImg(module)" />
-                            {{ $t(getModuleName(module)) }}
+                            {{ getModuleName(module) }}
                         </h3>
                         <TinyChart
                             :ref="'tinyChart-' + module.id"
-                            :moduleKey="module.name"
+                            :moduleKey="getModuleKey(module)"
                             :station-id="station.id"
                             :station="station"
                             :querier="sensorDataQuerier"
@@ -181,19 +181,19 @@
                             <img alt="Module icon" :src="getModuleImg(module)" />
                             <input
                                 v-if="editedModule && editedModule.id === module.id"
+                                v-model="editedModule.label"
                                 class="input"
                                 maxlength="25"
                                 :disabled="editedModule.id !== selectedModule.id"
                                 :title="editedModule.label"
-                                v-model="editedModule.label"
                             />
                             <input
                                 v-else
                                 class="input"
                                 maxlength="25"
-                                :title="module.label ? module.label : $t(getModuleName(module))"
                                 disabled
-                                :value="module.label ? module.label : $t(getModuleName(module))"
+                                :title="getModuleName(module)"
+                                :value="getModuleName(module)"
                             />
                             <template v-if="!isCustomizationEnabled()">
                                 <a
@@ -211,10 +211,10 @@
                     </ul>
                     <header v-if="isMobileView">
                         <img alt="Module icon" :src="getModuleImg(selectedModule)" />
-                        {{ $t(getModuleName(selectedModule)) }}
+                        {{ getModuleName(selectedModule) }}
                     </header>
                     <div class="station-readings-values">
-                        <header v-if="!isMobileView">{{ $t(getModuleName(selectedModule)) }}</header>
+                        <header v-if="!isMobileView">{{ getModuleName(selectedModule) }}</header>
                         <LatestStationReadings :id="station.id" :moduleKey="getModuleKey(selectedModule)" />
                     </div>
                 </div>
@@ -453,14 +453,11 @@ export default Vue.extend({
             }
             return this.$loadAsset(utils.getBatteryIcon(this.station.battery));
         },
-        getModuleImg(module: ProjectModule): string {
+        getModuleImg(module: DisplayModule): string {
             return this.$loadAsset(utils.getModuleImg(module));
         },
-        getModuleName(module: DisplayModule) {
-            if (!module.label) {
-                return module.name.replace("modules.", "fk.");
-            }
-            return module.label;
+        getModuleName(module: DisplayModule): string {
+            return module.label || this.$tc(module.name.replace("modules.", "fk."));
         },
         getModuleKey(module: DisplayModule) {
             return module.name.replace("modules.", "fk.");
@@ -489,7 +486,7 @@ export default Vue.extend({
         onEditModuleNameClick(module: DisplayModule): void {
             this.editedModule = JSON.parse(JSON.stringify(module));
             if (this.editedModule) {
-                this.editedModule.label = this.$tc(this.getModuleName(module));
+                this.editedModule.label = this.getModuleName(module);
             }
             this.dirtyModules = true;
         },
