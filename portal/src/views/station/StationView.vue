@@ -459,7 +459,7 @@ export default Vue.extend({
         getModuleName(module: DisplayModule): string {
             return module.label || this.$tc(module.name.replace("modules.", "fk."));
         },
-        getModuleKey(module: DisplayModule) {
+        getModuleKey(module: DisplayModule): string {
             return module.name.replace("modules.", "fk.");
         },
         partnerCustomization(): PartnerCustomization {
