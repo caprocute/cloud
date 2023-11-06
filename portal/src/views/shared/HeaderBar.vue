@@ -128,6 +128,7 @@ export default Vue.extend({
             return this.$router.push({ name: "notifications" });
         },
         notificationNavigate(notification: Notification) {
+            console.log("Radoi notif", notification);
             if (notification.projectId) {
                 return this.$router
                     .push({
@@ -143,7 +144,7 @@ export default Vue.extend({
                 return this.$router
                     .push({
                         name: "exploreBookmark",
-                        params: { bookmark: notification.bookmark },
+                        query: { bookmark: notification.bookmark },
                         hash: `#comment-id-${notification.postId}`,
                     })
                     .catch((err) => {
