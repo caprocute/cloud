@@ -55,7 +55,7 @@ const actions = (services: Services) => {
 
             commit(CONNECTED, send);
         },
-        [ActionTypes.NOTIFICATIONS_SEEN]: async ({ commit, state }: ActionParameters, payload: MarkNotificationsSeen) => {
+        [ActionTypes.NOTIFICATIONS_SEEN]: async ({ commit, state }: ActionParameters) => {
             await services.api.seenNotifications({ ids: state.notifications.map((n) => n.notificationId) });
 
             commit(SEEN);
