@@ -135,6 +135,9 @@ export default Vue.extend({
                         params: { id: notification.projectId },
                         hash: `#comment-id-${notification.postId}`,
                     })
+                    .then(() => {
+                        this.$store.dispatch(new MarkNotificationsSeen([notification.notificationId]));
+                    })
                     .catch((err) => {
                         return;
                     });
@@ -145,6 +148,9 @@ export default Vue.extend({
                         name: "exploreBookmark",
                         query: { bookmark: notification.bookmark },
                         hash: `#comment-id-${notification.postId}`,
+                    })
+                    .then(() => {
+                        this.$store.dispatch(new MarkNotificationsSeen([notification.notificationId]));
                     })
                     .catch((err) => {
                         return;
