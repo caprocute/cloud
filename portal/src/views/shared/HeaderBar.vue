@@ -128,7 +128,6 @@ export default Vue.extend({
             return this.$router.push({ name: "notifications" });
         },
         notificationNavigate(notification: Notification) {
-            console.log("Radoi notif", notification);
             if (notification.projectId) {
                 return this.$router
                     .push({
