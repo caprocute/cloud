@@ -112,6 +112,7 @@ build:migrations:
 deploy:staging:
   stage: deploy
   needs: ["build:images", "build:migrations"]
+  image: ruby:3.1
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       when: manual
@@ -133,6 +134,7 @@ deploy:staging:
 deploy:prod:
   stage: deploy
   needs: ["build:images", "build:migrations"]
+  image: ruby:3.1
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
       when: manual
