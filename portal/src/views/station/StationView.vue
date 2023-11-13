@@ -900,6 +900,9 @@ export default Vue.extend({
             width: 100%;
             resize: none;
             overflow: hidden;
+            // iOS safari fix to have same styling
+            opacity: 1;
+            -webkit-text-fill-color: #2c3e50;
 
             &:disabled {
                 padding: 0;
