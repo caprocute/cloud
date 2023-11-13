@@ -77,6 +77,7 @@
                                 :ref="'note-ref-' + fieldNote.id"
                                 :value="fieldNote.body"
                                 :readonly="!editingFieldNote || editingFieldNote.id !== fieldNote.id"
+                                @save="saveEdit(fieldNote)"
                                 @empty="onNewFieldNoteText($event, 'edit')"
                             />
                         </template>
@@ -236,8 +237,8 @@ export default Vue.extend({
             }
 
             try {
-                this.editingFieldNote = null;
                 await this.$store.dispatch(ActionTypes.UPDATE_FIELD_NOTE, { stationId: this.stationId, note: payload });
+                await this.$store.dispatch(ActionTypes.NEED_FIELD_NOTES, { id: this.stationId });
                 await this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
                     message: this.$tc("fieldNotes.editSuccess"),
                     type: SnackbarStyle.success,
@@ -328,8 +329,7 @@ export default Vue.extend({
         },
         groupByMonth() {
             if (this.fieldNotes.length > 0) {
-                const groupedFieldNotes = _.groupBy(this.fieldNotes, (b) => moment(b.createdAt).startOf("month").format("YYYY/MM"));
-                this.groupedFieldNotes = JSON.parse(JSON.stringify(groupedFieldNotes));
+                this.groupedFieldNotes = _.groupBy(this.fieldNotes, (b) => moment(b.createdAt).startOf("month").format("YYYY/MM")) as any;
             } else {
                 this.groupedFieldNotes = null;
             }
