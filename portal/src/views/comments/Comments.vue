@@ -17,7 +17,6 @@
                     <template v-if="user">
                         <div class="new-comment-wrap">
                             <Tiptap
-                                ref="tipTapNewComment"
                                 v-model="newComment.body"
                                 :placeholder="$tc('comments.commentForm.placeholder')"
                                 :saveLabel="$tc('comments.commentForm.saveLabel')"
@@ -328,7 +327,7 @@ export default Vue.extend({
             required: false,
         },
         parentData: {
-            type: Object as PropType<[number, Bookmark]>,
+            type: [Object, Number],
             required: true,
         },
         workspace: {
@@ -394,10 +393,7 @@ export default Vue.extend({
             if (this.parentData instanceof Bookmark) {
                 return this.parentData.p[0];
             }
-            if (this.parentData instanceof Number) {
-                // return this.parentData;
-            }
-            throw new Error();
+            return this.parentData;
         },
         stationId(): number | null {
             if (this.parentData instanceof Bookmark) {
@@ -529,8 +525,6 @@ export default Vue.extend({
             await this.$services.api
                 .postComment(comment)
                 .then((response: { post: Comment }) => {
-                    // TODO: find a way to avoid any
-                    (this.$refs.tipTapNewComment as any).editor.commands.clearContent();
                     // add the comment to the replies array
                     if (comment.threadId) {
                         if (this.posts) {
