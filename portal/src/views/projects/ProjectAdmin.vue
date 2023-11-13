@@ -96,18 +96,16 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
-import { CurrentUser, ProjectModule, DisplayStation, Project, DisplayProject, ProjectUser } from "@/store";
+import Vue, {PropType} from "vue";
+import {CurrentUser, DisplayProject, DisplayStation, Project, ProjectModule, ProjectUser} from "@/store";
 import CommonComponents from "@/views/shared";
 import ProjectStations from "./ProjectStations.vue";
-import ProjectActivity from "./ProjectActivity.vue";
 import ProjectDataFiles from "./ProjectDataFiles.vue";
 import StationsReadings from "./StationsReadings.vue";
 import Comments from "../comments/Comments.vue";
 import TeamManager from "./TeamManager.vue";
 import * as utils from "../../utilities";
-import { twitterCardMeta } from "@/social";
-import { isMobile } from "../../utilities";
+import {twitterCardMeta} from "@/social";
 
 export default Vue.extend({
     name: "ProjectAdmin",

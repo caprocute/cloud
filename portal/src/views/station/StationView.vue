@@ -231,21 +231,11 @@
             </section>
 
             <section v-if="notes && !isCustomizationEnabled()" class="section-notes container-box">
-                <NotesForm
-                    v-bind:key="station.id"
-                    :station="station"
-                    :readonly="station.readOnly"
-                    @change="dirtyNotes = true"
-                    @saved="dirtyNotes = false"
-                />
+                <NotesForm v-bind:key="station.id" :station="station" :readonly="station.readOnly" />
             </section>
 
             <section class="section-notes container-box">
-                <FieldNotes
-                    :stationName="station.name"
-                    @dirtyNewNote="dirtyNewNote = $event"
-                    @dirtyEditNote="dirtyEditNote = $event"
-                ></FieldNotes>
+                <FieldNotes :stationName="station.name"></FieldNotes>
             </section>
         </div>
     </StandardLayout>
@@ -285,6 +275,7 @@ import TinyChart from "@/views/viz/TinyChart.vue";
 import { BookmarkFactory, serializeBookmark } from "@/views/viz/viz";
 import { ExploreContext } from "@/views/viz/common";
 import FieldNotes from "@/views/fieldNotes/FieldNotes.vue";
+import { confirmLeaveWithDirtyCheck } from "@/store/modules/dirty";
 
 export default Vue.extend({
     name: "StationView",
@@ -306,11 +297,6 @@ export default Vue.extend({
         selectedModule: DisplayModule | null;
         isMobileView: boolean;
         loading: boolean;
-        dirtyNotes: boolean;
-        dirtyModules: boolean;
-        dirtyNewNote: boolean;
-        dirtyEditNote: boolean;
-        dirtyStationDesc: boolean;
         sensorDataQuerier: SensorDataQuerier;
         editModuleIndex: number | null;
         editingDescription: boolean;
@@ -323,11 +309,6 @@ export default Vue.extend({
             selectedModule: null,
             isMobileView: window.screen.availWidth <= 500,
             loading: true,
-            dirtyNotes: false,
-            dirtyModules: false,
-            dirtyNewNote: false,
-            dirtyEditNote: false,
-            dirtyStationDesc: false,
             editedModule: null,
             editModuleIndex: null,
             editingDescription: false,
@@ -412,24 +393,10 @@ export default Vue.extend({
           return !this.isPartnerCustomisationEnabled && !this.station.readOnly;
         },
     },
-    beforeRouteLeave(to: never, from: never, next: any) {
-        if (this.dirtyNotes || this.dirtyModules || this.dirtyNewNote || this.dirtyEditNote || this.dirtyStationDesc) {
-            this.$confirm({
-                message: this.$tc("notes.confirmLeavePopupMessage"),
-                button: {
-                    no: this.$tc("no"),
-                    yes: this.$tc("yes"),
-                },
-                callback: (confirm) => {
-                    if (confirm) {
-                        this.dirtyNotes = false;
-                        next();
-                    }
-                },
-            });
-        } else {
+    beforeRouteLeave(to: any, from: any, next: any) {
+        confirmLeaveWithDirtyCheck(() => {
             next();
-        }
+        }, this);
     },
     beforeMount(): Promise<any> {
         const stationId = this.$route.params.stationId;
@@ -481,7 +448,7 @@ export default Vue.extend({
         saveStationDescription(): void {
             const payload = { id: this.station.id, name: this.station.name, ...this.form };
             this.$store.dispatch(ActionTypes.UPDATE_STATION, payload);
-            this.dirtyStationDesc = false;
+            this.$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, "stationDescription");
             this.editingDescription = false;
         },
         onEditModuleNameClick(module: DisplayModule): void {
@@ -489,7 +456,7 @@ export default Vue.extend({
             if (this.editedModule) {
                 this.editedModule.label = this.$tc(this.getModuleName(module));
             }
-            this.dirtyModules = true;
+            this.$store.dispatch(ActionTypes.NEW_DIRTY_FIELD, "editModuleName");
         },
         saveModuleName(): void {
             if (!this.editedModule) {
@@ -498,7 +465,7 @@ export default Vue.extend({
             const payload = { stationId: this.station.id, moduleId: this.editedModule.id, label: this.editedModule.label };
             this.$store.dispatch(ActionTypes.UPDATE_STATION_MODULE, payload).then(() => {
                 this.editedModule = null;
-                this.dirtyModules = false;
+                this.$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, "editModuleName");
             });
         },
         selectModule(module: DisplayModule) {
@@ -534,7 +501,7 @@ export default Vue.extend({
 
             el.style.height = "";
             el.style.height = el.scrollHeight + "px";
-            this.dirtyStationDesc = true;
+            this.$store.dispatch(ActionTypes.NEW_DIRTY_FIELD, "stationDescription");
         },
     },
 });

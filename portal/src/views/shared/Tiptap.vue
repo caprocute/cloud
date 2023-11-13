@@ -94,7 +94,10 @@ export default Vue.extend({
 
         const changed = (editor) => {
             this.$emit("input", editor.getJSON());
-            this.$emit("empty", editor.isEmpty);
+
+            if (editor.isEmpty) {
+                this.$emit("empty", true);
+            }
         };
         const saved = (editor, ...args) => {
             if (!editor.isEmpty) {

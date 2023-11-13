@@ -16,7 +16,8 @@
                 <div class="new-field-note-wrap">
                     <Tiptap
                         @editor-focus="checkEditingFieldNote()"
-                        @empty="onNewFieldNoteText($event, 'new')"
+                        @input="$store.dispatch(ActionTypes.NEW_DIRTY_FIELD, 'newFieldNote')"
+                        @empty="$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, 'newFieldNote')"
                         v-model="newNoteText"
                         placeholder="Join the discussion!"
                         saveLabel="Save"
@@ -77,6 +78,7 @@
                                 :ref="'note-ref-' + fieldNote.id"
                                 :value="fieldNote.body"
                                 :readonly="!editingFieldNote || editingFieldNote.id !== fieldNote.id"
+                                @input="onEditFieldNoteInput(fieldNote, $event)"
                                 @save="saveEdit(fieldNote)"
                                 @empty="onNewFieldNoteText($event, 'edit')"
                             />
@@ -118,6 +120,7 @@ import _ from "lodash";
 import { PortalStationFieldNotes } from "@/views/fieldNotes/model";
 import { jsPDF } from "jspdf";
 import { SnackbarStyle } from "@/store/modules/snackbar";
+import { field } from "vega";
 
 interface GroupedFieldNotes {
     [date: string]: PortalStationFieldNotes[];
@@ -136,6 +139,9 @@ export default Vue.extend({
         },
     },
     computed: {
+        ActionTypes() {
+            return ActionTypes;
+        },
         ...mapGetters({ isAuthenticated: "isAuthenticated" }),
         ...mapState({
             user: (s: GlobalState) => s.user.user,
@@ -204,7 +210,7 @@ export default Vue.extend({
                     message: this.$tc("fieldNotes.addSuccess"),
                     type: SnackbarStyle.success,
                 });
-                this.$emit("dirtyNewNote", false);
+                await this.$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, "newFieldNote");
             } catch (e) {
                 return this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
                     message: this.$tc("somethingWentWrong"),
@@ -243,7 +249,7 @@ export default Vue.extend({
                     message: this.$tc("fieldNotes.editSuccess"),
                     type: SnackbarStyle.success,
                 });
-                this.$emit("dirtyEditNote", false);
+                await this.$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, "editFieldNote-" + fieldNote.id);
             } catch (e) {
                 return this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
                     message: this.$tc("somethingWentWrong"),
@@ -318,7 +324,7 @@ export default Vue.extend({
                         if (confirm && this.editingFieldNote) {
                             editorRef[0].editor.commands.setContent(JSON.parse(fieldNote.body));
                             this.editingFieldNote = null;
-                            this.$emit("dirtyEditNote", false);
+                            await this.$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, "editFieldNote-" + fieldNote.id);
                         }
                     },
                 });
@@ -390,12 +396,11 @@ export default Vue.extend({
                 windowWidth: 675, //window width in CSS pixels
             });
         },
-        onNewFieldNoteText(empty: string, type: "new" | "edit"): void {
-            if (type === "new") {
-                this.$emit("dirtyNewNote", !empty);
-            }
-            if (type === "edit") {
-                this.$emit("dirtyEditNote", true);
+        onEditFieldNoteInput(fieldNote: PortalStationFieldNotes, event: string) {
+            if (JSON.stringify(event) !== fieldNote.body) {
+                this.$store.dispatch(ActionTypes.NEW_DIRTY_FIELD, "editFieldNote-" + fieldNote.id);
+            } else {
+                this.$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, "editFieldNote-" + fieldNote.id);
             }
         },
     },
