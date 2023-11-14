@@ -79,7 +79,7 @@ export default Vue.extend({
                 return this.$router
                     .push({
                         name: "exploreBookmark",
-                        params: { bookmark: notification.bookmark },
+                        query: { bookmark: notification.bookmark },
                         hash: `#comment-id-${notification.postId}`,
                     })
                     .catch((err) => {

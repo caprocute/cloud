@@ -92,7 +92,7 @@ export default Vue.extend({
             required: false,
         },
         bounds: {
-            type: (Array as unknown) as PropType<[[number, number], [number, number]]>,
+            type: Array as unknown as PropType<[[number, number], [number, number]]>,
             required: false,
         },
     },
@@ -214,27 +214,15 @@ export default Vue.extend({
     margin-top: 0;
     @include position(absolute, 66px null null 0);
 
+    ::v-deep .station-hover-summary {
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+    }
+
     @include bp-down($sm) {
         top: 54px;
         height: calc(100% - 54px);
-    }
-}
-
-::v-deep .station-hover-summary {
-    left: 360px;
-    top: 170px;
-}
-
-::v-deep .summary-container {
-    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.07);
-    border: solid 2px #d8dce0;
-    background-color: #fff;
-    position: unset;
-    margin: 190px 0 60px 119px;
-    max-width: calc(100vw - 20px);
-
-    @include bp-down($sm) {
-        margin: 129px auto 60px auto;
     }
 }
 
@@ -305,7 +293,7 @@ export default Vue.extend({
         width: calc(100% - 20px);
     }
 
-    .summary-container {
+    .station-hover-summary {
         z-index: 0;
         position: unset;
         margin: 20px;
@@ -334,7 +322,8 @@ export default Vue.extend({
         }
 
         .navigate-button {
-            right: 0;
+            right: -3px;
+            top: -10px;
         }
     }
 }

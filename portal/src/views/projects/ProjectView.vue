@@ -55,17 +55,18 @@ import * as ActionTypes from "@/store/actions";
 import { GlobalState } from "@/store/modules/global";
 import { AuthenticationRequiredError, ForbiddenError } from "@/api";
 import { getPartnerCustomizationWithDefault, isCustomisationEnabled, PartnerCustomization } from "@/views/shared/partners";
+import { confirmLeaveWithDirtyCheck } from "@/store/modules/dirty";
 import ForbiddenBanner from "@/views/shared/ForbiddenBanner.vue";
 
 export default Vue.extend({
     name: "ProjectView",
     components: {
-        ForbiddenBanner,
         ...CommonComponents,
         StandardLayout,
         ProjectPublic,
         ProjectAdmin,
         ProjectActivity,
+        ForbiddenBanner,
     },
     props: {
         id: {
@@ -128,6 +129,11 @@ export default Vue.extend({
                 }
             }
         });
+    },
+    beforeRouteLeave(to: any, from: any, next: any) {
+        confirmLeaveWithDirtyCheck(() => {
+            next();
+        }, this);
     },
     methods: {
         goBack() {
