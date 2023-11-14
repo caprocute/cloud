@@ -4,7 +4,7 @@ stages:
   - deploy
 
 variables:
-  VERSION: 0.3.52
+  VERSION: 0.3.53
 
 test:go:
   stage: test
