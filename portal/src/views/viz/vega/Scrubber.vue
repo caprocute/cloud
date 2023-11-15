@@ -73,8 +73,11 @@ export default Vue.extend({
         window.removeEventListener("mouseup", this.mouseUp);
     },
     methods: {
-        mouseUp() {
-            if (this.scrubbed && this.scrubbed.length == 2) {
+        mouseUp(event) {
+            const target = event.target;
+            const isTargetEl = target.classList.contains("vega-embed") || target.tagName === "svg" || target.tagName === "path";
+
+            if (this.scrubbed && this.scrubbed.length == 2 && isTargetEl) {
                 console.log("viz: vega:scrubber:brush-zoomed", this.scrubbed);
                 this.$emit("time-zoomed", new TimeZoom(null, new TimeRange(this.scrubbed[0], this.scrubbed[1])));
             } else {
@@ -124,8 +127,8 @@ export default Vue.extend({
             vegaInfo.view.addSignalListener("event_click", (_, value) => {
                 this.$emit("event-clicked", value);
             });
-            vegaInfo.view.addEventListener("mouseup", () => {
-                this.mouseUp();
+            vegaInfo.view.addEventListener("mouseup", (event) => {
+                this.mouseUp(event);
             });
 
             console.log("viz: scrubber", {
