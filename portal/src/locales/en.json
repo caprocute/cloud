@@ -520,5 +520,10 @@
         "noData": "There's no data to display."
     },
     "edit": "Edit",
-    "save": "Save"
+    "save": "Save",
+    "dirtyInputs": {
+        "listTitle": "The following areas have been edited and not saved:",
+        "stationDescription": "Station description",
+        "editModuleName": "Module name"
+    }
 }

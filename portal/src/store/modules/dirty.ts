@@ -1,6 +1,6 @@
 import * as ActionTypes from "@/store/actions";
 import Vue from "vue";
-import {GlobalState} from '@/store';
+import { GlobalState } from "@/store";
 
 export class DirtyState {
     dirtyInputs: string[] = [];
@@ -69,9 +69,26 @@ export function confirmLeaveWithDirtyCheck(
     component: Vue & { $confirm(message: string, options: any): void; $store: { state: GlobalState } }
 ) {
     const { dirtyInputs } = component.$store.state.dirty;
+    let affectedFields = "";
+
+    dirtyInputs.forEach((input: string) => {
+        // check if trans value pair exists
+        if (component.$tc("dirtyInputs." + input) !== "dirtyInputs." + input) {
+            affectedFields += component.$tc("dirtyInputs." + input) + "\n";
+        }
+    });
+
+    let message = component.$tc("notes.confirmLeavePopupMessage");
+
+    if (affectedFields.length > 0) {
+        message += component.$tc('dirtyInputs.listTitle') + '\n\n' ;
+        message += affectedFields;
+    }
+
+    console.log("Radoi affectedFields", affectedFields);
     if (dirtyInputs.length > 0) {
         component.$confirm({
-            message: component.$tc("notes.confirmLeavePopupMessage"),
+            message: message,
             button: {
                 no: component.$tc("no"),
                 yes: component.$tc("yes"),
