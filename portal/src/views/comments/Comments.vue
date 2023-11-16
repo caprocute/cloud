@@ -119,7 +119,7 @@
                         </div>
                     </template>
                     <template v-else>
-                        <p class="need-login-msg" @click="test()">
+                        <p class="need-login-msg">
                             {{ $tc("comments.loginToComment.part1") }}
                             <router-link
                                 :to="{ name: 'login', query: { after: $route.path, params: JSON.stringify($route.query) } }"
