@@ -222,6 +222,14 @@ li {
     }
 }
 
+.vc-container {
+    max-width: 90vw;
+
+    .vc-text {
+        white-space: break-spaces;
+    }
+}
+
 .cupertino-pane-wrapper {
     .draggable {
         z-index: 10 !important;

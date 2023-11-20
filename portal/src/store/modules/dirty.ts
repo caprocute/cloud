@@ -44,7 +44,6 @@ const mutations = {
     },
     ["CLEAR_DIRTY_FIELD"]: (state: DirtyState, payload: string) => {
         const newState = state.dirtyInputs.filter((input) => input !== payload);
-        console.log("new state", newState);
         Vue.set(state, "dirtyInputs", newState);
     },
     ["CLEAR_ALL_DIRTY_FIELDS"]: (state: DirtyState) => {
@@ -69,23 +68,28 @@ export function confirmLeaveWithDirtyCheck(
     component: Vue & { $confirm(message: string, options: any): void; $store: { state: GlobalState } }
 ) {
     const { dirtyInputs } = component.$store.state.dirty;
-    let affectedFields = "";
+    let dirtyFieldsDesc = "";
 
     dirtyInputs.forEach((input: string) => {
-        // check if trans value pair exists
-        if (component.$tc("dirtyInputs." + input) !== "dirtyInputs." + input) {
-            affectedFields += component.$tc("dirtyInputs." + input) + "\n";
+        const inputKey = input.split("#")[0]; // strip id from input (for editing fields)
+        const translationKey = "dirtyInputs." + inputKey;
+
+        // check if trans key-value pair exists & make sure its not a duplicate
+        if (component.$tc(translationKey) !== translationKey && !dirtyFieldsDesc.includes(component.$tc(translationKey))) {
+            dirtyFieldsDesc += component.$tc(translationKey) + "\n";
         }
     });
 
-    let message = component.$tc("notes.confirmLeavePopupMessage");
+    let message = "";
 
-    if (affectedFields.length > 0) {
-        message += component.$tc('dirtyInputs.listTitle') + '\n\n' ;
-        message += affectedFields;
+    if (dirtyFieldsDesc.length > 0) {
+        message += component.$tc("dirtyInputs.confirmLeaveDetailedTitle") + "\n\n";
+        message += dirtyFieldsDesc;
+        message += "\n" + component.$tc("dirtyInputs.confirmLeaveDetailedMsg");
+    } else {
+        message = component.$tc("dirtyInputs.confirmLeaveBasic");
     }
 
-    console.log("Radoi affectedFields", affectedFields);
     if (dirtyInputs.length > 0) {
         component.$confirm({
             message: message,
