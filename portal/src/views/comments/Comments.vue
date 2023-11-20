@@ -17,11 +17,12 @@
                     <template v-if="user">
                         <div class="new-comment-wrap">
                             <Tiptap
-                                ref="tipTapNewComment"
                                 v-model="newComment.body"
                                 :placeholder="$tc('comments.commentForm.placeholder')"
                                 :saveLabel="$tc('comments.commentForm.saveLabel')"
-                                @save="save(newComment)"
+                                @input="$store.dispatch(ActionTypes.NEW_DIRTY_FIELD, 'newComment')"
+                                @empty="$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, 'newComment')"
+                                @save="save(newComment, 'newComment')"
                             />
                         </div>
                     </template>
@@ -103,12 +104,16 @@
                                 :placeholder="$tc('comments.eventForm.title.placeholder')"
                                 :saveLabel="$tc('comments.eventForm.title.saveLabel')"
                                 :showSaveButton="false"
+                                @input="$store.dispatch(ActionTypes.NEW_DIRTY_FIELD, 'newDataEventTitle')"
+                                @empty="$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, 'newDataEventTitle')"
                                 @save="saveDataEvent(newDataEvent)"
                             />
                             <Tiptap
                                 v-model="newDataEvent.description"
                                 :placeholder="$tc('comments.eventForm.description.placeholder')"
                                 :saveLabel="$tc('comments.eventForm.description.saveLabel')"
+                                @input="$store.dispatch(ActionTypes.NEW_DIRTY_FIELD, 'newDataEventDesc')"
+                                @empty="$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, 'newDataEventDesc')"
                                 @save="saveDataEvent(newDataEvent)"
                             />
                         </div>
@@ -143,7 +148,9 @@
                         v-model="newComment.body"
                         :placeholder="$tc('comments.commentForm.placeholder')"
                         :saveLabel="$tc('comments.commentForm.saveLabel')"
-                        @save="save(newComment)"
+                        @input="$store.dispatch(ActionTypes.NEW_DIRTY_FIELD, 'newComment')"
+                        @empty="$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, 'newComment')"
+                        @save="save(newComment, 'newComment')"
                     />
                 </div>
             </template>
@@ -206,7 +213,9 @@
                                 v-model="item.body"
                                 :readonly="item.readonly"
                                 saveLabel="Save"
-                                @save="saveEdit(item.id, item.body)"
+                                @input="$store.dispatch(ActionTypes.NEW_DIRTY_FIELD, 'editComment-' + item.id)"
+                                @empty="$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, 'editComment-' + item.id)"
+                                @save="saveEdit(item.id, item.body, 'editComment-' + item.id)"
                             />
                             <div v-else class="edit-event">
                                 <Tiptap
@@ -215,6 +224,8 @@
                                     :placeholder="$tc('comments.eventForm.title.placeholder')"
                                     :saveLabel="$tc('comments.eventForm.title.saveLabel')"
                                     :showSaveButton="false"
+                                    @input="$store.dispatch(ActionTypes.NEW_DIRTY_FIELD, 'editEventTitle-' + item.id)"
+                                    @empty="$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, 'editEventTitle-' + item.id)"
                                     @save="saveEditDataEvent(item)"
                                 />
                                 <div class="event-range">{{ item.start | prettyDateTime }} - {{ item.end | prettyDateTime }}</div>
@@ -223,6 +234,8 @@
                                     :readonly="item.readonly"
                                     :placeholder="$tc('comments.eventForm.description.placeholder')"
                                     :saveLabel="$tc('comments.eventForm.description.saveLabel')"
+                                    @input="$store.dispatch(ActionTypes.NEW_DIRTY_FIELD, 'editEventDesc-' + item.id)"
+                                    @empty="$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, 'editEventDesc-' + item.id)"
                                     @save="saveEditDataEvent(item)"
                                 />
                             </div>
@@ -254,7 +267,9 @@
                                             v-model="reply.body"
                                             :readonly="reply.readonly"
                                             :saveLabel="$tc('comments.reply.saveLabel')"
-                                            @save="saveEdit(reply.id, reply.body)"
+                                            @input="$store.dispatch(ActionTypes.NEW_DIRTY_FIELD, 'editCommentReply-' + reply.id)"
+                                            @empty="$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, 'editCommentReply-' + reply.id)"
+                                            @save="saveEdit(reply.id, reply.body, 'editCommentReply-' + reply.id)"
                                         />
                                     </div>
                                 </div>
@@ -269,7 +284,9 @@
                                         v-model="newReply.body"
                                         :placeholder="$tc('comments.reply.placeholder')"
                                         :saveLabel="$tc('comments.reply.saveLabel')"
-                                        @save="save(newReply)"
+                                        @input="$store.dispatch(ActionTypes.NEW_DIRTY_FIELD, 'newCommentReply')"
+                                        @empty="$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, 'newCommentReply')"
+                                        @save="save(newReply, 'newCommentReply')"
                                     />
                                 </div>
                             </div>
@@ -310,6 +327,7 @@ import { TimeRange } from "@/views/viz/common";
 import { ActionTypes, DisplayProject } from "@/store";
 import { interpolatePartner, isCustomisationEnabled } from "@/views/shared/partners";
 import InfoTooltip from "@/views/shared/InfoTooltip.vue";
+import { PortalStationFieldNotes } from "@/views/fieldNotes/model";
 import { SnackbarStyle } from "@/store/modules/snackbar";
 
 export default Vue.extend({
@@ -327,7 +345,7 @@ export default Vue.extend({
             required: false,
         },
         parentData: {
-            type: Object as PropType<[number, Bookmark]>,
+            type: [Object, Number],
             required: true,
         },
         workspace: {
@@ -391,10 +409,7 @@ export default Vue.extend({
             if (this.parentData instanceof Bookmark) {
                 return this.parentData.p[0];
             }
-            if (this.parentData instanceof Number) {
-                // return this.parentData;
-            }
-            throw new Error();
+            return this.parentData;
         },
         stationId(): number | null {
             if (this.parentData instanceof Bookmark) {
@@ -511,6 +526,8 @@ export default Vue.extend({
                             message: this.$tc("comments.dataEventSuccess"),
                             type: SnackbarStyle.success,
                         });
+                        this.$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, "newDataEventTitle");
+                        this.$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, "newDataEventDesc");
                     }
                 })
                 .catch((e) => {
@@ -521,7 +538,8 @@ export default Vue.extend({
                     });
                 });
         },
-        async save(comment: NewComment): Promise<void> {
+        async save(comment: NewComment, dirtyInputId: string): Promise<void> {
+
             if (this.viewType === "data") {
                 comment.bookmark = JSON.stringify(this.parentData);
             }
@@ -529,8 +547,7 @@ export default Vue.extend({
             await this.$services.api
                 .postComment(comment)
                 .then((response: { post: Comment }) => {
-                    // TODO: find a way to avoid any
-                    (this.$refs.tipTapNewComment as any).editor.commands.clearContent();
+                    this.$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, dirtyInputId);
                     // add the comment to the replies array
                     if (comment.threadId) {
                         if (this.posts) {
@@ -656,12 +673,13 @@ export default Vue.extend({
         startEditing(item: Comment | DataEvent): void {
             item.readonly = false;
         },
-        saveEdit(commentID: number, body: Record<string, unknown>) {
+        saveEdit(commentID: number, body: Record<string, unknown>, dirtyInputId: string) {
             this.$services.api
                 .editComment(commentID, body)
                 .then((response) => {
                     if (response) {
-                        this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
+                      this.$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, dirtyInputId);
+                      this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
                             message: this.$tc("comments.saveSuccess"),
                             type: SnackbarStyle.success,
                         });
@@ -723,6 +741,7 @@ export default Vue.extend({
                     if (response) {
                         this.newDataEvent.title = "";
                         this.newDataEvent.description = "";
+                        this.$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, 'editEventDesc-' + dataEvent.id)
                         this.getDataEvents();
                         this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
                             message: this.$tc("comments.dataEventSuccess"),
@@ -854,6 +873,13 @@ export default Vue.extend({
                     !this.areWorkspaceGroupsEmpty()) ||
                 false
             );
+        },
+        onEditCommentInput(comment: any, event: string) {
+            if (JSON.stringify(event) !== comment.body) {
+                this.$store.dispatch(ActionTypes.NEW_DIRTY_FIELD, "editComment-" + comment.id);
+            } else {
+                this.$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, "editComment-" + comment.id);
+            }
         },
     },
 });

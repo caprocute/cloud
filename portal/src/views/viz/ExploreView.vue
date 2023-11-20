@@ -17,6 +17,7 @@ import { Bookmark, serializeBookmark, deserializeBookmark } from "./viz";
 
 import Vue from "vue";
 import ExploreWorkspace from "./ExploreWorkspace.vue";
+import { confirmLeaveWithDirtyCheck } from "@/store/modules/dirty";
 
 export default Vue.extend({
     name: "ExploreView",
@@ -77,6 +78,11 @@ export default Vue.extend({
             await this.refreshBookmarkFromToken();
         }
     },
+    beforeRouteLeave(to: any, from: any, next: any) {
+        confirmLeaveWithDirtyCheck(() => {
+            next();
+        }, this);
+    },
     methods: {
         async refreshBookmarkFromToken(): Promise<void> {
             const token = this.token;
@@ -112,14 +118,13 @@ export default Vue.extend({
             await this.$router.push({ name: "shareWorkspace", query: { v: this.token } });
         },
         async eventClicked(id: number): Promise<void> {
-          if (this.token) {
-            await this.$router.push({
-              name: "exploreShortBookmark",
-              query: { v: this.token },
-              hash: `#event-id-${id}`
-            })
-          }
-
+            if (this.token) {
+                await this.$router.push({
+                    name: "exploreShortBookmark",
+                    query: { v: this.token },
+                    hash: `#event-id-${id}`,
+                });
+            }
         },
     },
 });

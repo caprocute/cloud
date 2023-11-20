@@ -190,10 +190,6 @@ a {
     &:not(:disabled) {
         border: 1px solid $color-border;
     }
-
-    @include bp-down($sm) {
-        display: none;
-    }
 }
 
 .loading-container {

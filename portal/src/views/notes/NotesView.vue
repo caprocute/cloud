@@ -42,7 +42,6 @@
                                         :notes="selectedNotes"
                                         :readonly="project.project.readOnly"
                                         @save="saveForm"
-                                        @change="onChange"
                                     />
                                 </div>
                                 <div v-else class="tab-content empty">Please choose a station from the left.</div>
@@ -108,6 +107,7 @@ import { serializePromiseChain } from "@/utilities";
 
 import { PortalStationNotesReply, Notes, mergeNotes } from "./model";
 import { DisplayStation, DisplayProject } from "@/store";
+import { confirmLeaveWithDirtyCheck } from "@/store/modules/dirty";
 
 export default Vue.extend({
     name: "NotesView",
@@ -132,7 +132,6 @@ export default Vue.extend({
     },
     data(): {
         notes: { [stationId: number]: PortalStationNotesReply };
-        dirty: boolean;
         loading: boolean;
         success: boolean;
         failed: boolean;
@@ -141,7 +140,6 @@ export default Vue.extend({
     } {
         return {
             notes: {},
-            dirty: false,
             loading: false,
             success: false,
             failed: false,
@@ -222,17 +220,10 @@ export default Vue.extend({
         }
         await Promise.all(pending);
     },
-    beforeRouteUpdate(to: never, from: never, next: any) {
-        console.log("router: update");
-        if (this.maybeConfirmLeave()) {
+    beforeRouteLeave(to: any, from: any, next: any) {
+        confirmLeaveWithDirtyCheck(() => {
             next();
-        }
-    },
-    beforeRouteLeave(to: never, from: never, next: any) {
-        console.log("router: leave");
-        if (this.maybeConfirmLeave()) {
-            next();
-        }
+        }, this);
     },
     methods: {
         async loadNotes(stationId: number): Promise<void> {
@@ -261,20 +252,6 @@ export default Vue.extend({
                 this.isStationSelected = !this.isStationSelected;
             }
         },
-        onChange(): void {
-            this.dirty = true;
-        },
-        maybeConfirmLeave(): boolean {
-            if (this.dirty) {
-                if (window.confirm("You may have unsaved changes, are you sure you'd like to leave?")) {
-                    this.dirty = false;
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-            return true;
-        },
         async saveForm(formNotes: Notes): Promise<void> {
             this.success = false;
             this.failed = false;
@@ -288,7 +265,6 @@ export default Vue.extend({
                 const payload = mergeNotes(this.notes[this.stationId], formNotes);
                 return this.$services.api.patchStationNotes(this.stationId, payload).then(
                     (updated) => {
-                        this.dirty = false;
                         this.success = true;
                         console.log("success", updated);
                     },
@@ -482,5 +458,4 @@ export default Vue.extend({
         font-size: 12px !important;
     }
 }
-
 </style>

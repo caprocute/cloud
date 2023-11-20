@@ -7,6 +7,7 @@ import { ExportingState } from "./exporting";
 import { NotificationsState } from "./notifications";
 import { DiscussionState, NotesState, FieldNotesState } from "@/store";
 import { SnackbarState } from "@/store/modules/snackbar";
+import {DirtyState} from '@/store/modules/dirty';
 
 export interface RouteState {
     name: string | null;
@@ -32,6 +33,7 @@ export interface GlobalState {
     readonly fieldNotes: FieldNotesState;
     readonly snackbar: SnackbarState;
     readonly discussion: DiscussionState;
+    readonly dirty: DirtyState;
 }
 
 export interface GlobalGetters {

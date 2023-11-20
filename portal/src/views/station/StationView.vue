@@ -155,11 +155,11 @@
                     >
                         <h3 class="module-data-title flex flex-al-center">
                             <img alt="Module icon" :src="getModuleImg(module)" />
-                            {{ $t(getModuleName(module)) }}
+                            {{ getModuleName(module) }}
                         </h3>
                         <TinyChart
                             :ref="'tinyChart-' + module.id"
-                            :moduleKey="module.name"
+                            :moduleKey="getModuleKey(module)"
                             :station-id="station.id"
                             :station="station"
                             :querier="sensorDataQuerier"
@@ -181,19 +181,19 @@
                             <img alt="Module icon" :src="getModuleImg(module)" />
                             <input
                                 v-if="editedModule && editedModule.id === module.id"
+                                v-model="editedModule.label"
                                 class="input"
                                 maxlength="25"
                                 :disabled="editedModule.id !== selectedModule.id"
                                 :title="editedModule.label"
-                                v-model="editedModule.label"
                             />
                             <input
                                 v-else
                                 class="input"
                                 maxlength="25"
-                                :title="module.label ? module.label : $t(getModuleName(module))"
                                 disabled
-                                :value="module.label ? module.label : $t(getModuleName(module))"
+                                :title="getModuleName(module)"
+                                :value="getModuleName(module)"
                             />
                             <template v-if="isModuleNameEditable">
                                 <a
@@ -211,11 +211,11 @@
                     </ul>
                     <header v-if="isMobileView">
                         <img alt="Module icon" :src="getModuleImg(selectedModule)" />
-                        {{ $t(getModuleName(selectedModule)) }}
+                        {{ getModuleName(selectedModule) }}
                     </header>
                     <div class="station-readings-values">
-                        <header v-if="!isMobileView">{{ $t(getModuleName(selectedModule)) }}</header>
-                        <LatestStationReadings :id="station.id" :moduleKey="getModuleName(selectedModule)" />
+                        <header v-if="!isMobileView">{{ getModuleName(selectedModule) }}</header>
+                        <LatestStationReadings :id="station.id" :moduleKey="getModuleKey(selectedModule)" />
                     </div>
                 </div>
             </section>
@@ -231,21 +231,11 @@
             </section>
 
             <section v-if="notes && !isCustomizationEnabled()" class="section-notes container-box">
-                <NotesForm
-                    v-bind:key="station.id"
-                    :station="station"
-                    :readonly="station.readOnly"
-                    @change="dirtyNotes = true"
-                    @saved="dirtyNotes = false"
-                />
+                <NotesForm v-bind:key="station.id" :station="station" :readonly="station.readOnly" />
             </section>
 
             <section class="section-notes container-box">
-                <FieldNotes
-                    :stationName="station.name"
-                    @dirtyNewNote="dirtyNewNote = $event"
-                    @dirtyEditNote="dirtyEditNote = $event"
-                ></FieldNotes>
+                <FieldNotes :stationName="station.name"></FieldNotes>
             </section>
         </div>
     </StandardLayout>
@@ -285,6 +275,7 @@ import TinyChart from "@/views/viz/TinyChart.vue";
 import { BookmarkFactory, serializeBookmark } from "@/views/viz/viz";
 import { ExploreContext } from "@/views/viz/common";
 import FieldNotes from "@/views/fieldNotes/FieldNotes.vue";
+import { confirmLeaveWithDirtyCheck } from "@/store/modules/dirty";
 import { SnackbarStyle } from "@/store/modules/snackbar";
 
 export default Vue.extend({
@@ -307,10 +298,6 @@ export default Vue.extend({
         selectedModule: DisplayModule | null;
         isMobileView: boolean;
         loading: boolean;
-        dirtyNotes: boolean;
-        dirtyModules: boolean;
-        dirtyNewNote: boolean;
-        dirtyEditNote: boolean;
         sensorDataQuerier: SensorDataQuerier;
         editModuleIndex: number | null;
         editingDescription: boolean;
@@ -323,10 +310,6 @@ export default Vue.extend({
             selectedModule: null,
             isMobileView: window.screen.availWidth <= 500,
             loading: true,
-            dirtyNotes: false,
-            dirtyModules: false,
-            dirtyNewNote: false,
-            dirtyEditNote: false,
             editedModule: null,
             editModuleIndex: null,
             editingDescription: false,
@@ -339,8 +322,10 @@ export default Vue.extend({
     watch: {
         station() {
             this.loading = false;
-            this.selectedModule = this.station.modules[0];
             this.form.description = this.station.description;
+            if (!this.selectedModule) {
+                this.selectedModule = this.station.modules[0];
+            }
         },
     },
     computed: {
@@ -411,24 +396,10 @@ export default Vue.extend({
             return !this.isPartnerCustomisationEnabled && !this.station.readOnly;
         },
     },
-    beforeRouteLeave(to: never, from: never, next: any) {
-        if (this.dirtyNotes || this.dirtyModules || this.dirtyNewNote || this.dirtyEditNote) {
-            this.$confirm({
-                message: this.$tc("notes.confirmLeavePopupMessage"),
-                button: {
-                    no: this.$tc("no"),
-                    yes: this.$tc("yes"),
-                },
-                callback: (confirm) => {
-                    if (confirm) {
-                        this.dirtyNotes = false;
-                        next();
-                    }
-                },
-            });
-        } else {
+    beforeRouteLeave(to: any, from: any, next: any) {
+        confirmLeaveWithDirtyCheck(() => {
             next();
-        }
+        }, this);
     },
     beforeMount(): Promise<any> {
         const stationId = this.$route.params.stationId;
@@ -453,14 +424,14 @@ export default Vue.extend({
             }
             return this.$loadAsset(utils.getBatteryIcon(this.station.battery));
         },
-        getModuleImg(module: ProjectModule): string {
+        getModuleImg(module: DisplayModule): string {
             return this.$loadAsset(utils.getModuleImg(module));
         },
-        getModuleName(module: DisplayModule) {
-            if (!module.label) {
-                return module.name.replace("modules.", "fk.");
-            }
-            return module.label;
+        getModuleName(module: DisplayModule): string {
+            return module.label || this.$tc(module.name.replace("modules.", "fk."));
+        },
+        getModuleKey(module: DisplayModule): string {
+            return module.name.replace("modules.", "fk.");
         },
         partnerCustomization(): PartnerCustomization {
             return getPartnerCustomizationWithDefault();
@@ -496,15 +467,17 @@ export default Vue.extend({
                     });
                 })
                 .finally(() => {
+                  this.$store.dispatch(ActionTypes.UPDATE_STATION, payload);
+                  this.$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, "stationDescription");
                     this.editingDescription = false;
                 });
         },
         onEditModuleNameClick(module: DisplayModule): void {
             this.editedModule = JSON.parse(JSON.stringify(module));
             if (this.editedModule) {
-                this.editedModule.label = this.$tc(this.getModuleName(module));
+                this.editedModule.label = this.getModuleName(module);
             }
-            this.dirtyModules = true;
+            this.$store.dispatch(ActionTypes.NEW_DIRTY_FIELD, "editModuleName");
         },
         saveModuleName(): void {
             if (!this.editedModule) {
@@ -527,7 +500,7 @@ export default Vue.extend({
                 })
                 .finally(() => {
                     this.editedModule = null;
-                    this.dirtyModules = false;
+                    this.$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, "editModuleName");
                 });
         },
         selectModule(module: DisplayModule) {
@@ -563,6 +536,7 @@ export default Vue.extend({
 
             el.style.height = "";
             el.style.height = el.scrollHeight + "px";
+            this.$store.dispatch(ActionTypes.NEW_DIRTY_FIELD, "stationDescription");
         },
     },
 });
@@ -961,6 +935,9 @@ export default Vue.extend({
             width: 100%;
             resize: none;
             overflow: hidden;
+            // iOS safari fix to have same styling
+            opacity: 1;
+            -webkit-text-fill-color: #2c3e50;
 
             &:disabled {
                 padding: 0;
