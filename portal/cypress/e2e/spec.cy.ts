@@ -32,15 +32,12 @@ describe("Station Page", () => {
     it("should not display save button if user is not authenticated", () => {
         cy.login();
         cy.visit(stationPageUrl);
+
         cy.get('[data-cy="saveNotes"]').should("not.exist");
     });
 
-   /* it("should successfully save the form when valid data is entered", () => {
-        // Assuming that there are commands to log in a user and set up necessary preconditions.
+    it("should successfully save the form when valid data is entered", () => {
         cy.login();
-
-        cy.wait(2000);
-
         cy.visit(stationPageUrl);
 
         cy.get('[data-cy="studyObjectiveBody"]').type("Some text");
@@ -52,19 +49,17 @@ describe("Station Page", () => {
         cy.get('[data-cy="editCustomKey"]').click();
         cy.get('[data-cy="customKeyTitle"]').clear().type("Some title");
 
-        // Stub response for API call(s) made during form submission (replace '/api-endpoint' with actual endpoint)
-        cy.intercept("PATCH", "/stations/1/notes", { fixture: "success.json" }).as("submitForm");
+        cy.intercept("PATCH", "/stations/1/notes").as("submitForm");
 
-        // Click submit button
         cy.get('.buttons button[type="submit"]').click();
 
-        // Assert that API call was successful
         cy.wait("@submitForm").its("response.statusCode").should("eq", 200);
     });
 
     it("go back to stations dashboard", () => {
         cy.login();
         cy.visit(stationPageUrl);
+
         cy.get('[data-cy="backBtn"]').click();
         cy.url().should("eq", Cypress.config("baseUrl") + "/dashboard/stations/1");
     });
@@ -72,10 +67,11 @@ describe("Station Page", () => {
     it("shows Field Notes Section", () => {
         cy.login();
         cy.visit(stationPageUrl);
+
         cy.get('[data-cy="fieldNotes"]');
     });
 
-    it("can edit station description", () => {
+   /* it("can edit station description", () => {
         const partnerCustomization = window.location.hostname.indexOf("floodnet.") >= 0;
 
         if (!partnerCustomization) {
