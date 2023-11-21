@@ -235,6 +235,22 @@ func (db *DB) WithNewTransaction(ctx context.Context, fn func(context.Context) e
 	return err
 }
 
+func (db *DB) WithNewOwnedTransaction(ctx context.Context, fn func(context.Context, *sqlx.Tx) error) error {
+	tx, err := db.db.Beginx()
+	if err != nil {
+		return err
+	}
+
+	txCtx := context.WithValue(ctx, TxContextKey, tx)
+	err = fn(txCtx, tx)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return err
+}
+
 func (db *DB) Transaction(ctx context.Context) (tx *sqlx.Tx) {
 	if v := ctx.Value(TxContextKey); v != nil {
 		return v.(*sqlx.Tx)

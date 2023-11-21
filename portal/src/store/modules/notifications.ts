@@ -56,9 +56,9 @@ const actions = (services: Services) => {
             commit(CONNECTED, send);
         },
         [ActionTypes.NOTIFICATIONS_SEEN]: async ({ commit, state }: ActionParameters, payload: MarkNotificationsSeen) => {
-            await services.api.seenNotifications({ ids: state.notifications.map((n) => n.notificationId) });
-
-            commit(SEEN);
+            const ids = payload.ids.length > 0 ? payload.ids : state.notifications.map((n) => n.notificationId);
+            await services.api.seenNotifications({ ids });
+            commit(SEEN, ids);
         },
     };
 };
@@ -79,8 +79,12 @@ const mutations = {
             state.notifications.push(payload);
         }
     },
-    [SEEN]: (state: NotificationsState) => {
-        Vue.set(state, "notifications", []);
+    [SEEN]: (state: NotificationsState, ids: number[]) => {
+        Vue.set(
+            state,
+            "notifications",
+            state.notifications.filter((notification) => !ids.includes(notification.notificationId))
+        );
     },
 };
 

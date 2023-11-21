@@ -1,6 +1,5 @@
 <template>
     <div class="row-section manage-team-container">
-        <vue-confirm-dialog />
 
         <div class="section-heading">Manage Team</div>
         <div class="users-container">

@@ -291,7 +291,7 @@ export class ScrubberSpecFactory {
                             events: {
                                 source: "scope",
                                 type: "mouseover",
-                                filter: ['event.item.mark.name === "de_circle"'],
+                                filter: ['event && event.item && event.item.mark.name === "de_circle"'],
                             },
                             update: "[event.item.datum.start, event.item.datum.end]",
                         },
@@ -435,8 +435,7 @@ export class ScrubberSpecFactory {
                             events: {
                                 signal: "brush_translate_delta",
                             },
-                            update:
-                                "clampRange(panLinear(brush_translate_anchor.extent_x, brush_translate_delta.x / span(brush_translate_anchor.extent_x)), 0, width)",
+                            update: "clampRange(panLinear(brush_translate_anchor.extent_x, brush_translate_delta.x / span(brush_translate_anchor.extent_x)), 0, width)",
                         },
                         /*
                         {
@@ -668,8 +667,7 @@ export class ScrubberSpecFactory {
                                 value: "#DCDEDF",
                             },
                             description: {
-                                signal:
-                                    '"Time: " + (timeFormat(datum["time"], \'%b %d, %Y\')) + "; value: " + (format(datum["value"], ""))',
+                                signal: '"Time: " + (timeFormat(datum["time"], \'%b %d, %Y\')) + "; value: " + (format(datum["value"], ""))',
                             },
                             x: {
                                 scale: "x",
@@ -684,8 +682,7 @@ export class ScrubberSpecFactory {
                                 field: "value_start",
                             },
                             defined: {
-                                signal:
-                                    'isValid(datum["time"]) && isFinite(+datum["time"]) && isValid(datum["value"]) && isFinite(+datum["value"])',
+                                signal: 'isValid(datum["time"]) && isFinite(+datum["time"]) && isValid(datum["value"]) && isFinite(+datum["value"])',
                             },
                         },
                     },
@@ -710,8 +707,7 @@ export class ScrubberSpecFactory {
                                 value: "#52b5e4",
                             },
                             description: {
-                                signal:
-                                    '"Time: " + (timeFormat(datum["time"], \'%b %d, %Y\')) + "; value: " + (format(datum["value"], ""))',
+                                signal: '"Time: " + (timeFormat(datum["time"], \'%b %d, %Y\')) + "; value: " + (format(datum["value"], ""))',
                             },
                             x: {
                                 scale: "x",
@@ -726,8 +722,7 @@ export class ScrubberSpecFactory {
                                 field: "value_start",
                             },
                             defined: {
-                                signal:
-                                    'isValid(datum["time"]) && isFinite(+datum["time"]) && isValid(datum["value"]) && isFinite(+datum["value"])',
+                                signal: 'isValid(datum["time"]) && isFinite(+datum["time"]) && isValid(datum["value"]) && isFinite(+datum["value"])',
                             },
                         },
                     },

@@ -16,6 +16,7 @@ import { ScrubberSpecFactory, ChartSettings } from "./ScrubberSpecFactory";
 import { DiscussionState } from "@/store/modules/discussion";
 import { ActionTypes } from "@/store";
 import { DataEvent } from "@/views/comments/model";
+import moment from "moment";
 
 export default Vue.extend({
     name: "Scrubber",
@@ -35,8 +36,9 @@ export default Vue.extend({
     },
     data(): {
         vega: any | null;
+        scrubbed: number[] | null;
     } {
-        return { vega: null };
+        return { vega: null, scrubbed: null };
     },
     async mounted(): Promise<void> {
         await this.refresh();
@@ -62,20 +64,41 @@ export default Vue.extend({
             return this.$state.discussion.dataEvents;
         },
     },
+    created() {
+        console.log("viz: scrubber: created");
+        window.addEventListener("mouseup", this.mouseUp);
+    },
+    destroyed() {
+        console.log("viz: scrubber: destroyed");
+        window.removeEventListener("mouseup", this.mouseUp);
+    },
     methods: {
+        mouseUp(event: Event) {
+            const target = event.target;
+            let isTargetEl = false;
+
+            if (target && target instanceof Element) {
+                isTargetEl = target.classList.contains("vega-embed") || target.tagName === "svg" || target.tagName === "path";
+            }
+
+            if (this.scrubbed && this.scrubbed.length == 2 && isTargetEl) {
+                console.log("viz: vega:scrubber:brush-zoomed", this.scrubbed);
+                this.$emit("time-zoomed", new TimeZoom(null, new TimeRange(this.scrubbed[0], this.scrubbed[1])));
+            } else {
+                console.log("viz: vega:scrubber:brush-noop");
+            }
+        },
         async refresh(): Promise<void> {
             console.log("viz:", "scrubber: refresh");
 
             const factory = new ScrubberSpecFactory(
                 this.series,
                 new ChartSettings(this.visible, undefined, { w: 0, h: 0 }, false, false, isMobile()),
-                this.dataEvents.filter((event) =>
-                    this.series.every(
-                        (seriesData) =>
-                            event.start > seriesData.queried.timeRange[0] &&
-                            event.end < seriesData.queried.timeRange[1]
-                    )
-                ),
+                this.dataEvents.filter((event) => {
+                    return this.series.every(
+                        (seriesData) => event.start >= seriesData.queried.timeRange[0] && event.end <= seriesData.queried.timeRange[1]
+                    );
+                })
             );
 
             const spec = factory.create();
@@ -88,12 +111,12 @@ export default Vue.extend({
             this.vega = vegaInfo;
 
             // eslint-disable-next-line
-            let scrubbed: number[] = [];
             vegaInfo.view.addSignalListener("brush", (_, value) => {
+                // console.log("viz: vega:brush", value);
                 if (value.time) {
-                    scrubbed = value.time;
+                    this.scrubbed = value.time;
                 } else if (this.series[0].queried) {
-                    scrubbed = this.series[0].queried.timeRange;
+                    this.scrubbed = this.series[0].queried.timeRange;
                 }
             });
             // vegaInfo.view.addSignalListener("scrub_handle_left", (_, value) => {
@@ -106,13 +129,7 @@ export default Vue.extend({
             //     console.log(evt, value);
             // });
             vegaInfo.view.addSignalListener("event_click", (_, value) => {
-              this.$emit("event-clicked", value);
-            });
-            vegaInfo.view.addEventListener("mouseup", () => {
-                if (scrubbed.length == 2) {
-                    console.log("viz: vega:scrubber:brush-zoomed", scrubbed);
-                    this.$emit("time-zoomed", new TimeZoom(null, new TimeRange(scrubbed[0], scrubbed[1])));
-                }
+                this.$emit("event-clicked", value);
             });
 
             console.log("viz: scrubber", {

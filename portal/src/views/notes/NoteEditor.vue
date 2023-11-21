@@ -3,7 +3,7 @@
         <div class="title">
             <TextAreaField v-if="editingTitle" :data-cy="'customKeyTitle'" v-model="title" />
             <template v-else>{{ title }}</template>
-            <a class="edit-btn" data-cy="editCustomKey" v-if="editableTitle && !editingTitle" @click="editingTitle = !editingTitle">
+            <a data-cy="editCustomKey" class="edit-btn" v-if="editableTitle && !editingTitle && !readonly" @click="editingTitle = !editingTitle">
                 {{ $t("notes.customTitleEditLabel") }}
             </a>
         </div>
@@ -78,6 +78,9 @@ export default Vue.extend({
         },
         title: {
             get(this: any) {
+                if (this.editingTitle) {
+                    return this.note.title;
+                }
                 return this.note.title || this.note.help.title;
             },
             set(this: any, value) {

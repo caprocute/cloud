@@ -26,6 +26,7 @@ import Mention from "@tiptap/extension-mention";
 import Placeholder from "@tiptap/extension-placeholder";
 import MentionList from "../comments/MentionList.vue";
 import tippy, { Props } from "tippy.js";
+import { CharacterCount } from "@tiptap/extension-character-count";
 
 export default Vue.extend({
     name: "TipTap",
@@ -79,24 +80,29 @@ export default Vue.extend({
         value(value: string): void {
             if (this.editor) {
                 if (JSON.stringify(this.editor.getJSON()) === JSON.stringify(value)) return;
-                this.editor.commands.setContent(value);
+                this.editor.commands.setContent(this.asContent(value));
             }
         },
     },
     computed: {
         empty(): boolean {
-            return this.editor == null || this.editor.getCharacterCount() == 0;
+            return this.editor == null || this.editor.storage.characterCount.characters() == 0;
         },
     },
     mounted() {
         const services = this.$services;
 
-        const changed = (value) => {
-            this.$emit("input", value);
+        const changed = (editor) => {
+            this.$emit("input", editor.getJSON());
+
+            if (editor.isEmpty) {
+                this.$emit("empty", true);
+            }
         };
         const saved = (editor, ...args) => {
             if (!editor.isEmpty) {
                 this.$emit("save", editor.getJSON());
+                editor.commands.clearContent();
             }
         };
 
@@ -104,17 +110,16 @@ export default Vue.extend({
             name: "newline",
             addCommands() {
                 return {
-                    addNewline: () => ({ state, dispatch }) => {
-                        const { schema, tr } = state;
-                        const paragraph = schema.nodes.paragraph;
+                    addNewline:
+                        () =>
+                        ({ state, dispatch }) => {
+                            const { schema, tr } = state;
+                            const paragraph = schema.nodes.paragraph;
 
-                        const transaction = tr
-                            .deleteSelection()
-                            .replaceSelectionWith(paragraph.create(), true)
-                            .scrollIntoView();
-                        if (dispatch) dispatch(transaction);
-                        return true;
-                    },
+                            const transaction = tr.deleteSelection().replaceSelectionWith(paragraph.create(), true).scrollIntoView();
+                            if (dispatch) dispatch(transaction);
+                            return true;
+                        },
                 } as never;
             },
             addKeyboardShortcuts() {
@@ -136,26 +141,18 @@ export default Vue.extend({
             },
         });
 
-        function asContent(v: unknown): JSONContent | null {
-            if (_.isString(v)) {
-                if (v.length == 0) {
-                    return null;
-                }
-                return JSON.parse(v);
-            }
-            return v as JSONContent;
-        }
         // eslint-disable-next-line
         const thisComp = this;
         this.editor = new Editor({
             editable: !this.readonly,
-            content: asContent(this.value),
+            content: this.asContent(this.value),
             extensions: [
                 Document,
                 Paragraph,
                 Text,
                 ModifyEnter,
                 CustomNewLine,
+                CharacterCount,
                 Mention.configure({
                     HTMLAttributes: {
                         class: "mention",
@@ -163,12 +160,12 @@ export default Vue.extend({
                     suggestion: {
                         items: (props: { query: string; editor: Editor }): any[] => {
                             if (props.query.length > 0) {
-                                return (services.api.mentionables(props.query).then((mentionables) => {
+                                return services.api.mentionables(props.query).then((mentionables) => {
                                     console.log("mentionables", mentionables);
                                     return mentionables.users;
-                                }) as unknown) as any[];
+                                }) as unknown as any[];
                             } else {
-                                return (Promise.resolve([]) as unknown) as any[];
+                                return Promise.resolve([]) as unknown as any[];
                             }
                         },
                         render: () => {
@@ -229,14 +226,14 @@ export default Vue.extend({
                 }),
             ],
             onUpdate({ editor }) {
-                changed(editor.getJSON());
+                changed(editor);
             },
             onBlur({ editor }) {
                 console.log("editor-blur");
             },
             onFocus({ editor }) {
                 console.log("editor-focus");
-                thisComp.$emit('editor-focus');
+                thisComp.$emit("editor-focus");
             },
         });
 
@@ -279,6 +276,15 @@ export default Vue.extend({
             contentContainerEl.classList.toggle("truncated");
             this.seeMore = !show;
             this.seeLess = show;
+        },
+        asContent(v: unknown): JSONContent | null {
+            if (_.isString(v)) {
+                if (v.length == 0) {
+                    return null;
+                }
+                return JSON.parse(v);
+            }
+            return v as JSONContent;
         },
     },
 });

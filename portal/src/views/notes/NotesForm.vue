@@ -8,12 +8,31 @@
             </div>
         </div>
         <div class="site-notes">
-            <form id="form" data-cy="notesForm">
-                <NoteEditor :dataCy="'studyObjectiveBody'" v-model="form.studyObjective" :v="$v.form.studyObjective" :readonly="readonly" @change="onChange" />
-                <NoteEditor :dataCy="'sitePurposeBody'" v-model="form.sitePurpose" :v="$v.form.sitePurpose" :readonly="readonly" @change="onChange" />
-                <NoteEditor :dataCy="'siteCriteriaBody'" v-model="form.siteCriteria" :v="$v.form.siteCriteria" :readonly="readonly" @change="onChange" />
-                <NoteEditor :dataCy="'siteDescriptionBody'" v-model="form.siteDescription" :v="$v.form.siteDescription" :readonly="readonly" @change="onChange" />
-                <NoteEditor :dataCy="'customKeyBody'" v-model="form.customKey" :v="$v.form.customKey" :readonly="readonly" :editableTitle="true" @change="onChange" />
+            <form id="form">
+                <NoteEditor
+                    v-model="form.studyObjective"
+                    :v="$v.form.studyObjective"
+                    :readonly="readonly"
+                    :dataCy="'studyObjectiveBody'"
+                    @change="onChange('studyObjective')"
+                />
+                <NoteEditor v-model="form.sitePurpose" :v="$v.form.sitePurpose" :readonly="readonly" :dataCy="'sitePurposeBody'" @change="onChange('sitePurpose')" />
+                <NoteEditor v-model="form.siteCriteria" :v="$v.form.siteCriteria" :readonly="readonly" :dataCy="'siteCriteriaBody'" @change="onChange('siteCriteria')" />
+                <NoteEditor
+                    v-model="form.siteDescription"
+                    :v="$v.form.siteDescription"
+                    :readonly="readonly"
+                    :dataCy="'siteDescriptionBody'"
+                    @change="onChange('siteDescription')"
+                />
+                <NoteEditor
+                    v-model="form.customKey"
+                    :v="$v.form.customKey"
+                    :readonly="readonly"
+                    :editableTitle="true"
+                    :dataCy="'customKeyBody'"
+                    @change="onChange('customKey')"
+                />
             </form>
         </div>
     </div>
@@ -57,9 +76,7 @@ export default Vue.extend({
     data: () => {
         return {
             form: new Notes(),
-            notesState: {
-                dirty: false,
-            },
+            formBeforeChanges: new Notes(),
         };
     },
     computed: {
@@ -79,6 +96,7 @@ export default Vue.extend({
     },
     mounted(this: any) {
         this.form = Notes.createFrom({ notes: this.notes, media: this.media });
+        this.formBeforeChanges = JSON.parse(JSON.stringify(this.form));
     },
     methods: {
         async onSave(): Promise<void> {
@@ -91,22 +109,29 @@ export default Vue.extend({
             return this.$services.api
                 .patchStationNotes(this.station.id, payload)
                 .then(() => {
+                    this.$store.dispatch(ActionTypes.NEED_NOTES, { id: this.station.id });
                     this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
                         message: this.$tc("notes.updateSuccess"),
                         type: SnackbarStyle.success,
                     });
-                    this.$emit('saved');
+                    Notes.Keys.forEach((key) => {
+                        this.$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, key);
+                    });
+                    this.$emit("saved");
                 })
                 .catch(() => {
-                  this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
+                    this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
                         message: this.$tc("notes.updateFail"),
                         type: SnackbarStyle.fail,
                     });
                 });
         },
-        onChange(): void {
-            this.notesState.dirty = true;
-            this.$emit("change");
+        onChange(key: string): void {
+            if (this.form[key].body !== this.formBeforeChanges[key].body) {
+                this.$store.dispatch(ActionTypes.NEW_DIRTY_FIELD, key);
+            } else {
+                this.$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, key);
+            }
         },
     },
 });

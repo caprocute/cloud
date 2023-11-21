@@ -1,10 +1,12 @@
 VERSION_MAJOR = 0
 VERSION_MINOR = 3
-VERSION_PATCH = 50
+VERSION_PATCH = 52
 VERSION_PREL ?= $(BUILD_NUMBER)
 GIT_LOCAL_BRANCH ?= unknown
 GIT_HASH ?= $(shell git log -1 --format=%h)
 CI_CONTAINER_NAME ?= "fktests-$(GIT_LOCAL_BRANCH)"
+FIELDKIT_POSTGRES_URL ?= postgres://fieldkit:password@127.0.0.1:5432/fieldkit?sslmode=disable
+FIELDKIT_TIME_SCALE_URL ?= postgres://postgres:password@127.0.0.1:5433/fk?sslmode=disable
 
 VERSION := "$(VERSION_MAJOR).$(VERSION_MINOR).$(VERSION_PATCH)-$(GIT_LOCAL_BRANCH).$(VERSION_PREL)-$(GIT_HASH)"
 
@@ -47,7 +49,7 @@ charting-tests: charting-setup
 portal/src/secrets.ts: portal/src/secrets.ts.template
 	cp $^ $@
 
-binaries: $(BUILD)/server $(BUILD)/ingester $(BUILD)/fktool $(BUILD)/fkdata $(BUILD)/sanitizer $(BUILD)/webhook $(BUILD)/scratch $(BUILD)/movedata
+binaries: $(BUILD)/server $(BUILD)/ingester $(BUILD)/fktool $(BUILD)/fkdata $(BUILD)/sanitizer $(BUILD)/webhook $(BUILD)/scratch $(BUILD)/movedata $(BUILD)/merger
 
 portal/node_modules:
 	cd portal && $(JSPKG) install
@@ -86,6 +88,8 @@ webhook: $(BUILD)/webhook
 
 movedata: $(BUILD)/movedata
 
+merger: $(BUILD)/merger
+
 scratch: $(BUILD)/scratch
 
 $(BUILD)/server: $(SERVER_SOURCES)
@@ -108,6 +112,9 @@ $(BUILD)/webhook: server/cmd/webhook/*.go $(SERVER_SOURCES)
 
 $(BUILD)/movedata: server/cmd/movedata/*.go $(SERVER_SOURCES)
 	cd server/cmd/movedata && $(GO) build -o $@ *.go
+
+$(BUILD)/merger: server/cmd/merger/*.go $(SERVER_SOURCES)
+	cd server/cmd/merger && $(GO) build -o $@ *.go
 
 $(BUILD)/scratch: server/cmd/scratch/*.go $(SERVER_SOURCES)
 	cd server/cmd/scratch && $(GO) build -o $@ *.go
@@ -165,10 +172,10 @@ migrate-image:
 	cd migrations && make image
 
 migrate-up:
-	cd migrations && MIGRATE_PATH=`pwd`/primary MIGRATE_DATABASE_URL="postgres://fieldkit:password@127.0.0.1:5432/fieldkit?sslmode=disable" go run main.go migrate
+	cd migrations && MIGRATE_PATH=`pwd`/primary MIGRATE_DATABASE_URL=$(FIELDKIT_POSTGRES_URL) go run main.go migrate
 
 migrate-up-tsdb:
-	cd migrations && MIGRATE_PATH=`pwd`/tsdb MIGRATE_DATABASE_URL="postgres://postgres:password@127.0.0.1:5433/fk?sslmode=disable" go run main.go migrate
+	cd migrations && MIGRATE_PATH=`pwd`/tsdb MIGRATE_DATABASE_URL=$(FIELDKIT_TIME_SCALE_URL) go run main.go migrate
 
 ci: setup binaries jstests charting-setup
 
@@ -187,10 +194,6 @@ ci-db-tests:
 
 write-version:
 	echo $(VERSION) > version.txt
-
-docker-images:
-	cp portal/src/secrets.ts.aws portal/src/secrets.ts
-	WORKING_DIRECTORY=$(WORKING_DIRECTORY) DOCKER_TAG=$(DOCKER_TAG) VERSION=$(VERSION) ./build.sh
 
 sanitize: sanitizer
 	mkdir -p sanitize-data

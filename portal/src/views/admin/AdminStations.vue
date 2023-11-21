@@ -3,8 +3,6 @@
         <div class="container">
             <router-link :to="{ name: 'adminMain' }" class="link">Back to Admin</router-link>
 
-            <vue-confirm-dialog />
-
             <table class="stations">
                 <thead>
                     <tr class="header">

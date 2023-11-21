@@ -177,8 +177,8 @@ func (c *EventsService) AddDataEvent(ctx context.Context, payload *eventsService
 		Context:     context,
 		Title:       payload.Event.Title,
 		Description: payload.Event.Description,
-		Start:       time.Unix(payload.Event.Start/1000, 0),
-		End:         time.Unix(payload.Event.End/1000, 0),
+		Start:       time.Unix(payload.Event.Start/1000, 0).UTC(),
+		End:         time.Unix(payload.Event.End/1000, 0).UTC(),
 	})
 	if err != nil {
 		return nil, err

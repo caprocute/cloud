@@ -1,6 +1,5 @@
 <template>
     <StandardLayout>
-        <vue-confirm-dialog />
         <div class="container-wrap">
             <DoubleHeader
                 :backRoute="projectId ? 'viewStation' : 'viewStationFromMap'"

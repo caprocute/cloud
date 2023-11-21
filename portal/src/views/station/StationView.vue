@@ -31,14 +31,15 @@
 
                             <div v-if="!isPartnerCustomisationEnabled" class="station-description">
                                 <textarea
-                                    v-if="form.description !== undefined"
+                                    ref="stationDescription"
+                                    v-if="form.description || editingDescription"
                                     class="input"
-                                    oninput='this.style.height = "";this.style.height = this.scrollHeight + "px"'
+                                    @input="onStationDescriptionInput()"
                                     v-model="form.description"
                                     :disabled="!editingDescription"
                                 />
                                 <a
-                                    v-if="form.description === undefined"
+                                    v-if="!station.readOnly && !form.description && !editingDescription"
                                     @click="
                                         form.description = '';
                                         editingDescription = true;
@@ -50,7 +51,7 @@
 
                                 <template>
                                     <a
-                                        v-if="form.description && !editingDescription"
+                                        v-if="!station.readOnly && form.description && !editingDescription"
                                         @click="editingDescription = true"
                                         class="station-description-edit"
                                     >
@@ -58,7 +59,7 @@
                                     </a>
                                     <a
                                         @click="saveStationDescription()"
-                                        v-if="editingDescription && form.description"
+                                        v-if="editingDescription"
                                         class="station-description-edit"
                                         style="margin-top: 4px"
                                     >
@@ -154,11 +155,11 @@
                     >
                         <h3 class="module-data-title flex flex-al-center">
                             <img alt="Module icon" :src="getModuleImg(module)" />
-                            {{ $t(getModuleName(module)) }}
+                            {{ getModuleName(module) }}
                         </h3>
                         <TinyChart
                             :ref="'tinyChart-' + module.id"
-                            :moduleKey="module.name"
+                            :moduleKey="getModuleKey(module)"
                             :station-id="station.id"
                             :station="station"
                             :querier="sensorDataQuerier"
@@ -180,21 +181,21 @@
                             <img alt="Module icon" :src="getModuleImg(module)" />
                             <input
                                 v-if="editedModule && editedModule.id === module.id"
+                                v-model="editedModule.label"
                                 class="input"
                                 maxlength="25"
                                 :disabled="editedModule.id !== selectedModule.id"
                                 :title="editedModule.label"
-                                v-model="editedModule.label"
                             />
                             <input
                                 v-else
                                 class="input"
                                 maxlength="25"
-                                :title="module.label ? module.label : $t(getModuleName(module))"
                                 disabled
-                                :value="module.label ? module.label : $t(getModuleName(module))"
+                                :title="getModuleName(module)"
+                                :value="getModuleName(module)"
                             />
-                            <template v-if="!isCustomizationEnabled()">
+                            <template v-if="isModuleNameEditable">
                                 <a
                                     v-if="!editedModule || (editedModule && editedModule.id !== module.id)"
                                     @click="onEditModuleNameClick(module)"
@@ -210,11 +211,11 @@
                     </ul>
                     <header v-if="isMobileView">
                         <img alt="Module icon" :src="getModuleImg(selectedModule)" />
-                        {{ $t(getModuleName(selectedModule)) }}
+                        {{ getModuleName(selectedModule) }}
                     </header>
                     <div class="station-readings-values">
-                        <header v-if="!isMobileView">{{ $t(getModuleName(selectedModule)) }}</header>
-                        <LatestStationReadings :id="station.id" :moduleKey="getModuleName(selectedModule)" />
+                        <header v-if="!isMobileView">{{ getModuleName(selectedModule) }}</header>
+                        <LatestStationReadings :id="station.id" :moduleKey="getModuleKey(selectedModule)" />
                     </div>
                 </div>
             </section>
@@ -230,7 +231,7 @@
             </section>
 
             <section v-if="notes && !isCustomizationEnabled()" class="section-notes container-box">
-                <NotesForm v-bind:key="station.id" :station="station" :readonly="station.readOnly" @change="dirtyNotes = true" />
+                <NotesForm v-bind:key="station.id" :station="station" :readonly="station.readOnly" />
             </section>
 
             <section class="section-notes container-box">
@@ -274,6 +275,7 @@ import TinyChart from "@/views/viz/TinyChart.vue";
 import { BookmarkFactory, serializeBookmark } from "@/views/viz/viz";
 import { ExploreContext } from "@/views/viz/common";
 import FieldNotes from "@/views/fieldNotes/FieldNotes.vue";
+import { confirmLeaveWithDirtyCheck } from "@/store/modules/dirty";
 
 export default Vue.extend({
     name: "StationView",
@@ -295,7 +297,6 @@ export default Vue.extend({
         selectedModule: DisplayModule | null;
         isMobileView: boolean;
         loading: boolean;
-        dirtyNotes: boolean;
         sensorDataQuerier: SensorDataQuerier;
         editModuleIndex: number | null;
         editingDescription: boolean;
@@ -308,12 +309,11 @@ export default Vue.extend({
             selectedModule: null,
             isMobileView: window.screen.availWidth <= 500,
             loading: true,
-            dirtyNotes: false,
             editedModule: null,
             editModuleIndex: null,
             editingDescription: false,
             form: {
-                description: null,
+                description: "",
             },
             sensorDataQuerier: new SensorDataQuerier(this.$services.api),
         };
@@ -321,8 +321,10 @@ export default Vue.extend({
     watch: {
         station() {
             this.loading = false;
-            this.selectedModule = this.station.modules[0];
             this.form.description = this.station.description;
+            if (!this.selectedModule) {
+                this.selectedModule = this.station.modules[0];
+            }
         },
     },
     computed: {
@@ -389,25 +391,14 @@ export default Vue.extend({
         isPartnerCustomisationEnabled(): boolean {
             return isCustomisationEnabled();
         },
+        isModuleNameEditable(): boolean {
+          return !this.isPartnerCustomisationEnabled && !this.station.readOnly;
+        },
     },
-    beforeRouteLeave(to: never, from: never, next: any) {
-        if (this.dirtyNotes) {
-            this.$confirm({
-                message: this.$tc("notes.confirmLeavePopupMessage"),
-                button: {
-                    no: this.$tc("no"),
-                    yes: this.$tc("yes"),
-                },
-                callback: (confirm) => {
-                    if (confirm) {
-                        this.dirtyNotes = false;
-                        next();
-                    }
-                },
-            });
-        } else {
+    beforeRouteLeave(to: any, from: any, next: any) {
+        confirmLeaveWithDirtyCheck(() => {
             next();
-        }
+        }, this);
     },
     beforeMount(): Promise<any> {
         const stationId = this.$route.params.stationId;
@@ -432,14 +423,14 @@ export default Vue.extend({
             }
             return this.$loadAsset(utils.getBatteryIcon(this.station.battery));
         },
-        getModuleImg(module: ProjectModule): string {
+        getModuleImg(module: DisplayModule): string {
             return this.$loadAsset(utils.getModuleImg(module));
         },
-        getModuleName(module: DisplayModule) {
-            if (!module.label) {
-                return module.name.replace("modules.", "fk.");
-            }
-            return module.label;
+        getModuleName(module: DisplayModule): string {
+            return module.label || this.$tc(module.name.replace("modules.", "fk."));
+        },
+        getModuleKey(module: DisplayModule): string {
+            return module.name.replace("modules.", "fk.");
         },
         partnerCustomization(): PartnerCustomization {
             return getPartnerCustomizationWithDefault();
@@ -459,13 +450,15 @@ export default Vue.extend({
         saveStationDescription(): void {
             const payload = { id: this.station.id, name: this.station.name, ...this.form };
             this.$store.dispatch(ActionTypes.UPDATE_STATION, payload);
+            this.$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, "stationDescription");
             this.editingDescription = false;
         },
         onEditModuleNameClick(module: DisplayModule): void {
             this.editedModule = JSON.parse(JSON.stringify(module));
             if (this.editedModule) {
-                this.editedModule.label = this.$tc(this.getModuleName(module));
+                this.editedModule.label = this.getModuleName(module);
             }
+            this.$store.dispatch(ActionTypes.NEW_DIRTY_FIELD, "editModuleName");
         },
         saveModuleName(): void {
             if (!this.editedModule) {
@@ -473,7 +466,9 @@ export default Vue.extend({
             }
             const payload = { stationId: this.station.id, moduleId: this.editedModule.id, label: this.editedModule.label };
             this.$store.dispatch(ActionTypes.UPDATE_STATION_MODULE, payload).then(() => {
+                this.selectedModule = this.editedModule;
                 this.editedModule = null;
+                this.$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, "editModuleName");
             });
         },
         selectModule(module: DisplayModule) {
@@ -499,6 +494,17 @@ export default Vue.extend({
                     window.open(url, "_blank");
                 }
             }
+        },
+        onStationDescriptionInput() {
+            const el = this.$refs["stationDescription"] as HTMLElement;
+
+            if (!el) {
+                throw new Error("Can not find stationDescription ref");
+            }
+
+            el.style.height = "";
+            el.style.height = el.scrollHeight + "px";
+            this.$store.dispatch(ActionTypes.NEW_DIRTY_FIELD, "stationDescription");
         },
     },
 });
@@ -738,6 +744,7 @@ export default Vue.extend({
 
                 input {
                     cursor: initial;
+                    z-index: 0; // needed so that the input is editable when active
                 }
             }
 
@@ -757,6 +764,7 @@ export default Vue.extend({
                 @include bp-down($sm) {
                     display: block;
                 }
+                z-index: -1; // allows module list toggle to work
             }
         }
 
@@ -895,6 +903,9 @@ export default Vue.extend({
             width: 100%;
             resize: none;
             overflow: hidden;
+            // iOS safari fix to have same styling
+            opacity: 1;
+            -webkit-text-fill-color: #2c3e50;
 
             &:disabled {
                 padding: 0;
