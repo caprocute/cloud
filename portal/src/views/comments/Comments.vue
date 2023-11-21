@@ -405,6 +405,9 @@ export default Vue.extend({
         };
     },
     computed: {
+      ActionTypes() {
+        return ActionTypes
+      },
         projectId(): number {
             if (this.parentData instanceof Bookmark) {
                 return this.parentData.p[0];
