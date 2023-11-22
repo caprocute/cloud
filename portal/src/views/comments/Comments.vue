@@ -119,7 +119,7 @@
                         </div>
                     </template>
                     <template v-else>
-                        <p class="need-login-msg" @click="test()">
+                        <p class="need-login-msg">
                             {{ $tc("comments.loginToComment.part1") }}
                             <router-link
                                 :to="{ name: 'login', query: { after: $route.path, params: JSON.stringify($route.query) } }"
@@ -564,7 +564,7 @@ export default Vue.extend({
                                         response.post.updatedAt
                                     )
                                 );
-                            this.newReply.body = "";
+                            this.resetNewReply();
                         } else {
                             console.warn(`posts is null`);
                         }
@@ -660,8 +660,8 @@ export default Vue.extend({
                 .editComment(commentID, body)
                 .then((response) => {
                     if (response) {
-                      this.$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, dirtyInputId);
-                      this.getComments();
+                        this.$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, dirtyInputId);
+                        this.getComments();
                     } else {
                         this.errorMessage = CommentsErrorsEnum.deleteComment;
                     }
@@ -710,7 +710,7 @@ export default Vue.extend({
                     if (response) {
                         this.newDataEvent.title = "";
                         this.newDataEvent.description = "";
-                        this.$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, 'editEventDesc#' + dataEvent.id)
+                        this.$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, 'editEventDesc#' + dataEvent.id);
                         this.getDataEvents();
                     }
                 })
@@ -832,6 +832,13 @@ export default Vue.extend({
             } else {
                 this.$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, "editComment#" + comment.id);
             }
+        },
+        resetNewReply() {
+            this.newReply = {
+                ...this.newReply,
+                body: null,
+                threadId: null,
+            };
         },
     },
 });
