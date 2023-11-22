@@ -435,7 +435,6 @@
         "title": "Station Details",
         "failed": "Oops, there was a problem saving your changes.",
         "success": "Saved.",
-        "confirmLeavePopupMessage": "You have unsaved changes. Are you sure you want to leave?",
         "noFieldData": "Nothing added yet.",
         "complete": "Complete",
         "btn": {
@@ -520,5 +519,19 @@
         "noData": "There's no data to display."
     },
     "edit": "Edit",
-    "save": "Save"
+    "save": "Save",
+    "dirtyInputs": {
+        "confirmLeaveDetailedTitle": "The following fields have not been saved yet:",
+        "confirmLeaveDetailedMsg": "Are you sure you want to leave?",
+        "confirmLeaveBasic": "You have unsaved changes. Are you sure you want to leave?",
+        "stationDescription": "Station description",
+        "editModuleName": "Module name",
+        "studyObjective": "Study objective",
+        "sitePurpose":"Site purpose",
+        "siteCriteria": "Site criteria",
+        "siteDescription": "Site description",
+        "customKey": "Custom note field",
+        "newFieldNote": "New Field note",
+        "editFieldNote": "Edited Field note"
+    }
 }

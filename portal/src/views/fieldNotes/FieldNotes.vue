@@ -249,7 +249,7 @@ export default Vue.extend({
                     message: this.$tc("fieldNotes.editSuccess"),
                     type: SnackbarStyle.success,
                 });
-                await this.$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, "editFieldNote-" + fieldNote.id);
+                await this.$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, "editFieldNote#" + fieldNote.id);
             } catch (e) {
                 return this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
                     message: this.$tc("somethingWentWrong"),
@@ -324,7 +324,7 @@ export default Vue.extend({
                         if (confirm && this.editingFieldNote) {
                             editorRef[0].editor.commands.setContent(JSON.parse(fieldNote.body));
                             this.editingFieldNote = null;
-                            await this.$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, "editFieldNote-" + fieldNote.id);
+                            await this.$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, "editFieldNote#" + fieldNote.id);
                         }
                     },
                 });
@@ -398,9 +398,9 @@ export default Vue.extend({
         },
         onEditFieldNoteInput(fieldNote: PortalStationFieldNotes, event: string) {
             if (JSON.stringify(event) !== fieldNote.body) {
-                this.$store.dispatch(ActionTypes.NEW_DIRTY_FIELD, "editFieldNote-" + fieldNote.id);
+                this.$store.dispatch(ActionTypes.NEW_DIRTY_FIELD, "editFieldNote#" + fieldNote.id);
             } else {
-                this.$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, "editFieldNote-" + fieldNote.id);
+                this.$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, "editFieldNote#" + fieldNote.id);
             }
         },
     },

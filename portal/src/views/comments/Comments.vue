@@ -215,9 +215,9 @@
                                 v-model="item.body"
                                 :readonly="item.readonly"
                                 saveLabel="Save"
-                                @input="$store.dispatch(ActionTypes.NEW_DIRTY_FIELD, 'editComment-' + item.id)"
-                                @empty="$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, 'editComment-' + item.id)"
-                                @save="saveEdit(item.id, item.body, 'editComment-' + item.id)"
+                                @input="$store.dispatch(ActionTypes.NEW_DIRTY_FIELD, 'editComment#' + item.id)"
+                                @empty="$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, 'editComment#' + item.id)"
+                                @save="saveEdit(item.id, item.body, 'editComment#' + item.id)"
                             />
                             <div v-else class="edit-event">
                                 <Tiptap
@@ -226,8 +226,8 @@
                                     :placeholder="$tc('comments.eventForm.title.placeholder')"
                                     :saveLabel="$tc('comments.eventForm.title.saveLabel')"
                                     :showSaveButton="false"
-                                    @input="$store.dispatch(ActionTypes.NEW_DIRTY_FIELD, 'editEventTitle-' + item.id)"
-                                    @empty="$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, 'editEventTitle-' + item.id)"
+                                    @input="$store.dispatch(ActionTypes.NEW_DIRTY_FIELD, 'editEventTitle#' + item.id)"
+                                    @empty="$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, 'editEventTitle#' + item.id)"
                                     @save="saveEditDataEvent(item)"
                                 />
                                 <div class="event-range">{{ item.start | prettyDateTime }} - {{ item.end | prettyDateTime }}</div>
@@ -236,8 +236,8 @@
                                     :readonly="item.readonly"
                                     :placeholder="$tc('comments.eventForm.description.placeholder')"
                                     :saveLabel="$tc('comments.eventForm.description.saveLabel')"
-                                    @input="$store.dispatch(ActionTypes.NEW_DIRTY_FIELD, 'editEventDesc-' + item.id)"
-                                    @empty="$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, 'editEventDesc-' + item.id)"
+                                    @input="$store.dispatch(ActionTypes.NEW_DIRTY_FIELD, 'editEventDesc#' + item.id)"
+                                    @empty="$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, 'editEventDesc#' + item.id)"
                                     @save="saveEditDataEvent(item)"
                                 />
                             </div>
@@ -269,9 +269,9 @@
                                             v-model="reply.body"
                                             :readonly="reply.readonly"
                                             :saveLabel="$tc('comments.reply.saveLabel')"
-                                            @input="$store.dispatch(ActionTypes.NEW_DIRTY_FIELD, 'editCommentReply-' + reply.id)"
-                                            @empty="$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, 'editCommentReply-' + reply.id)"
-                                            @save="saveEdit(reply.id, reply.body, 'editCommentReply-' + reply.id)"
+                                            @input="$store.dispatch(ActionTypes.NEW_DIRTY_FIELD, 'editCommentReply#' + reply.id)"
+                                            @empty="$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, 'editCommentReply#' + reply.id)"
+                                            @save="saveEdit(reply.id, reply.body, 'editCommentReply#' + reply.id)"
                                         />
                                     </div>
                                 </div>
@@ -710,7 +710,7 @@ export default Vue.extend({
                     if (response) {
                         this.newDataEvent.title = "";
                         this.newDataEvent.description = "";
-                        this.$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, "editEventDesc-" + dataEvent.id);
+                        this.$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, 'editEventDesc#' + dataEvent.id);
                         this.getDataEvents();
                     }
                 })
@@ -828,9 +828,9 @@ export default Vue.extend({
         },
         onEditCommentInput(comment: any, event: string) {
             if (JSON.stringify(event) !== comment.body) {
-                this.$store.dispatch(ActionTypes.NEW_DIRTY_FIELD, "editComment-" + comment.id);
+                this.$store.dispatch(ActionTypes.NEW_DIRTY_FIELD, "editComment#" + comment.id);
             } else {
-                this.$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, "editComment-" + comment.id);
+                this.$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, "editComment#" + comment.id);
             }
         },
         resetNewReply() {
