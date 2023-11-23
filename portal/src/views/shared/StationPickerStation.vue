@@ -37,9 +37,7 @@ export default Vue.extend({
                 .map((v) => v.toFixed(3))
                 .join(", ");
             const locations = [gps, "Unknown"];
-            return _(locations)
-                .compact()
-                .first();
+            return _(locations).compact().first();
         },
         status(this: any) {
             if (this.station.deployedAt) {
@@ -69,6 +67,7 @@ export default Vue.extend({
     flex: 0 0 calc(33% - 16px);
     box-sizing: border-box;
     cursor: pointer;
+    box-shadow: 0px 0px 4px 1px rgba(0, 0, 0, 0.1);
 
     @include bp-down($sm) {
         flex: 0 0 calc(50% - 18px);

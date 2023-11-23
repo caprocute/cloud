@@ -49,9 +49,9 @@
                             <img
                                 :alt="$tc('station.navigateToStation')"
                                 class="navigate-button"
-                                :src="$loadAsset(interpolatePartner('tooltip-') + '.svg')"
-                                width="24px"
-                                height="24px"
+                                src="@/assets/map_arrow.png"
+                                width="18px"
+                                height="18px"
                                 @click="openNotes(station)"
                             />
                         </div>
