@@ -45,15 +45,8 @@
                         :narrow="true"
                         @selected="showSummary(station)"
                     >
-                        <div class="station-links">
-                            <img
-                                :alt="$tc('station.navigateToStation')"
-                                class="navigate-button"
-                                src="@/assets/map_arrow.png"
-                                width="18px"
-                                height="18px"
-                                @click="openNotes(station)"
-                            />
+                        <div class="station-links" @click="openNotes(station)" :title="$tc('station.navigateToStation')">
+                            <i class="icon icon-arrow"></i>
                         </div>
                     </TinyStation>
                 </div>
@@ -430,11 +423,8 @@ export default Vue.extend({
     align-items: center;
     border-left: 1px solid var(--color-border);
     text-align: center;
-    cursor: initial;
-
-    img {
-        cursor: pointer;
-    }
+    cursor: pointer;
+    font-size: 14px;
 }
 
 .station-links .remove {
