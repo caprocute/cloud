@@ -224,7 +224,9 @@
         "singleProjectTitle": "Project:",
         "multipleProjectsTitle": "Projects:",
         "data": "Data",
-        "exploreData": "Explore Data"
+        "exploreData": "Explore Data",
+        "descriptionUpdateSuccess": "Station description updated successfully!",
+        "moduleNameUpdateSuccess": "Module name updated successfully!"
     },
     "user": {
         "profile": {
@@ -427,7 +429,11 @@
         "reply": {
             "placeholder": "Reply to comment",
             "saveLabel": "Save"
-        }
+        },
+        "saveSuccess": "Comment saved successfully!",
+        "deleteSuccess": "Comment deleted successfully!",
+        "dataEventSuccess": "Event saved successfully!",
+        "dataEventDeleteSuccess": "Event deleted successfully!"
     },
     "seeMore": "See more",
     "seeLess": "See less",
@@ -440,7 +446,7 @@
         "btn": {
             "save": "Save"
         },
-        "updateSuccess": "Notes updated!",
+        "updateSuccess": "Station details updated successfully!",
         "updateFail": "Notes update failed!",
         "customTitleEditLabel": "Edit",
         "stationDescriptionEditLabel": "Edit",
