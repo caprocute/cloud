@@ -135,6 +135,12 @@ export default Vue.extend({
             next();
         }, this);
     },
+    // needed for project nav from sidebar menu (route is not changed, only route param)
+    beforeRouteUpdate(to: any, from: any, next: any) {
+        confirmLeaveWithDirtyCheck(() => {
+            next();
+        }, this);
+    },
     methods: {
         goBack() {
             if (window.history.length > 1) {
