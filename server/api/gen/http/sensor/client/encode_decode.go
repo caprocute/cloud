@@ -889,13 +889,13 @@ func DecodeBookmarkResponse(decoder func(*http.Response) goahttp.Decoder, restor
 			if err != nil {
 				return nil, goahttp.ErrDecodingError("sensor", "bookmark", err)
 			}
-			p := NewBookmarkSavedBookmarkOK(&body)
+			p := NewBookmarkAndPermissionsViewOK(&body)
 			view := "default"
-			vres := &sensorviews.SavedBookmark{Projected: p, View: view}
-			if err = sensorviews.ValidateSavedBookmark(vres); err != nil {
+			vres := &sensorviews.BookmarkAndPermissions{Projected: p, View: view}
+			if err = sensorviews.ValidateBookmarkAndPermissions(vres); err != nil {
 				return nil, goahttp.ErrValidationError("sensor", "bookmark", err)
 			}
-			res := sensor.NewSavedBookmark(vres)
+			res := sensor.NewBookmarkAndPermissions(vres)
 			return res, nil
 		case http.StatusUnauthorized:
 			var (
@@ -1031,13 +1031,13 @@ func DecodeResolveResponse(decoder func(*http.Response) goahttp.Decoder, restore
 			if err != nil {
 				return nil, goahttp.ErrDecodingError("sensor", "resolve", err)
 			}
-			p := NewResolveSavedBookmarkOK(&body)
+			p := NewResolveBookmarkAndPermissionsOK(&body)
 			view := "default"
-			vres := &sensorviews.SavedBookmark{Projected: p, View: view}
-			if err = sensorviews.ValidateSavedBookmark(vres); err != nil {
+			vres := &sensorviews.BookmarkAndPermissions{Projected: p, View: view}
+			if err = sensorviews.ValidateBookmarkAndPermissions(vres); err != nil {
 				return nil, goahttp.ErrValidationError("sensor", "resolve", err)
 			}
-			res := sensor.NewSavedBookmark(vres)
+			res := sensor.NewBookmarkAndPermissions(vres)
 			return res, nil
 		case http.StatusUnauthorized:
 			var (
@@ -1100,4 +1100,16 @@ func DecodeResolveResponse(decoder func(*http.Response) goahttp.Decoder, restore
 			return nil, goahttp.ErrInvalidResponse("sensor", "resolve", resp.StatusCode, string(body))
 		}
 	}
+}
+
+// unmarshalBookmarkPermissionsResponseBodyToSensorviewsBookmarkPermissionsView
+// builds a value of type *sensorviews.BookmarkPermissionsView from a value of
+// type *BookmarkPermissionsResponseBody.
+func unmarshalBookmarkPermissionsResponseBodyToSensorviewsBookmarkPermissionsView(v *BookmarkPermissionsResponseBody) *sensorviews.BookmarkPermissionsView {
+	res := &sensorviews.BookmarkPermissionsView{
+		CanAddEvent:   v.CanAddEvent,
+		CanAddComment: v.CanAddComment,
+	}
+
+	return res
 }

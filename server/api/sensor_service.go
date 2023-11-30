@@ -258,7 +258,7 @@ func (c *SensorService) Meta(ctx context.Context) (*sensor.MetaResult, error) { 
 	}
 }
 
-func (c *SensorService) Bookmark(ctx context.Context, payload *sensor.BookmarkPayload) (*sensor.SavedBookmark, error) {
+func (c *SensorService) Bookmark(ctx context.Context, payload *sensor.BookmarkPayload) (*sensor.BookmarkAndPermissions, error) {
 	repository := repositories.NewBookmarkRepository(c.options.Database)
 
 	saved, err := repository.AddNew(ctx, nil, payload.Bookmark)
@@ -266,14 +266,15 @@ func (c *SensorService) Bookmark(ctx context.Context, payload *sensor.BookmarkPa
 		return nil, err
 	}
 
-	return &sensor.SavedBookmark{
-		URL:      fmt.Sprintf("/viz?v=%s", saved.Token),
-		Token:    saved.Token,
-		Bookmark: payload.Bookmark,
+	return &sensor.BookmarkAndPermissions{
+		URL:         fmt.Sprintf("/viz?v=%s", saved.Token),
+		Token:       saved.Token,
+		Bookmark:    payload.Bookmark,
+		Permissions: &sensor.BookmarkPermissions{},
 	}, nil
 }
 
-func (c *SensorService) Resolve(ctx context.Context, payload *sensor.ResolvePayload) (*sensor.SavedBookmark, error) {
+func (c *SensorService) Resolve(ctx context.Context, payload *sensor.ResolvePayload) (*sensor.BookmarkAndPermissions, error) {
 	repository := repositories.NewBookmarkRepository(c.options.Database)
 
 	resolved, err := repository.Resolve(ctx, payload.V)
@@ -284,7 +285,7 @@ func (c *SensorService) Resolve(ctx context.Context, payload *sensor.ResolvePayl
 		return nil, sensor.MakeNotFound(errors.New("not found"))
 	}
 
-	return &sensor.SavedBookmark{
+	return &sensor.BookmarkAndPermissions{
 		URL:      fmt.Sprintf("/viz?v=%s", resolved.Token),
 		Bookmark: resolved.Bookmark,
 	}, nil

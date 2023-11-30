@@ -100,21 +100,21 @@ func (c *Client) Recently(ctx context.Context, p *RecentlyPayload) (res *Recentl
 }
 
 // Bookmark calls the "bookmark" endpoint of the "sensor" service.
-func (c *Client) Bookmark(ctx context.Context, p *BookmarkPayload) (res *SavedBookmark, err error) {
+func (c *Client) Bookmark(ctx context.Context, p *BookmarkPayload) (res *BookmarkAndPermissions, err error) {
 	var ires interface{}
 	ires, err = c.BookmarkEndpoint(ctx, p)
 	if err != nil {
 		return
 	}
-	return ires.(*SavedBookmark), nil
+	return ires.(*BookmarkAndPermissions), nil
 }
 
 // Resolve calls the "resolve" endpoint of the "sensor" service.
-func (c *Client) Resolve(ctx context.Context, p *ResolvePayload) (res *SavedBookmark, err error) {
+func (c *Client) Resolve(ctx context.Context, p *ResolvePayload) (res *BookmarkAndPermissions, err error) {
 	var ires interface{}
 	ires, err = c.ResolveEndpoint(ctx, p)
 	if err != nil {
 		return
 	}
-	return ires.(*SavedBookmark), nil
+	return ires.(*BookmarkAndPermissions), nil
 }

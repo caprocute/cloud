@@ -664,7 +664,7 @@ func EncodeRecentlyError(encoder func(context.Context, http.ResponseWriter) goah
 // sensor bookmark endpoint.
 func EncodeBookmarkResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
 	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
-		res := v.(*sensorviews.SavedBookmark)
+		res := v.(*sensorviews.BookmarkAndPermissions)
 		enc := encoder(ctx, w)
 		body := NewBookmarkResponseBody(res.Projected)
 		w.WriteHeader(http.StatusOK)
@@ -773,7 +773,7 @@ func EncodeBookmarkError(encoder func(context.Context, http.ResponseWriter) goah
 // sensor resolve endpoint.
 func EncodeResolveResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
 	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
-		res := v.(*sensorviews.SavedBookmark)
+		res := v.(*sensorviews.BookmarkAndPermissions)
 		enc := encoder(ctx, w)
 		body := NewResolveResponseBody(res.Projected)
 		w.WriteHeader(http.StatusOK)
@@ -876,4 +876,16 @@ func EncodeResolveError(encoder func(context.Context, http.ResponseWriter) goaht
 			return encodeError(ctx, w, v)
 		}
 	}
+}
+
+// marshalSensorviewsBookmarkPermissionsViewToBookmarkPermissionsResponseBody
+// builds a value of type *BookmarkPermissionsResponseBody from a value of type
+// *sensorviews.BookmarkPermissionsView.
+func marshalSensorviewsBookmarkPermissionsViewToBookmarkPermissionsResponseBody(v *sensorviews.BookmarkPermissionsView) *BookmarkPermissionsResponseBody {
+	res := &BookmarkPermissionsResponseBody{
+		CanAddEvent:   *v.CanAddEvent,
+		CanAddComment: *v.CanAddComment,
+	}
+
+	return res
 }

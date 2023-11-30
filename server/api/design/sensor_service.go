@@ -177,7 +177,7 @@ var _ = Service("sensor", func() {
 			Required("bookmark")
 		})
 
-		Result(SavedBookmark)
+		Result(BookmarkAndPermissions)
 
 		HTTP(func() {
 			POST("bookmarks/save")
@@ -201,7 +201,7 @@ var _ = Service("sensor", func() {
 			Required("v")
 		})
 
-		Result(SavedBookmark)
+		Result(BookmarkAndPermissions)
 
 		HTTP(func() {
 			GET("bookmarks/resolve")
@@ -215,6 +215,36 @@ var _ = Service("sensor", func() {
 	})
 
 	commonOptions()
+})
+
+var BookmarkPermissions = ResultType("application/vnd.app.bookmark.permissions", func() {
+	TypeName("BookmarkPermissions")
+	Attributes(func() {
+		Attribute("canAddEvent", Boolean)
+		Attribute("canAddComment", Boolean)
+		Required("canAddEvent", "canAddComment")
+	})
+	View("default", func() {
+		Attribute("canAddEvent")
+		Attribute("canAddComment")
+	})
+})
+
+var BookmarkAndPermissions = ResultType("application/vnd.app.bookmark-and-permissions", func() {
+	TypeName("BookmarkAndPermissions ")
+	Attributes(func() {
+		Attribute("url", String)
+		Attribute("bookmark", String)
+		Attribute("token", String)
+		Attribute("permissions", BookmarkPermissions)
+		Required("url", "bookmark", "token", "permissions")
+	})
+	View("default", func() {
+		Attribute("url")
+		Attribute("bookmark")
+		Attribute("token")
+		Attribute("permissions")
+	})
 })
 
 var SavedBookmark = ResultType("application/vnd.app.bookmark", func() {
