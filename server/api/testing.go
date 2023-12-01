@@ -2,7 +2,6 @@ package api
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/fieldkit/cloud/server/common/sqlxcache"
@@ -45,7 +44,7 @@ func NewServiceOptions(e *tests.TestEnv) (*ControllerOptions, error) {
 
 func NewTestableApi(e *tests.TestEnv) (http.Handler, error) {
 	if testHandler != nil {
-		log.Printf("using existing test api")
+		// log.Printf("using existing test api")
 		return testHandler, nil
 	}
 
