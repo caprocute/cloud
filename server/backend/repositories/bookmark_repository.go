@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/fieldkit/cloud/server/common/sqlxcache"
+	"github.com/fieldkit/cloud/server/data"
 
 	gonanoid "github.com/matoous/go-nanoid/v2"
 )
@@ -25,6 +26,10 @@ type SavedBookmark struct {
 	Bookmark     string    `db:"bookmark"`
 	CreatedAt    time.Time `db:"created_at"`
 	ReferencedAt time.Time `db:"referenced_at"`
+}
+
+func (b *SavedBookmark) Parse() (*data.Bookmark, error) {
+	return data.ParseBookmark(b.Bookmark)
 }
 
 func (c *BookmarkRepository) AddNew(ctx context.Context, userID *int32, bookmark string) (*SavedBookmark, error) {
