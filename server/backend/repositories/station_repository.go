@@ -114,6 +114,28 @@ func (r *StationRepository) UpdatePhoto(ctx context.Context, station *data.Stati
 	return nil
 }
 
+func (r *StationRepository) QueryStationsByIDs(ctx context.Context, ids []int32) (stations []*data.Station, err error) {
+	stations = make([]*data.Station, 0)
+	if len(ids) == 0 {
+		return
+	}
+	query, args, err := sqlx.In(`
+		SELECT
+			id, name, device_id, model_id, owner_id, created_at, updated_at, battery, location_name, place_other, place_native, photo_id,
+			recording_started_at, memory_used, memory_available, firmware_number, firmware_time, ST_AsBinary(location) AS location, hidden, description, status
+		FROM fieldkit.station WHERE id IN (?)
+	`, ids)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := r.db.SelectContext(ctx, &stations, r.db.Rebind(query), args...); err != nil {
+		return nil, err
+	}
+
+	return stations, nil
+}
+
 func (r *StationRepository) QueryStationByID(ctx context.Context, id int32) (station *data.Station, err error) {
 	station = &data.Station{}
 	if err := r.db.GetContext(ctx, station, `

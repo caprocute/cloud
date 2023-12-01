@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/fieldkit/cloud/server/common/sqlxcache"
+	"github.com/jmoiron/sqlx"
 
 	"github.com/fieldkit/cloud/server/data"
 )
@@ -91,6 +92,26 @@ func (pr *ProjectRepository) QueryByID(ctx context.Context, projectID int32) (*d
 	return getting, nil
 }
 
+func (pr *ProjectRepository) QueryByIDs(ctx context.Context, projectIDs []int32) ([]*data.Project, error) {
+	if len(projectIDs) == 0 {
+		return make([]*data.Project, 0), nil
+	}
+
+	query, args, err := sqlx.In(`
+	SELECT id, name, description, goal, location, tags, privacy, start_time, end_time, bounds, show_stations, community_ranking FROM fieldkit.project WHERE id IN (?)
+	`, projectIDs)
+	if err != nil {
+		return nil, err
+	}
+
+	getting := make([]*data.Project, 0)
+	if err := pr.db.SelectContext(ctx, &getting, pr.db.Rebind(query), args...); err != nil {
+		return nil, err
+	}
+
+	return getting, nil
+}
+
 func (pr *ProjectRepository) QueryProjectUser(ctx context.Context, userID, projectID int32) (*data.ProjectUser, error) {
 	projectUsers := []*data.ProjectUser{}
 	if err := pr.db.SelectContext(ctx, &projectUsers, `
@@ -104,6 +125,23 @@ func (pr *ProjectRepository) QueryProjectUser(ctx context.Context, userID, proje
 	}
 
 	return projectUsers[0], nil
+}
+
+func (pr *ProjectRepository) QueryProjectUsers(ctx context.Context, userID int32) (map[int32]*data.ProjectUser, error) {
+	projectUsers := []*data.ProjectUser{}
+	if err := pr.db.SelectContext(ctx, &projectUsers, `
+		SELECT user_id, project_id, role FROM fieldkit.project_user WHERE user_id = $1
+		`, userID); err != nil {
+		return nil, err
+	}
+
+	mapped := make(map[int32]*data.ProjectUser)
+
+	for _, pu := range projectUsers {
+		mapped[pu.ProjectID] = pu
+	}
+
+	return mapped, nil
 }
 
 func (pr *ProjectRepository) QueryUserProjectRelationships(ctx context.Context, userID int32) (map[int32]*data.UserProjectRelationship, error) {
