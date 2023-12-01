@@ -131,6 +131,14 @@ func (e *TestEnv) AddProjectUser(p *data.Project, u *data.User, r *data.Role) er
 	return nil
 }
 
+func (e *TestEnv) AddStation() (*data.Station, error) {
+	stations, err := e.AddStations(1)
+	if err != nil {
+		return nil, err
+	}
+	return stations.Stations[0], nil
+}
+
 func (e *TestEnv) AddStationsOwnedBy(owner *data.User, number int) ([]*data.Station, error) {
 	stations := []*data.Station{}
 

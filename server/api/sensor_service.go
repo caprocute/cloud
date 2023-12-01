@@ -266,11 +266,16 @@ func (c *SensorService) Bookmark(ctx context.Context, payload *sensor.BookmarkPa
 		return nil, err
 	}
 
+	permissions, err := c.MakeBookmarkPermissions(ctx, saved)
+	if err != nil {
+		return nil, err
+	}
+
 	return &sensor.BookmarkAndPermissions{
 		URL:         fmt.Sprintf("/viz?v=%s", saved.Token),
 		Token:       saved.Token,
 		Bookmark:    payload.Bookmark,
-		Permissions: &sensor.BookmarkPermissions{},
+		Permissions: permissions,
 	}, nil
 }
 
@@ -285,9 +290,15 @@ func (c *SensorService) Resolve(ctx context.Context, payload *sensor.ResolvePayl
 		return nil, sensor.MakeNotFound(errors.New("not found"))
 	}
 
+	permissions, err := c.MakeBookmarkPermissions(ctx, resolved)
+	if err != nil {
+		return nil, err
+	}
+
 	return &sensor.BookmarkAndPermissions{
-		URL:      fmt.Sprintf("/viz?v=%s", resolved.Token),
-		Bookmark: resolved.Bookmark,
+		URL:         fmt.Sprintf("/viz?v=%s", resolved.Token),
+		Bookmark:    resolved.Bookmark,
+		Permissions: permissions,
 	}, nil
 }
 
@@ -300,4 +311,199 @@ func (s *SensorService) JWTAuth(ctx context.Context, token string, scheme *secur
 		Unauthorized: func(m string) error { return sensor.MakeUnauthorized(errors.New(m)) },
 		Forbidden:    func(m string) error { return sensor.MakeForbidden(errors.New(m)) },
 	})
+}
+
+func (c *SensorService) MakeBookmarkPermissions(ctx context.Context, saved *repositories.SavedBookmark) (*sensor.BookmarkPermissions, error) {
+	p, err := NewPermissions(ctx, c.options).Unwrap()
+	if err != nil {
+		return nil, err
+	}
+
+	if p.Anonymous() {
+		return &sensor.BookmarkPermissions{
+			CanAddEvent:   false,
+			CanAddComment: false,
+		}, nil
+	}
+
+	bookmark, err := saved.Parse()
+	if err != nil {
+		return nil, err
+	}
+
+	userID := p.UserID()
+
+	r := NewBookmarkPermissionsRepository(c.options.Database)
+
+	return r.MakeBookmarkPermissions(ctx, bookmark, userID)
+}
+
+type BookmarkPermissionsRepository struct {
+	db *sqlxcache.DB
+}
+
+func NewBookmarkPermissionsRepository(db *sqlxcache.DB) *BookmarkPermissionsRepository {
+	return &BookmarkPermissionsRepository{db: db}
+}
+
+func (r *BookmarkPermissionsRepository) MakeBookmarkPermissions(ctx context.Context, bookmark *data.Bookmark, userID int32) (*sensor.BookmarkPermissions, error) {
+	log := Logger(ctx).Sugar()
+
+	projectIDs, err := bookmark.ProjectIDs()
+	if err != nil {
+		log.Errorw("permissions", "error", err)
+		return &sensor.BookmarkPermissions{
+			CanAddEvent:   false,
+			CanAddComment: false,
+		}, nil
+	}
+
+	stationIDs, err := bookmark.StationIDs()
+	if err != nil {
+		log.Errorw("permissions", "error", err)
+		return &sensor.BookmarkPermissions{
+			CanAddEvent:   false,
+			CanAddComment: false,
+		}, nil
+	}
+
+	userStations, err := NewUserStations(ctx, r.db, userID, stationIDs)
+	if err != nil {
+		return nil, err
+	}
+
+	userProjects, err := NewUserProjects(ctx, r.db, userID, projectIDs)
+	if err != nil {
+		return nil, err
+	}
+
+	canAddEvent := userProjects.AnyProjects() && userProjects.AdminInAllProjects()
+	canAddComment :=
+		(userStations.AnyStations() && !userStations.AnyUnownedPrivateStations()) && !userProjects.AnyPrivateProjectsOutsideOf()
+
+	log.Infow("permissions", "any_projects", userProjects.AnyProjects(),
+		"in_any_projects", userProjects.InAnyProjects(),
+		"all_public_projects", userProjects.AllPublicProjects(),
+		"admin_in_all_projects", userProjects.AdminInAllProjects(),
+		"any_private_projects_outside_of", userProjects.AnyPrivateProjectsOutsideOf())
+
+	return &sensor.BookmarkPermissions{
+		CanAddEvent:   canAddEvent,
+		CanAddComment: canAddComment,
+	}, nil
+}
+
+type UserStations struct {
+	userID          int32
+	stations        []*data.Station
+	userProjects    map[int32]*data.ProjectUser
+	stationProjects map[int32][]int32
+	projectStations map[int32][]int32
+}
+
+func NewUserStations(ctx context.Context, db *sqlxcache.DB, userID int32, stationIDs []int32) (*UserStations, error) {
+	sr := repositories.NewStationRepository(db)
+	pr := repositories.NewProjectRepository(db)
+
+	userProjects, err := pr.QueryProjectUsers(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	stations, err := sr.QueryStationsByIDs(ctx, stationIDs)
+	if err != nil {
+		return nil, err
+	}
+
+	return &UserStations{
+		userID:       userID,
+		stations:     stations,
+		userProjects: userProjects,
+	}, nil
+}
+
+func (us *UserStations) AnyStations() bool {
+	return len(us.stations) > 0
+}
+
+func (us *UserStations) AnyUnownedPrivateStations() bool {
+	for _, station := range us.stations {
+		if station.Hidden != nil && *station.Hidden && station.OwnerID != us.userID {
+			return true
+		}
+	}
+	return false
+}
+
+type UserProjects struct {
+	userID       int32
+	projects     []*data.Project
+	userProjects map[int32]*data.ProjectUser
+}
+
+func NewUserProjects(ctx context.Context, db *sqlxcache.DB, userID int32, projectIDs []int32) (*UserProjects, error) {
+	pr := repositories.NewProjectRepository(db)
+
+	userProjects, err := pr.QueryProjectUsers(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	projects, err := pr.QueryByIDs(ctx, projectIDs)
+	if err != nil {
+		return nil, err
+	}
+
+	return &UserProjects{
+		userID:       userID,
+		projects:     projects,
+		userProjects: userProjects,
+	}, nil
+}
+
+func (up *UserProjects) AnyProjects() bool {
+	return len(up.projects) > 0
+}
+
+func (up *UserProjects) InAnyProjects() bool {
+	return len(up.userProjects) > 0
+}
+
+func (up *UserProjects) AdminInAllProjects() bool {
+	if len(up.projects) == 0 {
+		return false
+	}
+	for _, p := range up.projects {
+		if pu, ok := up.userProjects[p.ID]; ok {
+			if !pu.LookupRole().IsProjectAdministrator() {
+				return false
+			}
+		} else {
+			return false
+		}
+	}
+	return true
+}
+
+func (up *UserProjects) AllPublicProjects() bool {
+	if len(up.projects) == 0 {
+		return false
+	}
+	for _, p := range up.projects {
+		if p.Privacy != data.Public {
+			return false
+		}
+	}
+	return true
+}
+
+func (up *UserProjects) AnyPrivateProjectsOutsideOf() bool {
+	for _, p := range up.projects {
+		if p.Privacy != data.Public {
+			if _, ok := up.userProjects[p.ID]; !ok {
+				return true
+			}
+		}
+	}
+	return false
 }
