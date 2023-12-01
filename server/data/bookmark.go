@@ -9,11 +9,18 @@ import (
 type VizBookmark = []interface{} // [Stations, Sensors, [number, number], [[number, number], [number, number]] | [], ChartType, FastTime] | [];
 type GroupBookmark = [][]VizBookmark
 
-// {"v":1,"g":[ [[ [[159],[2],[-8640000000000000,8640000000000000],[],0,0] ]]],"s":[]}
+// {"v":1,"g":[ [[ [[159],[2],[-8640000000000000,8640000000000000],[],0,0] ]]],"s":[],"p":[]}
 type Bookmark struct {
 	Version  int32           `json:"v"`
 	Groups   []GroupBookmark `json:"g"`
 	Stations []int32         `json:"s"`
+	Projects *[]int32        `json:"p"`
+	Context  *ExploreContext `json:"c"`
+}
+
+type ExploreContext struct {
+	Project *int32 `json:"project"`
+	Map     bool   `json:"map"`
 }
 
 type BookmarkSensor struct {
@@ -163,5 +170,23 @@ func (b *Bookmark) StationIDs() ([]int32, error) {
 		}
 	}
 
+	if len(ids) == 0 {
+		ids = append(ids, b.Stations...)
+	}
+
 	return ids, nil
+}
+
+func (b *Bookmark) ProjectIDs() ([]int32, error) {
+	projectIDs := make([]int32, 0)
+
+	if b.Projects != nil {
+		projectIDs = append(projectIDs, *b.Projects...)
+	}
+
+	if b.Context != nil && b.Context.Project != nil {
+		projectIDs = append(projectIDs, *b.Context.Project)
+	}
+
+	return projectIDs, nil
 }
