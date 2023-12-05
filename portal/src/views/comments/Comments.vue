@@ -405,9 +405,9 @@ export default Vue.extend({
         };
     },
     computed: {
-      ActionTypes() {
-        return ActionTypes
-      },
+        ActionTypes() {
+            return ActionTypes;
+        },
         projectId(): number {
             if (this.parentData instanceof Bookmark) {
                 return this.parentData.p[0];
@@ -477,7 +477,8 @@ export default Vue.extend({
             await this.getDataEvents();
             return this.getComments();
         },
-        $route(): void {
+        async $route(): Promise<void> {
+            await this.getComments();
             this.highlightComment();
         },
         dataEventsFromState(): void {
@@ -542,7 +543,6 @@ export default Vue.extend({
                 });
         },
         async save(comment: NewComment, dirtyInputId: string): Promise<void> {
-
             if (this.viewType === "data") {
                 comment.bookmark = JSON.stringify(this.parentData);
             }
@@ -681,8 +681,8 @@ export default Vue.extend({
                 .editComment(commentID, body)
                 .then((response) => {
                     if (response) {
-                      this.$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, dirtyInputId);
-                      this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
+                        this.$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, dirtyInputId);
+                        this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
                             message: this.$tc("comments.saveSuccess"),
                             type: SnackbarStyle.success,
                         });
@@ -744,7 +744,7 @@ export default Vue.extend({
                     if (response) {
                         this.newDataEvent.title = "";
                         this.newDataEvent.description = "";
-                        this.$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, 'editEventDesc#' + dataEvent.id);
+                        this.$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, "editEventDesc#" + dataEvent.id);
                         this.getDataEvents();
                         this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
                             message: this.$tc("comments.dataEventSuccess"),
