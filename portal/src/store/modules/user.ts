@@ -93,6 +93,7 @@ const actions = (services: Services) => {
             try {
                 await services.api.getCurrentUser().then((user) => {
                     commit(CURRENT_USER, user);
+                    dispatch(ActionTypes.NOTIFICATIONS_INITIALIZE);
                     return user;
                 });
             } catch (error) {
