@@ -82,7 +82,6 @@
                                 :disable-mentions="true"
                                 @input="onEditFieldNoteInput(fieldNote, $event)"
                                 @save="saveEdit(fieldNote)"
-                                @empty="onNewFieldNoteText($event, 'edit')"
                             />
                         </template>
                         <div v-if="!editingFieldNote || (editingFieldNote && editingFieldNote.id !== fieldNote.id)" class="actions">
