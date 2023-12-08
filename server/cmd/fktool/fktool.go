@@ -165,8 +165,12 @@ func getFileHash(filename string) (string, error) {
 	return h, nil
 }
 
-func readCredentials(path string) (string, string, error) {
-	data, err := os.ReadFile(path)
+func (o *options) credentials() (string, string, error) {
+	if o.Credentials == "" {
+		return o.Email, o.Password, nil
+	}
+
+	data, err := os.ReadFile(o.Credentials)
 	if err != nil {
 		return "", "", err
 	}
@@ -316,18 +320,12 @@ func main() {
 
 	fkc := NewFkClient(o.Host, o.Scheme)
 
-	email := o.Email
-	password := o.Password
-
-	if o.Credentials != "" {
-		email, password, err := readCredentials(o.Credentials)
-		if err != nil {
-			log.Fatalf("%v", err)
-		}
+	email, password, err := o.credentials()
+	if err != nil {
+		log.Fatalf("%v", err)
 	}
 
-	err := fkc.Login(ctx, email, password)
-	if err != nil {
+	if err := fkc.Login(ctx, email, password); err != nil {
 		log.Fatalf("%v", err)
 	}
 
