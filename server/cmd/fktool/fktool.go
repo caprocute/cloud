@@ -29,10 +29,11 @@ import (
 )
 
 type options struct {
-	Scheme   string
-	Host     string
-	Email    string
-	Password string
+	Scheme      string
+	Host        string
+	Email       string
+	Password    string
+	Credentials string
 
 	Version string
 
@@ -164,6 +165,20 @@ func getFileHash(filename string) (string, error) {
 	return h, nil
 }
 
+func readCredentials(path string) (string, string, error) {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return "", "", err
+	}
+
+	lines := strings.Split(strings.TrimSpace(string(data)), "\n")
+	if len(lines) != 2 {
+		return "", "", fmt.Errorf("malformed credentials file, expecting user<NL>password")
+	}
+
+	return lines[0], lines[1], nil
+}
+
 func hasFile(session *session.Session, id string) (string, error) {
 	bucket := "conservify-firmware"
 
@@ -284,8 +299,9 @@ func main() {
 
 	flag.StringVar(&o.Scheme, "scheme", "http", "fk instance scheme")
 	flag.StringVar(&o.Host, "host", "127.0.0.1:8080", "fk instance hostname")
-	flag.StringVar(&o.Email, "email", "info@conservify.org", "email")
-	flag.StringVar(&o.Password, "password", "asdfasdfasdf", "password")
+	flag.StringVar(&o.Email, "email", "", "email")
+	flag.StringVar(&o.Password, "password", "", "password")
+	flag.StringVar(&o.Credentials, "credentials", "", "credentials file")
 	flag.StringVar(&o.Version, "version", "", "version")
 	flag.StringVar(&o.Module, "module", "", "override module")
 	flag.StringVar(&o.Profile, "profile", "", "override profile")
@@ -300,7 +316,17 @@ func main() {
 
 	fkc := NewFkClient(o.Host, o.Scheme)
 
-	err := fkc.Login(ctx, o.Email, o.Password)
+	email := o.Email
+	password := o.Password
+
+	if o.Credentials != "" {
+		email, password, err := readCredentials(o.Credentials)
+		if err != nil {
+			log.Fatalf("%v", err)
+		}
+	}
+
+	err := fkc.Login(ctx, email, password)
 	if err != nil {
 		log.Fatalf("%v", err)
 	}
