@@ -52,12 +52,11 @@ build:tools-amd64:
     - if: $CI_COMMIT_BRANCH == "main"
   image: golang:latest
   script:
-    - ls -alh
-    - (cd server/cmd/fktool && go build -o build/fktool *.go)
-    - ls -alh
-    - (cd server/cmd/fkdata && go build -o build/fkdata *.go)
-    - (cd server/cmd/sanitizer && go build -o build/sanitizer *.go)
-    - (cd server/cmd/scratch && go build -o build/scratch *.go)
+    - mkdir build
+    - (cd server/cmd/fktool && go build -o ../../../build/fktool *.go)
+    - (cd server/cmd/fkdata && go build -o ../../../build/fkdata *.go)
+    - (cd server/cmd/sanitizer && go build -o ../../../build/sanitizer *.go)
+    - (cd server/cmd/scratch && go build -o ../../../build/scratch *.go)
   artifacts:
     name: "cloud-tools-amd64-${CI_COMMIT_REF_NAME}"
     paths:
