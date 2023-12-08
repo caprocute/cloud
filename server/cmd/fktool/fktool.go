@@ -19,6 +19,7 @@ import (
 	"time"
 
 	_ "github.com/google/uuid"
+	"github.com/kelseyhightower/envconfig"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
@@ -313,6 +314,10 @@ func main() {
 	flag.BoolVar(&o.DryRun, "dry", false, "dry run")
 
 	flag.Parse()
+
+	if err := envconfig.Process("FIELDKIT", &o); err != nil {
+		log.Fatalf("configuration error: %v", err)
+	}
 
 	if o.Version == "" {
 		log.Fatalf("version is required")
