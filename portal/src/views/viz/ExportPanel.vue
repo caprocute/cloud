@@ -6,7 +6,6 @@
         </div>
         <div class="export-options">
             <div class="button" @click="onExportCSV">CSV</div>
-            <div class="button" @click="onExportJSONLines">JSON Lines</div>
         </div>
         <div class="user-exports" v-if="history">
             <div class="previous-heading">Previous Exports</div>
