@@ -500,7 +500,12 @@ func (e *CsvExporter) prepare(ctx context.Context, rawRecord *pb.DataRecord) err
 			modulesInRow = append(modulesInRow, hex.EncodeToString(module.Id))
 		}
 
-		for moduleIndex, module := range rawRecord.Modules {
+		for loopIndex, loopModule := range rawRecord.Modules {
+			// Capture loop variables in locals to avoid this common pitfall:
+			// https://go.dev/wiki/CommonMistakes#using-goroutines-on-loop-iterator-variables
+			moduleIndex := loopIndex
+			module := loopModule
+
 			id := hex.EncodeToString(module.Id)
 
 			// Track which modules "conflict" in the sense that they were both
