@@ -394,29 +394,29 @@ func (e *CsvExporter) compactFieldSets(ctx context.Context) error {
 	// the first field set that returns a value.
 	for _, id := range e.prepared.order {
 		if fs, ok := unassigned[id]; ok {
-			assigned_ids := make([]string, 0)
-			assigned_ids = append(assigned_ids, id)
+			assignedIds := make([]string, 0)
+			assignedIds = append(assignedIds, id)
 			candidates := make([]*fieldSet, 1)
 			candidates[0] = fs
 
 			if CompactFieldSets {
 				conflicts := e.prepared.conflicts[id]
-				for maybe_id, maybe := range unassigned {
-					if maybe_id != id {
+				for maybeId, maybe := range unassigned {
+					if maybeId != id {
 						if maybe.kind == fs.kind {
 							if len(maybe.fields) != len(fs.fields) {
 								panic("What, same kind different fields?")
 							}
-							if conflicts == nil || !conflicts[maybe_id] {
+							if conflicts == nil || !conflicts[maybeId] {
 								candidates = append(candidates, maybe)
-								assigned_ids = append(assigned_ids, maybe_id)
+								assignedIds = append(assignedIds, maybeId)
 							}
 						}
 					}
 				}
 			}
 
-			for _, id := range assigned_ids {
+			for _, id := range assignedIds {
 				delete(unassigned, id)
 			}
 
