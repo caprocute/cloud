@@ -94,7 +94,7 @@ export default Vue.extend({
             const factory = new ScrubberSpecFactory(
                 this.series,
                 new ChartSettings(this.visible, undefined, { w: 0, h: 0 }, false, false, isMobile()),
-                this.dataEvents.filter((event) => {
+                (this.dataEvents || []).filter((event) => {
                     return this.series.every(
                         (seriesData) => event.start >= seriesData.queried.timeRange[0] && event.end <= seriesData.queried.timeRange[1]
                     );
