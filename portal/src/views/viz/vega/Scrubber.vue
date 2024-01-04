@@ -42,6 +42,7 @@ export default Vue.extend({
         return { vega: null, scrubbed: null, scrubbing: false };
     },
     async mounted(): Promise<void> {
+        console.log("scrubber: mounted");
         await this.refresh();
     },
     watch: {
@@ -56,7 +57,8 @@ export default Vue.extend({
             this.pickRange(this.visible);
         },
         async dataEvents(): Promise<void> {
-            await this.refresh();
+            // console.log("scrubber: data-events");
+            // await this.refresh();
         },
     },
     computed: {
@@ -118,7 +120,7 @@ export default Vue.extend({
                 // Only remember scrubbed value if we're scrubbing. May be
                 // paranoid because we also check scrubbing in mouseup.
                 if (this.scrubbing) {
-                    console.log("viz: vega:brush", value);
+                    // console.log("viz: vega:brush", value);
                     if (value.time) {
                         this.scrubbed = value.time;
                     } else if (this.series[0].queried) {
@@ -133,6 +135,7 @@ export default Vue.extend({
                 // situations than when the user is scrubbing.
                 this.scrubbing = true;
             });
+            /*
             vegaInfo.view.addSignalListener("scrub_handle_left", (_, value) => {
                 console.log("signal:scrub-left", value);
             });
@@ -145,6 +148,7 @@ export default Vue.extend({
             vegaInfo.view.addSignalListener("brush_modify", (_, value) => {
                 console.log("signal:brush-modify", value);
             });
+            */
             vegaInfo.view.addSignalListener("event_click", (_, value) => {
                 this.$emit("event-clicked", value);
             });
