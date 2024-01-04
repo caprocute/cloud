@@ -133,7 +133,6 @@ export default Vue.extend({
                 // situations than when the user is scrubbing.
                 this.scrubbing = true;
             });
-            /*
             vegaInfo.view.addSignalListener("scrub_handle_left", (_, value) => {
                 console.log("signal:scrub-left", value);
             });
@@ -143,7 +142,9 @@ export default Vue.extend({
             vegaInfo.view.addSignalListener("brush_tuple", (_, value) => {
                 console.log("signal:brush-tuple", value);
             });
-            */
+            vegaInfo.view.addSignalListener("brush_modify", (_, value) => {
+                console.log("signal:brush-modify", value);
+            });
             vegaInfo.view.addSignalListener("event_click", (_, value) => {
                 this.$emit("event-clicked", value);
             });
