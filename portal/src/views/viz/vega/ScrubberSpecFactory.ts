@@ -414,14 +414,6 @@ export class ScrubberSpecFactory {
                             },
                             update: "[clamp(x(unit), 0, width), brush_x[1]]",
                         },
-                        /*
-                        {
-                            events: {
-                                signal: "brush_scale_trigger",
-                            },
-                            update: '[scale("x", brush_time[0]), scale("x", brush_time[1])]',
-                        },
-                        */
                         {
                             events: [
                                 {
@@ -437,14 +429,6 @@ export class ScrubberSpecFactory {
                             },
                             update: "clampRange(panLinear(brush_translate_anchor.extent_x, brush_translate_delta.x / span(brush_translate_anchor.extent_x)), 0, width)",
                         },
-                        /*
-                        {
-                            events: {
-                                signal: "brush_zoom_delta",
-                            },
-                            update: "clampRange(zoomLinear(brush_x, brush_zoom_anchor.x, brush_zoom_delta), 0, width)",
-                        },
-                        */
                     ],
                 },
                 {
@@ -458,23 +442,6 @@ export class ScrubberSpecFactory {
                         },
                     ],
                 },
-                /*
-                {
-                    name: "brush_scale_trigger",
-                    value: {},
-                    on: [
-                        {
-                            events: [
-                                {
-                                    scale: "x",
-                                },
-                            ],
-                            update:
-                                '(!isArray(brush_time) || (+invert("x", brush_x)[0] === +brush_time[0] && +invert("x", brush_x)[1] === +brush_time[1])) ? brush_scale_trigger : {}',
-                        },
-                    ],
-                },
-                */
                 {
                     name: "brush_tuple",
                     on: [
@@ -531,7 +498,7 @@ export class ScrubberSpecFactory {
                                             source: "scope",
                                             type: "mousedown",
                                             markname: "brush_brush",
-                                            filter: 'event.item.name !== "right_scrub"',
+                                            filter: '!event.item || event.item.name !== "right_scrub"',
                                         },
                                         {
                                             source: "window",
@@ -544,41 +511,6 @@ export class ScrubberSpecFactory {
                         },
                     ],
                 },
-                /*
-                {
-                    name: "brush_zoom_anchor",
-                    on: [
-                        {
-                            events: [
-                                {
-                                    source: "scope",
-                                    type: "wheel",
-                                    consume: true,
-                                    markname: "brush_brush",
-                                },
-                            ],
-                            update: "{x: x(unit), y: y(unit)}",
-                        },
-                    ],
-                },
-                {
-                    name: "brush_zoom_delta",
-                    on: [
-                        {
-                            events: [
-                                {
-                                    source: "scope",
-                                    type: "wheel",
-                                    consume: true,
-                                    markname: "brush_brush",
-                                },
-                            ],
-                            force: true,
-                            update: "pow(1.001, event.deltaY * pow(16, event.deltaMode))",
-                        },
-                    ],
-                },
-                */
                 {
                     name: "brush_modify",
                     on: [
@@ -859,7 +791,7 @@ export class ScrubberSpecFactory {
                     titleOpacity: 0,
                     labelOverlap: true,
                     tickCount: {
-                        signal: "ceil(height/40)",
+                        signal: "ceil(height / 40)",
                     },
                     zindex: 0,
                 },
