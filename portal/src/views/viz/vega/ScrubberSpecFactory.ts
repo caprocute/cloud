@@ -741,6 +741,7 @@ export class ScrubberSpecFactory {
                     type: "linear",
                     domain: {
                         fields: [
+                            /*
                             {
                                 data: "data_1",
                                 field: "value_start",
@@ -756,6 +757,11 @@ export class ScrubberSpecFactory {
                             {
                                 data: "data_2",
                                 field: "value_end",
+                            },
+                            */
+                            {
+                                data: "data_0",
+                                field: "value",
                             },
                         ],
                     },
