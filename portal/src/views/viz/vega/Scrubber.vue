@@ -37,8 +37,9 @@ export default Vue.extend({
     data(): {
         vega: any | null;
         scrubbed: number[] | null;
+        scrubbing: boolean;
     } {
-        return { vega: null, scrubbed: null };
+        return { vega: null, scrubbed: null, scrubbing: false };
     },
     async mounted(): Promise<void> {
         await this.refresh();
@@ -46,7 +47,6 @@ export default Vue.extend({
     watch: {
         async series(): Promise<void> {
             console.log("viz:", "scrubber: refresh(ignored, series)");
-            // await this.refresh();
         },
         async dragging(dragging): Promise<void> {
             console.log("viz:", "scrubber: dragging", dragging, this.visible);
@@ -74,19 +74,22 @@ export default Vue.extend({
     },
     methods: {
         mouseUp(event: Event) {
-            const target = event.target;
-            let isTargetEl = false;
-
-            if (target && target instanceof Element) {
-                isTargetEl = target.classList.contains("vega-embed") || target.tagName === "svg" || target.tagName === "path";
+            // Only refresh zoomed area if we're scrubbing. Otherwise, spurious
+            // brush signals, say from manually updating the initial brush area,
+            // will cause scrubbing to contain values and we end up emitting the
+            // time zoomed value. This will cause drop downs and the like to
+            // close on mouseups.
+            if (this.scrubbing) {
+                if (this.scrubbed && this.scrubbed.length == 2) {
+                    console.log("viz: vega:scrubber:brush-zoomed", this.scrubbed);
+                    this.$emit("time-zoomed", new TimeZoom(null, new TimeRange(this.scrubbed[0], this.scrubbed[1])));
+                    this.scrubbed = null;
+                } else {
+                    console.log("viz: vega:scrubber:brush-noop", this.scrubbed);
+                    this.scrubbed = null;
+                }
             }
-
-            if (this.scrubbed && this.scrubbed.length == 2 && isTargetEl) {
-                console.log("viz: vega:scrubber:brush-zoomed", this.scrubbed);
-                this.$emit("time-zoomed", new TimeZoom(null, new TimeRange(this.scrubbed[0], this.scrubbed[1])));
-            } else {
-                console.log("viz: vega:scrubber:brush-noop");
-            }
+            this.scrubbing = false;
         },
         async refresh(): Promise<void> {
             console.log("viz:", "scrubber: refresh");
@@ -112,22 +115,35 @@ export default Vue.extend({
 
             // eslint-disable-next-line
             vegaInfo.view.addSignalListener("brush", (_, value) => {
-                // console.log("viz: vega:brush", value);
-                if (value.time) {
-                    this.scrubbed = value.time;
-                } else if (this.series[0].queried) {
-                    this.scrubbed = this.series[0].queried.timeRange;
+                // Only remember scrubbed value if we're scrubbing. May be
+                // paranoid because we also check scrubbing in mouseup.
+                if (this.scrubbing) {
+                    console.log("viz: vega:brush", value);
+                    if (value.time) {
+                        this.scrubbed = value.time;
+                    } else if (this.series[0].queried) {
+                        this.scrubbed = this.series[0].queried.timeRange;
+                    }
                 }
             });
-            // vegaInfo.view.addSignalListener("scrub_handle_left", (_, value) => {
-            //     console.log("SCRUB HANDLE RIGHT", value)
-            // });
-            // vegaInfo.view.addSignalListener("scrub_handle_right", (_, value) => {
-            //     console.log("SCRUB HANDLE RIGHT", value)
-            // });
-            // vegaInfo.view.addEventListener("mousedown", (evt, value) => {
-            //     console.log(evt, value);
-            // });
+            vegaInfo.view.addEventListener("mousedown", (_, value) => {
+                console.log("signal:mousedown", value);
+                // We need this to know if we should refresh on a future
+                // mouseup, since the above brush signal gets invoked in more
+                // situations than when the user is scrubbing.
+                this.scrubbing = true;
+            });
+            /*
+            vegaInfo.view.addSignalListener("scrub_handle_left", (_, value) => {
+                console.log("signal:scrub-left", value);
+            });
+            vegaInfo.view.addSignalListener("scrub_handle_right", (_, value) => {
+                console.log("signal:scrub-right", value);
+            });
+            vegaInfo.view.addSignalListener("brush_tuple", (_, value) => {
+                console.log("signal:brush-tuple", value);
+            });
+            */
             vegaInfo.view.addSignalListener("event_click", (_, value) => {
                 this.$emit("event-clicked", value);
             });
