@@ -88,6 +88,10 @@
                 "battery_vs": "Battery Shunt Voltage",
                 "battery_ma": "Battery Current",
                 "battery_power": "Battery Power",
+                "solar_vbus": "Solar Bus Voltage",
+                "solar_vs": "Solar Shunt Voltage",
+                "solar_ma": "Solar Current",
+                "solar_power": "Solar Power",
                 "free_memory": "Free Memory",
                 "uptime": "Uptime",
                 "temperature": "Temperature"
