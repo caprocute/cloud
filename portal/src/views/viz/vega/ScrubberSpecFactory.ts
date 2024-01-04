@@ -277,7 +277,7 @@ export class ScrubberSpecFactory {
                             events: {
                                 source: "scope",
                                 type: "mouseup",
-                                filter: ['event.item.mark.name === "de_circle"'],
+                                filter: ['event.item && event.item.mark.name === "de_circle"'],
                             },
                             update: "event.item.datum.id",
                         },
@@ -291,7 +291,7 @@ export class ScrubberSpecFactory {
                             events: {
                                 source: "scope",
                                 type: "mouseover",
-                                filter: ['event && event.item && event.item.mark.name === "de_circle"'],
+                                filter: ['event.item && event.item.mark.name === "de_circle"'],
                             },
                             update: "[event.item.datum.start, event.item.datum.end]",
                         },
