@@ -26,4 +26,4 @@ RUN ssh -i .secure_files/deploy.pem -o StrictHostKeyChecking=no ${DEPLOY_HOST} "
 RUN scp -i .secure_files/deploy.pem -o StrictHostKeyChecking=no -r .secure_files/prod.json "${DEPLOY_HOST}:working/db-clone/env.json"
 RUN scp -i .secure_files/deploy.pem -o StrictHostKeyChecking=no -r db-clone.sh "${DEPLOY_HOST}:working/db-clone"
 RUN scp -i .secure_files/deploy.pem -o StrictHostKeyChecking=no -r desecreter "${DEPLOY_HOST}:working/db-clone"
-RUN ssh -i .secure_files/deploy.pem -o StrictHostKeyChecking=no ${DEPLOY_HOST} working/db-clone/db-clone.sh prod
+RUN ssh -i .secure_files/deploy.pem -o StrictHostKeyChecking=no ${DEPLOY_HOST} working/db-clone/db-clone.sh
