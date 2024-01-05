@@ -7,7 +7,7 @@ cd "${0%/*}"
 echo `pwd`
 
 STAMP=`date +%Y%m%d_%H%M%S`
-FILE=db-${ENV}-${STAMP}.sql
+FILE=db-${STAMP}.sql
 echo ${FILE}
 
 # Warning: If you enable set -x then you will leak database passwords.
