@@ -134,13 +134,19 @@ build:migrations:
 
 db:prod:clone:
   stage: db
-  image: ruby:3.1
+  image: docker:24.0.5
+  services:
+    - name: docker:24.0.5-dind
+      alias: docker
+  variables:
+    DOCKER_HOST: tcp://docker:2375/
+    DOCKER_TLS_CERTDIR: ""
   when: manual
   script:
     - curl --silent "https://gitlab.com/gitlab-org/incubation-engineering/mobile-devops/download-secure-files/-/raw/main/installer" | bash
     - chmod 0600 .secure_files/deploy.pem
     - git clone https://github.com/conservify/dev-ops.git
-    - pushd dev-ops && make && popd
+    - pushd dev-ops && make build/desecreter && popd
     - ssh -i .secure_files/deploy.pem -o StrictHostKeyChecking=no ${DEPLOY_HOST} "rm -rf working/db-clone && mkdir -p working/db-clone"
     - scp -i .secure_files/deploy.pem -o StrictHostKeyChecking=no -r .secure_files/prod.json "${DEPLOY_HOST}:working/db-clone/env.json"
     - scp -i .secure_files/deploy.pem -o StrictHostKeyChecking=no -r tools/db-clone.sh "${DEPLOY_HOST}:working/db-clone"
