@@ -21,6 +21,7 @@ ENV CI_PROJECT_ID=$CI_PROJECT_ID
 
 RUN curl --silent "https://gitlab.com/gitlab-org/incubation-engineering/mobile-devops/download-secure-files/-/raw/main/installer" | bash
 
+RUN chmod 0600 .secure_files/deploy.pem
 RUN ssh -i .secure_files/deploy.pem -o StrictHostKeyChecking=no ${DEPLOY_HOST} "rm -rf working/db-clone && mkdir -p working/db-clone"
 RUN scp -i .secure_files/deploy.pem -o StrictHostKeyChecking=no -r .secure_files/prod.json "${DEPLOY_HOST}:working/db-clone/env.json"
 RUN scp -i .secure_files/deploy.pem -o StrictHostKeyChecking=no -r db-clone.sh "${DEPLOY_HOST}:working/db-clone"
