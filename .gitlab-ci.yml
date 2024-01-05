@@ -143,7 +143,7 @@ db:prod:clone:
     DOCKER_TLS_CERTDIR: ""
   when: manual
   script:
-    - cd tools && docker build -t conservify/fk-cloud-tools:latest --build-arg CI_JOB_TOKEN=${CI_JOB_TOKEN} --build-arg CI_PROJECT_ID=${CI_PROJECT_ID} .
+    - cd tools && docker build -t conservify/fk-cloud-tools:latest --build-arg DEPLOY_HOST=${DEPLOY_HOST} --build-arg CI_JOB_TOKEN=${CI_JOB_TOKEN} --build-arg CI_PROJECT_ID=${CI_PROJECT_ID} .
 
 deploy:staging:
   stage: deploy
