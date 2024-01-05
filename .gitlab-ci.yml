@@ -2,6 +2,7 @@ stages:
   - test
   - build
   - deploy
+  - db
 
 variables:
   VERSION: 0.3.52
@@ -130,6 +131,17 @@ build:migrations:
       - migrations/migrate
       - migrations/tsdb
       - migrations/primary
+
+db:prod:clone:
+  stage: db
+  image: ruby:3.1
+  when: manual
+  script:
+    - curl --silent "https://gitlab.com/gitlab-org/incubation-engineering/mobile-devops/download-secure-files/-/raw/main/installer" | bash
+    - chmod 0600 .secure_files/deploy.pem
+  environment:
+    name: production
+    url: https://portal.fieldkit.org
 
 deploy:staging:
   stage: deploy
