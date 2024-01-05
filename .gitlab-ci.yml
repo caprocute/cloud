@@ -143,6 +143,7 @@ db:prod:clone:
     DOCKER_TLS_CERTDIR: ""
   when: manual
   script:
+    - apt install -y curl
     - curl --silent "https://gitlab.com/gitlab-org/incubation-engineering/mobile-devops/download-secure-files/-/raw/main/installer" | bash
     - chmod 0600 .secure_files/deploy.pem
     - git clone https://github.com/conservify/dev-ops.git
