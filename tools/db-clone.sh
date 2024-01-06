@@ -40,7 +40,7 @@ fi
 DATABASE_USER=`jq -r .database_username.value ${TERRAFORM_ENV}`
 DATABASE_PASS=`jq -r .database_password.value ${TERRAFORM_ENV}`
 DATABASE_NAME=fk
-PROXY_URL=postgres://${DATABASE_USER}:${DATABASE_PASS}@127.0.0.1/${DATABASE_NAME}?sslmode=disable
+PROXY_URL=postgres://${DATABASE_USER}:${DATABASE_PASS}@127.0.0.1:8432/${DATABASE_NAME}?sslmode=disable
 
 # When we exit, take down our entire process group, specifically the ssh session
 # we're opening. I'm planning on redoing how this works.

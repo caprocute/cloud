@@ -5,7 +5,7 @@ DATABASE_HOST=`jq -r .database_address.value ${TERRAFORM_ENV}`
 netstat -tupan
 
 if [ -f "${SSH_KEY}" ]; then
-	ssh -o "ControlMaster=no" -o StrictHostKeyChecking=no -N -i ${SSH_KEY} -L 5432:${DATABASE_HOST}:5432 ${DEPLOY_HOST}
+	ssh -o "ControlMaster=no" -o StrictHostKeyChecking=no -N -i ${SSH_KEY} -L 8432:${DATABASE_HOST}:5432 ${DEPLOY_HOST}
 else
-	ssh -o "ControlMaster=no" -o StrictHostKeyChecking=no -N -L 5432:${DATABASE_HOST}:5432 ${DEPLOY_HOST}
+	ssh -o "ControlMaster=no" -o StrictHostKeyChecking=no -N -L 8432:${DATABASE_HOST}:5432 ${DEPLOY_HOST}
 fi

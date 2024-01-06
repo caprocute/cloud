@@ -5,7 +5,7 @@ RUN cd dev-ops && make rust-binaries
 RUN pwd
 
 FROM ubuntu:22.04
-RUN apt-get update && apt-get install -y curl postgresql-client ruby jq openssh-client
+RUN apt-get update && apt-get install -y curl postgresql-client ruby jq openssh-client net-tools
 WORKDIR /work
 COPY db-clone.sh .
 COPY pg-tunnel.sh .
