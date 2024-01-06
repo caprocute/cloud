@@ -143,6 +143,7 @@ db:primary:prod:clone:
     DOCKER_TLS_CERTDIR: ""
   when: manual
   script:
+    - echo ${SYNC_COPY_TARGET_DBS}
     - cd tools
     - docker build -t conservify/fk-cloud-tools:latest .
     - docker run -e DATABASE=primary -e DEPLOY_HOST=${DEPLOY_HOST} -e SYNC_COPY_TARGET_DBS=${SYNC_COPY_TARGET_DBS} -e CI_JOB_TOKEN=${CI_JOB_TOKEN} -e CI_PROJECT_ID=${CI_PROJECT_ID} conservify/fk-cloud-tools:latest /work/db-clone.sh ${DEPLOY_HOST} ${SYNC_COPY_TARGET_DBS} primary

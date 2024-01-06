@@ -1,9 +1,10 @@
 #!/bin/bash
 
-# We need the database being cloned.
 DEPLOY_HOST=$1
 SYNC_COPY_TARGET_DBS=$2
 DATABASE=$3
+
+echo Arguments: $1 $2 $3
 
 if [ -z "${DEPLOY_HOST}" ]; then
 	echo "usage: db-clone.sh DEPLOY_HOST SYNC_COPY_TARGET_DBS DATABASE"
