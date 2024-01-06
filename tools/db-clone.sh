@@ -2,16 +2,21 @@
 
 # We need the database being cloned.
 DEPLOY_HOST=$1
-DATABASE=$2
-SYNC_COPY_TARGET_DBS=$3
+SYNC_COPY_TARGET_DBS=$2
+DATABASE=$3
 
-if [ -z "${DATABASE}" ]; then
-	echo "usage: db-clone.sh DEPLOY_HOST DATABASE SYNC_COPY_TARGET_DBS"
+if [ -z "${DEPLOY_HOST}" ]; then
+	echo "usage: db-clone.sh DEPLOY_HOST SYNC_COPY_TARGET_DBS DATABASE"
 	exit 2
 fi
 
-if [ -z "${DEPLOY_HOST}" ]; then
-	echo "usage: db-clone.sh DEPLOY_HOST DATABASE SYNC_COPY_TARGET_DBS"
+if [ -z "${SYNC_COPY_TARGET_DBS}" ]; then
+	echo "usage: db-clone.sh DEPLOY_HOST SYNC_COPY_TARGET_DBS DATABASE"
+	exit 2
+fi
+
+if [ -z "${DATABASE}" ]; then
+	echo "usage: db-clone.sh DEPLOY_HOST SYNC_COPY_TARGET_DBS DATABASE"
 	exit 2
 fi
 
@@ -92,6 +97,7 @@ pg_dump --data-only --disable-triggers "${PROXY_URL}" \
 # Compress and send to the sync folder.
 echo Compressing...
 bzip2 ${FILE}
+echo scp ${FILE}.bz2 ${SYNC_COPY_TARGET_DBS}
 scp ${FILE}.bz2 ${SYNC_COPY_TARGET_DBS}
 
 echo done
