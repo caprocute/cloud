@@ -58,8 +58,6 @@ echo Exporting...
 # Schema first.
 pg_dump --schema-only ${PROXY_URL} > ${FILE}
 
-exit 0
-
 # Users table, sanitized of passwords.
 pg_dump --data-only --disable-triggers "${PROXY_URL}" -t fieldkit.user | ./desecreter >> ${FILE}
 
