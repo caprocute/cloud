@@ -99,6 +99,6 @@ pg_dump --data-only --disable-triggers "${PROXY_URL}" \
 echo Compressing...
 bzip2 ${FILE}
 echo scp ${FILE}.bz2 ${SYNC_COPY_TARGET_DBS}
-scp ${FILE}.bz2 ${SYNC_COPY_TARGET_DBS}
+scp -o StrictHostKeyChecking=no -i ${SSH_KEY} ${FILE}.bz2 ${SYNC_COPY_TARGET_DBS}
 
 echo done
