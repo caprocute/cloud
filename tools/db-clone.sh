@@ -7,17 +7,17 @@ DATABASE=$3
 echo Arguments: $1 $2 $3
 
 if [ -z "${DEPLOY_HOST}" ]; then
-	echo "usage: db-clone.sh DEPLOY_HOST SYNC_COPY_TARGET_DBS DATABASE"
+	echo "usage: db-clone.sh DEPLOY_HOST SYNC_COPY_TARGET_DBS DATABASE: DEPLOY_HOST is required"
 	exit 2
 fi
 
 if [ -z "${SYNC_COPY_TARGET_DBS}" ]; then
-	echo "usage: db-clone.sh DEPLOY_HOST SYNC_COPY_TARGET_DBS DATABASE"
+	echo "usage: db-clone.sh DEPLOY_HOST SYNC_COPY_TARGET_DBS DATABASE: SYNC_COPY_TARGET_DBS is required"
 	exit 2
 fi
 
 if [ -z "${DATABASE}" ]; then
-	echo "usage: db-clone.sh DEPLOY_HOST SYNC_COPY_TARGET_DBS DATABASE"
+	echo "usage: db-clone.sh DEPLOY_HOST SYNC_COPY_TARGET_DBS DATABASE: DATABASE is required"
 	exit 2
 fi
 
