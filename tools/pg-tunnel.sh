@@ -1,7 +1,5 @@
 #!/bin/bash
 
-DATABASE_HOST=`jq -r .database_address.value ${TERRAFORM_ENV}`
-
 netstat -tupan
 
 if [ -f "${SSH_KEY}" ]; then

@@ -44,9 +44,19 @@ if ! [ -f "${TERRAFORM_ENV}" ]; then
 fi
 
 # Warning: If you enable set -x then you will leak database passwords.
-DATABASE_USER=`jq -r .database_username.value ${TERRAFORM_ENV}`
-DATABASE_PASS=`jq -r .database_password.value ${TERRAFORM_ENV}`
-DATABASE_NAME=fk
+if [ "${DATABASE}" == "primary" ]; then
+    DATABASE_HOST=`jq -r .database_address.value ${TERRAFORM_ENV}`
+    DATABASE_USER=`jq -r .database_username.value ${TERRAFORM_ENV}`
+    DATABASE_PASS=`jq -r .database_password.value ${TERRAFORM_ENV}`
+    DATABASE_NAME=fk
+fi
+
+if [ "${DATABASE}" == "ts" ]; then
+    DATABASE_HOST=`jq -r .timescaledb_address.value ${TERRAFORM_ENV}`
+    DATABASE_USER=`jq -r .timescaledb_username.value ${TERRAFORM_ENV}`
+    DATABASE_PASS=`jq -r .timescaledb_password.value ${TERRAFORM_ENV}`
+    DATABASE_NAME=fk
+fi
 PROXY_URL=postgres://${DATABASE_USER}:${DATABASE_PASS}@127.0.0.1:8432/${DATABASE_NAME}?sslmode=disable
 
 # When we exit, take down our entire process group, specifically the ssh session
@@ -55,47 +65,47 @@ trap "trap - SIGTERM && kill -- -$$" SIGINT SIGTERM EXIT
 
 # Start tunnel for talking to postgres.
 echo Starting tunnel...
-TERRAFORM_ENV=${TERRAFORM_ENV} SSH_KEY=${SSH_KEY} ./pg-tunnel.sh &
+TERRAFORM_ENV=${TERRAFORM_ENV} SSH_KEY=${SSH_KEY} DATABASE_HOST=${DATABASE_HOST} ./pg-tunnel.sh &
 echo Wait hack...
 sleep 5
 
 # Ok, we're ready to start exporting now...
 echo Exporting...
 
-# Schema first.
-pg_dump --schema-only ${PROXY_URL} > ${FILE}
+if [ "${DATABASE}" = "primary" ]; then
+    # Schema first.
+    pg_dump --schema-only ${PROXY_URL} > ${FILE}
 
-# Users table, sanitized of passwords.
-pg_dump --data-only --disable-triggers "${PROXY_URL}" -t fieldkit.user | ./desecreter >> ${FILE}
+    # Users table, sanitized of passwords.
+    pg_dump --data-only --disable-triggers "${PROXY_URL}" -t fieldkit.user | ./desecreter >> ${FILE}
 
-# Everything else, exluding heavy and obsolete tables, as well as user which we've already done.
-pg_dump --data-only --disable-triggers "${PROXY_URL}" \
-    -T fieldkit.user \
-    -T fieldkit.aggregated_24h \
-    -T fieldkit.aggregated_12h \
-    -T fieldkit.aggregated_6h \
-    -T fieldkit.aggregated_1h \
-    -T fieldkit.aggregated_30m \
-    -T fieldkit.aggregated_10m \
-    -T fieldkit.aggregated_1m \
-    -T fieldkit.aggregated_10s \
-    -T fieldkit.ttn_messages \
-    -T fieldkit.bookmarks \
-    -T fieldkit.ingestion_queue \
-    -T fieldkit.data_record >> ${FILE}
+    # Everything else, exluding heavy and obsolete tables, as well as user which we've already done.
+    pg_dump --data-only --disable-triggers "${PROXY_URL}" \
+        -T fieldkit.user \
+        -T fieldkit.aggregated_24h \
+        -T fieldkit.aggregated_12h \
+        -T fieldkit.aggregated_6h \
+        -T fieldkit.aggregated_1h \
+        -T fieldkit.aggregated_30m \
+        -T fieldkit.aggregated_10m \
+        -T fieldkit.aggregated_1m \
+        -T fieldkit.aggregated_10s \
+        -T fieldkit.ttn_messages \
+        -T fieldkit.bookmarks \
+        -T fieldkit.ingestion_queue \
+        -T fieldkit.data_record >> ${FILE}
+fi
 
-# Warning: If you enable set -x then you will leak database passwords.
-# DATABASE_URL=`jq -r .timescaledb_url.value $TERRAFORM_ENV`
+if [ "${DATABASE}" = "ts" ]; then
+    # Schema first.
+    pg_dump --schema-only "${PROXY_URL}" > ${FILE}
 
-# echo Exporting...
-
-# Schema first.
-# docker run --log-driver none --rm postgres pg_dump --schema-only "${DATABASE_URL}" > ${FILE}
-
-# Everything else.
-# docker run --log-driver none --rm postgres pg_dump --data-only --disable-triggers ${extraArgs} "${DATABASE_URL}" >> ${FILE}
+    # Everything else.
+    pg_dump --data-only --disable-triggers "${PROXY_URL}" >> ${FILE}
+fi
 
 # Compress and send to the sync folder.
+ls -alh
 echo Compressing...
 bzip2 ${FILE}
 echo scp ${FILE}.bz2 ${SYNC_COPY_TARGET_DBS}
