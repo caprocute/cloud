@@ -2,6 +2,7 @@ stages:
   - test
   - build
   - deploy
+  - db
 
 variables:
   VERSION: 0.3.53
@@ -130,6 +131,37 @@ build:migrations:
       - migrations/migrate
       - migrations/tsdb
       - migrations/primary
+
+db:primary:prod:clone:
+  stage: db
+  image: docker:24.0.5
+  services:
+    - name: docker:24.0.5-dind
+      alias: docker
+  variables:
+    DOCKER_HOST: tcp://docker:2375/
+    DOCKER_TLS_CERTDIR: ""
+  when: manual
+  script:
+    - cd tools
+    - docker build -t conservify/fk-cloud-tools:latest .
+    - docker run -e DATABASE=primary -e DEPLOY_HOST=${DEPLOY_HOST} -e SYNC_COPY_TARGET_DBS=${SYNC_COPY_TARGET_DBS} -e CI_JOB_TOKEN=${CI_JOB_TOKEN} -e CI_PROJECT_ID=${CI_PROJECT_ID} conservify/fk-cloud-tools:latest /work/db-clone.sh "${DEPLOY_HOST}" "${SYNC_COPY_TARGET_DBS}" "primary"
+
+db:ts:prod:clone:
+  stage: db
+  image: docker:24.0.5
+  timeout: 6h
+  services:
+    - name: docker:24.0.5-dind
+      alias: docker
+  variables:
+    DOCKER_HOST: tcp://docker:2375/
+    DOCKER_TLS_CERTDIR: ""
+  when: manual
+  script:
+    - cd tools
+    - docker build -t conservify/fk-cloud-tools:latest .
+    - docker run -e DATABASE=ts -e DEPLOY_HOST=${DEPLOY_HOST} -e SYNC_COPY_TARGET_DBS=${SYNC_COPY_TARGET_DBS} -e CI_JOB_TOKEN=${CI_JOB_TOKEN} -e CI_PROJECT_ID=${CI_PROJECT_ID} conservify/fk-cloud-tools:latest /work/db-clone.sh "${DEPLOY_HOST}" "${SYNC_COPY_TARGET_DBS}" "ts"
 
 deploy:staging:
   stage: deploy
