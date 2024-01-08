@@ -45,42 +45,25 @@ fi
 
 # Warning: If you enable set -x then you will leak database passwords.
 if [ "${DATABASE}" == "primary" ]; then
-    DATABASE_HOST=`jq -r .database_address.value ${TERRAFORM_ENV}`
-    DATABASE_USER=`jq -r .database_username.value ${TERRAFORM_ENV}`
-    DATABASE_PASS=`jq -r .database_password.value ${TERRAFORM_ENV}`
-    DATABASE_NAME=fk
+    DATABASE_URL=`jq -r .database_url.value ${TERRAFORM_ENV}`
 fi
 
 if [ "${DATABASE}" == "ts" ]; then
-    DATABASE_HOST=`jq -r .timescaledb_address.value ${TERRAFORM_ENV}`
-    DATABASE_USER=`jq -r .timescaledb_username.value ${TERRAFORM_ENV}`
-    DATABASE_PASS=`jq -r .timescaledb_password.value ${TERRAFORM_ENV}`
-    DATABASE_NAME=fk
+    DATABASE_URL=`jq -r .timescaledb_url.value ${TERRAFORM_ENV}`
 fi
-PROXY_URL=postgres://${DATABASE_USER}:${DATABASE_PASS}@127.0.0.1:8432/${DATABASE_NAME}?sslmode=disable
-
-# When we exit, take down our entire process group, specifically the ssh session
-# we're opening. I'm planning on redoing how this works.
-trap "trap - SIGTERM && kill -- -$$" SIGINT SIGTERM EXIT
-
-# Start tunnel for talking to postgres.
-echo Starting tunnel...
-TERRAFORM_ENV=${TERRAFORM_ENV} SSH_KEY=${SSH_KEY} DATABASE_HOST=${DATABASE_HOST} ./pg-tunnel.sh &
-echo Wait hack...
-sleep 5
 
 # Ok, we're ready to start exporting now...
 echo Exporting...
 
 if [ "${DATABASE}" = "primary" ]; then
     # Schema first.
-    pg_dump --schema-only ${PROXY_URL} > ${FILE}
+    pg_dump --schema-only ${DATABASE_URL} > ${FILE}
 
     # Users table, sanitized of passwords.
-    pg_dump --data-only --disable-triggers "${PROXY_URL}" -t fieldkit.user | ./desecreter >> ${FILE}
+    pg_dump --data-only --disable-triggers "${DATABASE_URL}" -t fieldkit.user | ./desecreter >> ${FILE}
 
     # Everything else, exluding heavy and obsolete tables, as well as user which we've already done.
-    pg_dump --data-only --disable-triggers "${PROXY_URL}" \
+    pg_dump --data-only --disable-triggers "${DATABASE_URL}" \
         -T fieldkit.user \
         -T fieldkit.aggregated_24h \
         -T fieldkit.aggregated_12h \
@@ -97,15 +80,15 @@ if [ "${DATABASE}" = "primary" ]; then
 fi
 
 if [ "${DATABASE}" = "ts" ]; then
-    echo "SELECT _timescaledb_internal.stop_background_workers();" | psql ${PROXY_URL}
+    echo "SELECT _timescaledb_internal.stop_background_workers();" | psql ${DATABASE_URL}
 
     # Schema first.
-    pg_dump --schema-only "${PROXY_URL}" > ${FILE}
+    pg_dump --schema-only "${DATABASE_URL}" > ${FILE}
 
     # Everything else.
-    pg_dump --data-only --disable-triggers "${PROXY_URL}" >> ${FILE}
+    pg_dump --data-only --disable-triggers "${DATABASE_URL}" >> ${FILE}
 
-    echo "SELECT _timescaledb_internal.start_background_workers();" | psql ${PROXY_URL}
+    echo "SELECT _timescaledb_internal.start_background_workers();" | psql ${DATABASE_URL}
 fi
 
 # Compress and send to the sync folder.
