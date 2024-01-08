@@ -166,7 +166,7 @@ db:ts:prod:clone:
 
 deploy:staging:
   stage: deploy
-  needs: ["build:images", "build:migrations"]
+  needs: ["build:images"]
   image: docker:24.0.5
   timeout: 1h
   rules:
@@ -188,19 +188,26 @@ deploy:staging:
     PRIMARY_MIGRATIONS_PATH: migrations/primary
     TSDB_MIGRATIONS_PATH: migrations/tsdb
     ARCHIVE: dev-ops-main/amis/build/portal-stack.tar
+    POLL_URL: https://api.fkdev.org/status
   script:
-    - ls -alh
-    - ls -alh migrations
-    - ls -alh tools
-    - ls -alh ${ARCHIVE}
+    - apk add wget curl unzip bash jq
     - curl --silent "https://gitlab.com/gitlab-org/incubation-engineering/mobile-devops/download-secure-files/-/raw/main/installer" | bash
     - chmod 0600 "${SSH_KEY}"
-    - MIGRATE_DATABASE_URL=`jq -r .database_url.value ${TERRAFORM_ENV}` MIGRATE_PATH=${PRIMARY_MIGRATIONS_PATH} migrations/migrate migrate
-    - MIGRATE_DATABASE_URL=`jq -r .timescaledb_url.value ${TERRAFORM_ENV}` MIGRATE_PATH=${TSDB_MIGRATIONS_PATH} migrations/migrate migrate
-    - cd tools
-    - echo docker build -t conservify/fk-cloud-tools:latest .
+    - cd migrations
+    - docker build --progress=plain -t conservify/fk-cloud-migrations:latest .
     - cd ..
-    - echo docker run -e DEPLOY_HOST=${DEPLOY_HOST} -e CI_JOB_TOKEN=${CI_JOB_TOKEN} -e CI_PROJECT_ID=${CI_PROJECT_ID} conservify/fk-cloud-tools:latest /work/deploy.sh dev portal-stack
+    - cd tools
+    - docker build --progress=plain -t conservify/fk-cloud-tools:latest .
+    - cd ..
+    - MIGRATE_DATABASE_URL=`jq -r .database_url.value ${TERRAFORM_ENV}`
+    - docker run -e MIGRATE_PATH=${PRIMARY_MIGRATIONS_PATH} -e MIGRATE_DATABASE_URL=${MIGRATE_DATABASE_URL} conservify/fk-cloud-migrations migrate
+    - MIGRATE_DATABASE_URL=`jq -r .timescaledb_url.value ${TERRAFORM_ENV}`
+    - docker run -e MIGRATE_PATH=${TSDB_MIGRATIONS_PATH} -e MIGRATE_DATABASE_URL=${MIGRATE_DATABASE_URL} conservify/fk-cloud-migrations migrate
+    - docker run conservify/fk-cloud-tools:latest /work/deployer deploy --prepare-only --cert ${SSH_KEY} --terraform ${TERRAFORM_ENV} --archive ${ARCHIVE} --poll ${POLL_URL}
+    - (cd tools && ls -alh && pwd && cd ..)
+    - pwd
+    - (cd tools && ls -alh && pwd)
+    - pwd
   environment:
     name: staging
     url: https://portal.fkdev.org
