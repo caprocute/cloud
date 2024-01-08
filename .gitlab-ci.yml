@@ -164,6 +164,16 @@ db:ts:prod:clone:
     - docker build -t conservify/fk-cloud-tools:latest .
     - docker run -e DATABASE=ts -e DEPLOY_HOST=${DEPLOY_HOST} -e SYNC_COPY_TARGET_DBS=${SYNC_COPY_TARGET_DBS} -e CI_JOB_TOKEN=${CI_JOB_TOKEN} -e CI_PROJECT_ID=${CI_PROJECT_ID} conservify/fk-cloud-tools:latest /work/db-clone.sh "${DEPLOY_HOST}" "${SYNC_COPY_TARGET_DBS}" "ts"
 
+db:test:
+  stage: db
+  when: manual
+  image: ruby:3.1
+  script:
+    - curl --silent "https://gitlab.com/gitlab-org/incubation-engineering/mobile-devops/download-secure-files/-/raw/main/installer" | bash
+    - chmod 0600 .secure_files/deploy.pem
+    - curl http://10.1.5.48:7000/status || true
+    - ssh -o StrictHostKeyChecking=no -i .secure_files/deploy.pem ubuntu@10.1.5.48 whoami
+
 deploy:staging:
   stage: deploy
   needs: ["build:images", "build:migrations"]
