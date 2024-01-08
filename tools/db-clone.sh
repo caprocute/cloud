@@ -97,11 +97,15 @@ if [ "${DATABASE}" = "primary" ]; then
 fi
 
 if [ "${DATABASE}" = "ts" ]; then
+    echo "SELECT _timescaledb_internal.stop_background_workers();" | psql ${PROXY_URL}
+
     # Schema first.
     pg_dump --schema-only "${PROXY_URL}" > ${FILE}
 
     # Everything else.
     pg_dump --data-only --disable-triggers "${PROXY_URL}" >> ${FILE}
+
+    echo "SELECT _timescaledb_internal.start_background_workers();" | psql ${PROXY_URL}
 fi
 
 # Compress and send to the sync folder.
