@@ -150,6 +150,7 @@ db:primary:prod:clone:
 db:ts:prod:clone:
   stage: db
   image: docker:24.0.5
+  timeout: 6h
   services:
     - name: docker:24.0.5-dind
       alias: docker
