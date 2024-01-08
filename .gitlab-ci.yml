@@ -117,12 +117,12 @@ build:images:
 
 build:migrations:
   stage: build
+  image: golang:latest
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
     - if: $CI_COMMIT_TAG
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
     - if: $CI_COMMIT_BRANCH == "main"
-  image: golang:latest
   script:
     - cd migrations && go build -o migrate *.go
   artifacts:
@@ -135,6 +135,7 @@ build:migrations:
 db:primary:prod:clone:
   stage: db
   image: docker:24.0.5
+  timeout: 3h
   services:
     - name: docker:24.0.5-dind
       alias: docker
@@ -166,7 +167,8 @@ db:ts:prod:clone:
 deploy:staging:
   stage: deploy
   needs: ["build:images", "build:migrations"]
-  image: ruby:3.1
+  image: docker:24.0.5
+  timeout: 1h
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       when: manual
@@ -174,13 +176,19 @@ deploy:staging:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
       when: manual
       allow_failure: true
+  services:
+    - name: docker:24.0.5-dind
+      alias: docker
+  variables:
+    DOCKER_HOST: tcp://docker:2375/
+    DOCKER_TLS_CERTDIR: ""
   script:
-    - curl --silent "https://gitlab.com/gitlab-org/incubation-engineering/mobile-devops/download-secure-files/-/raw/main/installer" | bash
-    - chmod 0600 .secure_files/deploy.pem
-    - ssh -i .secure_files/deploy.pem -o StrictHostKeyChecking=no ${DEPLOY_HOST} "rm -rf dev-ops/deploy && mkdir -p dev-ops/deploy"
-    - scp -i .secure_files/deploy.pem -o StrictHostKeyChecking=no -r migrations/migrate migrations/primary migrations/tsdb "${DEPLOY_HOST}:dev-ops/deploy"
-    - scp -i .secure_files/deploy.pem -o StrictHostKeyChecking=no dev-ops-main/amis/build/*.tar "${DEPLOY_HOST}:dev-ops/deploy"
-    - ssh -i .secure_files/deploy.pem -o StrictHostKeyChecking=no ${DEPLOY_HOST} dev-ops/deploy.sh dev portal-stack
+    - cd tools
+    - docker build -t conservify/fk-cloud-tools:latest .
+    - cd ..
+    - ls -alh migrations
+    - ls -alh tools
+    - docker run -e DEPLOY_HOST=${DEPLOY_HOST} -e CI_JOB_TOKEN=${CI_JOB_TOKEN} -e CI_PROJECT_ID=${CI_PROJECT_ID} conservify/fk-cloud-tools:latest /work/deploy.sh dev portal-stack
   environment:
     name: staging
     url: https://portal.fkdev.org

@@ -1,20 +1,20 @@
 #!/bin/bash
 
 DEPLOY_HOST=$1
-SYNC_COPY_TARGET_DBS=$2
-DATABASE=$3
-
-echo Arguments: $1 $2 $3
 
 if [ -z "${DEPLOY_HOST}" ]; then
 	echo "usage: db-clone.sh DEPLOY_HOST SYNC_COPY_TARGET_DBS DATABASE: DEPLOY_HOST is required"
 	exit 2
 fi
 
+SYNC_COPY_TARGET_DBS=$2
+
 if [ -z "${SYNC_COPY_TARGET_DBS}" ]; then
 	echo "usage: db-clone.sh DEPLOY_HOST SYNC_COPY_TARGET_DBS DATABASE: SYNC_COPY_TARGET_DBS is required"
 	exit 2
 fi
+
+DATABASE=$3
 
 if [ -z "${DATABASE}" ]; then
 	echo "usage: db-clone.sh DEPLOY_HOST SYNC_COPY_TARGET_DBS DATABASE: DATABASE is required"
@@ -24,7 +24,6 @@ fi
 # Change to script directory.
 cd "${0%/*}"
 echo `pwd`
-whoami
 
 # Name of the archive we're going to make.
 STAMP=`date +%Y%m%d_%H%M%S`
@@ -43,19 +42,12 @@ if ! [ -f "${TERRAFORM_ENV}" ]; then
     ls  -alh
 fi
 
-# Warning: If you enable set -x then you will leak database passwords.
-if [ "${DATABASE}" == "primary" ]; then
-    DATABASE_URL=`jq -r .database_url.value ${TERRAFORM_ENV}`
-fi
-
-if [ "${DATABASE}" == "ts" ]; then
-    DATABASE_URL=`jq -r .timescaledb_url.value ${TERRAFORM_ENV}`
-fi
-
 # Ok, we're ready to start exporting now...
-echo Exporting...
+echo exporting...
 
 if [ "${DATABASE}" = "primary" ]; then
+    DATABASE_URL=`jq -r .database_url.value ${TERRAFORM_ENV}`
+
     # Schema first.
     pg_dump --schema-only ${DATABASE_URL} > ${FILE}
 
@@ -80,6 +72,8 @@ if [ "${DATABASE}" = "primary" ]; then
 fi
 
 if [ "${DATABASE}" = "ts" ]; then
+    DATABASE_URL=`jq -r .timescaledb_url.value ${TERRAFORM_ENV}`
+
     echo "SELECT _timescaledb_internal.stop_background_workers();" | psql ${DATABASE_URL}
 
     # Schema first.
