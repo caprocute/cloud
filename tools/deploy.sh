@@ -43,8 +43,8 @@ TSDB_MIGRATIONS_PATH=~/dev-ops/deploy/tsdb
 ARCHIVE=~/dev-ops/deploy/${STACK}.tar
 
 # Warning: If you enable set -x then you will leak database passwords.
-# MIGRATE_DATABASE_URL=`jq -r .database_url.value $TERRAFORM_ENV` MIGRATE_PATH=$PRIMARY_MIGRATIONS_PATH ~/dev-ops/deploy/migrate migrate
-# MIGRATE_DATABASE_URL=`jq -r .timescaledb_url.value $TERRAFORM_ENV` MIGRATE_PATH=$TSDB_MIGRATIONS_PATH ~/dev-ops/deploy/migrate migrate
+MIGRATE_DATABASE_URL=`jq -r .database_url.value $TERRAFORM_ENV` MIGRATE_PATH=$PRIMARY_MIGRATIONS_PATH ~/dev-ops/deploy/migrate migrate
+MIGRATE_DATABASE_URL=`jq -r .timescaledb_url.value $TERRAFORM_ENV` MIGRATE_PATH=$TSDB_MIGRATIONS_PATH ~/dev-ops/deploy/migrate migrate
 
 ./deployer deploy --prepare-only \
  	--cert ${SSH_KEY} \
