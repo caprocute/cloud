@@ -54,10 +54,19 @@ scp -o StrictHostKeyChecking=no -i ${SSH_KEY} ${DEPLOY_HOST}:${SYNC_COPY_TARGET_
 echo importing database...
 
 echo 'CREATE DATABASE "fk-restore"' | psql ${ADMIN_URL}
-echo 'ALTER DATABASE "fk-restore" SET search_path TO "\$user", fieldkit, public;"' | psql ${ADMIN_URL}
+echo 'ALTER DATABASE "fk-restore" SET search_path TO "\$user", fieldkit, public;' | psql ${ADMIN_URL}
 
 echo 'SET session_replication_role TO replica;' > restore.sql
-xz -dc *.sql.xz >> restore.sql
+if [ -f *.sql.xz ]; then
+    for a in *.sql.xz; do
+        xz -dc $a >> restore.sql
+    done
+fi
+if [ -f *.sql.bz2 ]; then
+    for a in *.sql.bz2; do
+        bunzip2 -dc $a >> restore.sql
+    done
+fi
 echo 'DELETE FROM fieldkit.gue_jobs;' >> restore.sql
 echo 'SET session_replication_role TO default;' >> restore.sql
 
