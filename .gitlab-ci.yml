@@ -235,26 +235,44 @@ deploy:staging:
     - docker run -e MIGRATE_PATH=${PRIMARY_MIGRATIONS_PATH} -e MIGRATE_DATABASE_URL=${MIGRATE_DATABASE_URL} conservify/fk-cloud-migrations migrate
     - MIGRATE_DATABASE_URL=`jq -r .timescaledb_url.value ${TERRAFORM_ENV}`
     - docker run -e MIGRATE_PATH=${TSDB_MIGRATIONS_PATH} -e MIGRATE_DATABASE_URL=${MIGRATE_DATABASE_URL} conservify/fk-cloud-migrations migrate
-    - docker run -v $(pwd)/.secure_files:/work/.secure_files -v $(pwd)/dev-ops-main:/work/dev-ops-main conservify/fk-cloud-tools /work/deployer deploy --prepare-only --cert ${SSH_KEY} --terraform ${TERRAFORM_ENV} --archive ${ARCHIVE} --poll ${POLL_URL}
+    - docker run -v $(pwd)/.secure_files:/work/.secure_files -v $(pwd)/dev-ops-main:/work/dev-ops-main conservify/fk-cloud-tools /work/deployer deploy --cert ${SSH_KEY} --terraform ${TERRAFORM_ENV} --archive ${ARCHIVE} --poll ${POLL_URL}
   environment:
     name: staging
     url: https://portal.fkdev.org
 
 deploy:prod:
   stage: deploy
-  needs: ["build:images", "build:migrations"]
-  image: ruby:3.1
+  needs: ["build:images"]
+  image: docker:24.0.5
+  timeout: 1h
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
       when: manual
       allow_failure: true
+  services:
+    - name: docker:24.0.5-dind
+      alias: docker
+  variables:
+    DOCKER_HOST: tcp://docker:2375/
+    DOCKER_TLS_CERTDIR: ""
+    TERRAFORM_ENV: .secure_files/prod.json
+    SSH_KEY: .secure_files/deploy.pem
+    PRIMARY_MIGRATIONS_PATH: migrations/primary
+    TSDB_MIGRATIONS_PATH: migrations/tsdb
+    ARCHIVE: dev-ops-main/amis/build/portal-stack.tar
+    ENV: dev
+    POLL_URL: https://api.fieldkit.org/status
   script:
+    - apk add wget curl unzip bash jq
     - curl --silent "https://gitlab.com/gitlab-org/incubation-engineering/mobile-devops/download-secure-files/-/raw/main/installer" | bash
-    - chmod 0600 .secure_files/deploy.pem
-    - ssh -i .secure_files/deploy.pem -o StrictHostKeyChecking=no ${DEPLOY_HOST} "rm -rf dev-ops/deploy && mkdir -p dev-ops/deploy"
-    - scp -i .secure_files/deploy.pem -o StrictHostKeyChecking=no -r migrations/migrate migrations/primary migrations/tsdb "${DEPLOY_HOST}:dev-ops/deploy"
-    - scp -i .secure_files/deploy.pem -o StrictHostKeyChecking=no dev-ops-main/amis/build/*.tar "${DEPLOY_HOST}:dev-ops/deploy"
-    - ssh -i .secure_files/deploy.pem -o StrictHostKeyChecking=no ${DEPLOY_HOST} dev-ops/deploy.sh prod portal-stack
+    - chmod 0600 "${SSH_KEY}"
+    - (cd migrations && docker build --progress=plain -t conservify/fk-cloud-migrations:latest .)
+    - (cd tools && docker build --progress=plain -t conservify/fk-cloud-tools:latest .)
+    - MIGRATE_DATABASE_URL=`jq -r .database_url.value ${TERRAFORM_ENV}`
+    - docker run -e MIGRATE_PATH=${PRIMARY_MIGRATIONS_PATH} -e MIGRATE_DATABASE_URL=${MIGRATE_DATABASE_URL} conservify/fk-cloud-migrations migrate
+    - MIGRATE_DATABASE_URL=`jq -r .timescaledb_url.value ${TERRAFORM_ENV}`
+    - docker run -e MIGRATE_PATH=${TSDB_MIGRATIONS_PATH} -e MIGRATE_DATABASE_URL=${MIGRATE_DATABASE_URL} conservify/fk-cloud-migrations migrate
+    - docker run -v $(pwd)/.secure_files:/work/.secure_files -v $(pwd)/dev-ops-main:/work/dev-ops-main conservify/fk-cloud-tools /work/deployer deploy --cert ${SSH_KEY} --terraform ${TERRAFORM_ENV} --archive ${ARCHIVE} --poll ${POLL_URL}
   environment:
     name: production
     url: https://portal.fieldkit.org
