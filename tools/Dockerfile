@@ -7,9 +7,7 @@ RUN pwd
 FROM ubuntu:22.04
 RUN apt-get update && apt-get install -y curl postgresql-client ruby jq openssh-client net-tools bzip2 xz-utils
 WORKDIR /work
-COPY deploy.sh .
 COPY db-clone.sh .
+COPY db-restore.sh .
 COPY --from=rust-tools /work/dev-ops/build/desecreter .
 COPY --from=rust-tools /work/dev-ops/build/deployer .
-RUN ls -alh
-RUN pwd

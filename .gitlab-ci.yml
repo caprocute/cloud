@@ -135,6 +135,7 @@ build:migrations:
 db:primary:prod:clone:
   stage: db
   image: docker:24.0.5
+  when: manual
   timeout: 3h
   services:
     - name: docker:24.0.5-dind
@@ -142,15 +143,16 @@ db:primary:prod:clone:
   variables:
     DOCKER_HOST: tcp://docker:2375/
     DOCKER_TLS_CERTDIR: ""
-  when: manual
+    DATABASE: primary
   script:
     - cd tools
     - docker build -t conservify/fk-cloud-tools:latest .
-    - docker run -e DATABASE=primary -e DEPLOY_HOST=${DEPLOY_HOST} -e SYNC_COPY_TARGET_DBS=${SYNC_COPY_TARGET_DBS} -e CI_JOB_TOKEN=${CI_JOB_TOKEN} -e CI_PROJECT_ID=${CI_PROJECT_ID} conservify/fk-cloud-tools:latest /work/db-clone.sh "${DEPLOY_HOST}" "${SYNC_COPY_TARGET_DBS}" "primary"
+    - docker run -e DEPLOY_HOST=${DEPLOY_HOST} -e SYNC_COPY_TARGET_DBS=${SYNC_COPY_TARGET_DBS} -e SYNC_COPY_TARGET_DBS_PATH=${SYNC_COPY_TARGET_DBS_PATH} -e CI_JOB_TOKEN=${CI_JOB_TOKEN} -e CI_PROJECT_ID=${CI_PROJECT_ID} -e DATABASE=${DATABASE} conservify/fk-cloud-tools:latest /work/db-clone.sh
 
 db:ts:prod:clone:
   stage: db
   image: docker:24.0.5
+  when: manual
   timeout: 6h
   services:
     - name: docker:24.0.5-dind
@@ -158,11 +160,45 @@ db:ts:prod:clone:
   variables:
     DOCKER_HOST: tcp://docker:2375/
     DOCKER_TLS_CERTDIR: ""
-  when: manual
+    DATABASE: ts
   script:
     - cd tools
     - docker build -t conservify/fk-cloud-tools:latest .
-    - docker run -e DATABASE=ts -e DEPLOY_HOST=${DEPLOY_HOST} -e SYNC_COPY_TARGET_DBS=${SYNC_COPY_TARGET_DBS} -e CI_JOB_TOKEN=${CI_JOB_TOKEN} -e CI_PROJECT_ID=${CI_PROJECT_ID} conservify/fk-cloud-tools:latest /work/db-clone.sh "${DEPLOY_HOST}" "${SYNC_COPY_TARGET_DBS}" "ts"
+    - docker run -e DEPLOY_HOST=${DEPLOY_HOST} -e SYNC_COPY_TARGET_DBS=${SYNC_COPY_TARGET_DBS} -e SYNC_COPY_TARGET_DBS_PATH=${SYNC_COPY_TARGET_DBS_PATH} -e CI_JOB_TOKEN=${CI_JOB_TOKEN} -e CI_PROJECT_ID=${CI_PROJECT_ID} -e DATABASE=${DATABASE} conservify/fk-cloud-tools:latest /work/db-clone.sh
+
+db:primary:dev:restore:
+  stage: db
+  image: docker:24.0.5
+  when: manual
+  timeout: 3h
+  services:
+    - name: docker:24.0.5-dind
+      alias: docker
+  variables:
+    DOCKER_HOST: tcp://docker:2375/
+    DOCKER_TLS_CERTDIR: ""
+    DATABASE: primary
+  script:
+    - cd tools
+    - docker build -t conservify/fk-cloud-tools:latest .
+    - docker run -e DEPLOY_HOST=${DEPLOY_HOST} -e SYNC_COPY_TARGET_DBS_PATH=${SYNC_COPY_TARGET_DBS_PATH} -e CI_JOB_TOKEN=${CI_JOB_TOKEN} -e CI_PROJECT_ID=${CI_PROJECT_ID} -e DATABASE=${DATABASE} conservify/fk-cloud-tools:latest /work/db-restore.sh
+
+db:ts:dev:restore:
+  stage: db
+  image: docker:24.0.5
+  when: manual
+  timeout: 3h
+  services:
+    - name: docker:24.0.5-dind
+      alias: docker
+  variables:
+    DOCKER_HOST: tcp://docker:2375/
+    DOCKER_TLS_CERTDIR: ""
+    DATABASE: ts
+  script:
+    - cd tools
+    - docker build -t conservify/fk-cloud-tools:latest .
+    - docker run -e DEPLOY_HOST=${DEPLOY_HOST} -e SYNC_COPY_TARGET_DBS_PATH=${SYNC_COPY_TARGET_DBS_PATH} -e CI_JOB_TOKEN=${CI_JOB_TOKEN} -e CI_PROJECT_ID=${CI_PROJECT_ID} -e DATABASE=${DATABASE} conservify/fk-cloud-tools:latest /work/db-restore.sh
 
 deploy:staging:
   stage: deploy
@@ -182,32 +218,24 @@ deploy:staging:
   variables:
     DOCKER_HOST: tcp://docker:2375/
     DOCKER_TLS_CERTDIR: ""
-    ENV: dev
     TERRAFORM_ENV: .secure_files/dev.json
     SSH_KEY: .secure_files/deploy.pem
     PRIMARY_MIGRATIONS_PATH: migrations/primary
     TSDB_MIGRATIONS_PATH: migrations/tsdb
     ARCHIVE: dev-ops-main/amis/build/portal-stack.tar
+    ENV: dev
     POLL_URL: https://api.fkdev.org/status
   script:
     - apk add wget curl unzip bash jq
     - curl --silent "https://gitlab.com/gitlab-org/incubation-engineering/mobile-devops/download-secure-files/-/raw/main/installer" | bash
     - chmod 0600 "${SSH_KEY}"
-    - cd migrations
-    - docker build --progress=plain -t conservify/fk-cloud-migrations:latest .
-    - cd ..
-    - cd tools
-    - docker build --progress=plain -t conservify/fk-cloud-tools:latest .
-    - cd ..
+    - (cd migrations && docker build --progress=plain -t conservify/fk-cloud-migrations:latest .)
+    - (cd tools && docker build --progress=plain -t conservify/fk-cloud-tools:latest .)
     - MIGRATE_DATABASE_URL=`jq -r .database_url.value ${TERRAFORM_ENV}`
     - docker run -e MIGRATE_PATH=${PRIMARY_MIGRATIONS_PATH} -e MIGRATE_DATABASE_URL=${MIGRATE_DATABASE_URL} conservify/fk-cloud-migrations migrate
     - MIGRATE_DATABASE_URL=`jq -r .timescaledb_url.value ${TERRAFORM_ENV}`
     - docker run -e MIGRATE_PATH=${TSDB_MIGRATIONS_PATH} -e MIGRATE_DATABASE_URL=${MIGRATE_DATABASE_URL} conservify/fk-cloud-migrations migrate
-    - docker run conservify/fk-cloud-tools:latest /work/deployer deploy --prepare-only --cert ${SSH_KEY} --terraform ${TERRAFORM_ENV} --archive ${ARCHIVE} --poll ${POLL_URL}
-    - (cd tools && ls -alh && pwd && cd ..)
-    - pwd
-    - (cd tools && ls -alh && pwd)
-    - pwd
+    - docker run -v $(pwd)/.secure_files:/work/.secure_files -v $(pwd)/dev-ops-main:/work/dev-ops-main conservify/fk-cloud-tools /work/deployer deploy --prepare-only --cert ${SSH_KEY} --terraform ${TERRAFORM_ENV} --archive ${ARCHIVE} --poll ${POLL_URL}
   environment:
     name: staging
     url: https://portal.fkdev.org

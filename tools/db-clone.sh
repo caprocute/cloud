@@ -1,23 +1,22 @@
 #!/bin/bash
 
-DEPLOY_HOST=$1
-
 if [ -z "${DEPLOY_HOST}" ]; then
-	echo "usage: db-clone.sh DEPLOY_HOST SYNC_COPY_TARGET_DBS DATABASE: DEPLOY_HOST is required"
+	echo "usage: db-clone.sh: DEPLOY_HOST is required"
 	exit 2
 fi
-
-SYNC_COPY_TARGET_DBS=$2
 
 if [ -z "${SYNC_COPY_TARGET_DBS}" ]; then
-	echo "usage: db-clone.sh DEPLOY_HOST SYNC_COPY_TARGET_DBS DATABASE: SYNC_COPY_TARGET_DBS is required"
+	echo "usage: db-clone.sh: SYNC_COPY_TARGET_DBS is required"
 	exit 2
 fi
 
-DATABASE=$3
+if [ -z "${SYNC_COPY_TARGET_DBS_PATH}" ]; then
+	echo "usage: db-clone.sh: SYNC_COPY_TARGET_DBS_PATH is required"
+	exit 2
+fi
 
 if [ -z "${DATABASE}" ]; then
-	echo "usage: db-clone.sh DEPLOY_HOST SYNC_COPY_TARGET_DBS DATABASE: DATABASE is required"
+	echo "usage: db-clone.sh: DATABASE is required"
 	exit 2
 fi
 
@@ -87,9 +86,9 @@ fi
 
 # Compress and send to the sync folder.
 ls -alh
-echo Compressing...
+echo compressing...
 bzip2 ${FILE}
-echo scp ${FILE}.bz2 ${SYNC_COPY_TARGET_DBS}
 scp -o StrictHostKeyChecking=no -i ${SSH_KEY} ${FILE}.bz2 ${SYNC_COPY_TARGET_DBS}
+ssh -o StrictHostKeyChecking=no -i ${SSH_KEY} ${DEPLOY_HOST} ln -sf ${SYNC_COPY_TARGET_DBS_PATH}/${FILE}.bz2 ${SYNC_COPY_TARGET_DBS_PATH}/db-${DATABASE}-latest.bz2
 
 echo done
