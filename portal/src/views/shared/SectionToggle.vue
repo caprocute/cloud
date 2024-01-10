@@ -4,8 +4,18 @@
         <div class="toggle-wrap">
             <div class="toggle-bg">
                 <div class="toggle-controls" v-if="showToggle">
-                    <a @click="toggleClickHandler($event, 'left')" :class="{ selected: matchSection('left') }">{{ leftLabel }}</a>
-                    <a @click="toggleClickHandler($event, 'right')" :class="{ selected: matchSection('right') }">
+                    <a
+                        @click="toggleClickHandler($event, 'left')"
+                        :class="{ selected: matchSection('left') }"
+                        :disabled="!permissions.canAddComment"
+                    >
+                        {{ leftLabel }}
+                    </a>
+                    <a
+                        @click="toggleClickHandler($event, 'right')"
+                        :class="{ selected: matchSection('right') }"
+                        :disabled="permissions.canAddEvent"
+                    >
                         {{ rightLabel }}
                     </a>
                 </div>
@@ -55,6 +65,11 @@ export default Vue.extend({
             return this.selectedSection === section;
         },
     },
+    computed: {
+        permissions(): { canAddComment: boolean; canAddEvent: boolean } {
+            return this.$state.discussion.permissions;
+        },
+    },
 });
 </script>
 
@@ -97,6 +112,10 @@ export default Vue.extend({
         user-select: none;
         cursor: pointer;
         border-radius: 25px;
+
+        &[disabled] {
+            pointer-events: none;
+        }
     }
 }
 </style>

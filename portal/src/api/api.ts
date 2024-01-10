@@ -440,11 +440,12 @@ export interface SavedBookmark {
     url: string;
     bookmark: string;
     token: string;
+    permissions: { canAddComment: boolean; canAddEvent: boolean };
 }
 
 export interface PendingInvite {
     id: number;
-    project: { id: number; name: string; };
+    project: { id: number; name: string };
     time: number;
     role: number;
 }
@@ -797,7 +798,7 @@ class FKApi {
         });
     }
 
-    updateStation(data: {id: number, name: string, description: string | null }): Promise<Station> {
+    updateStation(data: { id: number; name: string; description: string | null }): Promise<Station> {
         return this.invoke({
             auth: Auth.Required,
             method: "PATCH",
@@ -1091,13 +1092,12 @@ class FKApi {
         });
     }
 
-    updateModule(data: {stationId: number, moduleId: number, label: string}): Promise<Station> {
-
+    updateModule(data: { stationId: number; moduleId: number; label: string }): Promise<Station> {
         return this.invoke({
             auth: Auth.Required,
             method: "PATCH",
             url: this.baseUrl + "/stations/" + data.stationId + "/modules/" + data.moduleId,
-            data: {label: data.label},
+            data: { label: data.label },
         });
     }
 

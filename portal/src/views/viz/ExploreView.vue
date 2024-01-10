@@ -18,6 +18,7 @@ import { Bookmark, serializeBookmark, deserializeBookmark } from "./viz";
 import Vue from "vue";
 import ExploreWorkspace from "./ExploreWorkspace.vue";
 import { confirmLeaveWithDirtyCheck } from "@/store/modules/dirty";
+import { ActionTypes } from "@/store";
 
 export default Vue.extend({
     name: "ExploreView",
@@ -93,6 +94,9 @@ export default Vue.extend({
                     const savedBookmark = await this.$services.api.resolveBookmark(token);
                     console.log(`viz: bookmark-resolved`, savedBookmark);
                     Vue.set(this.resolved, token, deserializeBookmark(savedBookmark.bookmark));
+                    console.log("Radoi resolved", this.resolved);
+                    console.log("Radoi savedBookmark", savedBookmark);
+                    await this.$store.dispatch(ActionTypes.SET_DISCUSSION_PERMISSIONS, savedBookmark.permissions);
                 } else {
                     console.log(`viz: bookmark-missing`);
                 }

@@ -6,6 +6,7 @@ import { DataEvent } from "@/views/comments/model";
 
 export class DiscussionState {
     dataEvents: DataEvent[];
+    permissions: { canAddComment: boolean; canAddEvent: boolean };
 }
 
 const getters = {
@@ -29,6 +30,12 @@ const actions = (services: Services) => {
         ) => {
             commit(MutationTypes.DATA_EVENT_APPEND, payload.dataEvent);
         },
+        [ActionTypes.SET_DISCUSSION_PERMISSIONS]: async (
+            { commit, dispatch, state }: { commit: any; dispatch: any; state: DiscussionState },
+            payload: { canAddComment: boolean; canAddEvent: boolean }
+        ) => {
+            commit(MutationTypes.UPDATE_DISCUSSION_PERMISSIONS, payload);
+        },
     };
 };
 
@@ -43,6 +50,12 @@ const mutations = {
     },
     [MutationTypes.DATA_EVENT_APPEND]: (state: DiscussionState, dataEvent: DataEvent) => {
         state.dataEvents.push(dataEvent);
+    },
+    [MutationTypes.UPDATE_DISCUSSION_PERMISSIONS]: (
+        state: DiscussionState,
+        permissions: { canAddComment: boolean; canAddEvent: boolean }
+    ) => {
+        state.permissions = permissions;
     },
 };
 

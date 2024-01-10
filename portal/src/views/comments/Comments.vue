@@ -466,6 +466,7 @@ export default Vue.extend({
             return null;
         },
         parentBookmark(): Bookmark | null {
+            console.log("Radoi bk", this.parentData);
             if (this.parentData instanceof Bookmark) {
                 return this.parentData;
             }
