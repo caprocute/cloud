@@ -267,6 +267,10 @@ input[type="file"] {
     flex-wrap: wrap;
     gap: 20px 10px;
     margin-top: 20px;
+
+    @include bp-down($xs) {
+        justify-content: space-between;
+    }
 }
 
 ::v-deep .silentbox-item {
@@ -276,6 +280,8 @@ input[type="file"] {
     min-width: 100px;
 
     @include bp-down($xs) {
+        height: 250px;
+
         &:nth-of-type(even) {
             .options-btns {
                 right: auto;
