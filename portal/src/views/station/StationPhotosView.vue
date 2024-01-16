@@ -225,7 +225,7 @@ export default Vue.extend({
         height: 100%;
 
         &:after {
-            transform: translate(-1px, 13px);
+            transform: translate(-1px, 5px);
             font-weight: bold;
         }
     }
@@ -265,15 +265,15 @@ input[type="file"] {
 #silentbox-gallery {
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-between;
+    gap: 20px 10px;
+    margin-top: 20px;
 }
 
 ::v-deep .silentbox-item {
     position: relative;
-    margin-top: 10px;
-    flex: 0 0 calc(50% - 5px);
     background-color: #e2e4e6;
-    min-height: 300px;
+    height: 300px;
+    min-width: 100px;
 
     @include bp-down($xs) {
         &:nth-of-type(even) {
@@ -287,8 +287,7 @@ input[type="file"] {
         object-fit: cover;
         border-radius: 2px;
         width: 100%;
-        min-height: 200px;
-        max-height: 400px;
+        height: 100%;
     }
 }
 
