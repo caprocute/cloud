@@ -9,7 +9,6 @@
             @toggle="onSectionToggle"
             :default="logMode === 'comment' ? 'left' : 'right'"
             v-if="viewType === 'data'"
-            :showToggle="showPostsTypeToggle()"
         >
             <template #left>
                 <div class="new-comment" :class="{ 'align-center': !user }">
@@ -466,7 +465,6 @@ export default Vue.extend({
             return null;
         },
         parentBookmark(): Bookmark | null {
-            console.log("Radoi bk", this.parentData);
             if (this.parentData instanceof Bookmark) {
                 return this.parentData;
             }
@@ -855,28 +853,6 @@ export default Vue.extend({
         },
         interpolatePartner(baseString): string {
             return interpolatePartner(baseString);
-        },
-        // don't allow the user to log an event if the viz group has no data, by simply hiding the Event logging toggle
-        areWorkspaceGroupsEmpty(): boolean {
-            let areEmpty = false;
-
-            if (this.workspace) {
-                this.workspace.groups.forEach((group) => {
-                    if (group.isEmpty()) {
-                        areEmpty = true;
-                    }
-                });
-            }
-
-            return areEmpty;
-        },
-        showPostsTypeToggle(): boolean {
-            return (
-                (((this.user && this.user.admin) ||
-                    (this.projectUser && this.projectUser.user && this.projectUser.role === "Administrator")) &&
-                    !this.areWorkspaceGroupsEmpty()) ||
-                false
-            );
         },
         onEditCommentInput(comment: any, event: string) {
             if (JSON.stringify(event) !== comment.body) {

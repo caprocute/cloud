@@ -3,18 +3,18 @@
         <hr class="toggle-hr" />
         <div class="toggle-wrap">
             <div class="toggle-bg">
-                <div class="toggle-controls" v-if="showToggle">
+                <div class="toggle-controls">
                     <a
+                        v-if="permissions.canAddComment"
                         @click="toggleClickHandler($event, 'left')"
                         :class="{ selected: matchSection('left') }"
-                        :disabled="!permissions.canAddComment"
                     >
                         {{ leftLabel }}
                     </a>
                     <a
+                        v-if="permissions.canAddEvent"
                         @click="toggleClickHandler($event, 'right')"
                         :class="{ selected: matchSection('right') }"
-                        :disabled="permissions.canAddEvent"
                     >
                         {{ rightLabel }}
                     </a>
@@ -43,10 +43,6 @@ export default Vue.extend({
         default: {
             type: String,
             default: "left",
-        },
-        showToggle: {
-            type: Boolean,
-            required: true,
         },
     },
     data(): {
@@ -112,10 +108,6 @@ export default Vue.extend({
         user-select: none;
         cursor: pointer;
         border-radius: 25px;
-
-        &[disabled] {
-            pointer-events: none;
-        }
     }
 }
 </style>
