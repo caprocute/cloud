@@ -15,12 +15,13 @@
             <template v-if="user">
                 <div class="new-field-note-wrap">
                     <Tiptap
-                        @editor-focus="checkEditingFieldNote()"
-                        @input="$store.dispatch(ActionTypes.NEW_DIRTY_FIELD, 'newFieldNote')"
-                        @empty="$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, 'newFieldNote')"
                         v-model="newNoteText"
                         placeholder="Join the discussion!"
                         saveLabel="Save"
+                        :disable-mentions="true"
+                        @editor-focus="checkEditingFieldNote()"
+                        @input="$store.dispatch(ActionTypes.NEW_DIRTY_FIELD, 'newFieldNote')"
+                        @empty="$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, 'newFieldNote')"
                         @save="save()"
                     />
                 </div>
@@ -78,9 +79,9 @@
                                 :ref="'note-ref-' + fieldNote.id"
                                 :value="fieldNote.body"
                                 :readonly="!editingFieldNote || editingFieldNote.id !== fieldNote.id"
+                                :disable-mentions="true"
                                 @input="onEditFieldNoteInput(fieldNote, $event)"
                                 @save="saveEdit(fieldNote)"
-                                @empty="onNewFieldNoteText($event, 'edit')"
                             />
                         </template>
                         <div v-if="!editingFieldNote || (editingFieldNote && editingFieldNote.id !== fieldNote.id)" class="actions">

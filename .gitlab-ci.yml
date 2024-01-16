@@ -2,9 +2,10 @@ stages:
   - test
   - build
   - deploy
+  - db
 
 variables:
-  VERSION: 0.3.52
+  VERSION: 0.3.53
 
 test:go:
   stage: test
@@ -42,6 +43,28 @@ test:js:
     - cp src/secrets.ts.template src/secrets.ts
     - node_modules/.bin/vue-cli-service build
     - node_modules/.bin/vue-cli-service test:unit
+
+build:tools-amd64:
+  stage: build
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_COMMIT_TAG
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_BRANCH == "main"
+  image: golang:latest
+  script:
+    - mkdir build
+    - (cd server/cmd/fktool && go build -o ../../../build/fktool *.go)
+    - (cd server/cmd/fkdata && go build -o ../../../build/fkdata *.go)
+    - (cd server/cmd/sanitizer && go build -o ../../../build/sanitizer *.go)
+    - (cd server/cmd/scratch && go build -o ../../../build/scratch *.go)
+  artifacts:
+    name: "cloud-tools-amd64-${CI_COMMIT_REF_NAME}"
+    paths:
+      - build/fktool
+      - build/fkdata
+      - build/sanitizer
+      - build/scratch
 
 build:compile:
   stage: build
@@ -108,6 +131,37 @@ build:migrations:
       - migrations/migrate
       - migrations/tsdb
       - migrations/primary
+
+db:primary:prod:clone:
+  stage: db
+  image: docker:24.0.5
+  services:
+    - name: docker:24.0.5-dind
+      alias: docker
+  variables:
+    DOCKER_HOST: tcp://docker:2375/
+    DOCKER_TLS_CERTDIR: ""
+  when: manual
+  script:
+    - cd tools
+    - docker build -t conservify/fk-cloud-tools:latest .
+    - docker run -e DATABASE=primary -e DEPLOY_HOST=${DEPLOY_HOST} -e SYNC_COPY_TARGET_DBS=${SYNC_COPY_TARGET_DBS} -e CI_JOB_TOKEN=${CI_JOB_TOKEN} -e CI_PROJECT_ID=${CI_PROJECT_ID} conservify/fk-cloud-tools:latest /work/db-clone.sh "${DEPLOY_HOST}" "${SYNC_COPY_TARGET_DBS}" "primary"
+
+db:ts:prod:clone:
+  stage: db
+  image: docker:24.0.5
+  timeout: 6h
+  services:
+    - name: docker:24.0.5-dind
+      alias: docker
+  variables:
+    DOCKER_HOST: tcp://docker:2375/
+    DOCKER_TLS_CERTDIR: ""
+  when: manual
+  script:
+    - cd tools
+    - docker build -t conservify/fk-cloud-tools:latest .
+    - docker run -e DATABASE=ts -e DEPLOY_HOST=${DEPLOY_HOST} -e SYNC_COPY_TARGET_DBS=${SYNC_COPY_TARGET_DBS} -e CI_JOB_TOKEN=${CI_JOB_TOKEN} -e CI_PROJECT_ID=${CI_PROJECT_ID} conservify/fk-cloud-tools:latest /work/db-clone.sh "${DEPLOY_HOST}" "${SYNC_COPY_TARGET_DBS}" "ts"
 
 deploy:staging:
   stage: deploy
