@@ -275,11 +275,6 @@ input[type="file"] {
     background-color: #e2e4e6;
     min-height: 300px;
 
-    &:nth-of-type(1) {
-        flex: 0 0 100%;
-        margin-top: 15px;
-    }
-
     @include bp-down($xs) {
         &:nth-of-type(even) {
             .options-btns {
