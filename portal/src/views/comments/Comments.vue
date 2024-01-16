@@ -832,7 +832,7 @@ export default Vue.extend({
                     const el = document.querySelector(location.hash);
 
                     if (el) {
-                        el.scrollIntoView({ behavior: "smooth" });
+                        el.scrollIntoView({ behavior: "smooth", block: "center" });
                         el.classList.add("highlight");
                         setTimeout(() => {
                             el.classList.remove("highlight");
