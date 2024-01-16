@@ -8,6 +8,7 @@ import VueConfirmDialog from "vue-confirm-dialog";
 import Multiselect from "vue-multiselect";
 import { BadgePlugin } from "bootstrap-vue";
 import VueSilentbox from 'vue-silentbox';
+import VueGtag from "vue-gtag";
 
 import prettyBytes from "pretty-bytes";
 import moment from "moment";
@@ -21,6 +22,7 @@ import ConfigurationPlugin from "./config";
 import Config from "./secrets";
 import App from "./App.vue";
 import { format as d3format } from "d3-format";
+import {getPartnerCustomization, isCustomisationEnabled} from '@/views/shared/partners';
 
 const services = new Services();
 
@@ -64,6 +66,12 @@ Vue.component("vue-confirm-dialog", VueConfirmDialog.default);
 Vue.component("multiselect", Multiselect);
 Vue.use(BadgePlugin);
 Vue.use(VueSilentbox);
+
+if (isCustomisationEnabled() && getPartnerCustomization()?.googleTagManagerId) {
+    Vue.use(VueGtag, {
+        config: { id: "G-TTJPFSVRX6" },
+    });
+}
 
 Vue.config.productionTip = false;
 

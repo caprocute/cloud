@@ -130,6 +130,7 @@ export interface PartnerCustomization {
         project: Component | null;
     };
     latestPrimaryNoDataColor: string;
+    googleTagManagerId: string | null;
 }
 
 function getAttribute(station: DisplayStation, name: string): string | null {
@@ -201,6 +202,7 @@ export function getPartnerCustomization(): PartnerCustomization | null {
                 project: FloodNetProjectDescription,
             },
             latestPrimaryNoDataColor: "#cccccc",
+            googleTagManagerId: "G-TTJPFSVRX6",
         };
     }
     return null;
@@ -257,6 +259,7 @@ export function getPartnerCustomizationWithDefault(): PartnerCustomization {
             project: FieldKitProjectDescription,
         },
         latestPrimaryNoDataColor: "#777a80",
+        googleTagManagerId: null,
     };
 }
 
