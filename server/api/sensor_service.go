@@ -185,9 +185,12 @@ func (c *SensorService) Recently(ctx context.Context, payload *sensor.RecentlyPa
 
 	durations := []time.Duration{
 		time.Hour * 1,
-		time.Hour * 24,
-		time.Hour * 48,
-		time.Hour * 72,
+		// Partner asked that we show stations w/o data in the past hour as
+		// inactive, which means we're no longer showing data that's older than
+		// an hour.
+		// time.Hour * 24,
+		// time.Hour * 48,
+		// time.Hour * 72,
 	}
 
 	data, err := be.QueryRecentlyAggregated(ctx, stationIDs, durations)
