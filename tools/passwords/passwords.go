@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"flag"
 	"log"
+	"strings"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/kelseyhightower/envconfig"
@@ -38,7 +39,7 @@ func main() {
 	flag.Parse()
 
 	if options.Password != "" {
-		hashed, err := generateHashFromPassword(options.Password)
+		hashed, err := generateHashFromPassword(strings.TrimSpace(options.Password))
 		if err != nil {
 			panic(err)
 		}
