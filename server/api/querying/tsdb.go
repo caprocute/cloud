@@ -542,12 +542,17 @@ func (tsdb *TimeScaleDBBackend) queryLastTimes(ctx context.Context, stationIDs [
 	return lastTimes, nil
 }
 
-func (tsdb *TimeScaleDBBackend) queryDailyAggregate(ctx context.Context, stationIDs []int32, duration time.Duration, ids *backend.SensorDatabaseIDs) ([]*backend.DataRow, error) {
+func (tsdb *TimeScaleDBBackend) queryAggregate(ctx context.Context, stationIDs []int32, duration time.Duration, ids *backend.SensorDatabaseIDs) ([]*backend.DataRow, error) {
 	queryMetrics := tsdb.metrics.DailyQuery()
 
 	defer queryMetrics.Send()
 
 	since := time.Now()
+
+	aggregateTable := "fieldkit.sensor_data_1h"
+	if duration.Hours() >= 24 {
+		aggregateTable = "fieldkit.sensor_data_24h"
+	}
 
 	sql := fmt.Sprintf(`
 	SELECT
@@ -560,10 +565,10 @@ func (tsdb *TimeScaleDBBackend) queryDailyAggregate(ctx context.Context, station
 		MIN(min_value) AS min_value,
 		MAX(max_value) AS max_value,
 		LAST(last_value, bucket_time) AS last_value
-	FROM fieldkit.sensor_data_24h
+	FROM %s
 	WHERE station_id = ANY($1) AND bucket_time > ($2::TIMESTAMP + interval '-%f seconds')
 	GROUP BY station_id, module_id, sensor_id
-	`, duration.Seconds())
+	`, aggregateTable, duration.Seconds())
 
 	pgRows, err := tsdb.pool.Query(ctx, sql, stationIDs, since)
 	if err != nil {
@@ -644,7 +649,7 @@ func (tsdb *TimeScaleDBBackend) QueryRecentlyAggregated(ctx context.Context, sta
 		byWindow[key] = make([]*backend.DataRow, 0)
 
 		go func(duration time.Duration) {
-			daily, err := tsdb.queryDailyAggregate(ctx, stationIDs, duration, ids)
+			daily, err := tsdb.queryAggregate(ctx, stationIDs, duration, ids)
 			if err != nil {
 				log := Logger(ctx).Sugar()
 				log.Errorw("tsdb:error", "error", err)
