@@ -27,6 +27,8 @@ if ! [ -f "${TERRAFORM_ENV}" ]; then
     curl --silent "https://gitlab.com/gitlab-org/incubation-engineering/mobile-devops/download-secure-files/-/raw/main/installer" | bash
     TERRAFORM_ENV=`pwd`/.secure_files/dev.json
     SSH_KEY=`pwd`/.secure_files/deploy.pem
+    USER_PASSWORD_FILE=`pwd`/.secure_files/fkdev-password.txt
+    USER_PASSWORD=`head -n 1 ${USER_PASSWORD_FILE}`
     chmod 0600 "${SSH_KEY}"
     ls  -alh
 fi
@@ -67,6 +69,10 @@ echo 'DELETE FROM fieldkit.gue_jobs;' >> restore.sql
 echo 'SET session_replication_role TO default;' >> restore.sql
 
 cat restore.sql | psql ${TEMPORARY_URL} < restore.sql
+
+if [ "${DATABASE}" = "primary" ]; then
+    FIELDKIT_POSTGRES_URL=${TEMPORARY_URL} ./passwords --set-all --password ${USER_PASSWORD}
+fi
 
 STAMP=`date +%Y%m%d_%H%M%S`
 echo "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = 'fk';" | psql ${ADMIN_URL}
