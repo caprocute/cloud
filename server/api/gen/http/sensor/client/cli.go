@@ -164,11 +164,17 @@ func BuildTailPayload(sensorTailStations string, sensorTailBackend string, senso
 
 // BuildRecentlyPayload builds the payload for the sensor recently endpoint
 // from CLI flags.
-func BuildRecentlyPayload(sensorRecentlyStations string, sensorRecentlyAuth string) (*sensor.RecentlyPayload, error) {
+func BuildRecentlyPayload(sensorRecentlyStations string, sensorRecentlyWindows string, sensorRecentlyAuth string) (*sensor.RecentlyPayload, error) {
 	var stations *string
 	{
 		if sensorRecentlyStations != "" {
 			stations = &sensorRecentlyStations
+		}
+	}
+	var windows *string
+	{
+		if sensorRecentlyWindows != "" {
+			windows = &sensorRecentlyWindows
 		}
 	}
 	var auth *string
@@ -179,6 +185,7 @@ func BuildRecentlyPayload(sensorRecentlyStations string, sensorRecentlyAuth stri
 	}
 	v := &sensor.RecentlyPayload{}
 	v.Stations = stations
+	v.Windows = windows
 	v.Auth = auth
 
 	return v, nil

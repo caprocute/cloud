@@ -715,6 +715,9 @@ func EncodeRecentlyRequest(encoder func(*http.Request) goahttp.Encoder) func(*ht
 		if p.Stations != nil {
 			values.Add("stations", *p.Stations)
 		}
+		if p.Windows != nil {
+			values.Add("windows", *p.Windows)
+		}
 		req.URL.RawQuery = values.Encode()
 		return nil
 	}

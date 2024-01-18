@@ -573,17 +573,22 @@ func DecodeRecentlyRequest(mux goahttp.Muxer, decoder func(*http.Request) goahtt
 	return func(r *http.Request) (interface{}, error) {
 		var (
 			stations *string
+			windows  *string
 			auth     *string
 		)
 		stationsRaw := r.URL.Query().Get("stations")
 		if stationsRaw != "" {
 			stations = &stationsRaw
 		}
+		windowsRaw := r.URL.Query().Get("windows")
+		if windowsRaw != "" {
+			windows = &windowsRaw
+		}
 		authRaw := r.Header.Get("Authorization")
 		if authRaw != "" {
 			auth = &authRaw
 		}
-		payload := NewRecentlyPayload(stations, auth)
+		payload := NewRecentlyPayload(stations, windows, auth)
 		if payload.Auth != nil {
 			if strings.Contains(*payload.Auth, " ") {
 				// Remove authorization scheme prefix (e.g. "Bearer")

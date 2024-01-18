@@ -1111,9 +1111,10 @@ func NewTailPayload(stations *string, backend *string, auth *string) *sensor.Tai
 }
 
 // NewRecentlyPayload builds a sensor service recently endpoint payload.
-func NewRecentlyPayload(stations *string, auth *string) *sensor.RecentlyPayload {
+func NewRecentlyPayload(stations *string, windows *string, auth *string) *sensor.RecentlyPayload {
 	v := &sensor.RecentlyPayload{}
 	v.Stations = stations
+	v.Windows = windows
 	v.Auth = auth
 
 	return v
