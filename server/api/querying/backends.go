@@ -42,6 +42,13 @@ type RecentlyAggregated struct {
 	Stations map[int32]*StationLastTime           `json:"stations"`
 }
 
+func NewRecentlyAggregated() *RecentlyAggregated {
+	return &RecentlyAggregated{
+		Windows:  make(map[time.Duration][]*backend.DataRow),
+		Stations: make(map[int32]*StationLastTime),
+	}
+}
+
 type DataBackend interface {
 	QueryData(ctx context.Context, qp *backend.QueryParams) (*QueriedData, error)
 	QueryTail(ctx context.Context, stationIDs []int32) (*SensorTailData, error)
