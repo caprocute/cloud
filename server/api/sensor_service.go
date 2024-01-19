@@ -181,7 +181,7 @@ func (c *SensorService) parseWindows(payload *sensor.RecentlyPayload) []time.Dur
 		windows := strings.Split(*payload.Windows, ",")
 		for _, hoursString := range windows {
 			hours, err := strconv.Atoi(hoursString)
-			if err != nil {
+			if err == nil {
 				durations = append(durations, time.Hour*time.Duration(hours))
 			}
 		}
