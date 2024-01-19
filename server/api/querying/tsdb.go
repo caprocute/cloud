@@ -549,7 +549,7 @@ func (tsdb *TimeScaleDBBackend) queryAggregate(ctx context.Context, stationIDs [
 
 	since := time.Now()
 
-	aggregateTable := "fieldkit.sensor_data_1h"
+	aggregateTable := "fieldkit.sensor_data_10m"
 	if duration.Hours() >= 24 {
 		aggregateTable = "fieldkit.sensor_data_24h"
 	}

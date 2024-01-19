@@ -130,6 +130,7 @@ export interface PartnerCustomization {
         project: Component | null;
     };
     latestPrimaryNoDataColor: string;
+    queryRecentlyQueryString: (station: number[]) => URLSearchParams;
 }
 
 function getAttribute(station: DisplayStation, name: string): string | null {
@@ -201,6 +202,12 @@ export function getPartnerCustomization(): PartnerCustomization | null {
                 project: FloodNetProjectDescription,
             },
             latestPrimaryNoDataColor: "#cccccc",
+            queryRecentlyQueryString: (stations: number[]): URLSearchParams => {
+                const qp = new URLSearchParams();
+                qp.append("stations", stations.join(","));
+                qp.append("windows", [1].join(","));
+                return qp;
+            },
         };
     }
     return null;
@@ -257,6 +264,12 @@ export function getPartnerCustomizationWithDefault(): PartnerCustomization {
             project: FieldKitProjectDescription,
         },
         latestPrimaryNoDataColor: "#777a80",
+        queryRecentlyQueryString: (stations: number[]): URLSearchParams => {
+            const qp = new URLSearchParams();
+            qp.append("stations", stations.join(","));
+            qp.append("windows", [24, 48, 72].join(","));
+            return qp;
+        },
     };
 }
 

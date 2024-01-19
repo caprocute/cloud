@@ -12,6 +12,9 @@ import { BoundingRectangle } from "@/store/map-types";
 
 import { SensorInfoResponse } from "@/views/viz/api";
 
+// Move this out of views.
+import { getPartnerCustomizationWithDefault } from "@/views/shared/partners";
+
 // Ew
 import { NewComment, NewDataEvent } from "@/views/comments/model";
 import { Comment, DataEvent } from "@/views/comments/model";
@@ -444,7 +447,7 @@ export interface SavedBookmark {
 
 export interface PendingInvite {
     id: number;
-    project: { id: number; name: string; };
+    project: { id: number; name: string };
     time: number;
     role: number;
 }
@@ -797,7 +800,7 @@ class FKApi {
         });
     }
 
-    updateStation(data: {id: number, name: string, description: string | null }): Promise<Station> {
+    updateStation(data: { id: number; name: string; description: string | null }): Promise<Station> {
         return this.invoke({
             auth: Auth.Required,
             method: "PATCH",
@@ -1091,13 +1094,12 @@ class FKApi {
         });
     }
 
-    updateModule(data: {stationId: number, moduleId: number, label: string}): Promise<Station> {
-
+    updateModule(data: { stationId: number; moduleId: number; label: string }): Promise<Station> {
         return this.invoke({
             auth: Auth.Required,
             method: "PATCH",
             url: this.baseUrl + "/stations/" + data.stationId + "/modules/" + data.moduleId,
-            data: {label: data.label},
+            data: { label: data.label },
         });
     }
 
@@ -1233,8 +1235,8 @@ class FKApi {
                 stations: {},
             });
         }
-        const qp = new URLSearchParams();
-        qp.append("stations", stations.join(","));
+        const customizations = getPartnerCustomizationWithDefault();
+        const qp = customizations.queryRecentlyQueryString(stations);
         return this.invoke({
             auth: Auth.Optional,
             method: "GET",
