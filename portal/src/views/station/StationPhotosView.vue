@@ -280,7 +280,9 @@ input[type="file"] {
     min-width: 100px;
 
     @include bp-down($xs) {
-        height: 250px;
+        height: auto;
+        max-height: 80vh;
+        flex: 1 1 auto;
 
         &:nth-of-type(even) {
             .options-btns {
