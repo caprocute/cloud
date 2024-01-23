@@ -1406,6 +1406,7 @@ type StationSensor struct {
 	SensorID        *int64         `json:"sensorId"`
 	SensorKey       *string        `json:"sensorKey"`
 	SensorReadAt    *time.Time     `json:"sensorReadAt"`
+	ModuleOrder     int32          `json:"moduleOrder"`
 	Order           int32          `json:"order"`
 }
 
@@ -1462,6 +1463,7 @@ func (sr *StationRepository) QueryStationSensors(ctx context.Context, stations [
 
 	for _, row := range rows {
 		var moduleKey *string
+		moduleOrder := 0
 		if row.ModuleKey != nil {
 			if !strings.HasPrefix(*row.ModuleKey, "fk.") && !strings.HasPrefix(*row.ModuleKey, "wh.") {
 				newKey := "fk." + strings.TrimPrefix(*row.ModuleKey, "modules.")
@@ -1475,6 +1477,7 @@ func (sr *StationRepository) QueryStationSensors(ctx context.Context, stations [
 			moduleAndSensor, _ := metaRepository.FindByFullKey(ctx, *row.SensorKey)
 			if moduleAndSensor != nil {
 				order = moduleAndSensor.Sensor.Order
+				moduleOrder = moduleAndSensor.Module.Order
 			}
 		}
 		byStation[row.StationID] = append(byStation[row.StationID], &StationSensor{
@@ -1488,6 +1491,7 @@ func (sr *StationRepository) QueryStationSensors(ctx context.Context, stations [
 			SensorKey:       row.SensorKey,
 			SensorReadAt:    row.SensorReadAt,
 			Order:           int32(order),
+			ModuleOrder:     int32(moduleOrder),
 		})
 	}
 
