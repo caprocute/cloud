@@ -232,9 +232,9 @@ deploy:staging:
     - (cd migrations && docker build --progress=plain -t conservify/fk-cloud-migrations:latest .)
     - (cd tools && docker build --progress=plain -t conservify/fk-cloud-tools:latest .)
     - MIGRATE_DATABASE_URL=`jq -r .database_url.value ${TERRAFORM_ENV}`
-    - docker run -e MIGRATE_PATH=${PRIMARY_MIGRATIONS_PATH} -e MIGRATE_DATABASE_URL=${MIGRATE_DATABASE_URL} conservify/fk-cloud-migrations migrate
+    - docker run -e MIGRATE_PATH=/migrations -e MIGRATE_DATABASE_URL=${MIGRATE_DATABASE_URL} -v ${PRIMARY_MIGRATIONS_PATH}:/migrations conservify/fk-cloud-migrations migrate
     - MIGRATE_DATABASE_URL=`jq -r .timescaledb_url.value ${TERRAFORM_ENV}`
-    - docker run -e MIGRATE_PATH=${TSDB_MIGRATIONS_PATH} -e MIGRATE_DATABASE_URL=${MIGRATE_DATABASE_URL} conservify/fk-cloud-migrations migrate
+    - docker run -e MIGRATE_PATH=/migrations -e MIGRATE_DATABASE_URL=${MIGRATE_DATABASE_URL} -v ${TSDB_MIGRATIONS_PATH}:/migrations conservify/fk-cloud-migrations migrate
     - docker run -v $(pwd)/.secure_files:/work/.secure_files -v $(pwd)/dev-ops-main:/work/dev-ops-main conservify/fk-cloud-tools /work/deployer deploy --cert ${SSH_KEY} --terraform ${TERRAFORM_ENV} --archive ${ARCHIVE} --poll ${POLL_URL}
   environment:
     name: staging
