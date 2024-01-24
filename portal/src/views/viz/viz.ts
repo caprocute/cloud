@@ -823,7 +823,7 @@ export class Workspace implements VizInfoFactory {
 
         this.associated = meta.associated.stations;
         this.stationsFull = meta.associated.stations.map((as) => as.station);
-
+        console.log("radoi station in intialize()", this.stations);
         return this;
     }
 
