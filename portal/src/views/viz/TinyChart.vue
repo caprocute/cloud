@@ -138,6 +138,7 @@ export default Vue.extend({
                 const vizSensor = getQuickSensor(quickSensors);
                 const sensor = meta.findSensor(vizSensor);
                 const data = stationData.data.filter((datum) => datum.sensorId == vizSensor[1][1]); // TODO VizSensor
+
                 if (data.length === 0) {
                     thisComp.handleNoDataCase();
                     return null;

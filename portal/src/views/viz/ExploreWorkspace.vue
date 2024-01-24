@@ -302,6 +302,7 @@ export default Vue.extend({
             const ws = this.bookmark ? Workspace.fromBookmark(allSensors, this.bookmark, settings) : new Workspace(allSensors, settings);
 
             this.workspace = await ws.initialize();
+
             console.log(`viz: workspace-created`);
 
             return ws;
@@ -325,9 +326,11 @@ export default Vue.extend({
                         const sensorModuleId = quickSensors.stations[stationId][0].moduleId;
                         const sensorId = quickSensors.stations[stationId][0].sensorId;
                         const vizSensor: VizSensor = [stationId, [sensorModuleId, sensorId]];
+
                         const associated = await this.$services.api.getAssociatedStations(stationId);
                         const stationIds = associated.stations.map((associatedStation) => associatedStation.station.id);
                         console.log(`viz: show-station-associated`, { associated, stationIds });
+
                         const getInitialBookmark = () => {
                             const quickSensor = quickSensors.stations[stationId].filter((qs) => qs.sensorId == sensorId);
                             if (quickSensor.length == 1) {
@@ -379,6 +382,7 @@ export default Vue.extend({
                 .map((d) => d.id);
 
             this.selectedIndex = validStations.indexOf(this.selectedId);
+
             return validStations;
         },
         onNewSummaryStation(evt) {

@@ -823,6 +823,7 @@ export class Workspace implements VizInfoFactory {
 
         this.associated = meta.associated.stations;
         this.stationsFull = meta.associated.stations.map((as) => as.station);
+
         return this;
     }
 
