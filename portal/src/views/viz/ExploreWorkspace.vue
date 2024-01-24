@@ -328,9 +328,6 @@ export default Vue.extend({
                         const associated = await this.$services.api.getAssociatedStations(stationId);
                         const stationIds = associated.stations.map((associatedStation) => associatedStation.station.id);
                         console.log(`viz: show-station-associated`, { associated, stationIds });
-                        console.log("radoi sensorId", sensorId);
-                        console.log("radoi vizSensor", vizSensor);
-                        console.log("radoi quickSensors", quickSensors);
                         const getInitialBookmark = () => {
                             const quickSensor = quickSensors.stations[stationId].filter((qs) => qs.sensorId == sensorId);
                             if (quickSensor.length == 1) {
