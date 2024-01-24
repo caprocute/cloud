@@ -1412,9 +1412,14 @@ type StationSensor struct {
 
 type StationSensorByOrder []*StationSensor
 
-func (a StationSensorByOrder) Len() int           { return len(a) }
-func (a StationSensorByOrder) Less(i, j int) bool { return a[i].Order < a[j].Order }
-func (a StationSensorByOrder) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a StationSensorByOrder) Len() int { return len(a) }
+func (a StationSensorByOrder) Less(i, j int) bool {
+	if a[i].ModuleOrder == a[j].ModuleOrder {
+		return a[i].Order < a[j].Order
+	}
+	return a[i].ModuleOrder < a[j].ModuleOrder
+}
+func (a StationSensorByOrder) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
 func (sr *StationRepository) QueryStationSensors(ctx context.Context, stations []int32) (map[int32][]*StationSensor, error) {
 	query, args, err := sqlx.In(`
