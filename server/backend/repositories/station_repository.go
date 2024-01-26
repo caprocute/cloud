@@ -1406,14 +1406,20 @@ type StationSensor struct {
 	SensorID        *int64         `json:"sensorId"`
 	SensorKey       *string        `json:"sensorKey"`
 	SensorReadAt    *time.Time     `json:"sensorReadAt"`
+	ModuleOrder     int32          `json:"moduleOrder"`
 	Order           int32          `json:"order"`
 }
 
 type StationSensorByOrder []*StationSensor
 
-func (a StationSensorByOrder) Len() int           { return len(a) }
-func (a StationSensorByOrder) Less(i, j int) bool { return a[i].Order < a[j].Order }
-func (a StationSensorByOrder) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a StationSensorByOrder) Len() int { return len(a) }
+func (a StationSensorByOrder) Less(i, j int) bool {
+	if a[i].ModuleOrder == a[j].ModuleOrder {
+		return a[i].Order < a[j].Order
+	}
+	return a[i].ModuleOrder < a[j].ModuleOrder
+}
+func (a StationSensorByOrder) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
 func (sr *StationRepository) QueryStationSensors(ctx context.Context, stations []int32) (map[int32][]*StationSensor, error) {
 	query, args, err := sqlx.In(`
@@ -1462,6 +1468,7 @@ func (sr *StationRepository) QueryStationSensors(ctx context.Context, stations [
 
 	for _, row := range rows {
 		var moduleKey *string
+		moduleOrder := 0
 		if row.ModuleKey != nil {
 			if !strings.HasPrefix(*row.ModuleKey, "fk.") && !strings.HasPrefix(*row.ModuleKey, "wh.") {
 				newKey := "fk." + strings.TrimPrefix(*row.ModuleKey, "modules.")
@@ -1475,6 +1482,7 @@ func (sr *StationRepository) QueryStationSensors(ctx context.Context, stations [
 			moduleAndSensor, _ := metaRepository.FindByFullKey(ctx, *row.SensorKey)
 			if moduleAndSensor != nil {
 				order = moduleAndSensor.Sensor.Order
+				moduleOrder = moduleAndSensor.Module.Order
 			}
 		}
 		byStation[row.StationID] = append(byStation[row.StationID], &StationSensor{
@@ -1488,6 +1496,7 @@ func (sr *StationRepository) QueryStationSensors(ctx context.Context, stations [
 			SensorKey:       row.SensorKey,
 			SensorReadAt:    row.SensorReadAt,
 			Order:           int32(order),
+			ModuleOrder:     int32(moduleOrder),
 		})
 	}
 
