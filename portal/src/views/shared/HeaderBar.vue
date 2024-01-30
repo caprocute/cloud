@@ -60,6 +60,10 @@
                 </template>
             </div>
         </div>
+
+        <div class="language-selector">
+            <i class="icon icon-globe"></i>
+        </div>
     </div>
 </template>
 
@@ -173,7 +177,12 @@ export default Vue.extend({
     box-sizing: border-box;
     z-index: $z-index-header;
     flex: 0 0 65px;
+    padding-right: 85px;
     @include flex(center, flex-end);
+
+    @include bp-down($lg) {
+        padding-right: 14px;
+    }
 
     @include bp-down($md) {
         padding: 0 10px;
@@ -185,25 +194,20 @@ export default Vue.extend({
         }
     }
 
+    @include bp-down($sm) {
+        padding-right: 0;
+    }
+
     > a {
         display: flex;
         align-items: center;
     }
 
     &-account {
-        padding-right: 85px;
         text-align: right;
         position: relative;
         height: 100%;
         @include flex(center);
-
-        @include bp-down($lg) {
-            padding-right: 14px;
-        }
-
-        @include bp-down($sm) {
-            padding-right: 0;
-        }
 
         &-name {
             font-size: 16px;
@@ -225,7 +229,7 @@ export default Vue.extend({
             transition: all 0.33s;
             transform: translateY(-50%);
             cursor: pointer;
-            @include position(absolute, 50% 69px null null);
+            @include position(absolute, 50% null null calc(100% + 5px));
 
             @include bp-down($lg) {
                 right: 0;
@@ -436,6 +440,37 @@ button {
     img {
         width: 100%;
         margin-top: 15px;
+    }
+}
+
+.language-selector {
+    margin-left: 20px;
+    padding: 10px;
+    position: relative;
+
+    &:after {
+        content: "";
+        background: url("../../assets/icon-chevron-dropdown.svg") no-repeat center center;
+        width: 10px;
+        height: 10px;
+        transition: all 0.33s;
+        transform: translateY(-50%);
+        cursor: pointer;
+        @include position(absolute, 50% null null calc(100% - 5px));
+
+        @include bp-down($lg) {
+            right: 0;
+        }
+
+        @include bp-down($sm) {
+            display: none;
+        }
+    }
+
+    &:hover {
+        &:after {
+            transform: rotate(180deg) translateY(50%);
+        }
     }
 }
 </style>
