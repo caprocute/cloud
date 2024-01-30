@@ -3,33 +3,33 @@
         <Logo class="form-header-logo"></Logo>
         <div v-if="!attempted">
             <form class="form" @submit.prevent="save">
-                <h1 class="form-title">Recover Account</h1>
-                <div class="form-subtitle">Enter your email address below, and password reset instructions will be sent.</div>
+                <h1 class="form-title">{{ $t("recover.form.title") }}</h1>
+                <div class="form-subtitle">{{ $t("recover.form.subtitle") }}</div>
                 <div class="form-group">
                     <TextField v-model="form.email" label="Email" keyboardType="email" />
 
                     <div class="form-errors" v-if="$v.form.email.$error">
-                        <div v-if="!$v.form.email.required">Email is a required field.</div>
-                        <div v-if="!$v.form.email.email">Must be a valid email address.</div>
+                        <div v-if="!$v.form.email.required">{{ $t("recover.form.email.required") }}</div>
+                        <div v-if="!$v.form.email.email">{{ $t("recover.form.email.valid") }}</div>
                     </div>
                 </div>
-                <button class="form-submit" type="submit">Recover</button>
+                <button class="form-submit" type="submit">{{ $t("recover.form.button") }}</button>
                 <div>
-                    <router-link :to="{ name: 'login' }" class="form-link">Back to Log In</router-link>
+                    <router-link :to="{ name: 'login' }" class="form-link">{{ $t("recover.form.backButton") }}</router-link>
                 </div>
             </form>
         </div>
         <div v-if="attempted" class="form success">
             <div v-if="!resending">
                 <img alt="Success" src="@/assets/icon-success.svg" width="57px" class="form-header-icon" />
-                <h1 class="form-title">Password Reset Email Sent</h1>
-                <div class="form-subtitle">Check your inbox for the email with a link to reset your password.</div>
-                <button class="form-submit" v-on:click="resend">Resend Email</button>
-                <router-link :to="{ name: 'login' }" class="form-link">Back to Log In</router-link>
+                <h1 class="form-title">{{ $t("recover.sentTitle") }}</h1>
+                <div class="form-subtitle">{{ $t("recover.sentSubtitle") }}</div>
+                <button class="form-submit" v-on:click="resend">{{ $t('recover.form.created.resend') }}</button>
+                <router-link :to="{ name: 'login' }" class="form-link">{{ $t("recover.form.backButton") }}</router-link>
             </div>
             <div v-if="resending">
                 <img alt="Resending" src="@/assets/Icon_Syncing2.png" width="57px" class="form-header-icon" />
-                <p>Resending</p>
+                <p>{{ $t("recover.form.resending") }}</p>
             </div>
         </div>
     </div>

@@ -284,8 +284,60 @@
             }
         }
     },
+    "reset": {
+        "form": {
+            "title": "Reset Password",
+            "name": {
+                "label": "Name",
+                "required": "Name is a required field."
+            },
+            "email": {
+                "label": "Email",
+                "required": "Email is a required field.",
+                "valid": "Must be a valid email address.",
+                "taken": "This address appears to already be registered."
+            },
+            "password": {
+                "label": "Password",
+                "required": "This is a required field.",
+                "valid": "Password must be at least 10 characters."
+            },
+            "passwordConfirmation": {
+                "label": "Confirm password",
+                "required": "Confirmation is a required field.",
+                "valid": "Passwords must match."
+            },
+            "backButton": "Back to Log in",
+            "successTitle": "Success!",
+            "failedTitle": "Password Not Reset",
+            "failedSubtitle": "Unfortunately we were unable to reset your password.",
+            "retry": {
+                "please": "Please",
+                "contactUs": "contact us",
+                "assitance": "if you would like assistance."
+            }
+        }
+    },
+    "recover": {
+        "form": {
+            "title": "Recover Account",
+            "subtitle": "Enter your email address below, and password reset instructions will be sent.",
+            "button": "Recover",
+            "sentTitle": "Password Reset Email Sent",
+            "sentSubtitle": "Check your inbox for the email with a link to reset your password.",
+            "resending": "Resending",
+            "backButton": "Back to Log in",
+            "email": {
+                "label": "Email",
+                "required": "Email is a required field.",
+                "valid": "Must be a valid email address.",
+                "taken": "This address appears to already be registered."
+            }
+        }
+    },
     "login": {
         "form": {
+            "title": "Log In to Your Account",
             "spoofEmail": {
                 "label": "Spoof Email",
                 "required": "Spoof Email is a required field.",
@@ -313,7 +365,6 @@
     "createAccount": {
         "form": {
             "title": "Create Your Account",
-            "recover": "Recover Account",
             "name": {
                 "label": "Name",
                 "required": "Name is a required field."
@@ -535,7 +586,7 @@
         "stationDescription": "Station description",
         "editModuleName": "Module name",
         "studyObjective": "Study objective",
-        "sitePurpose":"Site purpose",
+        "sitePurpose": "Site purpose",
         "siteCriteria": "Site criteria",
         "siteDescription": "Site description",
         "customKey": "Custom note field",

@@ -1,6 +1,6 @@
 <template>
     <form class="form" @submit.prevent="save">
-        <h1 class="form-title">Log In to Your Account</h1>
+        <h1 class="form-title">{{$t('login.form.title')}}</h1>
         <div class="form-group" v-if="spoofing">
             <TextField v-model="form.spoofEmail" :label="$t('login.form.spoofEmail.label')" />
             <div class="form-errors" v-if="$v.form.spoofEmail.$error">
