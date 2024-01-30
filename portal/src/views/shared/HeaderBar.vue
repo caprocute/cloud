@@ -61,32 +61,27 @@
             </div>
         </div>
 
-        <div class="language-selector">
-            <span class="triangle"></span>
-            <i class="icon icon-globe"></i>
-            <ul class="language-list">
-                <li>{{ $t("languageSelector.english") }}</li>
-                <li>{{ $t("languageSelector.spanish") }}</li>
-            </ul>
-        </div>
+        <LanguageSelector></LanguageSelector>
     </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import { mapState, mapGetters } from "vuex";
+import {mapGetters, mapState} from "vuex";
 import * as ActionTypes from "@/store/actions";
-import { MarkNotificationsSeen } from "@/store";
+import {MarkNotificationsSeen} from "@/store";
 import CommonComponents from "@/views/shared";
 import NotificationsList from "@/views/notifications/NotificationsList.vue";
-import { GlobalState } from "@/store/modules/global";
+import {GlobalState} from "@/store/modules/global";
 import Logo from "@/views/shared/Logo.vue";
-import { Notification } from "@/store/modules/notifications";
-import { isMobile } from "@/utilities";
+import {Notification} from "@/store/modules/notifications";
+import {isMobile} from "@/utilities";
+import LanguageSelector from '@/views/shared/LanguageSelector.vue';
 
 export default Vue.extend({
     name: "HeaderBar",
     components: {
+      LanguageSelector,
         ...CommonComponents,
         NotificationsList,
         Logo,
@@ -282,7 +277,7 @@ export default Vue.extend({
     }
 }
 
-.triangle {
+::v-deep .triangle {
     @include position(absolute, null null -10px 5px);
     z-index: $z-index-top;
     width: 0;
@@ -448,75 +443,4 @@ button {
     }
 }
 
-.language-selector {
-    margin-left: 20px;
-    padding: 10px;
-    position: relative;
-
-    .triangle {
-        opacity: 0;
-        visibility: hidden;
-    }
-
-    @include attention() {
-        .language-list,
-        .triangle {
-            visibility: visible;
-            opacity: 1;
-        }
-    }
-
-    &:after {
-        content: "";
-        background: url("../../assets/icon-chevron-dropdown.svg") no-repeat center center;
-        width: 10px;
-        height: 10px;
-        transition: all 0.33s;
-        transform: translateY(-50%);
-        cursor: pointer;
-        @include position(absolute, 50% null null calc(100% - 5px));
-
-        @include bp-down($lg) {
-            right: 0;
-        }
-
-        @include bp-down($sm) {
-            display: none;
-        }
-    }
-
-    &:hover {
-        &:after {
-            transform: rotate(180deg) translateY(50%);
-        }
-    }
-}
-
-.language-list {
-    position: absolute;
-    right: -10px;
-    top: 48px;
-    box-shadow: 2px 2.3px 4px 1px rgba(0, 0, 0, 0.04);
-    border: solid 1px #d8dce0;
-    background-color: #fff;
-    min-width: 100px;
-    opacity: 0;
-    visibility: hidden;
-
-    li {
-        padding: 6px 12px;
-        text-align: left;
-        cursor: pointer;
-        transition: background-color 0.5ms;
-
-        &.active,
-        &:hover {
-            background-color: #f4f5f7;
-        }
-    }
-}
-
-.icon-globe {
-    font-size: 16px;
-}
 </style>

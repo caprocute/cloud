@@ -8,8 +8,8 @@
 <script lang="ts">
 import Vue from "vue";
 import * as ActionTypes from "@/store/actions";
-import { AuthenticationRequiredError } from "@/api";
-import { getPartnerCustomization, PartnerCustomization } from "./views/shared/partners";
+import {AuthenticationRequiredError} from "@/api";
+import {getPartnerCustomization, PartnerCustomization} from "./views/shared/partners";
 import SnackBar from "@/views/shared/SnackBar.vue";
 
 export default Vue.extend({

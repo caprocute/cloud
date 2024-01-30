@@ -7,12 +7,11 @@ import VCalendar from "v-calendar";
 import VueConfirmDialog from "vue-confirm-dialog";
 import Multiselect from "vue-multiselect";
 import { BadgePlugin } from "bootstrap-vue";
-import VueSilentbox from 'vue-silentbox';
+import VueSilentbox from "vue-silentbox";
 
 import prettyBytes from "pretty-bytes";
 import moment from "moment";
 import { sync } from "vuex-router-sync";
-import i18n from "./i18n";
 import * as MutationTypes from "./store/mutations";
 import { Services } from "@/api";
 import storeFactory from "./store";
@@ -21,6 +20,10 @@ import ConfigurationPlugin from "./config";
 import Config from "./secrets";
 import App from "./App.vue";
 import { format as d3format } from "d3-format";
+
+import VueI18n from "vue-i18n";
+import { languages } from "./locales/index.js";
+import { defaultLocale } from "./locales/index.js";
 
 const services = new Services();
 
@@ -34,19 +37,19 @@ const AssetsPlugin = {
 };
 
 Object.defineProperty(Vue.prototype, "$getters", {
-    get: function(this: Vue) {
+    get: function (this: Vue) {
         return this.$store.getters;
     },
 });
 
 Object.defineProperty(Vue.prototype, "$services", {
-    get: function(this: Vue) {
+    get: function (this: Vue) {
         return services;
     },
 });
 
 Object.defineProperty(Vue.prototype, "$state", {
-    get: function(this: Vue) {
+    get: function (this: Vue) {
         return this.$store.state;
     },
 });
@@ -161,6 +164,12 @@ store.commit(MutationTypes.INITIALIZE);
 
 const router = routerFactory(store);
 sync(store, router);
+
+const messages = Object.assign(languages);
+const i18n = new VueI18n({
+    locale: defaultLocale,
+    messages,
+});
 
 new Vue({
     i18n,
