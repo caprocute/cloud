@@ -62,7 +62,12 @@
         </div>
 
         <div class="language-selector">
+            <span class="triangle"></span>
             <i class="icon icon-globe"></i>
+            <ul class="language-list">
+                <li>{{ $t("languageSelector.english") }}</li>
+                <li>{{ $t("languageSelector.spanish") }}</li>
+            </ul>
         </div>
     </div>
 </template>
@@ -381,7 +386,7 @@ button {
         opacity: 0;
         visibility: hidden;
         @include flex();
-        @include position(absolute, calc(100% + 1px) 70px null null);
+        @include position(absolute, calc(100% + 1px) 30px null null);
 
         @include bp-down($lg) {
             top: 100%;
@@ -448,6 +453,19 @@ button {
     padding: 10px;
     position: relative;
 
+    .triangle {
+        opacity: 0;
+        visibility: hidden;
+    }
+
+    @include attention() {
+        .language-list,
+        .triangle {
+            visibility: visible;
+            opacity: 1;
+        }
+    }
+
     &:after {
         content: "";
         background: url("../../assets/icon-chevron-dropdown.svg") no-repeat center center;
@@ -472,5 +490,33 @@ button {
             transform: rotate(180deg) translateY(50%);
         }
     }
+}
+
+.language-list {
+    position: absolute;
+    right: -10px;
+    top: 48px;
+    box-shadow: 2px 2.3px 4px 1px rgba(0, 0, 0, 0.04);
+    border: solid 1px #d8dce0;
+    background-color: #fff;
+    min-width: 100px;
+    opacity: 0;
+    visibility: hidden;
+
+    li {
+        padding: 6px 12px;
+        text-align: left;
+        cursor: pointer;
+        transition: background-color 0.5ms;
+
+        &.active,
+        &:hover {
+            background-color: #f4f5f7;
+        }
+    }
+}
+
+.icon-globe {
+    font-size: 16px;
 }
 </style>
