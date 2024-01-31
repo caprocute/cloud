@@ -87,7 +87,7 @@ export default Vue.extend({
     computed: {
         // Mapbox maps absolutely hate being mangled by Vue
         protectedData(): ProtectedData {
-            return (this as unknown) as ProtectedData;
+            return this as unknown as ProtectedData;
         },
         bounds(): LngLat[] | null {
             if (this.value) {
@@ -262,9 +262,9 @@ export default Vue.extend({
                 _.orderBy(
                     _.cloneDeep(this.mapped.features),
                     [
-                        (feature) => feature.properties != null ? sortFactors[feature.properties.id][0] : 0,
-                        (feature) => feature.properties != null ? sortFactors[feature.properties.id][1] : 0,
-                        (feature) => feature.properties != null ? sortFactors[feature.properties.id][2] : 0,
+                        (feature) => (feature.properties != null ? sortFactors[feature.properties.id][0] : 0),
+                        (feature) => (feature.properties != null ? sortFactors[feature.properties.id][1] : 0),
+                        (feature) => (feature.properties != null ? sortFactors[feature.properties.id][2] : 0),
                     ],
                     ["asc", "desc", "asc"]
                 )

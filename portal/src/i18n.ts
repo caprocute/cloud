@@ -58,7 +58,7 @@ function loadLocaleMessages(): LocaleMessages {
     const messages: LocaleMessages = {};
 
     locales.keys().forEach((key) => {
-        const matched = key.match(/([A-Za-z0-9-_]+)\./i);
+        const matched = key.match(/([A-Za-z0-9-_]+)\//i);
         if (matched && matched.length > 1) {
             const locale = matched[1];
             if (messages[locale]) {
@@ -69,17 +69,13 @@ function loadLocaleMessages(): LocaleMessages {
         }
     });
 
-    const keys = _((messages.en.modules as unknown) as Record<string, ModuleLocales>)
+    const keys = _(messages.en.modules as unknown as Record<string, ModuleLocales>)
         .map((m, moduleKey) => {
             return _(m.sensors)
                 .map((sensorName, sensorKey) => {
                     const normalizedKey = sensorKey
                         .split(".")
-                        .map((p) =>
-                            _.camelCase(p)
-                                .replace("10M", "10m")
-                                .replace("2M", "2m")
-                        )
+                        .map((p) => _.camelCase(p).replace("10M", "10m").replace("2M", "2m"))
                         .join(".");
 
                     if (moduleKey.indexOf("wh.") == 0) {
@@ -96,7 +92,7 @@ function loadLocaleMessages(): LocaleMessages {
         .fromPairs()
         .value();
 
-    const moduleKeys = _((messages.en.modules as unknown) as Record<string, ModuleLocales>)
+    const moduleKeys = _(messages.en.modules as unknown as Record<string, ModuleLocales>)
         .map((m, moduleKey) => {
             if (moduleKey.startsWith("wh.")) {
                 // HACK

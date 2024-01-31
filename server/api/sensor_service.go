@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strconv"
+	"strings"
 	"time"
 
 	_ "github.com/lib/pq"
@@ -172,6 +174,22 @@ func (c *SensorService) Tail(ctx context.Context, payload *sensor.TailPayload) (
 	}, nil
 }
 
+func (c *SensorService) parseWindows(payload *sensor.RecentlyPayload) []time.Duration {
+	durations := make([]time.Duration, 0)
+
+	if payload.Windows != nil {
+		windows := strings.Split(*payload.Windows, ",")
+		for _, hoursString := range windows {
+			hours, err := strconv.Atoi(hoursString)
+			if err == nil {
+				durations = append(durations, time.Hour*time.Duration(hours))
+			}
+		}
+	}
+
+	return durations
+}
+
 func (c *SensorService) Recently(ctx context.Context, payload *sensor.RecentlyPayload) (*sensor.RecentlyResult, error) {
 	stationIDs := backend.ParseStationIDs(payload.Stations)
 	if len(stationIDs) == 0 {
@@ -183,10 +201,11 @@ func (c *SensorService) Recently(ctx context.Context, payload *sensor.RecentlyPa
 		return nil, err
 	}
 
-	durations := []time.Duration{
-		time.Hour * 24,
-		time.Hour * 48,
-		time.Hour * 72,
+	durations := c.parseWindows(payload)
+	if len(durations) == 0 {
+		return &sensor.RecentlyResult{
+			Object: querying.NewRecentlyAggregated(),
+		}, nil
 	}
 
 	data, err := be.QueryRecentlyAggregated(ctx, stationIDs, durations)

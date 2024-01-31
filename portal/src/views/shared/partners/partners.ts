@@ -131,6 +131,8 @@ export interface PartnerCustomization {
     };
     latestPrimaryNoDataColor: string;
     googleTagManagerId: string | null;
+    queryRecentlyQueryString: (station: number[]) => URLSearchParams;
+
 }
 
 function getAttribute(station: DisplayStation, name: string): string | null {
@@ -203,6 +205,12 @@ export function getPartnerCustomization(): PartnerCustomization | null {
             },
             latestPrimaryNoDataColor: "#cccccc",
             googleTagManagerId: "G-TTJPFSVRX6",
+            queryRecentlyQueryString: (stations: number[]): URLSearchParams => {
+                const qp = new URLSearchParams();
+                qp.append("stations", stations.join(","));
+                qp.append("windows", [1].join(","));
+                return qp;
+            },
         };
     }
     return null;
@@ -260,6 +268,12 @@ export function getPartnerCustomizationWithDefault(): PartnerCustomization {
         },
         latestPrimaryNoDataColor: "#777a80",
         googleTagManagerId: null,
+        queryRecentlyQueryString: (stations: number[]): URLSearchParams => {
+            const qp = new URLSearchParams();
+            qp.append("stations", stations.join(","));
+            qp.append("windows", [24, 48, 72].join(","));
+            return qp;
+        },
     };
 }
 

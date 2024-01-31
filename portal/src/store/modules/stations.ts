@@ -224,7 +224,7 @@ export class StationReadings {
     }
 }
 
-type StationSortTuiple = [number, number, string];
+type StationSortTuple = [number, number, string];
 
 export class DisplayStation {
     public readonly id: number;
@@ -278,7 +278,7 @@ export class DisplayStation {
         return null;
     }
 
-    public getSortOrder(which: VisibleReadings): StationSortTuiple {
+    public getSortOrder(which: VisibleReadings): StationSortTuple {
         if (this.inactive) {
             return [3, 0, this.name];
         }

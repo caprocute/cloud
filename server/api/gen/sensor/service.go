@@ -108,6 +108,7 @@ type TailResult struct {
 type RecentlyPayload struct {
 	Auth     *string
 	Stations *string
+	Windows  *string
 }
 
 // RecentlyResult is the result type of the sensor service recently method.
