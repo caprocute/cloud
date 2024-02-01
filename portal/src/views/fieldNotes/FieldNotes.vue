@@ -85,8 +85,8 @@
                             />
                         </template>
                         <div v-if="!editingFieldNote || (editingFieldNote && editingFieldNote.id !== fieldNote.id)" class="actions">
-                            <button v-if="user" @click="editFieldNote(fieldNote)">
-                                <i class="icon icon-edit" v-if="canEdit(fieldNote)"></i>
+                            <button v-if="user && canEdit(fieldNote)" @click="editFieldNote(fieldNote)">
+                                <i class="icon icon-edit"></i>
                                 {{ $t("fieldNotes.edit") }}
                             </button>
                             <button @click="deleteFieldNote(fieldNote.id)" v-if="canDelete(fieldNote)">
@@ -513,7 +513,10 @@ button {
 
 .actions {
     padding-left: 52px;
-    margin-top: 15px;
+
+    button {
+        margin-top: 15px;
+    }
 
     &.hidden {
         display: none;
