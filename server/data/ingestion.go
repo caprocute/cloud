@@ -18,7 +18,7 @@ import (
 
 	"github.com/golang/protobuf/proto"
 
-	pb "github.com/fieldkit/data-protocol"
+	pb "gitlab.com/fieldkit/libraries/data-protocol"
 )
 
 const (

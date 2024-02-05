@@ -13,8 +13,6 @@ require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/disintegration/imageorient v0.0.0-20180920195336-8147d86e83ec
 	github.com/elgs/gojq v0.0.0-20201120033525-b5293fef2759
-	github.com/fieldkit/app-protocol v0.0.0-20200515173549-e0925480073d
-	github.com/fieldkit/data-protocol v0.0.0-20230718145913-fb96ddfb3f7e
 	github.com/go-pg/pg/v10 v10.9.1
 	github.com/goadesign/goa v1.4.0
 	github.com/golang/protobuf v1.5.2
@@ -129,6 +127,8 @@ require (
 	github.com/vmihailenco/tagparser v0.1.2 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	github.com/zach-klippenstein/goregen v0.0.0-20160303162051-795b5e3961ea // indirect
+	gitlab.com/fieldkit/libraries/app-protocol v0.0.0-20240205194803-e3e032ad0353 // indirect
+	gitlab.com/fieldkit/libraries/data-protocol v0.0.0-20240205194926-13d5785bdcc5 // indirect
 	go.opentelemetry.io/otel v1.10.0 // indirect
 	go.opentelemetry.io/otel/metric v0.32.0 // indirect
 	go.opentelemetry.io/otel/trace v1.10.0 // indirect
@@ -143,7 +143,7 @@ require (
 	golang.org/x/tools v0.1.10 // indirect
 	golang.org/x/xerrors v0.0.0-20220411194840-2f41105eb62f // indirect
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/protobuf v1.31.0 // indirect
+	google.golang.org/protobuf v1.32.0 // indirect
 	gopkg.in/AlecAivazis/survey.v1 v1.8.7 // indirect
 	gopkg.in/ini.v1 v1.51.0 // indirect
 	gopkg.in/kyokomi/emoji.v1 v1.5.1 // indirect

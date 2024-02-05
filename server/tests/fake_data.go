@@ -14,8 +14,8 @@ import (
 
 	"github.com/golang/protobuf/proto"
 
-	pbapp "github.com/fieldkit/app-protocol"
-	pb "github.com/fieldkit/data-protocol"
+	pbapp "gitlab.com/fieldkit/libraries/app-protocol"
+	pb "gitlab.com/fieldkit/libraries/data-protocol"
 
 	"github.com/fieldkit/cloud/server/backend/repositories"
 	"github.com/fieldkit/cloud/server/data"
@@ -396,7 +396,7 @@ func (e *TestEnv) NewHttpStatusReply(s *data.Station) *pbapp.HttpReply {
 			Identity: &pbapp.Identity{
 				Name:       s.Name,
 				DeviceId:   deviceID,
-				Generation: generation,
+				GenerationId: generation,
 			},
 			Recording: &pbapp.Recording{
 				Enabled:     recording > 0,

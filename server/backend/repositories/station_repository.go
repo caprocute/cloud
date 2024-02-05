@@ -15,7 +15,7 @@ import (
 
 	"github.com/jmoiron/sqlx"
 
-	pbapp "github.com/fieldkit/app-protocol"
+	pbapp "gitlab.com/fieldkit/libraries/app-protocol"
 
 	"github.com/fieldkit/cloud/server/data"
 )
@@ -364,7 +364,7 @@ func (r *StationRepository) UpdateStationModelFromStatus(ctx context.Context, s 
 		return err
 	}
 
-	if statusReply.Status == nil || statusReply.Status.Identity == nil || statusReply.Status.Identity.Generation == nil {
+	if statusReply.Status == nil || statusReply.Status.Identity == nil || statusReply.Status.Identity.GenerationId == nil {
 		return fmt.Errorf("incomplete status, no identity or generation")
 	}
 
@@ -384,7 +384,7 @@ func (r *StationRepository) updateStationConfigurationFromStatus(ctx context.Con
 
 	pr := NewProvisionRepository(r.db)
 
-	p, err := pr.QueryOrCreateProvision(ctx, station.DeviceID, statusReply.Status.Identity.Generation)
+	p, err := pr.QueryOrCreateProvision(ctx, station.DeviceID, statusReply.Status.Identity.GenerationId)
 	if err != nil {
 		return err
 	}

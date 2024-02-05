@@ -6,7 +6,7 @@ import (
 	"github.com/jmoiron/sqlx/types"
 	"github.com/lib/pq"
 
-	pb "github.com/fieldkit/data-protocol"
+	pb "gitlab.com/fieldkit/libraries/data-protocol"
 )
 
 type SensorRanges struct {

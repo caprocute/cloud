@@ -3,7 +3,7 @@ package backend
 import (
 	"context"
 
-	pb "github.com/fieldkit/data-protocol"
+	pb "gitlab.com/fieldkit/libraries/data-protocol"
 
 	"github.com/fieldkit/cloud/server/data"
 )

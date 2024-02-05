@@ -13,7 +13,7 @@ import (
 	"github.com/fieldkit/cloud/server/common/logging"
 	"github.com/fieldkit/cloud/server/data"
 
-	pb "github.com/fieldkit/data-protocol"
+	pb "gitlab.com/fieldkit/libraries/data-protocol"
 )
 
 const (

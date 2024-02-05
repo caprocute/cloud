@@ -6,7 +6,7 @@ import (
 
 	"github.com/fieldkit/cloud/server/common/sqlxcache"
 
-	pb "github.com/fieldkit/data-protocol"
+	pb "gitlab.com/fieldkit/libraries/data-protocol"
 
 	"github.com/fieldkit/cloud/server/common/logging"
 

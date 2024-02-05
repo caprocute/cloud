@@ -11,7 +11,7 @@ import (
 	"github.com/paulmach/orb"
 	"github.com/paulmach/orb/encoding/wkb"
 
-	pb "github.com/fieldkit/app-protocol"
+	pb "gitlab.com/fieldkit/libraries/app-protocol"
 )
 
 const (
@@ -130,7 +130,7 @@ func (s *Station) UpdateFromStatus(ctx context.Context, raw string) error {
 				}{
 					Name:         status.Identity.Name,
 					DeviceID:     hex.EncodeToString(status.Identity.DeviceId),
-					GenerationID: hex.EncodeToString(status.Identity.Generation),
+					GenerationID: hex.EncodeToString(status.Identity.GenerationId),
 					Firmware:     status.Identity.Firmware,
 					Build:        status.Identity.Build,
 				})

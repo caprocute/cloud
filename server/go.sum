@@ -703,6 +703,14 @@ github.com/zach-klippenstein/goregen v0.0.0-20160303162051-795b5e3961ea h1:Cyhwe
 github.com/zach-klippenstein/goregen v0.0.0-20160303162051-795b5e3961ea/go.mod h1:eNr558nEUjP8acGw8FFjTeWvSgU1stO7FAO6eknhHe4=
 github.com/zenazn/goji v0.9.0/go.mod h1:7S9M489iMyHBNxwZnk9/EHS098H4/F6TATF2mIxtB1Q=
 github.com/zenazn/goji v0.9.1-0.20160507202103-64eb34159fe5/go.mod h1:7S9M489iMyHBNxwZnk9/EHS098H4/F6TATF2mIxtB1Q=
+gitlab.com/fieldkit/libraries/app-protocol v0.0.0-20240205181956-91aa5adbeca4 h1:gJ/HcKQwNXY5AoBlIDMF3pXPn5SMNxf5X/p9Y9bZvNA=
+gitlab.com/fieldkit/libraries/app-protocol v0.0.0-20240205181956-91aa5adbeca4/go.mod h1:hoWYgsUBpmDIq/5mOVWQ0vieQfpXFdiZbLsUkdcNVgs=
+gitlab.com/fieldkit/libraries/app-protocol v0.0.0-20240205194803-e3e032ad0353 h1:unS0me273wnPc6PaTt6M0CJdm7yWjbWnnCQWeXP3BsI=
+gitlab.com/fieldkit/libraries/app-protocol v0.0.0-20240205194803-e3e032ad0353/go.mod h1:hoWYgsUBpmDIq/5mOVWQ0vieQfpXFdiZbLsUkdcNVgs=
+gitlab.com/fieldkit/libraries/data-protocol v0.0.0-20240203010142-8940f03a1984 h1:VW35Jnqa1fZDmVj2TEqIHocsLTjypdOp6A+3VNs2yZ0=
+gitlab.com/fieldkit/libraries/data-protocol v0.0.0-20240203010142-8940f03a1984/go.mod h1:rcmMZHkII6K0DhGEXOG4i5o/62qwZRIH4FoNddPy7JY=
+gitlab.com/fieldkit/libraries/data-protocol v0.0.0-20240205194926-13d5785bdcc5 h1:mSHoAboIh6Jhsk/qzMACok3mnH4xi6G1bVEq4uAb6GU=
+gitlab.com/fieldkit/libraries/data-protocol v0.0.0-20240205194926-13d5785bdcc5/go.mod h1:rcmMZHkII6K0DhGEXOG4i5o/62qwZRIH4FoNddPy7JY=
 go.etcd.io/bbolt v1.3.2/go.mod h1:IbVyRI1SCnLcuJnV2u8VeU0CEYM7e686BmAb1XKL+uU=
 go.mongodb.org/mongo-driver v1.0.3/go.mod h1:u7ryQJ+DOzQmeO7zB6MHyr8jkEQvC8vH7qLUO4lqsUM=
 go.mongodb.org/mongo-driver v1.1.1/go.mod h1:u7ryQJ+DOzQmeO7zB6MHyr8jkEQvC8vH7qLUO4lqsUM=
@@ -1101,6 +1109,8 @@ google.golang.org/protobuf v1.28.1 h1:d0NfwRgPtno5B1Wa6L2DAG+KivqkdutMf1UhdNx175
 google.golang.org/protobuf v1.28.1/go.mod h1:HV8QOd/L58Z+nl8r43ehVNZIU/HEI6OcFqwMG9pJV4I=
 google.golang.org/protobuf v1.31.0 h1:g0LDEJHgrBl9N9r17Ru3sqWhkIx2NB67okBHPwC7hs8=
 google.golang.org/protobuf v1.31.0/go.mod h1:HV8QOd/L58Z+nl8r43ehVNZIU/HEI6OcFqwMG9pJV4I=
+google.golang.org/protobuf v1.32.0 h1:pPC6BG5ex8PDFnkbrGU3EixyhKcQ2aDuBS36lqK/C7I=
+google.golang.org/protobuf v1.32.0/go.mod h1:c6P6GXX6sHbq/GpV6MGZEdwhWPcYBgnhAHhKbcUYpos=
 gopkg.in/AlecAivazis/survey.v1 v1.8.7 h1:oBJqtgsyBLg9K5FK9twNUbcPnbCPoh+R9a+7nag3qJM=
 gopkg.in/AlecAivazis/survey.v1 v1.8.7/go.mod h1:iBNOmqKz/NUbZx3bA+4hAGLRC7fSK7tgtVDT4tB22XA=
 gopkg.in/alecthomas/kingpin.v2 v2.2.6/go.mod h1:FMv+mEhP44yOT+4EoQTLFTRgOQ1FBLkstjWtayDeSgw=
