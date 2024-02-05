@@ -3,13 +3,13 @@
 // station HTTP client types
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package client
 
 import (
-	station "github.com/fieldkit/cloud/server/api/gen/station"
-	stationviews "github.com/fieldkit/cloud/server/api/gen/station/views"
+	station "gitlab.com/fieldkit/cloud/server/api/gen/station"
+	stationviews "gitlab.com/fieldkit/cloud/server/api/gen/station/views"
 	goa "goa.design/goa/v3/pkg"
 )
 

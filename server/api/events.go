@@ -6,16 +6,16 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/fieldkit/cloud/server/common/sqlxcache"
+	"gitlab.com/fieldkit/cloud/server/common/sqlxcache"
 	"github.com/jmoiron/sqlx/types"
 
 	"goa.design/goa/v3/security"
 
-	eventsService "github.com/fieldkit/cloud/server/api/gen/data_events"
+	eventsService "gitlab.com/fieldkit/cloud/server/api/gen/data_events"
 
-	"github.com/fieldkit/cloud/server/backend/repositories"
-	"github.com/fieldkit/cloud/server/common"
-	"github.com/fieldkit/cloud/server/data"
+	"gitlab.com/fieldkit/cloud/server/backend/repositories"
+	"gitlab.com/fieldkit/cloud/server/common"
+	"gitlab.com/fieldkit/cloud/server/data"
 )
 
 type EventsService struct {

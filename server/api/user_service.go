@@ -17,11 +17,11 @@ import (
 	jwtgo "github.com/dgrijalva/jwt-go"
 	"goa.design/goa/v3/security"
 
-	user "github.com/fieldkit/cloud/server/api/gen/user"
+	user "gitlab.com/fieldkit/cloud/server/api/gen/user"
 
-	"github.com/fieldkit/cloud/server/backend/repositories"
-	"github.com/fieldkit/cloud/server/common"
-	"github.com/fieldkit/cloud/server/data"
+	"gitlab.com/fieldkit/cloud/server/backend/repositories"
+	"gitlab.com/fieldkit/cloud/server/common"
+	"gitlab.com/fieldkit/cloud/server/data"
 )
 
 var (

@@ -16,7 +16,7 @@ import (
 	"github.com/muesli/smartcrop"
 	"github.com/muesli/smartcrop/nfnt"
 
-	"github.com/fieldkit/cloud/server/backend/repositories"
+	"gitlab.com/fieldkit/cloud/server/backend/repositories"
 )
 
 type ResizedImage struct {

@@ -11,9 +11,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/tidwall/gjson"
 
-	discService "github.com/fieldkit/cloud/server/api/gen/discussion"
+	discService "gitlab.com/fieldkit/cloud/server/api/gen/discussion"
 
-	"github.com/fieldkit/cloud/server/tests"
+	"gitlab.com/fieldkit/cloud/server/tests"
 )
 
 func TestDiscussionGetDiscussionProjectEmpty(t *testing.T) {

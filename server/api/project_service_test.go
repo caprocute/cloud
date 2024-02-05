@@ -11,8 +11,8 @@ import (
 	"github.com/kinbiko/jsonassert"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/fieldkit/cloud/server/data"
-	"github.com/fieldkit/cloud/server/tests"
+	"gitlab.com/fieldkit/cloud/server/data"
+	"gitlab.com/fieldkit/cloud/server/tests"
 )
 
 func TestGetProjectsAllNoAuth(t *testing.T) {

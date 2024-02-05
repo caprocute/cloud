@@ -6,12 +6,12 @@ import (
 	"math"
 	"time"
 
-	"github.com/fieldkit/cloud/server/common/errors"
-	"github.com/fieldkit/cloud/server/common/sqlxcache"
+	"gitlab.com/fieldkit/cloud/server/common/errors"
+	"gitlab.com/fieldkit/cloud/server/common/sqlxcache"
 
 	pb "gitlab.com/fieldkit/libraries/data-protocol"
 
-	"github.com/fieldkit/cloud/server/data"
+	"gitlab.com/fieldkit/cloud/server/data"
 )
 
 type RecordRepository struct {

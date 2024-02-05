@@ -6,14 +6,14 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/fieldkit/cloud/server/common/sqlxcache"
+	"gitlab.com/fieldkit/cloud/server/common/sqlxcache"
 	"goa.design/goa/v3/security"
 
-	stationNoteService "github.com/fieldkit/cloud/server/api/gen/station_note"
+	stationNoteService "gitlab.com/fieldkit/cloud/server/api/gen/station_note"
 
-	"github.com/fieldkit/cloud/server/backend/repositories"
-	"github.com/fieldkit/cloud/server/common"
-	"github.com/fieldkit/cloud/server/data"
+	"gitlab.com/fieldkit/cloud/server/backend/repositories"
+	"gitlab.com/fieldkit/cloud/server/common"
+	"gitlab.com/fieldkit/cloud/server/data"
 )
 
 type StationNoteService struct {

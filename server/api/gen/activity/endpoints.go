@@ -3,7 +3,7 @@
 // activity endpoints
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package activity
 

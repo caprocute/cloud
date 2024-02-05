@@ -3,13 +3,13 @@
 // sensor HTTP server types
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package server
 
 import (
-	sensor "github.com/fieldkit/cloud/server/api/gen/sensor"
-	sensorviews "github.com/fieldkit/cloud/server/api/gen/sensor/views"
+	sensor "gitlab.com/fieldkit/cloud/server/api/gen/sensor"
+	sensorviews "gitlab.com/fieldkit/cloud/server/api/gen/sensor/views"
 	goa "goa.design/goa/v3/pkg"
 )
 

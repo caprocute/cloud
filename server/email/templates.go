@@ -4,7 +4,7 @@ import (
 	html "html/template"
 	text "text/template"
 
-	"github.com/fieldkit/cloud/server/data"
+	"gitlab.com/fieldkit/cloud/server/data"
 )
 
 type templateOptions struct {

@@ -3,15 +3,15 @@
 // user HTTP client types
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package client
 
 import (
 	"unicode/utf8"
 
-	user "github.com/fieldkit/cloud/server/api/gen/user"
-	userviews "github.com/fieldkit/cloud/server/api/gen/user/views"
+	user "gitlab.com/fieldkit/cloud/server/api/gen/user"
+	userviews "gitlab.com/fieldkit/cloud/server/api/gen/user/views"
 	goa "goa.design/goa/v3/pkg"
 )
 

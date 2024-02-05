@@ -14,13 +14,13 @@ import (
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 
-	"github.com/fieldkit/cloud/server/common/sqlxcache"
+	"gitlab.com/fieldkit/cloud/server/common/sqlxcache"
 
-	"github.com/fieldkit/cloud/server/common"
-	"github.com/fieldkit/cloud/server/common/logging"
+	"gitlab.com/fieldkit/cloud/server/common"
+	"gitlab.com/fieldkit/cloud/server/common/logging"
 
-	"github.com/fieldkit/cloud/server/data"
-	"github.com/fieldkit/cloud/server/files"
+	"gitlab.com/fieldkit/cloud/server/data"
+	"gitlab.com/fieldkit/cloud/server/files"
 )
 
 type options struct {

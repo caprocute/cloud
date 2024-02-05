@@ -3,7 +3,7 @@
 // activity HTTP client CLI support package
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package cli
 
@@ -13,30 +13,30 @@ import (
 	"net/http"
 	"os"
 
-	activityc "github.com/fieldkit/cloud/server/api/gen/http/activity/client"
-	csvc "github.com/fieldkit/cloud/server/api/gen/http/csv/client"
-	datac "github.com/fieldkit/cloud/server/api/gen/http/data/client"
-	dataeventsc "github.com/fieldkit/cloud/server/api/gen/http/data_events/client"
-	discoursec "github.com/fieldkit/cloud/server/api/gen/http/discourse/client"
-	discussionc "github.com/fieldkit/cloud/server/api/gen/http/discussion/client"
-	exportc "github.com/fieldkit/cloud/server/api/gen/http/export/client"
-	firmwarec "github.com/fieldkit/cloud/server/api/gen/http/firmware/client"
-	followingc "github.com/fieldkit/cloud/server/api/gen/http/following/client"
-	informationc "github.com/fieldkit/cloud/server/api/gen/http/information/client"
-	ingestionc "github.com/fieldkit/cloud/server/api/gen/http/ingestion/client"
-	modulesc "github.com/fieldkit/cloud/server/api/gen/http/modules/client"
-	notesc "github.com/fieldkit/cloud/server/api/gen/http/notes/client"
-	notificationsc "github.com/fieldkit/cloud/server/api/gen/http/notifications/client"
-	oidcc "github.com/fieldkit/cloud/server/api/gen/http/oidc/client"
-	projectc "github.com/fieldkit/cloud/server/api/gen/http/project/client"
-	recordsc "github.com/fieldkit/cloud/server/api/gen/http/records/client"
-	sensorc "github.com/fieldkit/cloud/server/api/gen/http/sensor/client"
-	stationc "github.com/fieldkit/cloud/server/api/gen/http/station/client"
-	stationnotec "github.com/fieldkit/cloud/server/api/gen/http/station_note/client"
-	tasksc "github.com/fieldkit/cloud/server/api/gen/http/tasks/client"
-	testc "github.com/fieldkit/cloud/server/api/gen/http/test/client"
-	ttnc "github.com/fieldkit/cloud/server/api/gen/http/ttn/client"
-	userc "github.com/fieldkit/cloud/server/api/gen/http/user/client"
+	activityc "gitlab.com/fieldkit/cloud/server/api/gen/http/activity/client"
+	csvc "gitlab.com/fieldkit/cloud/server/api/gen/http/csv/client"
+	datac "gitlab.com/fieldkit/cloud/server/api/gen/http/data/client"
+	dataeventsc "gitlab.com/fieldkit/cloud/server/api/gen/http/data_events/client"
+	discoursec "gitlab.com/fieldkit/cloud/server/api/gen/http/discourse/client"
+	discussionc "gitlab.com/fieldkit/cloud/server/api/gen/http/discussion/client"
+	exportc "gitlab.com/fieldkit/cloud/server/api/gen/http/export/client"
+	firmwarec "gitlab.com/fieldkit/cloud/server/api/gen/http/firmware/client"
+	followingc "gitlab.com/fieldkit/cloud/server/api/gen/http/following/client"
+	informationc "gitlab.com/fieldkit/cloud/server/api/gen/http/information/client"
+	ingestionc "gitlab.com/fieldkit/cloud/server/api/gen/http/ingestion/client"
+	modulesc "gitlab.com/fieldkit/cloud/server/api/gen/http/modules/client"
+	notesc "gitlab.com/fieldkit/cloud/server/api/gen/http/notes/client"
+	notificationsc "gitlab.com/fieldkit/cloud/server/api/gen/http/notifications/client"
+	oidcc "gitlab.com/fieldkit/cloud/server/api/gen/http/oidc/client"
+	projectc "gitlab.com/fieldkit/cloud/server/api/gen/http/project/client"
+	recordsc "gitlab.com/fieldkit/cloud/server/api/gen/http/records/client"
+	sensorc "gitlab.com/fieldkit/cloud/server/api/gen/http/sensor/client"
+	stationc "gitlab.com/fieldkit/cloud/server/api/gen/http/station/client"
+	stationnotec "gitlab.com/fieldkit/cloud/server/api/gen/http/station_note/client"
+	tasksc "gitlab.com/fieldkit/cloud/server/api/gen/http/tasks/client"
+	testc "gitlab.com/fieldkit/cloud/server/api/gen/http/test/client"
+	ttnc "gitlab.com/fieldkit/cloud/server/api/gen/http/ttn/client"
+	userc "gitlab.com/fieldkit/cloud/server/api/gen/http/user/client"
 	goahttp "goa.design/goa/v3/http"
 	goa "goa.design/goa/v3/pkg"
 )

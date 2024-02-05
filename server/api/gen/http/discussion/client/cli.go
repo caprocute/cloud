@@ -3,7 +3,7 @@
 // discussion HTTP client CLI support package
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package client
 
@@ -12,7 +12,7 @@ import (
 	"fmt"
 	"strconv"
 
-	discussion "github.com/fieldkit/cloud/server/api/gen/discussion"
+	discussion "gitlab.com/fieldkit/cloud/server/api/gen/discussion"
 	goa "goa.design/goa/v3/pkg"
 )
 

@@ -13,9 +13,9 @@ import (
 
 	"github.com/golang/protobuf/proto"
 
-	"github.com/fieldkit/cloud/server/backend/repositories"
-	"github.com/fieldkit/cloud/server/data"
-	"github.com/fieldkit/cloud/server/tests"
+	"gitlab.com/fieldkit/cloud/server/backend/repositories"
+	"gitlab.com/fieldkit/cloud/server/data"
+	"gitlab.com/fieldkit/cloud/server/tests"
 )
 
 func TestGetStationsMine(t *testing.T) {

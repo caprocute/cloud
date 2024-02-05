@@ -32,21 +32,21 @@ import (
 	"github.com/vgarvardt/gue/v4/adapter/pgxv5"
 	guezap "github.com/vgarvardt/gue/v4/adapter/zap"
 
-	"github.com/fieldkit/cloud/server/common/sqlxcache"
+	"gitlab.com/fieldkit/cloud/server/common/sqlxcache"
 
-	"github.com/fieldkit/cloud/server/common/health"
-	"github.com/fieldkit/cloud/server/common/jobs"
-	"github.com/fieldkit/cloud/server/common/logging"
+	"gitlab.com/fieldkit/cloud/server/common/health"
+	"gitlab.com/fieldkit/cloud/server/common/jobs"
+	"gitlab.com/fieldkit/cloud/server/common/logging"
 
-	"github.com/fieldkit/cloud/server/api"
-	"github.com/fieldkit/cloud/server/backend"
-	"github.com/fieldkit/cloud/server/data"
-	"github.com/fieldkit/cloud/server/files"
-	"github.com/fieldkit/cloud/server/ingester"
-	"github.com/fieldkit/cloud/server/social"
-	"github.com/fieldkit/cloud/server/storage"
+	"gitlab.com/fieldkit/cloud/server/api"
+	"gitlab.com/fieldkit/cloud/server/backend"
+	"gitlab.com/fieldkit/cloud/server/data"
+	"gitlab.com/fieldkit/cloud/server/files"
+	"gitlab.com/fieldkit/cloud/server/ingester"
+	"gitlab.com/fieldkit/cloud/server/social"
+	"gitlab.com/fieldkit/cloud/server/storage"
 
-	_ "github.com/fieldkit/cloud/server/messages"
+	_ "gitlab.com/fieldkit/cloud/server/messages"
 
 	"expvar"
 

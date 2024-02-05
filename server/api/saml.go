@@ -13,8 +13,8 @@ import (
 
 	"github.com/crewjam/saml/samlsp"
 
-	"github.com/fieldkit/cloud/server/backend/repositories"
-	"github.com/fieldkit/cloud/server/data"
+	"gitlab.com/fieldkit/cloud/server/backend/repositories"
+	"gitlab.com/fieldkit/cloud/server/data"
 )
 
 type ResolveFunc func(ctx context.Context, w http.ResponseWriter, r *http.Request) error

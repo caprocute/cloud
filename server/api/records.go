@@ -6,12 +6,12 @@ import (
 
 	"goa.design/goa/v3/security"
 
-	records "github.com/fieldkit/cloud/server/api/gen/records"
+	records "gitlab.com/fieldkit/cloud/server/api/gen/records"
 
-	"github.com/fieldkit/cloud/server/backend/repositories"
-	"github.com/fieldkit/cloud/server/common"
-	serrors "github.com/fieldkit/cloud/server/common/errors"
-	"github.com/fieldkit/cloud/server/data"
+	"gitlab.com/fieldkit/cloud/server/backend/repositories"
+	"gitlab.com/fieldkit/cloud/server/common"
+	serrors "gitlab.com/fieldkit/cloud/server/common/errors"
+	"gitlab.com/fieldkit/cloud/server/data"
 )
 
 type RecordsService struct {

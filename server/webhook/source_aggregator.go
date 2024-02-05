@@ -10,15 +10,15 @@ import (
 
 	"github.com/jackc/pgx/v5"
 
-	"github.com/fieldkit/cloud/server/common/logging"
-	"github.com/fieldkit/cloud/server/common/sqlxcache"
-	"github.com/fieldkit/cloud/server/storage"
+	"gitlab.com/fieldkit/cloud/server/common/logging"
+	"gitlab.com/fieldkit/cloud/server/common/sqlxcache"
+	"gitlab.com/fieldkit/cloud/server/storage"
 
 	"github.com/montanaflynn/stats"
 
-	"github.com/fieldkit/cloud/server/backend/handlers"
-	"github.com/fieldkit/cloud/server/backend/repositories"
-	"github.com/fieldkit/cloud/server/data"
+	"gitlab.com/fieldkit/cloud/server/backend/handlers"
+	"gitlab.com/fieldkit/cloud/server/backend/repositories"
+	"gitlab.com/fieldkit/cloud/server/data"
 )
 
 const (

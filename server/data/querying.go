@@ -7,7 +7,7 @@ import (
 
 	"github.com/jmoiron/sqlx"
 
-	"github.com/fieldkit/cloud/server/common/sqlxcache"
+	"gitlab.com/fieldkit/cloud/server/common/sqlxcache"
 )
 
 type MapFunc func(*sqlx.Rows) (interface{}, error)

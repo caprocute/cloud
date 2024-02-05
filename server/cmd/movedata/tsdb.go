@@ -7,8 +7,8 @@ import (
 
 	"github.com/jackc/pgx/v5"
 
-	"github.com/fieldkit/cloud/server/common/logging"
-	"github.com/fieldkit/cloud/server/storage"
+	"gitlab.com/fieldkit/cloud/server/common/logging"
+	"gitlab.com/fieldkit/cloud/server/storage"
 )
 
 type MoveDataToTimeScaleDBHandler struct {

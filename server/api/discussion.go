@@ -6,17 +6,17 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/fieldkit/cloud/server/common/sqlxcache"
+	"gitlab.com/fieldkit/cloud/server/common/sqlxcache"
 	"github.com/jmoiron/sqlx/types"
 
 	"goa.design/goa/v3/security"
 
-	discService "github.com/fieldkit/cloud/server/api/gen/discussion"
+	discService "gitlab.com/fieldkit/cloud/server/api/gen/discussion"
 
-	"github.com/fieldkit/cloud/server/backend"
-	"github.com/fieldkit/cloud/server/backend/repositories"
-	"github.com/fieldkit/cloud/server/common"
-	"github.com/fieldkit/cloud/server/data"
+	"gitlab.com/fieldkit/cloud/server/backend"
+	"gitlab.com/fieldkit/cloud/server/backend/repositories"
+	"gitlab.com/fieldkit/cloud/server/common"
+	"gitlab.com/fieldkit/cloud/server/data"
 )
 
 type DiscussionService struct {

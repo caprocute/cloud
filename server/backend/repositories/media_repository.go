@@ -9,7 +9,7 @@ import (
 
 	"github.com/h2non/filetype"
 
-	"github.com/fieldkit/cloud/server/files"
+	"gitlab.com/fieldkit/cloud/server/files"
 )
 
 type SavedMedia struct {

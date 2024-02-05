@@ -3,13 +3,13 @@ package backend
 import (
 	"context"
 
-	"github.com/fieldkit/cloud/server/common/jobs"
-	"github.com/fieldkit/cloud/server/common/sqlxcache"
-	"github.com/fieldkit/cloud/server/data"
-	"github.com/fieldkit/cloud/server/storage"
+	"gitlab.com/fieldkit/cloud/server/common/jobs"
+	"gitlab.com/fieldkit/cloud/server/common/sqlxcache"
+	"gitlab.com/fieldkit/cloud/server/data"
+	"gitlab.com/fieldkit/cloud/server/storage"
 	pb "gitlab.com/fieldkit/libraries/data-protocol"
 
-	"github.com/fieldkit/cloud/server/backend/handlers"
+	"gitlab.com/fieldkit/cloud/server/backend/handlers"
 )
 
 func NewAllHandlers(db *sqlxcache.DB, tsConfig *storage.TimeScaleDBConfig, publisher jobs.MessagePublisher, completions *jobs.CompletionIDs) RecordHandler {

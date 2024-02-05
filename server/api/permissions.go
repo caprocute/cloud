@@ -8,9 +8,9 @@ import (
 
 	"github.com/goadesign/goa/middleware/security/jwt"
 
-	"github.com/fieldkit/cloud/server/backend/repositories"
-	"github.com/fieldkit/cloud/server/common"
-	"github.com/fieldkit/cloud/server/data"
+	"gitlab.com/fieldkit/cloud/server/backend/repositories"
+	"gitlab.com/fieldkit/cloud/server/common"
+	"gitlab.com/fieldkit/cloud/server/data"
 )
 
 type ProjectPermissions interface {

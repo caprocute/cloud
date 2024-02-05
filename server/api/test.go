@@ -7,11 +7,11 @@ import (
 
 	"goa.design/goa/v3/security"
 
-	test "github.com/fieldkit/cloud/server/api/gen/test"
+	test "gitlab.com/fieldkit/cloud/server/api/gen/test"
 
-	"github.com/fieldkit/cloud/server/common"
-	"github.com/fieldkit/cloud/server/data"
-	"github.com/fieldkit/cloud/server/messages"
+	"gitlab.com/fieldkit/cloud/server/common"
+	"gitlab.com/fieldkit/cloud/server/data"
+	"gitlab.com/fieldkit/cloud/server/messages"
 )
 
 type TestService struct {

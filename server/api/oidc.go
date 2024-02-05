@@ -14,10 +14,10 @@ import (
 
 	"github.com/coreos/go-oidc"
 
-	oidcService "github.com/fieldkit/cloud/server/api/gen/oidc"
+	oidcService "gitlab.com/fieldkit/cloud/server/api/gen/oidc"
 
-	"github.com/fieldkit/cloud/server/backend/repositories"
-	"github.com/fieldkit/cloud/server/data"
+	"gitlab.com/fieldkit/cloud/server/backend/repositories"
+	"gitlab.com/fieldkit/cloud/server/data"
 )
 
 type OidcAuthConfig struct {

@@ -1,4 +1,4 @@
-module github.com/fieldkit/cloud/server
+module gitlab.com/fieldkit/cloud/server
 
 go 1.18
 

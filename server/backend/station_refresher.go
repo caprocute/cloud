@@ -4,10 +4,10 @@ import (
 	"context"
 	"time"
 
-	"github.com/fieldkit/cloud/server/common/sqlxcache"
-	"github.com/fieldkit/cloud/server/storage"
+	"gitlab.com/fieldkit/cloud/server/common/sqlxcache"
+	"gitlab.com/fieldkit/cloud/server/storage"
 
-	"github.com/fieldkit/cloud/server/backend/handlers"
+	"gitlab.com/fieldkit/cloud/server/backend/handlers"
 )
 
 /**

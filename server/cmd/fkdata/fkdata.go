@@ -13,7 +13,7 @@ import (
 
 	"github.com/hashicorp/go-multierror"
 
-	"github.com/fieldkit/cloud/server/common/sqlxcache"
+	"gitlab.com/fieldkit/cloud/server/common/sqlxcache"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
@@ -23,14 +23,14 @@ import (
 	"github.com/vgarvardt/gue/v4"
 	"github.com/vgarvardt/gue/v4/adapter/pgxv5"
 
-	"github.com/fieldkit/cloud/server/backend"
-	"github.com/fieldkit/cloud/server/backend/handlers"
-	"github.com/fieldkit/cloud/server/common/errors"
-	"github.com/fieldkit/cloud/server/common/jobs"
-	"github.com/fieldkit/cloud/server/common/logging"
-	"github.com/fieldkit/cloud/server/files"
-	"github.com/fieldkit/cloud/server/messages"
-	"github.com/fieldkit/cloud/server/storage"
+	"gitlab.com/fieldkit/cloud/server/backend"
+	"gitlab.com/fieldkit/cloud/server/backend/handlers"
+	"gitlab.com/fieldkit/cloud/server/common/errors"
+	"gitlab.com/fieldkit/cloud/server/common/jobs"
+	"gitlab.com/fieldkit/cloud/server/common/logging"
+	"gitlab.com/fieldkit/cloud/server/files"
+	"gitlab.com/fieldkit/cloud/server/messages"
+	"gitlab.com/fieldkit/cloud/server/storage"
 )
 
 const SecondsPerWeek = int64(60 * 60 * 24 * 7)

@@ -14,7 +14,7 @@ import (
 	"github.com/kinbiko/jsonassert"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/fieldkit/cloud/server/tests"
+	"gitlab.com/fieldkit/cloud/server/tests"
 )
 
 func TestGetSensorsMeta(t *testing.T) {

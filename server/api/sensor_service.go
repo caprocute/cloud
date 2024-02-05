@@ -10,19 +10,19 @@ import (
 
 	_ "github.com/lib/pq"
 
-	"github.com/fieldkit/cloud/server/common/sqlxcache"
+	"gitlab.com/fieldkit/cloud/server/common/sqlxcache"
 
 	"goa.design/goa/v3/security"
 
-	sensor "github.com/fieldkit/cloud/server/api/gen/sensor"
+	sensor "gitlab.com/fieldkit/cloud/server/api/gen/sensor"
 
-	"github.com/fieldkit/cloud/server/backend"
-	"github.com/fieldkit/cloud/server/backend/repositories"
-	"github.com/fieldkit/cloud/server/common"
-	"github.com/fieldkit/cloud/server/data"
-	"github.com/fieldkit/cloud/server/storage"
+	"gitlab.com/fieldkit/cloud/server/backend"
+	"gitlab.com/fieldkit/cloud/server/backend/repositories"
+	"gitlab.com/fieldkit/cloud/server/common"
+	"gitlab.com/fieldkit/cloud/server/data"
+	"gitlab.com/fieldkit/cloud/server/storage"
 
-	"github.com/fieldkit/cloud/server/api/querying"
+	"gitlab.com/fieldkit/cloud/server/api/querying"
 )
 
 type StationsMeta struct {

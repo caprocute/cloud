@@ -17,8 +17,8 @@ import (
 	pbapp "gitlab.com/fieldkit/libraries/app-protocol"
 	pb "gitlab.com/fieldkit/libraries/data-protocol"
 
-	"github.com/fieldkit/cloud/server/backend/repositories"
-	"github.com/fieldkit/cloud/server/data"
+	"gitlab.com/fieldkit/cloud/server/backend/repositories"
+	"gitlab.com/fieldkit/cloud/server/data"
 )
 
 const (

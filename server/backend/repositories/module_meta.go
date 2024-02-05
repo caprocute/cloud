@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/fieldkit/cloud/server/common/errors"
-	"github.com/fieldkit/cloud/server/common/sqlxcache"
+	"gitlab.com/fieldkit/cloud/server/common/errors"
+	"gitlab.com/fieldkit/cloud/server/common/sqlxcache"
 )
 
 const (

@@ -10,11 +10,11 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/s3"
 
-	ingestion "github.com/fieldkit/cloud/server/api/gen/ingestion"
+	ingestion "gitlab.com/fieldkit/cloud/server/api/gen/ingestion"
 
-	"github.com/fieldkit/cloud/server/backend/repositories"
-	"github.com/fieldkit/cloud/server/common"
-	"github.com/fieldkit/cloud/server/messages"
+	"gitlab.com/fieldkit/cloud/server/backend/repositories"
+	"gitlab.com/fieldkit/cloud/server/common"
+	"gitlab.com/fieldkit/cloud/server/messages"
 )
 
 type IngestionService struct {

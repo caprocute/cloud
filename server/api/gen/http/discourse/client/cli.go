@@ -3,7 +3,7 @@
 // discourse HTTP client CLI support package
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package client
 
@@ -12,7 +12,7 @@ import (
 	"fmt"
 	"unicode/utf8"
 
-	discourse "github.com/fieldkit/cloud/server/api/gen/discourse"
+	discourse "gitlab.com/fieldkit/cloud/server/api/gen/discourse"
 	goa "goa.design/goa/v3/pkg"
 )
 

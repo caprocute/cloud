@@ -3,7 +3,7 @@
 // user HTTP server encoders and decoders
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package server
 
@@ -14,8 +14,8 @@ import (
 	"strconv"
 	"strings"
 
-	user "github.com/fieldkit/cloud/server/api/gen/user"
-	userviews "github.com/fieldkit/cloud/server/api/gen/user/views"
+	user "gitlab.com/fieldkit/cloud/server/api/gen/user"
+	userviews "gitlab.com/fieldkit/cloud/server/api/gen/user/views"
 	goahttp "goa.design/goa/v3/http"
 	goa "goa.design/goa/v3/pkg"
 )

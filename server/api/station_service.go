@@ -19,13 +19,13 @@ import (
 
 	goa "goa.design/goa/v3/pkg"
 
-	station "github.com/fieldkit/cloud/server/api/gen/station"
+	station "gitlab.com/fieldkit/cloud/server/api/gen/station"
 
-	"github.com/fieldkit/cloud/server/backend/repositories"
-	"github.com/fieldkit/cloud/server/common"
-	"github.com/fieldkit/cloud/server/common/sqlxcache"
-	"github.com/fieldkit/cloud/server/data"
-	"github.com/fieldkit/cloud/server/messages"
+	"gitlab.com/fieldkit/cloud/server/backend/repositories"
+	"gitlab.com/fieldkit/cloud/server/common"
+	"gitlab.com/fieldkit/cloud/server/common/sqlxcache"
+	"gitlab.com/fieldkit/cloud/server/data"
+	"gitlab.com/fieldkit/cloud/server/messages"
 )
 
 type StationService struct {

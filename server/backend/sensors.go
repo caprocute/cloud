@@ -12,10 +12,10 @@ import (
 
 	"github.com/jmoiron/sqlx"
 
-	"github.com/fieldkit/cloud/server/common/sqlxcache"
+	"gitlab.com/fieldkit/cloud/server/common/sqlxcache"
 
-	"github.com/fieldkit/cloud/server/backend/handlers"
-	"github.com/fieldkit/cloud/server/data"
+	"gitlab.com/fieldkit/cloud/server/backend/handlers"
+	"gitlab.com/fieldkit/cloud/server/data"
 )
 
 type AggregateSummary struct {

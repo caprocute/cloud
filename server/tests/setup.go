@@ -13,11 +13,11 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	_ "github.com/lib/pq"
 
-	"github.com/fieldkit/cloud/server/common/sqlxcache"
+	"gitlab.com/fieldkit/cloud/server/common/sqlxcache"
 
-	"github.com/fieldkit/cloud/server/common/logging"
+	"gitlab.com/fieldkit/cloud/server/common/logging"
 
-	"github.com/fieldkit/cloud/server/data"
+	"gitlab.com/fieldkit/cloud/server/data"
 )
 
 type TestEnv struct {

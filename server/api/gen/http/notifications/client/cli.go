@@ -3,7 +3,7 @@
 // notifications HTTP client CLI support package
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package client
 
@@ -11,7 +11,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	notifications "github.com/fieldkit/cloud/server/api/gen/notifications"
+	notifications "gitlab.com/fieldkit/cloud/server/api/gen/notifications"
 	goa "goa.design/goa/v3/pkg"
 )
 

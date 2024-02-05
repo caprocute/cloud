@@ -20,17 +20,17 @@ import (
 
 	"github.com/goadesign/goa"
 
-	"github.com/fieldkit/cloud/server/common/sqlxcache"
+	"gitlab.com/fieldkit/cloud/server/common/sqlxcache"
 
-	"github.com/fieldkit/cloud/server/common"
-	"github.com/fieldkit/cloud/server/common/goahelpers"
-	"github.com/fieldkit/cloud/server/common/jobs"
-	"github.com/fieldkit/cloud/server/common/logging"
+	"gitlab.com/fieldkit/cloud/server/common"
+	"gitlab.com/fieldkit/cloud/server/common/goahelpers"
+	"gitlab.com/fieldkit/cloud/server/common/jobs"
+	"gitlab.com/fieldkit/cloud/server/common/logging"
 
-	"github.com/fieldkit/cloud/server/backend/repositories"
-	"github.com/fieldkit/cloud/server/data"
-	"github.com/fieldkit/cloud/server/files"
-	"github.com/fieldkit/cloud/server/messages"
+	"gitlab.com/fieldkit/cloud/server/backend/repositories"
+	"gitlab.com/fieldkit/cloud/server/data"
+	"gitlab.com/fieldkit/cloud/server/files"
+	"gitlab.com/fieldkit/cloud/server/messages"
 )
 
 var (

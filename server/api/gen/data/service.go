@@ -3,14 +3,14 @@
 // data service
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package data
 
 import (
 	"context"
 
-	dataviews "github.com/fieldkit/cloud/server/api/gen/data/views"
+	dataviews "gitlab.com/fieldkit/cloud/server/api/gen/data/views"
 	goa "goa.design/goa/v3/pkg"
 	"goa.design/goa/v3/security"
 )

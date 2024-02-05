@@ -8,16 +8,16 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws/session"
 
-	"github.com/fieldkit/cloud/server/api/querying"
-	"github.com/fieldkit/cloud/server/common/sqlxcache"
+	"gitlab.com/fieldkit/cloud/server/api/querying"
+	"gitlab.com/fieldkit/cloud/server/common/sqlxcache"
 
-	"github.com/fieldkit/cloud/server/common/jobs"
-	"github.com/fieldkit/cloud/server/common/logging"
+	"gitlab.com/fieldkit/cloud/server/common/jobs"
+	"gitlab.com/fieldkit/cloud/server/common/logging"
 
-	"github.com/fieldkit/cloud/server/data"
-	"github.com/fieldkit/cloud/server/email"
-	"github.com/fieldkit/cloud/server/files"
-	"github.com/fieldkit/cloud/server/storage"
+	"gitlab.com/fieldkit/cloud/server/data"
+	"gitlab.com/fieldkit/cloud/server/email"
+	"gitlab.com/fieldkit/cloud/server/files"
+	"gitlab.com/fieldkit/cloud/server/storage"
 )
 
 type ControllerOptions struct {

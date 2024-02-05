@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/fieldkit/cloud/server/backend"
-	"github.com/fieldkit/cloud/server/data"
+	"gitlab.com/fieldkit/cloud/server/backend"
+	"gitlab.com/fieldkit/cloud/server/data"
 )
 
 type StationTailInfo struct {

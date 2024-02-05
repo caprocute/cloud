@@ -6,7 +6,7 @@ import (
 
 	"github.com/kelseyhightower/envconfig"
 
-	"github.com/fieldkit/cloud/server/common/logging"
+	"gitlab.com/fieldkit/cloud/server/common/logging"
 )
 
 type Options struct {

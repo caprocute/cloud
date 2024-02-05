@@ -7,10 +7,10 @@ import (
 	"math"
 	"time"
 
-	"github.com/fieldkit/cloud/server/backend/repositories"
-	"github.com/fieldkit/cloud/server/common/logging"
-	"github.com/fieldkit/cloud/server/common/sqlxcache"
-	"github.com/fieldkit/cloud/server/data"
+	"gitlab.com/fieldkit/cloud/server/backend/repositories"
+	"gitlab.com/fieldkit/cloud/server/common/logging"
+	"gitlab.com/fieldkit/cloud/server/common/sqlxcache"
+	"gitlab.com/fieldkit/cloud/server/data"
 	pb "gitlab.com/fieldkit/libraries/data-protocol"
 )
 

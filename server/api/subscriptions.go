@@ -10,7 +10,7 @@ import (
 	jwtgo "github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/websocket"
 
-	notifications "github.com/fieldkit/cloud/server/api/gen/notifications"
+	notifications "gitlab.com/fieldkit/cloud/server/api/gen/notifications"
 )
 
 type Subscriptions struct {

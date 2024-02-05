@@ -3,7 +3,7 @@
 // discourse HTTP server encoders and decoders
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package server
 
@@ -12,7 +12,7 @@ import (
 	"io"
 	"net/http"
 
-	discourse "github.com/fieldkit/cloud/server/api/gen/discourse"
+	discourse "gitlab.com/fieldkit/cloud/server/api/gen/discourse"
 	goahttp "goa.design/goa/v3/http"
 	goa "goa.design/goa/v3/pkg"
 )

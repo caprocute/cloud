@@ -4,17 +4,17 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/fieldkit/cloud/server/common/sqlxcache"
-	"github.com/fieldkit/cloud/server/storage"
+	"gitlab.com/fieldkit/cloud/server/common/sqlxcache"
+	"gitlab.com/fieldkit/cloud/server/storage"
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	"github.com/fieldkit/cloud/server/common/logging"
+	"gitlab.com/fieldkit/cloud/server/common/logging"
 
-	"github.com/fieldkit/cloud/server/common/jobs"
-	"github.com/fieldkit/cloud/server/files"
-	"github.com/fieldkit/cloud/server/messages"
+	"gitlab.com/fieldkit/cloud/server/common/jobs"
+	"gitlab.com/fieldkit/cloud/server/files"
+	"gitlab.com/fieldkit/cloud/server/messages"
 
-	"github.com/fieldkit/cloud/server/backend/repositories"
+	"gitlab.com/fieldkit/cloud/server/backend/repositories"
 )
 
 type StationIngestionSaga struct {

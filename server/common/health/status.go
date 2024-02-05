@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/fieldkit/cloud/server/common/logging"
+	"gitlab.com/fieldkit/cloud/server/common/logging"
 )
 
 type GitStatus struct {

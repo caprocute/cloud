@@ -3,12 +3,12 @@
 // notifications HTTP server types
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package server
 
 import (
-	notifications "github.com/fieldkit/cloud/server/api/gen/notifications"
+	notifications "gitlab.com/fieldkit/cloud/server/api/gen/notifications"
 	goa "goa.design/goa/v3/pkg"
 )
 

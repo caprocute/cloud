@@ -13,11 +13,11 @@ import (
 
 	"goa.design/goa/v3/security"
 
-	project "github.com/fieldkit/cloud/server/api/gen/project"
+	project "gitlab.com/fieldkit/cloud/server/api/gen/project"
 
-	"github.com/fieldkit/cloud/server/backend/repositories"
-	"github.com/fieldkit/cloud/server/common"
-	"github.com/fieldkit/cloud/server/data"
+	"gitlab.com/fieldkit/cloud/server/backend/repositories"
+	"gitlab.com/fieldkit/cloud/server/common"
+	"gitlab.com/fieldkit/cloud/server/data"
 )
 
 type ProjectService struct {

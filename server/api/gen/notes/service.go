@@ -3,7 +3,7 @@
 // notes service
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package notes
 
@@ -11,7 +11,7 @@ import (
 	"context"
 	"io"
 
-	notesviews "github.com/fieldkit/cloud/server/api/gen/notes/views"
+	notesviews "gitlab.com/fieldkit/cloud/server/api/gen/notes/views"
 	goa "goa.design/goa/v3/pkg"
 	"goa.design/goa/v3/security"
 )

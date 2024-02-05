@@ -5,7 +5,7 @@ import (
 	"encoding/hex"
 	"fmt"
 
-	"github.com/fieldkit/cloud/server/common/logging"
+	"gitlab.com/fieldkit/cloud/server/common/logging"
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
 	"github.com/influxdata/influxdb-client-go/v2/api"
 	"github.com/influxdata/influxdb-client-go/v2/api/write"

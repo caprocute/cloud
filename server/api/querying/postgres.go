@@ -8,11 +8,11 @@ import (
 
 	_ "github.com/lib/pq"
 
-	"github.com/fieldkit/cloud/server/common/sqlxcache"
+	"gitlab.com/fieldkit/cloud/server/common/sqlxcache"
 	"github.com/jmoiron/sqlx"
 
-	"github.com/fieldkit/cloud/server/backend"
-	"github.com/fieldkit/cloud/server/data"
+	"gitlab.com/fieldkit/cloud/server/backend"
+	"gitlab.com/fieldkit/cloud/server/data"
 )
 
 type PostgresBackend struct {

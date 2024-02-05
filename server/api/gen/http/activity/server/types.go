@@ -3,13 +3,13 @@
 // activity HTTP server types
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package server
 
 import (
-	activity "github.com/fieldkit/cloud/server/api/gen/activity"
-	activityviews "github.com/fieldkit/cloud/server/api/gen/activity/views"
+	activity "gitlab.com/fieldkit/cloud/server/api/gen/activity"
+	activityviews "gitlab.com/fieldkit/cloud/server/api/gen/activity/views"
 	goa "goa.design/goa/v3/pkg"
 )
 

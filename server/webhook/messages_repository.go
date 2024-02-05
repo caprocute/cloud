@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/fieldkit/cloud/server/common/sqlxcache"
+	"gitlab.com/fieldkit/cloud/server/common/sqlxcache"
 )
 
 const (

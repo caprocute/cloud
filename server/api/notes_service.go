@@ -11,11 +11,11 @@ import (
 
 	"goa.design/goa/v3/security"
 
-	notes "github.com/fieldkit/cloud/server/api/gen/notes"
+	notes "gitlab.com/fieldkit/cloud/server/api/gen/notes"
 
-	"github.com/fieldkit/cloud/server/backend/repositories"
-	"github.com/fieldkit/cloud/server/common"
-	"github.com/fieldkit/cloud/server/data"
+	"gitlab.com/fieldkit/cloud/server/backend/repositories"
+	"gitlab.com/fieldkit/cloud/server/common"
+	"gitlab.com/fieldkit/cloud/server/data"
 )
 
 type NotesService struct {

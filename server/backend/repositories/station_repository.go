@@ -10,14 +10,14 @@ import (
 	"strings"
 	"time"
 
-	"github.com/fieldkit/cloud/server/common/sqlxcache"
+	"gitlab.com/fieldkit/cloud/server/common/sqlxcache"
 	"github.com/iancoleman/strcase"
 
 	"github.com/jmoiron/sqlx"
 
 	pbapp "gitlab.com/fieldkit/libraries/app-protocol"
 
-	"github.com/fieldkit/cloud/server/data"
+	"gitlab.com/fieldkit/cloud/server/data"
 )
 
 var (

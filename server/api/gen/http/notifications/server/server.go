@@ -3,7 +3,7 @@
 // notifications HTTP server
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package server
 
@@ -12,7 +12,7 @@ import (
 	"net/http"
 	"regexp"
 
-	notifications "github.com/fieldkit/cloud/server/api/gen/notifications"
+	notifications "gitlab.com/fieldkit/cloud/server/api/gen/notifications"
 	"github.com/gorilla/websocket"
 	goahttp "goa.design/goa/v3/http"
 	goa "goa.design/goa/v3/pkg"

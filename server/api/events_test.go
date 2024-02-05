@@ -12,9 +12,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/tidwall/gjson"
 
-	eventsService "github.com/fieldkit/cloud/server/api/gen/data_events"
+	eventsService "gitlab.com/fieldkit/cloud/server/api/gen/data_events"
 
-	"github.com/fieldkit/cloud/server/tests"
+	"gitlab.com/fieldkit/cloud/server/tests"
 )
 
 func TestEventsUpdateMyEvent(t *testing.T) {

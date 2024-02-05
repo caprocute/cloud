@@ -3,7 +3,7 @@
 // user HTTP server
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package server
 
@@ -12,7 +12,7 @@ import (
 	"net/http"
 	"regexp"
 
-	user "github.com/fieldkit/cloud/server/api/gen/user"
+	user "gitlab.com/fieldkit/cloud/server/api/gen/user"
 	goahttp "goa.design/goa/v3/http"
 	goa "goa.design/goa/v3/pkg"
 	"goa.design/plugins/v3/cors"
