@@ -97,7 +97,8 @@
         "backProject": "Back to {name}",
         "backToStations": "Back to Stations",
         "backToSensors": "Back to Sensor Map",
-        "backStationDashboard": "Back to Station Dashboard"
+        "backStationDashboard": "Back to Station Dashboard",
+        "backDashboard": "Back to Dashboard"
     },
     "projects": {
         "title": {
@@ -119,7 +120,17 @@
         "recentActivity": "Recent Activity",
         "follow": "Follow",
         "unfollow": "Unfollow",
-        "activity": "Activity",
+        "activity": {
+            "button": "Activity",
+            "title": "Activity History",
+            "uploadedData": "Uploaded Data",
+            "readingsUploaded": "{records} readings uploaded from {name}, with {errorText}",
+            "noErrors": "no errors.",
+            "withError": "an error.",
+            "deployedStation": "Deployed Station",
+            "activityDeployed": "{activityName} was deployed.",
+            "empty": "No recent activity."
+        },
         "dashboard": "Project Dashboard",
         "stations": {
             "title": "Stations",
@@ -175,7 +186,8 @@
             "mapHint": "Pan or zoom to set map view",
             "startDate": "Start date",
             "endDate": "End date",
-            "confirmLeavePopupMessage": "You have unsaved changes. Are you sure you want to leave?"
+            "confirmLeavePopupMessage": "You have unsaved changes. Are you sure you want to leave?",
+            "confirmDelete": "Are you sure you want to delete this project?"
         },
         "invite": {
             "accept": "Accept Invite",
@@ -191,12 +203,44 @@
         "updateSuccess": "Project details updated!",
         "addSuccess": "Project added!",
         "privateBannerTitle": "This project is private",
-        "privateBannerSubtitle": "You do not have access to view this project"
+        "privateBannerSubtitle": "You do not have access to view this project",
+        "team": "Team",
+        "modules": "Modules",
+        "dataFiles": "Data Files",
+        "noDataFiles": "No readings have been uploaded yet.",
+        "share": "Share",
+        "update": {
+            "needLogin": {
+                "part1": "Please",
+                "part2": "log in",
+                "part3": "to view projects."
+            },
+            "label": "Enter your project update below.",
+            "delete": "Delete this update"
+        },
+        "teamManager": {
+            "heading": "Manage Team",
+            "members": "Members",
+            "role": "Role",
+            "updateRole": "Update Role",
+            "invitePending": "Invite pending",
+            "newMember": {
+                "placeholder": "New member email",
+                "emailRequired": "Email is a required field.",
+                "emailValid": "Must be a valid email address.",
+                "duplicate": "This user is already invited.",
+                "selectRole": "Select Role"
+            },
+            "invite": "Invite",
+            "confirmRemove": "Are you sure you want to remove this team member?"
+        }
     },
     "station": {
         "readings": {
             "title": "Latest Readings",
-            "empty": "There are no stations in this project."
+            "empty": "There are no stations in this project.",
+            "none": "No readings yet.",
+            "loading": "Loading"
         },
         "deployed": "Deployed",
         "deployedOn": "Deployed on",
@@ -228,7 +272,21 @@
         "data": "Data",
         "exploreData": "Explore Data",
         "descriptionUpdateSuccess": "Station description updated successfully!",
-        "moduleNameUpdateSuccess": "Module name updated successfully!"
+        "moduleNameUpdateSuccess": "Module name updated successfully!",
+        "photo": {
+            "module": {
+                "alt": "Module Icon"
+            },
+            "alt": "Station Image",
+            "default": {
+                "alt": "Default Station Image"
+            }
+        },
+        "nativeLands": " Native Lands:"
+    },
+    "stations": {
+        "addNew": "Add a New Station",
+        "noStations": "You don't have any stations. Download the FieldKit app, log in and connect to your station to add it to your account."
     },
     "user": {
         "profile": {
@@ -420,7 +478,10 @@
             "comment": "Comment",
             "reply": "Reply",
             "mention": "Mention"
-        }
+        },
+        "userReplied": "replied to your comment",
+        "userCommented": "commented on your data",
+        "userMentioned": "mentioned you in a comment"
     },
     "comments": {
         "loginToComment": {
@@ -440,7 +501,8 @@
         },
         "commentForm": {
             "placeholder": "Join the discussion!",
-            "saveLabel": "Post"
+            "saveLabel": "Post",
+            "saveEditLabel": "Save"
         },
         "eventTypeSelector": {
             "allProjectSensors": {
@@ -505,7 +567,14 @@
         "stationDescriptionEditLabel": "Edit",
         "stationDescriptionSaveLabel": "Save",
         "moduleNameEditLabel": "Edit",
-        "moduleNameSaveLabel": "Save"
+        "moduleNameSaveLabel": "Save",
+        "fields": {
+            "studyObjective": "Study Objective",
+            "sitePurpose": "Purpose of Site Location",
+            "siteCriteria": "Site Criteria",
+            "siteDescription": "Site Description",
+            "customKey": "Custom note field"
+        }
     },
     "fieldNotes": {
         "title": "Field Notes",
@@ -525,11 +594,20 @@
         "emptyNoteCannotSave": "There's nothing to save.",
         "noData": "There are no field notes yet. Be the first one to post something!",
         "finishEditingFirst": "Please cancel or update the note that you're currently editing before saving a new one.",
-        "finishEditingFirstBeforeNewOne": "Please cancel or update the note that you're currently editing before editing a new one."
+        "finishEditingFirstBeforeNewOne": "Please cancel or update the note that you're currently editing before editing a new one.",
+        "form": {
+            "saveLabel": "Save",
+            "placeholder": "Join the discussion!"
+        },
+        "monthRow": {
+            "entries": "Entries",
+            "lastUpdated": "Last updated:"
+        }
     },
     "unauthorized": "Unauthorized",
     "unauthorizedStation": "You don't have access to view this station",
     "sharePanel": {
+        "title": "Share",
         "copyUrl": "Copy URL",
         "copyBtn": "Copy",
         "linkCopied": "Link copied",
@@ -537,7 +615,25 @@
         "emailSubject": {
             "fieldkit": "Check out this data on FieldKit!",
             "floodnet": "Check out this data on FloodNet!"
-        }
+        },
+        "alt": {
+            "twitter": "Share on Twitter",
+            "facebook": "Share on Facebook"
+        },
+        "twitterText": "Check out this data on FieldKit!"
+    },
+    "exportPanel": {
+        "title": "Export",
+        "previous": {
+            "heading": "Previous Exports",
+            "noItems": "No previous exports."
+        },
+        "downloaded": "Downloaded",
+        "download": "Download"
+    },
+    "followPanel": {
+        "follow": "Follow",
+        "follows": "Follows"
     },
     "linkToFloodnet": {
         "desktop": "Project Info, Methodology & Data Sources",
@@ -575,7 +671,15 @@
     "dataView": {
         "computerTip": "For a better data analysis experience, view this data on your computer.",
         "swipeTip": "Swipe the chart to see more data.",
-        "noData": "There's no data to display."
+        "noData": "There's no data to display.",
+        "title": " Data View",
+        "buttons": {
+            "addChart": "Add Chart",
+            "share": "Share",
+            "export": "Export"
+        },
+        "noSensors": "Oh snap, this station doesn't appear to have any sensors to show you.",
+        "nothingSelected": "Nothing selected to visualize, please choose a station or project from the left."
     },
     "edit": "Edit",
     "save": "Save",
@@ -585,16 +689,14 @@
         "confirmLeaveBasic": "You have unsaved changes. Are you sure you want to leave?",
         "stationDescription": "Station description",
         "editModuleName": "Module name",
-        "studyObjective": "Study objective",
-        "sitePurpose": "Site purpose",
-        "siteCriteria": "Site criteria",
-        "siteDescription": "Site description",
-        "customKey": "Custom note field",
         "newFieldNote": "New field note",
         "editFieldNote": "Edited Field note"
     },
     "languageSelector": {
         "english": "English",
         "spanish": "Español"
+    },
+    "iconAlts": {
+        "close": "Close"
     }
 }

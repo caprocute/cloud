@@ -36,10 +36,10 @@
                             {{ $t("layout.header.admin") }}
                         </router-link>
                         <router-link v-if="user" :to="{ name: 'editUser' }" :title="$t('layout.header.myAccount')">
-                            <img src="@/assets/icon-account.svg" alt="My Account" />
+                            <img src="@/assets/icon-account.svg" :alt="$t('layout.header.myAccount')" />
                         </router-link>
                         <a class="log-out" v-if="isAuthenticated" v-on:click="logout" :title="$t('layout.header.logout')">
-                            <img src="@/assets/icon-logout.svg" alt="Logout" />
+                            <img src="@/assets/icon-logout.svg" :alt="$t('layout.header.logout')" />
                         </a>
                     </div>
                 </header>

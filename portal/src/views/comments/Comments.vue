@@ -212,7 +212,7 @@
                                 v-if="item.body"
                                 v-model="item.body"
                                 :readonly="item.readonly"
-                                saveLabel="Save"
+                                :saveLabel="$tc('comments.commentForm.saveEditLabel')"
                                 @input="$store.dispatch(ActionTypes.NEW_DIRTY_FIELD, 'editComment#' + item.id)"
                                 @empty="$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, 'editComment#' + item.id)"
                                 @save="saveEdit(item.id, item.body, 'editComment#' + item.id)"

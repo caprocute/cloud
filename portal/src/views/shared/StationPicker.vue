@@ -2,7 +2,7 @@
     <div class="station-picker">
         <div class="dialog">
             <div class="close-button" v-on:click="onClose">
-                <img alt="Close" src="@/assets/icon-close.svg" />
+                <img :alt="$t('iconAlts.close')" src="@/assets/icon-close.svg" />
             </div>
         </div>
         <div class="header">

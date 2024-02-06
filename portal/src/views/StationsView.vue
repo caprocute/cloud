@@ -40,9 +40,9 @@
             </div>
         </template>
         <div class="no-stations" v-if="isAuthenticated && showNoStationsMessage && hasNoStations">
-            <h1 class="heading">Add a New Station</h1>
+            <h1 class="heading">{{ $tc("stations.addNew") }}</h1>
             <p class="text">
-                You don't have any stations. Download the FieldKit app, log in and connect to your station to add it to your account.
+                {{ $tc("stations.noStations") }}
             </p>
             <a href="https://apps.apple.com/us/app/fieldkit-org/id1463631293?ls=1" target="_blank">
                 <img alt="App store" src="@/assets/appstore.svg" width="150" />

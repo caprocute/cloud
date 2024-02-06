@@ -3,7 +3,7 @@
         <div class="station-hover-summary" ref="paneContent" :class="{ 'is-pane': hasCupertinoPane }" v-if="viewingSummary && station">
             <StationSummaryContent ref="summaryContent" :station="station">
                 <template #top-right-actions>
-                    <img alt="Close" src="@/assets/icon-close.svg" class="close-button" v-on:click="wantCloseSummary" />
+                    <img :alt="$t('iconAlts.close')" src="@/assets/icon-close.svg" class="close-button" v-on:click="wantCloseSummary" />
                     <img
                         :alt="$tc('station.navigateToStation')"
                         class="navigate-button"
@@ -33,7 +33,7 @@
 
             <slot :station="station" :sensorDataQuerier="sensorDataQuerier"></slot>
 
-            <div class="explore-button" v-if="explore" v-on:click="onClickExplore">Explore Data</div>
+            <div class="explore-button" v-if="explore" v-on:click="onClickExplore">{{ $t("station.exploreData") }}</div>
 
             <StationBattery :station="station" />
         </div>

@@ -8,9 +8,9 @@
                     <div class="uom">{{ sensor.unitOfMeasure }}</div>
                 </div>
             </div>
-            <div v-if="sensors.length == 0">No readings yet.</div>
+            <div v-if="sensors.length == 0">{{ $t('station.readings.none') }}</div>
         </template>
-        <div class="loading" v-if="loading">Loading</div>
+        <div class="loading" v-if="loading">{{ $t('station.readings.loading') }}</div>
     </div>
 </template>
 

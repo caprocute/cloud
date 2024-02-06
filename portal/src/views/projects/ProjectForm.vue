@@ -5,7 +5,7 @@
             <h2 v-if="project && project.id">{{ $t("project.edit.title") }}</h2>
 
             <div class="close-form-button" v-on:click="closeForm">
-                <img alt="Close" src="@/assets/icon-close.svg" />
+                <img :alt="$t('iconAlts.close')" src="@/assets/icon-close.svg" />
             </div>
         </div>
 
@@ -373,7 +373,7 @@ export default Vue.extend({
             });
         },
         async deleteProject(): Promise<void> {
-            if (window.confirm("Are you sure you want to delete this project?")) {
+            if (window.confirm(this.$tc("project.form.confirmDelete"))) {
                 await this.$store.dispatch(ActionTypes.DELETE_PROJECT, { projectId: this.project.id }).then(() => {
                     return this.$router.push({ name: "projects" });
                 });
