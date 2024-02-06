@@ -27,6 +27,7 @@ export default Vue.extend({
     methods: {
         changeLang(locale: Locales) {
             this.$i18n.locale = locale;
+            localStorage.setItem("locale", locale);
         },
     },
 });
@@ -36,7 +37,7 @@ export default Vue.extend({
 @import "../../scss/mixins";
 
 .language-selector {
-    margin-left: 20px;
+    margin-right: 20px;
     padding: 10px;
     position: relative;
     height: 100%;
@@ -95,6 +96,10 @@ export default Vue.extend({
     opacity: 0;
     visibility: hidden;
     padding-top: 10px;
+
+    @include bp-down($xs) {
+        top: 55px;
+    }
 
     li {
         padding: 6px 12px;

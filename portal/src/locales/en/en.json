@@ -698,5 +698,20 @@
     },
     "iconAlts": {
         "close": "Close"
+    },
+    "admin": {
+        "serverLogs": {
+            "heading": "Server Logs",
+            "all": "fkprd and fkdev: all",
+            "errors": "fkprd and fkdev: errors",
+            "ingestions": "fkprd and fkdev: ingestions",
+            "conflicts": "fkprd and fkdev: conflicts"
+        },
+        "status": {
+            "server": "Server",
+            "tag": "Tag",
+            "name": "Name",
+            "git": "GIT"
+        }
     }
 }

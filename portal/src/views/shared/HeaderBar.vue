@@ -3,6 +3,7 @@
         <router-link :to="{ name: 'root' }">
             <Logo />
         </router-link>
+        <LanguageSelector></LanguageSelector>
         <div
             class="header-account"
             :class="isAuthenticated ? 'loggedin' : ''"
@@ -60,28 +61,26 @@
                 </template>
             </div>
         </div>
-
-        <LanguageSelector></LanguageSelector>
     </div>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import {mapGetters, mapState} from "vuex";
+import { mapGetters, mapState } from "vuex";
 import * as ActionTypes from "@/store/actions";
-import {MarkNotificationsSeen} from "@/store";
+import { MarkNotificationsSeen } from "@/store";
 import CommonComponents from "@/views/shared";
 import NotificationsList from "@/views/notifications/NotificationsList.vue";
-import {GlobalState} from "@/store/modules/global";
+import { GlobalState } from "@/store/modules/global";
 import Logo from "@/views/shared/Logo.vue";
-import {Notification} from "@/store/modules/notifications";
-import {isMobile} from "@/utilities";
-import LanguageSelector from '@/views/shared/LanguageSelector.vue';
+import { Notification } from "@/store/modules/notifications";
+import { isMobile } from "@/utilities";
+import LanguageSelector from "@/views/shared/LanguageSelector.vue";
 
 export default Vue.extend({
     name: "HeaderBar",
     components: {
-      LanguageSelector,
+        LanguageSelector,
         ...CommonComponents,
         NotificationsList,
         Logo,
@@ -192,10 +191,6 @@ export default Vue.extend({
         ::v-deep + * {
             margin-top: 54px;
         }
-    }
-
-    @include bp-down($sm) {
-        padding-right: 0;
     }
 
     > a {
@@ -395,6 +390,7 @@ button {
 
         @include bp-down($xs) {
             width: 100vw;
+            right: -10px;
         }
 
         &.active {
@@ -442,5 +438,4 @@ button {
         margin-top: 15px;
     }
 }
-
 </style>
