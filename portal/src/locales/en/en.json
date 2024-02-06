@@ -712,6 +712,78 @@
             "tag": "Tag",
             "name": "Name",
             "git": "GIT"
+        },
+        "userPicker": {
+            "placeholder": "User's name or email",
+            "noResult": "Oops! No users found."
+        },
+        "transfer": {
+            "button": "Transfer"
+        },
+        "playground": {
+            "modal": "Modal"
+        },
+        "backBtn": "Back to Admin",
+        "deleteUser": "Delete User",
+        "deleteForm": {
+            "email": {
+                "label": "Buh-bye Email",
+                "required": "Email is a required field.",
+                "valid": "Must be a valid email address."
+            },
+            "password": {
+                "label": "Your password",
+                "required": "Password is a required field.",
+                "valid": "Password must be at least 10 characters."
+            },
+            "button": "Bye bye bye",
+            "failed": "Oops, there was a problem",
+            "success": "They're toast."
+        },
+        "tnc": {
+            "failed": "Oops, there was a problem.",
+            "success": "Done, cleared that user's TNC status.",
+            "clear": "Clear TNC",
+            "form": {
+                "email": {
+                    "label": "Email",
+                    "required": "Email is a required field.",
+                    "valid": "Must be a valid email address."
+                },
+                "button": "Clear Terms and Conditions"
+            }
+        },
+        "stations": {
+            "id": "ID",
+            "name": "Name",
+            "deviceId": "Device ID",
+            "owner": "Owner",
+            "recording": "Recording",
+            "lastIngestion": "Last Ingestion",
+            "created": "Created",
+            "updated": "Updated",
+            "firmware": "Firmware",
+            "location": "Location",
+            "delete": "Delete",
+            "uploads": {
+                "heading": "Uploads",
+                "id": "ID",
+                "date": "Date",
+                "type": "Type",
+                "size": "Size",
+                "blocks": "Blocks",
+                "url": "URL"
+            },
+            "information": "Information",
+            "data": "Data:",
+            "samples": "Samples",
+            "serverLogs": "Server logs",
+            "10days": "10 days",
+            "processData": "Process Data",
+            "processRecs": "Process Recs",
+            "processRecsTsdb": "Process Recs (TsDB only)",
+            "exploreData": "Explore Data",
+            "transfer": "Transfer"
         }
     }
 }
