@@ -474,7 +474,7 @@ func main() {
 	}
 
 	statusHandler := health.StatusHandler(ctx)
-	robotsHandler := health.RobotsHandler(ctx)
+	robotsHandler := health.RobotsHandler(ctx, config.Production)
 	services := theApi.services
 	statusFinal := logging.Monitoring("status", services.Metrics)(statusHandler)
 	robotsFinal := logging.Monitoring("robots", services.Metrics)(robotsHandler)
