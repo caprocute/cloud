@@ -1,0 +1,138 @@
+{
+    "modules": {
+        "water": {
+            "name": "Agua"
+        },
+        "water.ec": {
+            "name": "Conductividad del Agua",
+            "sensors": {
+                "ec": "Conductividad",
+                "tds": "TDS",
+                "salinity": "Salinidad"
+            }
+        },
+        "water.ph": {
+            "name": "pH del Agua",
+            "sensors": {
+                "ph": "pH"
+            }
+        },
+        "water.do": {
+            "name": "Oxígeno Disuelto en el Agua",
+            "sensors": {
+                "do": "DO",
+                "temperature": "Temperatura",
+                "pressure": "Presión"
+            }
+        },
+        "water.dox": {
+            "name": "Oxígeno Disuelto en el Agua",
+            "sensors": {
+                "dox": "DO"
+            }
+        },
+        "water.temp": {
+            "name": "Temperatura del Agua",
+            "sensors": {
+                "temp": "Temperatura"
+            }
+        },
+        "water.orp": {
+            "name": "ORP del Agua",
+            "sensors": {
+                "orp": "ORP"
+            }
+        },
+        "water.unknown": {
+            "name": "Agua"
+        },
+        "weather": {
+            "name": "Clima",
+            "sensors": {
+                "humidity": "Humedad",
+                "temperature_1": "Temperatura 1",
+                "pressure": "Presión",
+                "temperature_2": "Temperatura 2",
+                "rain": "Lluvia",
+                "wind": "Viento",
+                "wind_mv": "Viento ADC Crudo",
+                "wind_speed": "Velocidad del Viento",
+                "wind_dir": "Dirección del Viento",
+                "wind_dir_mv": "Viento ADC Crudo Dirección",
+                "wind_hr_max_speed": "Velocidad Máx. del Viento (1 hora)",
+                "wind_hr_max_dir": "Dirección Máx. del Viento (1 hora)",
+                "wind_10m_max_speed": "Velocidad Máx. del Viento (10 min)",
+                "wind_10m_max_dir": "Dirección Máx. del Viento (10 min)",
+                "wind_2m_avg_speed": "Velocidad Prom. del Viento (2 min)",
+                "wind_2m_avg_dir": "Dirección Prom. del Viento (2 min)",
+                "rain_this_hour": "Lluvia Esta Hora",
+                "rain_prev_hour": "Lluvia Hora Anterior"
+            }
+        },
+        "distance": {
+            "name": "Distancia",
+            "sensors": {
+                "distance": "Distancia",
+                "distance_0": "Distancia 0",
+                "distance_1": "Distancia 1",
+                "distance_2": "Distancia 2",
+                "calibration": "Calibración"
+            }
+        },
+        "diagnostics": {
+            "name": "Diagnósticos",
+            "sensors": {
+                "battery_charge": "Carga de Batería",
+                "battery_voltage": "Voltaje de Batería",
+                "battery_vbus": "Voltaje Bus Batería",
+                "battery_vs": "Voltaje Derivación Batería",
+                "battery_ma": "Corriente de Batería",
+                "battery_power": "Potencia de Batería",
+                "solar_vbus": "Voltaje Bus Solar",
+                "solar_vs": "Voltaje Derivación Solar",
+                "solar_ma": "Corriente Solar",
+                "solar_power": "Potencia Solar",
+                "free_memory": "Memoria Libre",
+                "uptime": "Tiempo de Actividad",
+                "temperature": "Temperatura"
+            }
+        },
+        "random": {
+            "name": "Aleatorio",
+            "sensors": {
+                "random_0": "Aleatorio 0",
+                "random_1": "Aleatorio 1",
+                "random_2": "Aleatorio 2",
+                "random_3": "Aleatorio 3",
+                "random_4": "Aleatorio 4",
+                "random_5": "Aleatorio 5",
+                "random_6": "Aleatorio 6",
+                "random_7": "Aleatorio 7",
+                "random_8": "Aleatorio 8",
+                "random_9": "Aleatorio 9"
+            }
+        },
+        "testing": {
+            "sensors": {
+                "sin": "Sen(x)",
+                "saw.weekly": "Sierra(x)"
+            }
+        },
+        "wh.floodnet": {
+            "name": "FloodNet",
+            "sensors": {
+                "battery": "Batería",
+                "distance": "Distancia",
+                "depth": "Profundidad",
+                "depthUnfiltered": "Profundidad (No Filtrada)",
+                "tideFeet": "Nivel de Marea",
+                "altitude": "Altitud",
+                "temperature": "Temperatura",
+                "pressure": "Presión",
+                "sdError": "Error de SD",
+                "humidity": "Humedad",
+                "maxPrecipLast5MinMmPerMin": "Precipitación"
+            }
+        }
+    }
+}
