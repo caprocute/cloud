@@ -130,9 +130,8 @@ export interface PartnerCustomization {
         project: Component | null;
     };
     latestPrimaryNoDataColor: string;
-    googleTagManagerId: string | null;
+    googleTagManagerIds?: {staging: string, prod: string} | null;
     queryRecentlyQueryString: (station: number[]) => URLSearchParams;
-
 }
 
 function getAttribute(station: DisplayStation, name: string): string | null {
@@ -158,7 +157,7 @@ function getDeploymentDate(station: DisplayStation): string | null {
 export function getPartnerCustomization(): PartnerCustomization | null {
     // dataviz.floodnet.nyc, floodnet.fieldkit.org
     const hostname = Config.partners.hostOverride || window.location.hostname;
-    if (hostname.indexOf("floodnet.") >= 0) {
+    if (hostname.indexOf("floodnet.") <= 0) {
         return {
             title: "Data Dashboard - FloodNet",
             class: "floodnet",
@@ -204,7 +203,10 @@ export function getPartnerCustomization(): PartnerCustomization | null {
                 project: FloodNetProjectDescription,
             },
             latestPrimaryNoDataColor: "#cccccc",
-            googleTagManagerId: "G-TTJPFSVRX6",
+            googleTagManagerIds: {
+                staging: "G-F1QGZ545F8",
+                prod: "G-TTJPFSVRX6",
+            },
             queryRecentlyQueryString: (stations: number[]): URLSearchParams => {
                 const qp = new URLSearchParams();
                 qp.append("stations", stations.join(","));
@@ -267,7 +269,6 @@ export function getPartnerCustomizationWithDefault(): PartnerCustomization {
             project: FieldKitProjectDescription,
         },
         latestPrimaryNoDataColor: "#777a80",
-        googleTagManagerId: null,
         queryRecentlyQueryString: (stations: number[]): URLSearchParams => {
             const qp = new URLSearchParams();
             qp.append("stations", stations.join(","));
