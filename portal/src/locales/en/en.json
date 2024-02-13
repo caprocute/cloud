@@ -152,22 +152,27 @@
         },
         "form": {
             "name": {
+                "label": "Project Name",
                 "required": "Name is a required field.",
                 "maxLength": "This field has a limit of 100 characters."
             },
             "description": {
+                "label": "Short Description",
                 "required": "Description is a required field.",
                 "maxLength": "This field has a limit of 100 characters."
             },
             "goal": {
+                "label": "Project Goal",
                 "required": "Goal is a required field.",
                 "maxLength": "This field has a limit of 100 characters."
             },
             "location": {
+                "label": "Location",
                 "required": "Location is a required field.",
                 "maxLength": "This field has a limit of 100 characters."
             },
             "tags": {
+                "label": "Tags",
                 "help": "Press Enter to separate tags.",
                 "maxLength": "This field has a limit of 100 characters."
             },
