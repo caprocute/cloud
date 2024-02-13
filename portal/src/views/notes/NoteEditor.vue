@@ -2,7 +2,7 @@
     <div class="note-editor">
         <div class="title">
             <TextAreaField v-if="editingTitle" v-model="title" />
-            <template v-else>{{ title }}</template>
+            <template v-else>{{ $t(title) }}</template>
             <a class="edit-btn" v-if="editableTitle && !editingTitle && !readonly" @click="editingTitle = !editingTitle">
                 {{ $t("notes.customTitleEditLabel") }}
             </a>
