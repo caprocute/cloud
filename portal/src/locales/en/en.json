@@ -685,7 +685,14 @@
         },
         "noSensors": "Oh snap, this station doesn't appear to have any sensors to show you.",
         "nothingSelected": "Nothing selected to visualize, please choose a station or project from the left.",
-        "saveAs": "Save As"
+        "saveAs": "Save As",
+        "chartTypes": {
+            "timeSeries": "Time Series",
+            "bar": "Bar",
+            "histogram": "Histogram",
+            "range": "Range",
+            "map": "Map"
+        }
     },
     "edit": "Edit",
     "save": "Save",

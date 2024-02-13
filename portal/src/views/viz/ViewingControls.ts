@@ -229,23 +229,23 @@ export const ViewingControls = Vue.extend({
         chartTypes(): { label: string; id: ChartType }[] {
             const allTypes = [
                 {
-                    label: "Time Series",
+                    label: this.$tc('dataView.chartTypes.timeSeries'),
                     id: ChartType.TimeSeries,
                 },
                 {
-                    label: "Bar",
+                    label: this.$tc('dataView.chartTypes.bar'),
                     id: ChartType.Bar,
                 },
                 {
-                    label: "Histogram",
+                    label: this.$tc('dataView.chartTypes.histogram'),
                     id: ChartType.Histogram,
                 },
                 {
-                    label: "Range",
+                    label: this.$tc('dataView.chartTypes.range'),
                     id: ChartType.Range,
                 },
                 {
-                    label: "Map",
+                    label: this.$tc('dataView.chartTypes.map'),
                     id: ChartType.Map,
                 },
             ];
