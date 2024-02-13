@@ -118,7 +118,7 @@ export default Vue.extend({
                                 "</g>";
                             const saveLabel = document.createElement("span");
                             saveLabel.setAttribute("class", "save-label");
-                            saveLabel.innerHTML = "Save As";
+                            saveLabel.innerHTML = this.$tc('dataView.saveAs');
                             button.appendChild(saveLabel);
                         }
                     }

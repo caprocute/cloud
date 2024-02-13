@@ -631,10 +631,10 @@
         "title": "Export",
         "previous": {
             "heading": "Previous Exports",
-            "noItems": "No previous exports."
+            "noItems": "No previous exports.",
+            "download": "Download"
         },
-        "downloaded": "Downloaded",
-        "download": "Download"
+        "downloaded": "Downloaded"
     },
     "followPanel": {
         "follow": "Follow",
@@ -684,7 +684,8 @@
             "export": "Export"
         },
         "noSensors": "Oh snap, this station doesn't appear to have any sensors to show you.",
-        "nothingSelected": "Nothing selected to visualize, please choose a station or project from the left."
+        "nothingSelected": "Nothing selected to visualize, please choose a station or project from the left.",
+        "saveAs": "Save As"
     },
     "edit": "Edit",
     "save": "Save",
