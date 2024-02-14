@@ -130,6 +130,7 @@ export interface PartnerCustomization {
         project: Component | null;
     };
     latestPrimaryNoDataColor: string;
+    googleTagManagerIds?: {staging: string, prod: string} | null;
     queryRecentlyQueryString: (station: number[]) => URLSearchParams;
 }
 
@@ -202,6 +203,10 @@ export function getPartnerCustomization(): PartnerCustomization | null {
                 project: FloodNetProjectDescription,
             },
             latestPrimaryNoDataColor: "#cccccc",
+            googleTagManagerIds: {
+                staging: "G-F1QGZ545F8",
+                prod: "G-TTJPFSVRX6",
+            },
             queryRecentlyQueryString: (stations: number[]): URLSearchParams => {
                 const qp = new URLSearchParams();
                 qp.append("stations", stations.join(","));
