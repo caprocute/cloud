@@ -6,6 +6,6 @@ import esModules from "./es/modules.json";
 export const defaultLocale = "en";
 
 export const languages = {
-    en: { ...en, ...enModules },
-    es: { ...es, ...esModules },
+    "en-US": { ...en, ...enModules },
+    "es-ES": { ...es, ...esModules },
 };

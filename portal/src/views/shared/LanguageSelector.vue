@@ -3,8 +3,8 @@
         <span class="triangle"></span>
         <i class="icon icon-globe"></i>
         <ul class="language-list">
-            <li @click="changeLang(Locales.en)">{{ $t("languageSelector.english") }}</li>
-            <li @click="changeLang(Locales.es)">{{ $t("languageSelector.spanish") }}</li>
+            <li @click="changeLang(Locales.enUS)">{{ $t("languageSelector.english") }}</li>
+            <li @click="changeLang(Locales.esEs)">{{ $t("languageSelector.spanish") }}</li>
         </ul>
     </div>
 </template>
@@ -13,8 +13,8 @@
 import Vue from "vue";
 
 export enum Locales {
-    en = "en",
-    es = "es",
+    enUS = "en-US",
+    esEs = "es-ES",
 }
 
 export default Vue.extend({

@@ -77,7 +77,6 @@ export default Vue.extend({
             if (locale) {
                 this.changeLang(locale);
             }
-            console.log("Radoi lang", locale);
         },
     },
 });
