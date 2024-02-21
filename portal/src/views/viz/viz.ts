@@ -28,13 +28,16 @@ import { promiseAfter } from "@/utilities";
 import { createSensorColorScale } from "./d3-helpers";
 import { DisplayStation } from "@/store";
 import { getPartnerCustomizationWithDefault } from "../shared/partners";
+import {Locales} from '@/views/shared/LanguageSelector.vue';
 
 export * from "./common";
 
 type SensorReadAtType = string;
 
+const locale = localStorage.getItem("locale") as Locales;
+
 function getString(d) {
-    return d["enUS"] || d["enUs"] || d["en-US"]; // HACK
+    return d[locale] || d["enUS"] || d["enUs"] || d["en-US"]; // HACK
 }
 
 function getBackend(): string | null {
