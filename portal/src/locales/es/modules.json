@@ -7,7 +7,7 @@
             "name": "Conductividad del Agua",
             "sensors": {
                 "ec": "Conductividad",
-                "tds": "TDS",
+                "tds": "SDT",
                 "salinity": "Salinidad"
             }
         },
@@ -20,7 +20,7 @@
         "water.do": {
             "name": "Oxígeno Disuelto en el Agua",
             "sensors": {
-                "do": "DO",
+                "do": "OD",
                 "temperature": "Temperatura",
                 "pressure": "Presión"
             }
@@ -28,7 +28,7 @@
         "water.dox": {
             "name": "Oxígeno Disuelto en el Agua",
             "sensors": {
-                "dox": "DO"
+                "dox": "OD"
             }
         },
         "water.temp": {
