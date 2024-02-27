@@ -209,7 +209,7 @@
         "addSuccess": "El proyecto ya está agregado.",
         "privateBannerTitle": "Este proyecto es privado",
         "privateBannerSubtitle": "No tienes acceso para ver este proyecto",
-        "team": "Team",
+        "team": "Equipo",
         "modules": "Módulos",
         "dataFiles": "Data Files",
         "noDataFiles": "No readings have been uploaded yet.",
@@ -225,7 +225,7 @@
         },
         "teamManager": {
             "heading": "Manage Team",
-            "members": "Members",
+            "members": "Socios",
             "role": "Role",
             "updateRole": "Update Role",
             "invitePending": "Invite pending",
