@@ -216,9 +216,9 @@
         "share": "Share",
         "update": {
             "needLogin": {
-                "part1": "Please",
-                "part2": "log in",
-                "part3": "to view projects."
+                "part1": "Por favor",
+                "part2": "iniciar sesión",
+                "part3": "para ver proyectos."
             },
             "label": "Enter your project update below.",
             "delete": "Delete this update"
@@ -291,7 +291,7 @@
     },
     "stations": {
         "addNew": "Add a New Station",
-        "noStations": "You don't have any stations. Download the FieldKit app, log in and connect to your station to add it to your account."
+        "noStations": "No tienes ninguna estación. Descarga la aplicación FieldKit, inicia sesión y conéctate a tu estación para añadirla a tu cuenta."
     },
     "user": {
         "profile": {
@@ -371,7 +371,7 @@
                 "valid": "Las contraseñas deben coincidir."
             },
             "backButton": "Volver a iniciar sesión",
-            "successTitle": "Success!",
+            "successTitle": "¡Éxito!",
             "failedTitle": "Password Not Reset",
             "failedSubtitle": "Unfortunately we were unable to reset your password.",
             "retry": {
