@@ -226,8 +226,8 @@
         "teamManager": {
             "heading": "Manage Team",
             "members": "Socios",
-            "role": "Role",
-            "updateRole": "Update Role",
+            "role": "Rol",
+            "updateRole": "Actualizar rol",
             "invitePending": "Invite pending",
             "newMember": {
                 "placeholder": "New member email",
