@@ -172,7 +172,7 @@
                 "maxLength": "Este campo tiene un límite de 100 caracteres."
             },
             "tags": {
-                "label": "Tags",
+                "label": "Etiquetas",
                 "help": "Presione Enter para separar etiquetas.",
                 "maxLength": "Este campo tiene un límite de 100 caracteres."
             },
@@ -192,7 +192,7 @@
             "startDate": "Fecha de inicio",
             "endDate": "Fecha de fin",
             "confirmLeavePopupMessage": "Tienes cambios sin guardar. ¿Estás seguro de que quieres salir?",
-            "confirmDelete": "Are you sure you want to delete this project?"
+            "confirmDelete": "¿Estás seguro de que quieres eliminar este proyecto?"
         },
         "invite": {
             "accept": "Aceptar invitación",
