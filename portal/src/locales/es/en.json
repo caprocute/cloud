@@ -234,10 +234,10 @@
                 "emailRequired": "El correo electrónico es un campo obligatorio.",
                 "emailValid": "Debe ser una dirección válida de correo electrónico.",
                 "duplicate": "This user is already invited.",
-                "selectRole": "Select Role"
+                "selectRole": "Seleccionar rol"
             },
-            "invite": "Invite",
-            "confirmRemove": "Are you sure you want to remove this team member?"
+            "invite": "Invitar",
+            "confirmRemove": "¿Estás seguro de que quieres eliminar este miembro del equipo?"
         }
     },
     "station": {
@@ -287,10 +287,10 @@
                 "alt": "Default Station Image"
             }
         },
-        "nativeLands": " Native Lands:"
+        "nativeLands": " Tierras indígenas:"
     },
     "stations": {
-        "addNew": "Add a New Station",
+        "addNew": "Añadir una nueva estación",
         "noStations": "No tienes ninguna estación. Descarga la aplicación FieldKit, inicia sesión y conéctate a tu estación para añadirla a tu cuenta."
     },
     "user": {
@@ -385,7 +385,7 @@
         "form": {
             "title": "Recuperar cuenta",
             "subtitle": "Enter your email address below, and password reset instructions will be sent.",
-            "button": "Recover",
+            "button": "Recuperar",
             "sentTitle": "Password Reset Email Sent",
             "sentSubtitle": "Check your inbox for the email with a link to reset your password.",
             "resending": "Reenviando",
@@ -484,9 +484,9 @@
             "reply": "Responder",
             "mention": "Mención"
         },
-        "userReplied": "replied to your comment",
-        "userCommented": "commented on your data",
-        "userMentioned": "mentioned you in a comment"
+        "userReplied": "respondió a tu comentario",
+        "userCommented": "opinó sobre tus datos",
+        "userMentioned": "te mencionó en un comentario"
     },
     "comments": {
         "loginToComment": {
@@ -575,7 +575,7 @@
         "moduleNameSaveLabel": "Guardar",
         "fields": {
             "studyObjective": "Objetivo del estudio",
-            "sitePurpose": "Purpose of Site Location",
+            "sitePurpose": "Propósito de la ubicación del sitio",
             "siteCriteria": "Criterios del sitio",
             "siteDescription": "Descripción del sitio",
             "customKey": "Campo de nota personalizado"
@@ -612,7 +612,7 @@
     "unauthorized": "No autorizado",
     "unauthorizedStation": "No tienes acceso para ver esta estación",
     "sharePanel": {
-        "title": "Share",
+        "title": "Compartir",
         "copyUrl": "Copiar URL",
         "copyBtn": "Copiar",
         "linkCopied": "Enlace copiado",
@@ -622,7 +622,7 @@
             "floodnet": "¡Mira estos datos en FloodNet!"
         },
         "alt": {
-            "twitter": "Share on Twitter",
+            "twitter": "Compartir en Twitter",
             "facebook": "Share on Facebook"
         },
         "twitterText": "¡Mira estos datos en FieldKit!"
@@ -706,11 +706,11 @@
         "editFieldNote": "Nota de campo editada"
     },
     "languageSelector": {
-        "english": "English",
-        "spanish": "Español"
+        "english": "Inglés",
+        "spanish": "Español"
     },
     "iconAlts": {
-        "close": "Close"
+        "close": "Cerrar"
     },
     "admin": {
         "serverLogs": {
