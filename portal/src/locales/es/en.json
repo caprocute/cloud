@@ -98,7 +98,7 @@
         "backToStations": "Volver a las estaciones",
         "backToSensors": "Volver al mapa de sensores",
         "backStationDashboard": "Volver a la pantalla principal de la estación",
-        "backDashboard": "Back to Dashboard"
+        "backDashboard": "Volver a la pantalla principal"
     },
     "projects": {
         "title": {
@@ -122,13 +122,13 @@
         "unfollow": "Dejar de seguir",
         "activity": {
             "button": "Actividad",
-            "title": "Activity History",
-            "uploadedData": "Uploaded Data",
-            "readingsUploaded": "{records} readings uploaded from {name}, with {errorText}",
-            "noErrors": "no errors.",
-            "withError": "an error.",
-            "deployedStation": "Deployed Station",
-            "activityDeployed": "{activityName} was deployed.",
+            "title": "Historial de actividades",
+            "uploadedData": "Datos subidos",
+            "readingsUploaded": "{records} lecturas subidas de {name}, con {errorText}",
+            "noErrors": "sin errores.",
+            "withError": "un error.",
+            "deployedStation": "Estación desplegada",
+            "activityDeployed": "{activityName} fue desplegado.",
             "empty": "No hay actividad reciente."
         },
         "dashboard": "Pantalla principal del proyecto",
@@ -372,12 +372,12 @@
             },
             "backButton": "Volver a iniciar sesión",
             "successTitle": "¡Éxito!",
-            "failedTitle": "Password Not Reset",
+            "failedTitle": "La contraseña no está restablecida",
             "failedSubtitle": "Unfortunately we were unable to reset your password.",
             "retry": {
                 "please": "Por favor",
-                "contactUs": "contact us",
-                "assitance": "if you would like assistance."
+                "contactUs": "contáctanos",
+                "assitance": "si te gustaría ayuda."
             }
         }
     },
@@ -386,10 +386,10 @@
             "title": "Recuperar cuenta",
             "subtitle": "Enter your email address below, and password reset instructions will be sent.",
             "button": "Recuperar",
-            "sentTitle": "Password Reset Email Sent",
-            "sentSubtitle": "Check your inbox for the email with a link to reset your password.",
+            "sentTitle": "Hemos enviado el correo de restablecimiento de contraseña",
+            "sentSubtitle": "Visita tu bandeja de entrada para ver el correo electrónico con un enlace para restablecer tu contraseña.",
             "resending": "Reenviando",
-            "backButton": "Back to Log in",
+            "backButton": "Volver a iniciar sesión",
             "email": {
                 "label": "Correo electrónico",
                 "required": "El correo electrónico es un campo obligatorio.",
@@ -400,7 +400,7 @@
     },
     "login": {
         "form": {
-            "title": "Log In to Your Account",
+            "title": "Inicia sesión en tu cuenta",
             "spoofEmail": {
                 "label": "Correo Spoof",
                 "required": "Correo Spoof es un campo obligatorio.",
@@ -677,20 +677,20 @@
         "computerTip": "Para una mejor experiencia de análisis de datos, ve estos datos en tu computadora.",
         "swipeTip": "Desliza el gráfico para ver más datos.",
         "noData": "No hay datos que mostrar.",
-        "title": " Data View",
+        "title": "Vista de datos",
         "buttons": {
-            "addChart": "Add Chart",
-            "share": "Share",
-            "export": "Export"
+            "addChart": "Añadir gráfica",
+            "share": "Compartir",
+            "export": "Exportar"
         },
         "noSensors": "Oh snap, this station doesn't appear to have any sensors to show you.",
         "nothingSelected": "Nothing selected to visualize, please choose a station or project from the left.",
         "saveAs": "Guardar como",
         "chartTypes": {
-            "timeSeries": "Time Series",
-            "bar": "Bar",
-            "histogram": "Histogram",
-            "range": "Range",
+            "timeSeries": "Serie cronológica",
+            "bar": "Barras",
+            "histogram": "Histograma",
+            "range": "Rango",
             "map": "Mapa"
         }
     },
@@ -702,7 +702,7 @@
         "confirmLeaveBasic": "Tienes cambios sin guardar. ¿Estás seguro de que quieres salir?",
         "stationDescription": "Descripción de la estación",
         "editModuleName": "Nombre del módulo",
-        "newFieldNote": "New field note",
+        "newFieldNote": "Nueva nota de campo",
         "editFieldNote": "Nota de campo editada"
     },
     "languageSelector": {
