@@ -129,7 +129,7 @@
             "withError": "an error.",
             "deployedStation": "Deployed Station",
             "activityDeployed": "{activityName} was deployed.",
-            "empty": "No recent activity."
+            "empty": "No hay actividad reciente."
         },
         "dashboard": "Pantalla principal del proyecto",
         "stations": {
@@ -152,7 +152,7 @@
         },
         "form": {
             "name": {
-                "label": "Project Name",
+                "label": "Nombre del proyecto",
                 "required": "El nombre es un campo obligatorio.",
                 "maxLength": "Este campo tiene un límite de 100 caracteres."
             },
@@ -162,12 +162,12 @@
                 "maxLength": "Este campo tiene un límite de 100 caracteres."
             },
             "goal": {
-                "label": "Project Goal",
+                "label": "Objetivo del proyecto",
                 "required": "El objetivo es un campo obligatorio.",
                 "maxLength": "Este campo tiene un límite de 100 caracteres."
             },
             "location": {
-                "label": "Location",
+                "label": "Ubicación",
                 "required": "La ubicación es un campo obligatorio.",
                 "maxLength": "Este campo tiene un límite de 100 caracteres."
             },
@@ -211,9 +211,9 @@
         "privateBannerSubtitle": "No tienes acceso para ver este proyecto",
         "team": "Equipo",
         "modules": "Módulos",
-        "dataFiles": "Data Files",
+        "dataFiles": "Archivos de datos",
         "noDataFiles": "No readings have been uploaded yet.",
-        "share": "Share",
+        "share": "Compartir",
         "update": {
             "needLogin": {
                 "part1": "Por favor",
@@ -221,16 +221,16 @@
                 "part3": "para ver proyectos."
             },
             "label": "Enter your project update below.",
-            "delete": "Delete this update"
+            "delete": "Eliminar esta actualización"
         },
         "teamManager": {
-            "heading": "Manage Team",
+            "heading": "Administrar el equipo",
             "members": "Socios",
             "role": "Rol",
             "updateRole": "Actualizar rol",
-            "invitePending": "Invite pending",
+            "invitePending": "Invitación pendiente",
             "newMember": {
-                "placeholder": "New member email",
+                "placeholder": "Correo del nuevo miembro",
                 "emailRequired": "El correo electrónico es un campo obligatorio.",
                 "emailValid": "Debe ser una dirección válida de correo electrónico.",
                 "duplicate": "This user is already invited.",
