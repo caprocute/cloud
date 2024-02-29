@@ -212,7 +212,7 @@
         "team": "Equipo",
         "modules": "Módulos",
         "dataFiles": "Archivos de datos",
-        "noDataFiles": "No readings have been uploaded yet.",
+        "noDataFiles": "Aún no se han subido lecturas.",
         "share": "Compartir",
         "update": {
             "needLogin": {
@@ -220,7 +220,7 @@
                 "part2": "iniciar sesión",
                 "part3": "para ver proyectos."
             },
-            "label": "Enter your project update below.",
+            "label": "Introduce la actualización de tu proyecto a continuación.",
             "delete": "Eliminar esta actualización"
         },
         "teamManager": {
@@ -233,7 +233,7 @@
                 "placeholder": "Correo del nuevo miembro",
                 "emailRequired": "El correo electrónico es un campo obligatorio.",
                 "emailValid": "Debe ser una dirección válida de correo electrónico.",
-                "duplicate": "This user is already invited.",
+                "duplicate": "Este usuario ya está invitado.",
                 "selectRole": "Seleccionar rol"
             },
             "invite": "Invitar",
@@ -244,7 +244,7 @@
         "readings": {
             "title": "Últimas lecturas",
             "empty": "No hay ninguna estación en este proyecto.",
-            "none": "No readings yet.",
+            "none": "Aún no hay lecturas.",
             "loading": "Cargando"
         },
         "deployed": "Implementado",
@@ -290,7 +290,7 @@
         "nativeLands": " Tierras indígenas:"
     },
     "stations": {
-        "addNew": "Añadir una nueva estación",
+        "addNew": "Agregar una nueva estación",
         "noStations": "No tienes ninguna estación. Descarga la aplicación FieldKit, inicia sesión y conéctate a tu estación para añadirla a tu cuenta."
     },
     "user": {
@@ -373,7 +373,7 @@
             "backButton": "Volver a iniciar sesión",
             "successTitle": "¡Éxito!",
             "failedTitle": "La contraseña no está restablecida",
-            "failedSubtitle": "Unfortunately we were unable to reset your password.",
+            "failedSubtitle": "Desafortunadamente no podemos restablecer tu contraseña.",
             "retry": {
                 "please": "Por favor",
                 "contactUs": "contáctanos",
@@ -384,7 +384,7 @@
     "recover": {
         "form": {
             "title": "Recuperar cuenta",
-            "subtitle": "Enter your email address below, and password reset instructions will be sent.",
+            "subtitle": "Introduce tu dirección de correo electrónico a continuación y se enviarán las instrucciones para restablecer la contraseña tuya.",
             "button": "Recuperar",
             "sentTitle": "Hemos enviado el correo de restablecimiento de contraseña",
             "sentSubtitle": "Visita tu bandeja de entrada para ver el correo electrónico con un enlace para restablecer tu contraseña.",
