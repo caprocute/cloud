@@ -245,7 +245,7 @@
             "title": "Últimas lecturas",
             "empty": "No hay ninguna estación en este proyecto.",
             "none": "No readings yet.",
-            "loading": "Loading"
+            "loading": "Cargando"
         },
         "deployed": "Implementado",
         "deployedOn": "Implementado en",
@@ -280,11 +280,11 @@
         "moduleNameUpdateSuccess": "El nombre del módulo ya está actualizado con éxito.",
         "photo": {
             "module": {
-                "alt": "Module Icon"
+                "alt": "Icono del módulo"
             },
-            "alt": "Station Image",
+            "alt": "Imagen de la estación",
             "default": {
-                "alt": "Default Station Image"
+                "alt": "Imagen por defecto de la estación"
             }
         },
         "nativeLands": " Tierras indígenas:"
@@ -605,8 +605,8 @@
             "placeholder": "¡Únete a la discusión!"
         },
         "monthRow": {
-            "entries": "Entries",
-            "lastUpdated": "Last updated:"
+            "entries": "Entradas",
+            "lastUpdated": "Última actualización:"
         }
     },
     "unauthorized": "No autorizado",
@@ -623,22 +623,22 @@
         },
         "alt": {
             "twitter": "Compartir en Twitter",
-            "facebook": "Share on Facebook"
+            "facebook": "Compartir en Facebook"
         },
         "twitterText": "¡Mira estos datos en FieldKit!"
     },
     "exportPanel": {
         "title": "Exportar",
         "previous": {
-            "heading": "Previous Exports",
-            "noItems": "No previous exports.",
+            "heading": "Exportaciones anteriores",
+            "noItems": "No hay exportaciones anteriores.",
             "download": "Descargar"
         },
-        "downloaded": "Downloaded"
+        "downloaded": "Descargado"
     },
     "followPanel": {
         "follow": "Seguir",
-        "follows": "Follows"
+        "follows": "Seguideras"
     },
     "linkToFloodnet": {
         "desktop": "Información del proyecto, metodología y fuentes de datos",
