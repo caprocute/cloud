@@ -683,8 +683,8 @@
             "share": "Compartir",
             "export": "Exportar"
         },
-        "noSensors": "Oh snap, this station doesn't appear to have any sensors to show you.",
-        "nothingSelected": "Nothing selected to visualize, please choose a station or project from the left.",
+        "noSensors": "Parece que esta estación no tiene ningún sensor para mostrarte.",
+        "nothingSelected": "Nada está seleccionado para visualizar, por favor elige una estación o proyecto de la izquierda.",
         "saveAs": "Guardar como",
         "chartTypes": {
             "timeSeries": "Serie cronológica",
