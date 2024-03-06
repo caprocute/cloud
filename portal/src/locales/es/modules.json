@@ -7,7 +7,7 @@
             "name": "Conductividad del Agua",
             "sensors": {
                 "ec": "Conductividad",
-                "tds": "TDS",
+                "tds": "SDT",
                 "salinity": "Salinidad"
             }
         },
@@ -20,7 +20,7 @@
         "water.do": {
             "name": "Oxígeno Disuelto en el Agua",
             "sensors": {
-                "do": "DO",
+                "do": "OD",
                 "temperature": "Temperatura",
                 "pressure": "Presión"
             }
@@ -28,7 +28,7 @@
         "water.dox": {
             "name": "Oxígeno Disuelto en el Agua",
             "sensors": {
-                "dox": "DO"
+                "dox": "OD"
             }
         },
         "water.temp": {
@@ -55,9 +55,9 @@
                 "temperature_2": "Temperatura 2",
                 "rain": "Lluvia",
                 "wind": "Viento",
-                "wind_mv": "Viento ADC Crudo",
-                "wind_speed": "Velocidad del Viento",
-                "wind_dir": "Dirección del Viento",
+                "wind_mv": "Viento ADC Raw",
+                "wind_speed": "Velocidad del viento",
+                "wind_dir": "Dirección del viento",
                 "wind_dir_mv": "Viento ADC Crudo Dirección",
                 "wind_hr_max_speed": "Velocidad Máx. del Viento (1 hora)",
                 "wind_hr_max_dir": "Dirección Máx. del Viento (1 hora)",
