@@ -280,7 +280,7 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 
 					if pm.ReceivedAt != nil {
 						for _, pr := range pm.Data {
-							if pr.Key == sensorSchema.Key {
+							if pr.Key == sensorSchema.Key && (pr.ModuleBay == nil || uint32(*pr.ModuleBay) == module.Position) {
 								sensor.ReadingValue = &pr.Value
 								sensor.ReadingTime = pm.ReceivedAt
 								parsedReading = pr
