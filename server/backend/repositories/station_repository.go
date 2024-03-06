@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
-	"gitlab.com/fieldkit/cloud/server/common/sqlxcache"
 	"github.com/iancoleman/strcase"
+	"gitlab.com/fieldkit/cloud/server/common/sqlxcache"
 
 	"github.com/jmoiron/sqlx"
 
@@ -214,6 +214,17 @@ func (r *StationRepository) QueryStationConfigurationByMetaID(ctx context.Contex
 		return nil, nil
 	}
 	return configurations[0], nil
+}
+
+func (r *StationRepository) QueryStationModulesByConfigurationID(ctx context.Context, configurationID int64) ([]*data.StationModule, error) {
+	modules := []*data.StationModule{}
+	if err := r.db.SelectContext(ctx, &modules, `
+		SELECT id, configuration_id, hardware_id, module_index, position, flags, manufacturer, kind, version, name
+		FROM fieldkit.station_module WHERE configuration_id = $1
+		`, configurationID); err != nil {
+		return nil, err
+	}
+	return modules, nil
 }
 
 func (r *StationRepository) QueryStationModulesByMetaID(ctx context.Context, metaRecordID int64) ([]*data.StationModule, error) {

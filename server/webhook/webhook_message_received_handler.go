@@ -82,8 +82,12 @@ func (h *WebHookMessageReceivedHandler) parseMessage(ctx context.Context, row *W
 				if saved, err := h.model.Save(ctx, parsed); err != nil {
 					return nil, fmt.Errorf("save-model-error: %w", err)
 				} else if parsed.ReceivedAt != nil {
+					if len(saved.Sensors) != len(parsed.Data) {
+						rowLog.Warnf("wh:saved != parsed")
+					}
+					for _, savedSensor := range saved.Sensors {
+						parsedSensor := savedSensor.parsed
 
-					for _, parsedSensor := range parsed.Data {
 						key := parsedSensor.Key
 						if key == "" {
 							return nil, fmt.Errorf("parsed-sensor has no sensor key")
@@ -95,7 +99,7 @@ func (h *WebHookMessageReceivedHandler) parseMessage(ctx context.Context, row *W
 							ir := &data.IncomingReading{
 								Time:      *parsed.ReceivedAt,
 								StationID: saved.Station.ID,
-								ModuleID:  saved.Module.ID,
+								ModuleID:  savedSensor.sensor.ModuleID,
 								SensorKey: sensorKey,
 								Value:     parsedSensor.Value,
 							}

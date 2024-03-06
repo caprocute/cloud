@@ -28,6 +28,7 @@ type MessageSchemaExtractor struct {
 type MessageSchemaModule struct {
 	Key     string                 `json:"key"`
 	Name    *string                `json:"name"`
+	Bay     *int                   `json:"bay"`
 	Sensors []*MessageSchemaSensor `json:"sensors"`
 }
 

@@ -234,7 +234,9 @@ func (i *SourceAggregator) processBatches(ctx context.Context, batch *MessageBat
 							}
 						}
 
-						for _, parsedSensor := range parsed.Data {
+						for _, savedSensor := range saved.Sensors {
+							parsedSensor := savedSensor.parsed
+
 							key := parsedSensor.Key
 							if key == "" {
 								return fmt.Errorf("parsed-sensor has no sensor key")
@@ -250,7 +252,7 @@ func (i *SourceAggregator) processBatches(ctx context.Context, batch *MessageBat
 
 								ask := handlers.AggregateSensorKey{
 									SensorKey: sensorKey,
-									ModuleID:  saved.Module.ID,
+									ModuleID:  savedSensor.sensor.ModuleID,
 								}
 
 								if i.legacy {
@@ -261,7 +263,7 @@ func (i *SourceAggregator) processBatches(ctx context.Context, batch *MessageBat
 
 								ir := &data.IncomingReading{
 									StationID: saved.Station.ID,
-									ModuleID:  saved.Module.ID,
+									ModuleID:  savedSensor.sensor.ModuleID,
 									SensorID:  sensorID,
 									SensorKey: sensorKey,
 									Time:      *parsed.ReceivedAt,

@@ -18,6 +18,7 @@ import (
 type ParsedReading struct {
 	Key             string  `json:"key"`
 	ModuleKeyPrefix string  `json:"module_key_prefix"`
+	ModuleBay       *int    `json:"module_bay"`
 	FullSensorKey   string  `json:"full_sensor_key"`
 	Value           float64 `json:"value"`
 	Battery         bool    `json:"battery"`
@@ -388,6 +389,7 @@ func (m *WebHookMessage) tryParse(ctx context.Context, cache *JqCache, schemaReg
 							reading := &ParsedReading{
 								Key:             sensor.Key,
 								ModuleKeyPrefix: moduleKeyPrefix,
+								ModuleBay:       module.Bay,
 								FullSensorKey:   fullSensorKey,
 								Battery:         sensor.Battery,
 								Transient:       sensor.Transient,
