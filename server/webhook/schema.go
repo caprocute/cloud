@@ -61,6 +61,15 @@ type MessageSchemaStation struct {
 	Attributes           []*MessageSchemaAttribute `json:"attributes"`
 }
 
+func (mss *MessageSchemaStation) AllModulesHaveBays() bool {
+	for _, m := range mss.Modules {
+		if m.Bay == nil {
+			return false
+		}
+	}
+	return true
+}
+
 type MessageSchema struct {
 	Station  *MessageSchemaStation   `json:"station"` // Deprecated
 	Stations []*MessageSchemaStation `json:"stations"`

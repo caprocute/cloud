@@ -46,6 +46,10 @@ type ParsedMessage struct {
 	Attributes map[string]*ParsedAttribute
 }
 
+func (pm *ParsedMessage) AllModulesHaveBays() bool {
+	return pm.Schema.AllModulesHaveBays()
+}
+
 func toFloatArray(x interface{}) ([]float64, bool) {
 	if arrayValue, ok := x.([]interface{}); ok {
 		values := make([]float64, 0)

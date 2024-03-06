@@ -45,13 +45,21 @@ func (h *WebHookMessageReceivedHandler) Handle(ctx context.Context, m *WebHookMe
 		return err
 	}
 
+	log := Logger(ctx).Sugar().With("schema_id", m.SchemaID).With("message_id", m.MessageID)
+
 	for _, row := range h.batch.Messages {
 		if incoming, err := h.parseMessage(ctx, row); err != nil {
 			return err
 		} else {
-			if h.tsConfig != nil {
-				if err := h.saveMessages(ctx, incoming); err != nil {
-					return err
+			if len(incoming) == 0 {
+				log.Infow("wh:no-incoming")
+			} else {
+				if h.tsConfig != nil {
+					if err := h.saveMessages(ctx, incoming); err != nil {
+						return err
+					}
+				} else {
+					log.Infow("wh:no-ts-config")
 				}
 			}
 		}

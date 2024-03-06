@@ -112,6 +112,113 @@ func (m *ModelAdapter) findStationModule(ctx context.Context, pm *ParsedMessage,
 	return nil, nil
 }
 
+func (m *ModelAdapter) findStation(ctx context.Context, pm *ParsedMessage) (*data.Station, *data.Provision, *data.StationConfiguration, error) {
+	log := Logger(ctx).Sugar()
+
+	// Add or create station model, we use this during creation and updating.
+	model, err := m.sr.FindOrCreateStationModel(ctx, pm.SchemaID, pm.Schema.Model)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+
+	updating, err := m.sr.QueryStationByArbitraryDeviceID(ctx, pm.DeviceID)
+	if err != nil {
+		if err != sql.ErrNoRows {
+			return nil, nil, nil, fmt.Errorf("querying station: %w", err)
+		}
+	}
+
+	if updating == nil {
+		log.Infow("wh:station-missing", "device_id", pm.DeviceID)
+	} else {
+		log.Infow("wh:station", "message_device_id", pm.DeviceID, "device_id", updating.DeviceID)
+	}
+
+	// Add or create the station.
+	station := updating
+
+	// Add or create the station configuration..
+	if pm.AllModulesHaveBays() {
+		if station == nil {
+			return nil, nil, nil, fmt.Errorf("wh:module-bay-station-missing")
+		}
+
+		configuration, provision, err := m.sr.QueryVisibleConfiguration(ctx, station.ID)
+		if err != nil {
+			return nil, nil, nil, err
+		}
+
+		log.Infow("wh:station", "configuration_id", configuration.ID, "provision_id", provision.ID)
+
+		return station, provision, configuration, nil
+	} else {
+		if updating == nil {
+			deviceName := string(pm.DeviceID)
+
+			if pm.DeviceName != nil && *pm.DeviceName != "" {
+				deviceName = *pm.DeviceName
+			}
+
+			if pm.DeviceName == nil {
+				return nil, nil, nil, fmt.Errorf("no-device-name")
+			}
+
+			updating = &data.Station{
+				DeviceID:  pm.DeviceID,
+				Name:      deviceName,
+				OwnerID:   pm.OwnerID,
+				ModelID:   model.ID,
+				CreatedAt: time.Now(),
+				UpdatedAt: time.Now(),
+			}
+
+			added, err := m.sr.AddStation(ctx, updating)
+			if err != nil {
+				return nil, nil, nil, err
+			}
+
+			if pm.ProjectID != nil {
+				pr := repositories.NewProjectRepository(m.db)
+
+				if err := pr.AddStationToProjectByID(ctx, *pm.ProjectID, added.ID); err != nil {
+					return nil, nil, nil, err
+				}
+			}
+
+			station = added
+		} else {
+			station.ModelID = model.ID
+			if pm.DeviceName != nil && *pm.DeviceName != "" {
+				station.Name = *pm.DeviceName
+			}
+		}
+
+		// Add or create the provision.
+		defaultGenerationID := pm.DeviceID
+		provision, err := m.pr.QueryOrCreateProvision(ctx, pm.DeviceID, defaultGenerationID)
+		if err != nil {
+			return nil, nil, nil, err
+		}
+
+		sourceID := WebHookSourceID
+		configuration, err := m.sr.UpsertConfiguration(ctx,
+			&data.StationConfiguration{
+				ProvisionID: provision.ID,
+				SourceID:    &sourceID,
+				UpdatedAt:   time.Now(),
+			})
+		if err != nil {
+			return nil, nil, nil, err
+		}
+
+		if err := m.sr.UpsertVisibleConfiguration(ctx, station.ID, configuration.ID); err != nil {
+			return nil, nil, nil, err
+		}
+
+		return station, provision, configuration, nil
+	}
+}
+
 func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookStation, error) {
 	log := Logger(ctx).Sugar()
 
@@ -127,64 +234,9 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 		return cached.station, nil
 	}
 
-	// Add or create station model, we use this during creation and updating.
-	model, err := m.sr.FindOrCreateStationModel(ctx, pm.SchemaID, pm.Schema.Model)
+	station, provision, configuration, err := m.findStation(ctx, pm)
 	if err != nil {
 		return nil, err
-	}
-
-	updating, err := m.sr.QueryStationByArbitraryDeviceID(ctx, pm.DeviceID)
-	if err != nil {
-		if err != sql.ErrNoRows {
-			return nil, fmt.Errorf("querying station: %w", err)
-		}
-	}
-
-	if updating == nil {
-		log.Infow("station-missing", "device_id", pm.DeviceID)
-	}
-
-	// Add or create the station.
-	station := updating
-	if updating == nil {
-		deviceName := string(pm.DeviceID)
-
-		if pm.DeviceName != nil && *pm.DeviceName != "" {
-			deviceName = *pm.DeviceName
-		}
-
-		if pm.DeviceName == nil {
-			return nil, fmt.Errorf("no-device-name")
-		}
-
-		updating = &data.Station{
-			DeviceID:  pm.DeviceID,
-			Name:      deviceName,
-			OwnerID:   pm.OwnerID,
-			ModelID:   model.ID,
-			CreatedAt: time.Now(),
-			UpdatedAt: time.Now(),
-		}
-
-		added, err := m.sr.AddStation(ctx, updating)
-		if err != nil {
-			return nil, err
-		}
-
-		if pm.ProjectID != nil {
-			pr := repositories.NewProjectRepository(m.db)
-
-			if err := pr.AddStationToProjectByID(ctx, *pm.ProjectID, added.ID); err != nil {
-				return nil, err
-			}
-		}
-
-		station = added
-	} else {
-		station.ModelID = model.ID
-		if pm.DeviceName != nil && *pm.DeviceName != "" {
-			station.Name = *pm.DeviceName
-		}
 	}
 
 	attributesRepository := repositories.NewAttributesRepository(m.db)
@@ -200,29 +252,6 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 			return nil, fmt.Errorf("duplicate attribute: %v", attribute.Name)
 		}
 		attributes[attribute.Name] = attribute
-	}
-
-	// Add or create the provision.
-	defaultGenerationID := pm.DeviceID
-	provision, err := m.pr.QueryOrCreateProvision(ctx, pm.DeviceID, defaultGenerationID)
-	if err != nil {
-		return nil, err
-	}
-
-	// Add or create the station configuration..
-	sourceID := WebHookSourceID
-	configuration, err := m.sr.UpsertConfiguration(ctx,
-		&data.StationConfiguration{
-			ProvisionID: provision.ID,
-			SourceID:    &sourceID,
-			UpdatedAt:   time.Now(),
-		})
-	if err != nil {
-		return nil, err
-	}
-
-	if err := m.sr.UpsertVisibleConfiguration(ctx, station.ID, configuration.ID); err != nil {
-		return nil, err
 	}
 
 	sensors := make([]*WebHookSavedSensor, 0)
@@ -303,6 +332,7 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 			}
 		} else {
 			log.Infow("wh:no-module", "station_id", station.ID)
+			return nil, fmt.Errorf("no:wh-module")
 		}
 	}
 
