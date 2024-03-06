@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
-	"gitlab.com/fieldkit/cloud/server/common/sqlxcache"
 	"github.com/iancoleman/strcase"
+	"gitlab.com/fieldkit/cloud/server/common/sqlxcache"
 
 	"github.com/jmoiron/sqlx"
 
@@ -214,6 +214,17 @@ func (r *StationRepository) QueryStationConfigurationByMetaID(ctx context.Contex
 		return nil, nil
 	}
 	return configurations[0], nil
+}
+
+func (r *StationRepository) QueryStationModulesByConfigurationID(ctx context.Context, configurationID int64) ([]*data.StationModule, error) {
+	modules := []*data.StationModule{}
+	if err := r.db.SelectContext(ctx, &modules, `
+		SELECT id, configuration_id, hardware_id, module_index, position, flags, manufacturer, kind, version, name
+		FROM fieldkit.station_module WHERE configuration_id = $1
+		`, configurationID); err != nil {
+		return nil, err
+	}
+	return modules, nil
 }
 
 func (r *StationRepository) QueryStationModulesByMetaID(ctx context.Context, metaRecordID int64) ([]*data.StationModule, error) {
@@ -474,6 +485,35 @@ func (r *StationRepository) updateStationConfigurationFromStatus(ctx context.Con
 	}
 
 	return nil
+}
+
+func (r *StationRepository) QueryVisibleConfiguration(ctx context.Context, stationID int32) (*data.StationConfiguration, *data.Provision, error) {
+	configurations := make([]*data.StationConfiguration, 0)
+	if err := r.db.SelectContext(ctx, &configurations, `
+		SELECT id, provision_id, meta_record_id, source_id, updated_at FROM fieldkit.station_configuration
+		WHERE (id IN (SELECT configuration_id FROM fieldkit.visible_configuration WHERE station_id = $1))
+		`, stationID); err != nil {
+		return nil, nil, err
+	}
+
+	if len(configurations) != 1 {
+		return nil, nil, fmt.Errorf("no visible configuration for station")
+	}
+
+	configuration := configurations[0]
+
+	provisions := []*data.Provision{}
+	if err := r.db.SelectContext(ctx, &provisions, `
+		SELECT id, created, updated, generation, device_id FROM fieldkit.provision WHERE id = $1
+		`, configuration.ProvisionID); err != nil {
+		return nil, nil, err
+	}
+
+	if len(provisions) != 1 {
+		return nil, nil, fmt.Errorf("no provision for visible configuration")
+	}
+
+	return configuration, provisions[0], nil
 }
 
 func (r *StationRepository) UpsertVisibleConfiguration(ctx context.Context, stationID int32, configurationID int64) error {

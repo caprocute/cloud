@@ -125,7 +125,7 @@ func (mf *MetaFactory) Add(ctx context.Context, databaseRecord *data.MetaRecord,
 			if err != nil {
 				return nil, err
 			}
-			if extraModule == nil || extraSensor == nil {
+			if extraSensor == nil {
 				log.Warnw("meta:missing-sensor", "sensor_name", sensor.Name, "module_key", extraModule.Key, "header", hf)
 				return nil, &MissingSensorMetaError{MetaRecordID: databaseRecord.ID}
 			}
