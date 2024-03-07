@@ -1044,8 +1044,6 @@ func transformStationFull(signer *Signer, p Permissions, sf *data.StationFull, p
 		}
 	}
 
-	dataSummary := transformDataSummary(sf.DataSummary)
-
 	location := transformLocation(sf, preciseLocation)
 
 	var recordingStartedAt *int64
@@ -1111,7 +1109,7 @@ func transformStationFull(signer *Signer, p Permissions, sf *data.StationFull, p
 		PlaceNameOther:     sf.Station.PlaceOther,
 		PlaceNameNative:    sf.Station.PlaceNative,
 		Location:           location,
-		Data:               dataSummary,
+		Data:               nil,
 		Hidden:             sf.Station.Hidden,
 		Description:        sf.Station.Description,
 		Status:             sf.Station.Status,
@@ -1142,20 +1140,6 @@ func optionalTime(t *time.Time) *int64 {
 	}
 	value := t.Unix() * 1000
 	return &value
-}
-
-func transformDataSummary(ads *data.AggregatedDataSummary) *station.StationDataSummary {
-	if ads == nil {
-		return nil
-	}
-	if ads.Start == nil || ads.End == nil || ads.NumberSamples == nil {
-		return nil
-	}
-	return &station.StationDataSummary{
-		Start:           (*ads.Start).Unix() * 1000,
-		End:             (*ads.End).Unix() * 1000,
-		NumberOfSamples: *ads.NumberSamples,
-	}
 }
 
 func transformAllStationFull(signer *Signer, p Permissions, sfs []*data.StationFull, preciseLocation bool, transformAllConfigurations bool, moduleMeta *repositories.AllModuleMeta, filtering bool) ([]*station.StationFull, error) {

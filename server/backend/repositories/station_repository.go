@@ -706,17 +706,6 @@ func (r *StationRepository) QueryStationFull(ctx context.Context, id int32) (*da
 		return nil, err
 	}
 
-	dataSummaries := []*data.AggregatedDataSummary{}
-	if err := r.db.SelectContext(ctx, &dataSummaries, `
-		SELECT
-			a.station_id, MIN(a.time) AS start, MAX(a.time) AS end, SUM(a.nsamples) AS number_samples
-		FROM fieldkit.aggregated_24h AS a
-		WHERE station_id IN ($1)
-		GROUP BY a.station_id
-	`, stations[0].ID); err != nil {
-		return nil, err
-	}
-
 	media := []*data.FieldNoteMedia{}
 	if err := r.db.SelectContext(ctx, &media, `
 		SELECT id, user_id, content_type, created_at, url, key, station_id
@@ -789,7 +778,7 @@ func (r *StationRepository) QueryStationFull(ctx context.Context, id int32) (*da
 		return nil, err
 	}
 
-	all, err := r.toStationFull(stations, models, owners, iness, attributes, areas, dataSummaries, media, ingestions, provisions, configurations, modules, sensors, projectStations)
+	all, err := r.toStationFull(stations, models, owners, iness, attributes, areas, media, ingestions, provisions, configurations, modules, sensors, projectStations)
 	if err != nil {
 		return nil, err
 	}
@@ -857,17 +846,6 @@ func (r *StationRepository) QueryStationFullByOwnerID(ctx context.Context, id in
 		WHERE s.owner_id = $1
 		  AND s.location IS NOT NULL
 		`, id); err != nil {
-		return nil, err
-	}
-
-	dataSummaries := []*data.AggregatedDataSummary{}
-	if err := r.db.SelectContext(ctx, &dataSummaries, `
-		SELECT
-			a.station_id, MIN(a.time) AS start, MAX(a.time) AS end, SUM(a.nsamples) AS number_samples
-		FROM fieldkit.aggregated_24h AS a
-		WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)
-		GROUP BY a.station_id
-	`, id); err != nil {
 		return nil, err
 	}
 
@@ -961,7 +939,7 @@ func (r *StationRepository) QueryStationFullByOwnerID(ctx context.Context, id in
 		return nil, err
 	}
 
-	return r.toStationFull(stations, models, owners, iness, attributes, areas, dataSummaries, media, ingestions, provisions, configurations, modules, sensors, projectStations)
+	return r.toStationFull(stations, models, owners, iness, attributes, areas, media, ingestions, provisions, configurations, modules, sensors, projectStations)
 }
 
 func (r *StationRepository) QueryStationFullByProjectID(ctx context.Context, id int32) ([]*data.StationFull, error) {
@@ -1027,17 +1005,6 @@ func (r *StationRepository) QueryStationFullByProjectID(ctx context.Context, id 
 		WHERE s.id IN (SELECT station_id FROM fieldkit.project_station WHERE project_id = $1)
 		  AND s.location IS NOT NULL
 		`, id); err != nil {
-		return nil, err
-	}
-
-	dataSummaries := []*data.AggregatedDataSummary{}
-	if err := r.db.SelectContext(ctx, &dataSummaries, `
-		SELECT
-			a.station_id, MIN(a.time) AS start, MAX(a.time) AS end, SUM(a.nsamples) AS number_samples
-		FROM fieldkit.aggregated_24h AS a
-		WHERE station_id IN (SELECT station_id FROM fieldkit.project_station WHERE project_id = $1)
-		GROUP BY a.station_id
-	`, id); err != nil {
 		return nil, err
 	}
 
@@ -1148,14 +1115,13 @@ func (r *StationRepository) QueryStationFullByProjectID(ctx context.Context, id 
 		return nil, err
 	}
 
-	return r.toStationFull(stations, models, owners, iness, attributes, areas, dataSummaries, media, ingestions, provisions, configurations, modules, sensors, projectStations)
+	return r.toStationFull(stations, models, owners, iness, attributes, areas, media, ingestions, provisions, configurations, modules, sensors, projectStations)
 }
 
 func (r *StationRepository) toStationFull(stations []*data.Station,
 	models []*data.StationModel, owners []*data.User,
 	iness []*data.StationInterestingness,
 	attributes []*data.StationProjectNamedAttribute, areas []*data.StationArea,
-	dataSummaries []*data.AggregatedDataSummary,
 	media []*data.FieldNoteMedia, ingestions []*data.Ingestion, provisions []*data.Provision,
 	configurations []*data.StationConfiguration,
 	modules []*data.StationModule, sensors []*data.ModuleSensor,
@@ -1165,7 +1131,6 @@ func (r *StationRepository) toStationFull(stations []*data.Station,
 	ownersByID := make(map[int32]*data.User)
 	inessByID := make(map[int32][]*data.StationInterestingness)
 	ingestionsByDeviceID := make(map[string][]*data.Ingestion)
-	summariesByStationID := make(map[int32]*data.AggregatedDataSummary)
 	mediaByStationID := make(map[int32][]*data.FieldNoteMedia)
 	modulesByStationID := make(map[int32][]*data.StationModule)
 	sensorsByStationID := make(map[int32][]*data.ModuleSensor)
@@ -1205,10 +1170,6 @@ func (r *StationRepository) toStationFull(stations []*data.Station,
 
 	for _, v := range areas {
 		areasByStationID[v.ID] = append(areasByStationID[v.ID], v)
-	}
-
-	for _, v := range dataSummaries {
-		summariesByStationID[v.StationID] = v
 	}
 
 	for _, v := range media {
@@ -1270,7 +1231,6 @@ func (r *StationRepository) toStationFull(stations []*data.Station,
 			Configurations:  configurationsByStationID[station.ID],
 			Modules:         modulesByStationID[station.ID],
 			Sensors:         sensorsByStationID[station.ID],
-			DataSummary:     summariesByStationID[station.ID],
 			HasImages:       len(mediaByStationID[station.ID]) > 0,
 			ProjectIDs:      projectsByStationID[station.ID],
 		})
@@ -1396,14 +1356,6 @@ func (sr *StationRepository) Search(ctx context.Context, query string) (*Queried
 
 func (sr *StationRepository) Delete(ctx context.Context, stationID int32) error {
 	queries := []string{
-		`DELETE FROM fieldkit.aggregated_24h WHERE station_id IN ($1)`,
-		`DELETE FROM fieldkit.aggregated_12h WHERE station_id IN ($1)`,
-		`DELETE FROM fieldkit.aggregated_6h WHERE station_id IN ($1)`,
-		`DELETE FROM fieldkit.aggregated_1h WHERE station_id IN ($1)`,
-		`DELETE FROM fieldkit.aggregated_30m WHERE station_id IN ($1)`,
-		`DELETE FROM fieldkit.aggregated_10m WHERE station_id IN ($1)`,
-		`DELETE FROM fieldkit.aggregated_1m WHERE station_id IN ($1)`,
-		`DELETE FROM fieldkit.aggregated_10s WHERE station_id IN ($1)`,
 		`DELETE FROM fieldkit.visible_configuration WHERE station_id IN ($1)`,
 		`DELETE FROM fieldkit.notes_media WHERE station_id IN ($1)`,
 		`DELETE FROM fieldkit.notes WHERE station_id IN ($1)`,
