@@ -14,10 +14,6 @@ import (
 	"gitlab.com/fieldkit/cloud/server/tests"
 )
 
-func stringRef(s string) *string {
-	return &s
-}
-
 func TestCreateStationNotes(t *testing.T) {
 	assert := assert.New(t)
 	e, err := tests.NewTestEnv()
@@ -29,12 +25,12 @@ func TestCreateStationNotes(t *testing.T) {
 	api, err := NewTestableApi(e)
 	assert.NoError(err)
 
-	payload := fmt.Sprintf(`{
+	payload := `{
 		"notes": {
 			"notes": [],
 			"creating": [{ "key": "key-1", "body": "Hello, world!" }]
 		}
-	}`)
+	}`
 
 	req, _ := http.NewRequest("PATCH", fmt.Sprintf("/stations/%d/notes", fd.Stations[0].ID), bytes.NewReader([]byte(payload)))
 	req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(fd.Owner))
@@ -73,12 +69,12 @@ func TestUpdateStationNotes(t *testing.T) {
 	api, err := NewTestableApi(e)
 	assert.NoError(err)
 
-	creating := fmt.Sprintf(`{
+	creating := `{
 		"notes": {
 			"creating": [{ "key": "key-1", "body": "Carla" }],
 			"notes": []
 		}
-	}`)
+	}`
 
 	creatingReq, _ := http.NewRequest("PATCH", fmt.Sprintf("/stations/%d/notes", fd.Stations[0].ID), bytes.NewReader([]byte(creating)))
 	creatingReq.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(fd.Owner))

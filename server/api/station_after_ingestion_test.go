@@ -47,7 +47,7 @@ func TestQueryStationWithConfigurations(t *testing.T) {
 
 	req, _ := http.NewRequest("POST", "/user/stations", bytes.NewReader(payload))
 	req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(user))
-	rr := tests.ExecuteRequest(req, api)
+	tests.ExecuteRequest(req, api)
 
 	files, err := e.NewFilePair(4, 16)
 	assert.NoError(err)
@@ -88,7 +88,7 @@ func TestQueryStationWithConfigurations(t *testing.T) {
 
 	req, _ = http.NewRequest("GET", "/user/stations", nil)
 	req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(user))
-	rr = tests.ExecuteRequest(req, api)
+	rr := tests.ExecuteRequest(req, api)
 
 	assert.Equal(http.StatusOK, rr.Code)
 

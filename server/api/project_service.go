@@ -64,6 +64,9 @@ func (c *ProjectService) Add(ctx context.Context, payload *project.AddPayload) (
 	}
 
 	jsonBounds, err := json.Marshal(payload.Project.Bounds)
+	if err != nil {
+		return nil, err
+	}
 	jsonTextBounds := types.JSONText(jsonBounds)
 
 	newProject := &data.Project{
@@ -132,6 +135,9 @@ func (c *ProjectService) Update(ctx context.Context, payload *project.UpdatePayl
 	}
 
 	jsonBounds, err := json.Marshal(payload.Project.Bounds)
+	if err != nil {
+		return nil, err
+	}
 	jsonTextBounds := types.JSONText(jsonBounds)
 
 	updating := &data.Project{

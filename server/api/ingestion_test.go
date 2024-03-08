@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"net/http"
 	"testing"
 
@@ -21,7 +20,7 @@ func TestProcessPending(t *testing.T) {
 	api, err := NewTestableApi(e)
 	assert.NoError(err)
 
-	req, _ := http.NewRequest("POST", fmt.Sprintf("/data/process"), nil)
+	req, _ := http.NewRequest("POST", "/data/process", nil)
 	req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(user))
 	rr := tests.ExecuteRequest(req, api)
 

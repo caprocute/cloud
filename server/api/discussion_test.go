@@ -63,7 +63,7 @@ func TestDiscussionPostFirstProjectDiscussion(t *testing.T) {
 	)
 	assert.NoError(err)
 
-	reqPost, _ := http.NewRequest("POST", fmt.Sprintf("/discussion"), bytes.NewReader(payload))
+	reqPost, _ := http.NewRequest("POST", "/discussion", bytes.NewReader(payload))
 	reqPost.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(fd.Owner))
 	rrPost := tests.ExecuteRequest(reqPost, api)
 
@@ -131,7 +131,7 @@ func TestDiscussionPostProjectDiscussionReply(t *testing.T) {
 	)
 	assert.NoError(err)
 
-	reqFirst, _ := http.NewRequest("POST", fmt.Sprintf("/discussion"), bytes.NewReader(firstPayload))
+	reqFirst, _ := http.NewRequest("POST", "/discussion", bytes.NewReader(firstPayload))
 	reqFirst.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(fd.Owner))
 	rrFirst := tests.ExecuteRequest(reqFirst, api)
 	assert.Equal(http.StatusOK, rrFirst.Code)
@@ -152,7 +152,7 @@ func TestDiscussionPostProjectDiscussionReply(t *testing.T) {
 	)
 	assert.NoError(err)
 
-	reqReply, _ := http.NewRequest("POST", fmt.Sprintf("/discussion"), bytes.NewReader(replyPayload))
+	reqReply, _ := http.NewRequest("POST", "/discussion", bytes.NewReader(replyPayload))
 	reqReply.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(fd.Owner))
 	rrReply := tests.ExecuteRequest(reqReply, api)
 	assert.Equal(http.StatusOK, rrReply.Code)
@@ -214,7 +214,7 @@ func TestDiscussionUpdateMyPost(t *testing.T) {
 	)
 	assert.NoError(err)
 
-	reqPost, _ := http.NewRequest("POST", fmt.Sprintf("/discussion"), bytes.NewReader(payload1))
+	reqPost, _ := http.NewRequest("POST", "/discussion", bytes.NewReader(payload1))
 	reqPost.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(fd.Owner))
 	rrPost := tests.ExecuteRequest(reqPost, api)
 	assert.Equal(http.StatusOK, rrPost.Code)
@@ -293,7 +293,7 @@ func TestDiscussionUpdateStrangersPost(t *testing.T) {
 	)
 	assert.NoError(err)
 
-	reqPost, _ := http.NewRequest("POST", fmt.Sprintf("/discussion"), bytes.NewReader(payload1))
+	reqPost, _ := http.NewRequest("POST", "/discussion", bytes.NewReader(payload1))
 	reqPost.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(stranger))
 	rrPost := tests.ExecuteRequest(reqPost, api)
 	assert.Equal(http.StatusOK, rrPost.Code)
@@ -354,7 +354,7 @@ func TestDiscussionDeleteMyPost(t *testing.T) {
 	)
 	assert.NoError(err)
 
-	reqPost, _ := http.NewRequest("POST", fmt.Sprintf("/discussion"), bytes.NewReader(payload1))
+	reqPost, _ := http.NewRequest("POST", "/discussion", bytes.NewReader(payload1))
 	reqPost.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(fd.Owner))
 	rrPost := tests.ExecuteRequest(reqPost, api)
 	assert.Equal(http.StatusOK, rrPost.Code)
@@ -409,7 +409,7 @@ func TestDiscussionAdministratorDeleteStrangersPost(t *testing.T) {
 	)
 	assert.NoError(err)
 
-	reqPost, _ := http.NewRequest("POST", fmt.Sprintf("/discussion"), bytes.NewReader(payload1))
+	reqPost, _ := http.NewRequest("POST", "/discussion", bytes.NewReader(payload1))
 	reqPost.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(stranger))
 	rrPost := tests.ExecuteRequest(reqPost, api)
 	assert.Equal(http.StatusOK, rrPost.Code)
@@ -467,7 +467,7 @@ func TestDiscussionDeleteStrangersPost(t *testing.T) {
 	)
 	assert.NoError(err)
 
-	reqPost, _ := http.NewRequest("POST", fmt.Sprintf("/discussion"), bytes.NewReader(payload1))
+	reqPost, _ := http.NewRequest("POST", "/discussion", bytes.NewReader(payload1))
 	reqPost.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(stranger))
 	rrPost := tests.ExecuteRequest(reqPost, api)
 	assert.Equal(http.StatusOK, rrPost.Code)
@@ -522,7 +522,7 @@ func TestDiscussionDeleteMyPostWithReply(t *testing.T) {
 	)
 	assert.NoError(err)
 
-	req1, _ := http.NewRequest("POST", fmt.Sprintf("/discussion"), bytes.NewReader(payload1))
+	req1, _ := http.NewRequest("POST", "/discussion", bytes.NewReader(payload1))
 	req1.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(fd.Owner))
 	rr1 := tests.ExecuteRequest(req1, api)
 	assert.Equal(http.StatusOK, rr1.Code)
@@ -541,7 +541,7 @@ func TestDiscussionDeleteMyPostWithReply(t *testing.T) {
 	)
 	assert.NoError(err)
 
-	req2, _ := http.NewRequest("POST", fmt.Sprintf("/discussion"), bytes.NewReader(payload2))
+	req2, _ := http.NewRequest("POST", "/discussion", bytes.NewReader(payload2))
 	req2.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(stranger))
 	rr2 := tests.ExecuteRequest(req2, api)
 	assert.Equal(http.StatusOK, rr2.Code)
@@ -596,7 +596,7 @@ func TestDiscussionPostFirstContextDiscussionLegacyBookmark(t *testing.T) {
 	)
 	assert.NoError(err)
 
-	reqPost, _ := http.NewRequest("POST", fmt.Sprintf("/discussion"), bytes.NewReader(payload))
+	reqPost, _ := http.NewRequest("POST", "/discussion", bytes.NewReader(payload))
 	reqPost.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(fd.Owner))
 	rrPost := tests.ExecuteRequest(reqPost, api)
 
@@ -666,7 +666,7 @@ func TestDiscussionPostFirstContextDiscussion(t *testing.T) {
 	)
 	assert.NoError(err)
 
-	reqPost, _ := http.NewRequest("POST", fmt.Sprintf("/discussion"), bytes.NewReader(payload))
+	reqPost, _ := http.NewRequest("POST", "/discussion", bytes.NewReader(payload))
 	reqPost.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(fd.Owner))
 	rrPost := tests.ExecuteRequest(reqPost, api)
 

@@ -111,7 +111,7 @@ func NewOidcService(ctx context.Context, options *ControllerOptions) *OidcServic
 		for {
 			auth, err := NewOidcAuth(ctx, s.options, s.config)
 			if err != nil {
-				if time.Now().Sub(started) < time.Duration(1)*time.Minute {
+				if time.Since(started) < time.Duration(1)*time.Minute {
 					log.Warnw("oidc", "error", err)
 				} else {
 					log.Errorw("oidc", "error", err)

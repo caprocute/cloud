@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"time"
 
-	"gitlab.com/fieldkit/cloud/server/common/sqlxcache"
 	"github.com/jmoiron/sqlx/types"
+	"gitlab.com/fieldkit/cloud/server/common/sqlxcache"
 
 	"goa.design/goa/v3/security"
 
@@ -99,11 +99,6 @@ func (c *EventsService) DataEventsEndpoint(ctx context.Context, payload *eventsS
 	}, nil
 }
 
-func jsTimeToTime(value int64) *time.Time {
-	t := time.Unix(value/1000, 0)
-	return &t
-}
-
 func (c *EventsService) AddDataEvent(ctx context.Context, payload *eventsService.AddDataEventPayload) (*eventsService.AddDataEventResult, error) {
 	p, err := NewPermissions(ctx, c.options).Unwrap()
 	if err != nil {
@@ -145,7 +140,7 @@ func (c *EventsService) AddDataEvent(ctx context.Context, payload *eventsService
 			stationIDs = append(stationIDs, int64(id))
 		}
 
-		if payload.Event.AllProjectSensors == true {
+		if payload.Event.AllProjectSensors {
 			sr := repositories.NewStationRepository(c.db)
 
 			uniqueProjectIDS := make(map[int32]int32)

@@ -95,7 +95,7 @@ func (a *Int64Range) ToIntArray() []int {
 
 func (a *Int64Range) parseString(s string) error {
 	if s[0] != '[' || s[len(s)-1] != ')' {
-		return fmt.Errorf("Unexpected range boundaries. I was lazy.")
+		return fmt.Errorf("unexpected range boundaries, laziness")
 	}
 
 	values := s[1 : len(s)-1]

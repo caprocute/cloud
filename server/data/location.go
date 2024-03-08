@@ -3,13 +3,12 @@ package data
 import (
 	"database/sql/driver"
 	"encoding/json"
-	"errors"
 
-	"github.com/paulmach/go.geo"
+	geo "github.com/paulmach/go.geo"
 )
 
 var (
-	invalidLocationError = errors.New("invalid location")
+// errInvalidLocation = errors.New("invalid location")
 )
 
 type Location struct {

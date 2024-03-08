@@ -241,7 +241,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta(ctx context.Context) (mm *AllM
 
 func toUint32Array(a []int32) []uint32 {
 	u := make([]uint32, len(a))
-	for i, _ := range a {
+	for i := range a {
 		u[i] = uint32(a[i])
 	}
 	return u

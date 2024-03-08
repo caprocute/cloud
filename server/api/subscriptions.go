@@ -52,7 +52,7 @@ func (s *Subscriptions) Add(ctx context.Context, userID int32, listener *Listene
 	return nil
 }
 
-func (s *Subscriptions) getListeners(ctx context.Context, userID int32) ([]*Listener, error) {
+func (s *Subscriptions) getListeners(_ context.Context, userID int32) ([]*Listener, error) {
 	s.lock.RLock()
 	if listeners, ok := s.listeners[userID]; ok {
 		copied := make([]*Listener, len(listeners))

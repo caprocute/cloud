@@ -114,7 +114,7 @@ func (tsdb *TimeScaleDBBackend) queryIDs(ctx context.Context, qp *backend.QueryP
 	return ids, nil
 }
 
-func (tsdb *TimeScaleDBBackend) scanRows(ctx context.Context, pgRows pgx.Rows) ([]*DataRow, error) {
+func (tsdb *TimeScaleDBBackend) scanRows(_ context.Context, pgRows pgx.Rows) ([]*DataRow, error) {
 	dataRows := make([]*DataRow, 0)
 
 	for pgRows.Next() {
@@ -297,7 +297,7 @@ func (tsdb *TimeScaleDBBackend) getDataQuery(ctx context.Context, qp *backend.Qu
 	return sql, args, aggregate, nil
 }
 
-func (tsdb *TimeScaleDBBackend) createEmpty(ctx context.Context, qp *backend.QueryParams) (*QueriedData, error) {
+func (tsdb *TimeScaleDBBackend) createEmpty(_ context.Context, _ *backend.QueryParams) (*QueriedData, error) {
 	queriedData := &QueriedData{
 		Data:          make([]*backend.DataRow, 0),
 		BucketSize:    0,
@@ -738,7 +738,7 @@ func (tsdb *TimeScaleDBBackend) QueryTail(ctx context.Context, stationIDs []int3
 	}, nil
 }
 
-func (tsdb *TimeScaleDBBackend) rebucketeQuery(ctx context.Context, conn *pgx.Conn, qp *backend.QueryParams, ids *backend.SensorDatabaseIDs, source *SelectedAggregate, duration time.Duration) (string, []interface{}, error) {
+func (tsdb *TimeScaleDBBackend) rebucketeQuery(_ context.Context, _ *pgx.Conn, qp *backend.QueryParams, ids *backend.SensorDatabaseIDs, source *SelectedAggregate, duration time.Duration) (string, []interface{}, error) {
 	sql := fmt.Sprintf(`
 		SELECT
 			time_bucket('%f seconds', "bucket_time") AS bucket_time,

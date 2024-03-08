@@ -73,10 +73,10 @@ func (s *UserService) loginForUser(ctx context.Context, payload *user.LoginPaylo
 	s.options.Metrics.AuthTry()
 
 	authed, err := s.authenticateOrSpoof(ctx, payload.Login.Email, payload.Login.Password)
-	if err == data.IncorrectPasswordError {
+	if err == data.ErrIncorrectPassword {
 		return nil, user.MakeUnauthorized(errors.New("invalid email or password"))
 	}
-	if err == data.UnverifiedUserError {
+	if err == data.ErrUnverifiedUser {
 		return nil, user.MakeUserUnverified(errors.New("user unverified"))
 	}
 	if err != nil {
@@ -186,10 +186,6 @@ func (s *UserService) Add(ctx context.Context, payload *user.AddPayload) (*user.
 	s.options.Metrics.EmailVerificationSent()
 
 	pr := repositories.NewProjectRepository(s.options.Database)
-	if err != nil {
-		return nil, err
-	}
-
 	if _, err := pr.AddDefaultProject(ctx, user); err != nil {
 		return nil, err
 	}
@@ -238,7 +234,7 @@ func (s *UserService) ChangePassword(ctx context.Context, payload *user.ChangePa
 	}
 
 	err = updating.CheckPassword(payload.Change.OldPassword)
-	if err == data.IncorrectPasswordError {
+	if err == data.ErrIncorrectPassword {
 		return nil, user.MakeBadRequest(errors.New("bad request"))
 	}
 	if err != nil {
@@ -292,7 +288,7 @@ func (s *UserService) AcceptTnc(ctx context.Context, payload *user.AcceptTncPayl
 		return nil, user.MakeForbidden(errors.New("forbidden"))
 	}
 
-	if payload.Accept.Accept == true {
+	if payload.Accept.Accept {
 		updating.TncDate = time.Now()
 		if err := s.options.Database.NamedGetContext(ctx, updating, `
 		UPDATE fieldkit.user SET tnc_date = :tnc_date WHERE id = :id RETURNING *
@@ -985,7 +981,7 @@ func (s *UserService) authenticateOrSpoof(ctx context.Context, email, password s
 		return nil, err
 	}
 	if user == nil {
-		return nil, data.IncorrectPasswordError
+		return nil, data.ErrIncorrectPassword
 	}
 
 	log := Logger(ctx).Sugar()
@@ -1012,8 +1008,8 @@ func (s *UserService) authenticateOrSpoof(ctx context.Context, email, password s
 	}
 
 	err = user.CheckPassword(password)
-	if err == data.IncorrectPasswordError {
-		return nil, data.IncorrectPasswordError
+	if err == data.ErrIncorrectPassword {
+		return nil, data.ErrIncorrectPassword
 	}
 	if err != nil {
 		return nil, err
@@ -1037,7 +1033,7 @@ func (s *UserService) authenticateOrSpoof(ctx context.Context, email, password s
 	}
 
 	if !user.Valid {
-		return nil, data.UnverifiedUserError
+		return nil, data.ErrUnverifiedUser
 	}
 
 	return user, nil
@@ -1153,10 +1149,11 @@ func (as *AuthServer) UpdateAuthentication(ctx context.Context, user *data.User,
 	first, last := splitName(user.Name)
 
 	attrs := map[string][]string{
-		KeycloakPortalIDAttribute: []string{fmt.Sprintf("%d", user.ID)},
+		KeycloakPortalIDAttribute: {fmt.Sprintf("%d", user.ID)},
 	}
 
-	for _, ku := range users {
+	if len(users) >= 1 {
+		ku := users[0]
 		ku.FirstName = gocloak.StringP(first)
 		ku.LastName = gocloak.StringP(last)
 		ku.Email = gocloak.StringP(user.Email)
@@ -1172,7 +1169,6 @@ func (as *AuthServer) UpdateAuthentication(ctx context.Context, user *data.User,
 		}
 		updated = true
 		log.Infow("updated", "keycloak_user_id", ku.ID)
-		break
 	}
 
 	if !updated {

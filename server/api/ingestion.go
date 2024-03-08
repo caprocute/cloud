@@ -54,7 +54,7 @@ func (c *IngestionService) ProcessPending(ctx context.Context, payload *ingestio
 
 	for _, q := range queued {
 		if err := c.options.Publisher.Publish(ctx, &messages.ProcessIngestion{
-			messages.IngestionReceived{
+			IngestionReceived: messages.IngestionReceived{
 				QueuedID:    q.ID,
 				IngestionID: nil,
 				UserID:      p.UserID(),
@@ -152,7 +152,7 @@ func (c *IngestionService) ProcessIngestion(ctx context.Context, payload *ingest
 		return err
 	} else {
 		if err := c.options.Publisher.Publish(ctx, &messages.ProcessIngestion{
-			messages.IngestionReceived{
+			IngestionReceived: messages.IngestionReceived{
 				QueuedID:    id,
 				IngestionID: &i.ID,
 				UserID:      p.UserID(),

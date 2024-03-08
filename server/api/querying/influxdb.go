@@ -52,13 +52,13 @@ func (w *InfluxDBWindow) CalculateMaximumRows(start, end time.Time) int64 {
 
 var (
 	Windows = []*InfluxDBWindow{
-		&InfluxDBWindow{Specifier: "24h", Interval: time.Hour * 24},
-		&InfluxDBWindow{Specifier: "12h", Interval: time.Hour * 12},
-		&InfluxDBWindow{Specifier: "6h", Interval: time.Hour * 6},
-		&InfluxDBWindow{Specifier: "1h", Interval: time.Hour * 1},
-		&InfluxDBWindow{Specifier: "30m", Interval: time.Minute * 30},
-		&InfluxDBWindow{Specifier: "10m", Interval: time.Minute * 10},
-		&InfluxDBWindow{Specifier: "1m", Interval: time.Minute * 1},
+		{Specifier: "24h", Interval: time.Hour * 24},
+		{Specifier: "12h", Interval: time.Hour * 12},
+		{Specifier: "6h", Interval: time.Hour * 6},
+		{Specifier: "1h", Interval: time.Hour * 1},
+		{Specifier: "30m", Interval: time.Minute * 30},
+		{Specifier: "10m", Interval: time.Minute * 10},
+		{Specifier: "1m", Interval: time.Minute * 1},
 	}
 )
 
