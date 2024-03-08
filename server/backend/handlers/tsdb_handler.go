@@ -91,7 +91,7 @@ func (v *TsDBHandler) OnMeta(ctx context.Context, provision *data.Provision, raw
 }
 
 func (v *TsDBHandler) OnData(ctx context.Context, provision *data.Provision, rawData *pb.DataRecord, rawMeta *pb.DataRecord, db *data.DataRecord, meta *data.MetaRecord) error {
-	log := Logger(ctx).Sugar().With("data_record_id", db.ID, "meta_record_id", meta.ID, "provision_id", provision.ID)
+	log := Logger(ctx).Sugar().With("meta_record_id", meta.ID, "provision_id", provision.ID)
 
 	if v.metaID != meta.ID {
 		modules, err := v.stationRepository.QueryStationModulesByMetaID(ctx, meta.ID)

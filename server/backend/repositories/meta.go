@@ -20,12 +20,8 @@ const (
 	META_INTERNAL_MASK = 0x1
 )
 
-func loggerFor(ctx context.Context, databaseRecord *data.DataRecord) *zap.SugaredLogger {
-	return Logger(ctx).Sugar().With("data_record_id", databaseRecord.ID)
-}
-
-func verboseLoggerFor(ctx context.Context, databaseRecord *data.DataRecord, verbose bool) *zap.SugaredLogger {
-	return logging.OnlyLogIf(loggerFor(ctx, databaseRecord), verbose)
+func verboseLoggerFor(ctx context.Context, verbose bool) *zap.SugaredLogger {
+	return logging.OnlyLogIf(Logger(ctx).Sugar(), verbose)
 }
 
 type MissingSensorMetaError struct {
@@ -213,7 +209,7 @@ func (mf *MetaFactory) Resolve(ctx context.Context, databaseRecord *data.DataRec
 		moduleIndex := sgIndex
 		if moduleIndex >= len(meta.Station.AllModules) {
 			if verbose {
-				log := verboseLoggerFor(ctx, databaseRecord, verbose)
+				log := verboseLoggerFor(ctx, verbose)
 				log.Infow("skip", "module_index", moduleIndex, "number_module_metas", len(meta.Station.AllModules))
 			}
 			continue
@@ -229,7 +225,7 @@ func (mf *MetaFactory) Resolve(ctx context.Context, databaseRecord *data.DataRec
 		for sensorIndex, reading := range sensorGroup.Readings {
 			if sensorIndex >= len(module.Sensors) {
 				if verbose {
-					vl := verboseLoggerFor(ctx, databaseRecord, verbose)
+					vl := verboseLoggerFor(ctx, verbose)
 					vl.Infow("skip", "module_index", moduleIndex, "sensor_index", sensorIndex)
 				}
 				continue
@@ -240,7 +236,7 @@ func (mf *MetaFactory) Resolve(ctx context.Context, databaseRecord *data.DataRec
 			// This is only happening on one single record, so far.
 			if reading == nil {
 				if verbose {
-					log := verboseLoggerFor(ctx, databaseRecord, verbose)
+					log := verboseLoggerFor(ctx, verbose)
 					log.Warnw("nil", "sensor_index", sensorIndex, "sensor_name", sensor.Name)
 				}
 				continue
@@ -264,11 +260,11 @@ func (mf *MetaFactory) Resolve(ctx context.Context, databaseRecord *data.DataRec
 	if len(readings) == 0 {
 		if numberOfNonVirtualModulesWithData == 0 {
 			if verbose {
-				log := verboseLoggerFor(ctx, databaseRecord, verbose)
+				log := verboseLoggerFor(ctx, verbose)
 				log.Warnw("empty", "sensor_groups", len(dataRecord.Readings.SensorGroups), "physical_sensor_groups_with_data", numberOfNonVirtualModulesWithData)
 			}
 		} else {
-			log := loggerFor(ctx, databaseRecord)
+			log := Logger(ctx).Sugar()
 			log.Warnw("empty", "sensor_groups", len(dataRecord.Readings.SensorGroups), "physical_sensor_groups_with_data", numberOfNonVirtualModulesWithData)
 		}
 		return nil, nil
@@ -276,7 +272,6 @@ func (mf *MetaFactory) Resolve(ctx context.Context, databaseRecord *data.DataRec
 
 	location := getLocation(dataRecord.Readings.Location)
 	resolved := &ResolvedRecord{
-		ID:       databaseRecord.ID,
 		Time:     dataRecord.Readings.Time,
 		Location: location,
 		Readings: readings,

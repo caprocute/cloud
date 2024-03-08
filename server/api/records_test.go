@@ -11,21 +11,6 @@ import (
 	"gitlab.com/fieldkit/cloud/server/tests"
 )
 
-func TestGetMissingDataRecord(t *testing.T) {
-	assert := assert.New(t)
-	e, err := tests.NewTestEnv()
-	assert.NoError(err)
-
-	api, err := NewTestableApi(e)
-	assert.NoError(err)
-
-	req, _ := http.NewRequest("GET", fmt.Sprintf("/records/data/%d", 0), nil)
-	req.Header.Add("Authorization", e.NewAuthorizationHeaderForAdmin())
-	rr := tests.ExecuteRequest(req, api)
-
-	assert.Equal(http.StatusNotFound, rr.Code)
-}
-
 func TestGetMetaRecord(t *testing.T) {
 	assert := assert.New(t)
 	e, err := tests.NewTestEnv()

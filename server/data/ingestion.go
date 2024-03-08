@@ -155,7 +155,6 @@ func ParseBlocks(s string) ([]int64, error) {
 }
 
 type DataRecord struct {
-	ID           int64          `db:"id" json:"id"`
 	ProvisionID  int64          `db:"provision_id" json:"provision_id"`
 	Time         time.Time      `db:"time" json:"time"`
 	Number       int64          `db:"number" json:"number"`
@@ -385,7 +384,6 @@ func SanitizeDataRecord(r *DataRecord) *DataRecord {
 	}
 
 	return &DataRecord{
-		ID:           r.ID,
 		ProvisionID:  r.ProvisionID,
 		Time:         r.Time,
 		Number:       r.Number,

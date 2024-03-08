@@ -148,36 +148,6 @@ type MoveDataHandler interface {
 	Close(ctx context.Context) error
 }
 
-func processBinary(ctx context.Context, options *Options, db *sqlxcache.DB, handler backend.RecordHandler) error {
-	log := logging.Logger(ctx).Sugar()
-
-	allStationIDs := []int32{}
-	if options.StationID > 0 {
-		allStationIDs = append(allStationIDs, int32(options.StationID))
-	} else {
-		if err := db.SelectContext(ctx, &allStationIDs, "SELECT id FROM fieldkit.station ORDER BY ingestion_at DESC"); err != nil {
-			return err
-		}
-	}
-
-	for _, id := range allStationIDs {
-		walkParams := &backend.WalkParameters{
-			Start:      time.Time{},
-			End:        time.Now(),
-			StationIDs: []int32{id},
-		}
-
-		rw := backend.NewRecordWalker(db)
-		if err := rw.WalkStation(ctx, handler, backend.WalkerProgressNoop, walkParams); err != nil {
-			return err
-		}
-	}
-
-	_ = log
-
-	return nil
-}
-
 func processJsonSchema(ctx context.Context, options *Options, db *sqlxcache.DB, schemaID int32, resolver *Resolver, handler MoveDataHandler) error {
 	source := webhook.NewDatabaseMessageSource(db, schemaID, 0, false)
 
@@ -462,14 +432,6 @@ func process(ctx context.Context, options *Options) error {
 	}
 
 	defer destination.Close(ctx)
-
-	handler := NewMoveBinaryDataHandler(resolver, db, destination)
-
-	if options.BinaryRecords {
-		if err := processBinary(ctx, options, db, handler); err != nil {
-			return err
-		}
-	}
 
 	if options.JsonRecords {
 		if err := processJson(ctx, options, db, resolver, destination); err != nil {
