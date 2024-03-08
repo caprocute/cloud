@@ -9,7 +9,6 @@ import (
 	"strconv"
 	"strings"
 
-	_ "net/http"
 	_ "net/http/pprof"
 
 	"github.com/spf13/viper"
@@ -357,7 +356,7 @@ func createApi(ctx context.Context, config *Config) (*Api, error) {
 
 	publisher := jobs.NewQueMessagePublisher(metrics, pgxpool, qc)
 
-	services, err := api.CreateServiceOptions(ctx, apiConfig, database, publisher, mediaFiles, awsSession, metrics, qc, nil, timeScaleConfig)
+	services, err := api.CreateServiceOptions(ctx, apiConfig, database, publisher, mediaFiles, awsSession, metrics, qc, timeScaleConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -529,8 +528,6 @@ func createFileArchive(ctx context.Context, archiver string, buckets []string, a
 			}
 			reading = append(reading, s3)
 		}
-
-		break
 	case "aws":
 		for _, bucketName := range buckets {
 			s3, err := files.NewS3FileArchive(awsSession, metrics, bucketName, prefix)
@@ -542,7 +539,6 @@ func createFileArchive(ctx context.Context, archiver string, buckets []string, a
 				writing = append(writing, s3)
 			}
 		}
-		break
 	}
 
 	log.Infow("files", "archiver", archiver, "bucket_names", buckets, "reading", toListOfStrings(reading), "writing", toListOfStrings(writing))

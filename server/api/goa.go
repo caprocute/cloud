@@ -61,8 +61,8 @@ import (
 	notesSvr "gitlab.com/fieldkit/cloud/server/api/gen/http/notes/server"
 	notes "gitlab.com/fieldkit/cloud/server/api/gen/notes"
 
-    stationNotesSvr "gitlab.com/fieldkit/cloud/server/api/gen/http/station_note/server"
-    stationNotes "gitlab.com/fieldkit/cloud/server/api/gen/station_note"
+	stationNotesSvr "gitlab.com/fieldkit/cloud/server/api/gen/http/station_note/server"
+	stationNotes "gitlab.com/fieldkit/cloud/server/api/gen/station_note"
 
 	recordsSvr "gitlab.com/fieldkit/cloud/server/api/gen/http/records/server"
 	records "gitlab.com/fieldkit/cloud/server/api/gen/records"
@@ -129,14 +129,14 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	informationSvc := NewInformationService(ctx, options)
 	informationEndpoints := information.NewEndpoints(informationSvc)
 
-	sensorSvc := NewSensorService(ctx, options, options.influxConfig, options.timeScaleConfig)
+	sensorSvc := NewSensorService(ctx, options, options.timeScaleConfig)
 	sensorEndpoints := sensor.NewEndpoints(sensorSvc)
 
 	notesSvc := NewNotesService(ctx, options)
 	notesEndpoints := notes.NewEndpoints(notesSvc)
 
-    stationNotesSvc := NewStationNoteService(ctx, options)
-    stationNotesEndpoints := stationNotes.NewEndpoints(stationNotesSvc)
+	stationNotesSvc := NewStationNoteService(ctx, options)
+	stationNotesEndpoints := stationNotes.NewEndpoints(stationNotesSvc)
 
 	recordsSvc := NewRecordsService(ctx, options)
 	recordsEndpoints := records.NewEndpoints(recordsSvc)
@@ -340,8 +340,8 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 		log.Infow("mount", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
 	}
 	for _, m := range stationNotesServer.Mounts {
-    		log.Infow("mount", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
-    	}
+		log.Infow("mount", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
+	}
 	for _, m := range recordsServer.Mounts {
 		log.Infow("mount", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
 	}

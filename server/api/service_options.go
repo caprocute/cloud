@@ -8,7 +8,6 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws/session"
 
-	"gitlab.com/fieldkit/cloud/server/api/querying"
 	"gitlab.com/fieldkit/cloud/server/common/sqlxcache"
 
 	"gitlab.com/fieldkit/cloud/server/common/jobs"
@@ -45,14 +44,13 @@ type ControllerOptions struct {
 	// Subscribed listeners
 	subscriptions *Subscriptions
 
-	influxConfig    *querying.InfluxDBConfig
 	timeScaleConfig *storage.TimeScaleDBConfig
 
 	photoCache *PhotoCache
 }
 
 func CreateServiceOptions(ctx context.Context, config *ApiConfiguration, database *sqlxcache.DB, publisher jobs.MessagePublisher, mediaFiles files.FileArchive,
-	awsSession *session.Session, metrics *logging.Metrics, que *gue.Client, influxConfig *querying.InfluxDBConfig, timeScaleConfig *storage.TimeScaleDBConfig) (controllerOptions *ControllerOptions, err error) {
+	awsSession *session.Session, metrics *logging.Metrics, que *gue.Client, timeScaleConfig *storage.TimeScaleDBConfig) (controllerOptions *ControllerOptions, err error) {
 
 	emailer, err := createEmailer(awsSession, config)
 	if err != nil {
@@ -82,7 +80,6 @@ func CreateServiceOptions(ctx context.Context, config *ApiConfiguration, databas
 		locations:       locations,
 		que:             que,
 		subscriptions:   NewSubscriptions(),
-		influxConfig:    influxConfig,
 		timeScaleConfig: timeScaleConfig,
 		photoCache:      NewPhotoCache(mediaFiles, metrics),
 	}

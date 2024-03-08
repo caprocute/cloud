@@ -55,16 +55,14 @@ func NewRawQueryParamsFromSensorData(payload *sensor.DataPayload) (*backend.RawQ
 
 type SensorService struct {
 	options         *ControllerOptions
-	influxConfig    *querying.InfluxDBConfig
 	timeScaleConfig *storage.TimeScaleDBConfig
 	db              *sqlxcache.DB
 	tsdb            querying.DataBackend
 }
 
-func NewSensorService(ctx context.Context, options *ControllerOptions, influxConfig *querying.InfluxDBConfig, timeScaleConfig *storage.TimeScaleDBConfig) *SensorService {
+func NewSensorService(ctx context.Context, options *ControllerOptions, timeScaleConfig *storage.TimeScaleDBConfig) *SensorService {
 	return &SensorService{
 		options:         options,
-		influxConfig:    influxConfig,
 		timeScaleConfig: timeScaleConfig,
 		db:              options.Database,
 	}
