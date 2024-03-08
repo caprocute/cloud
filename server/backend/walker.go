@@ -152,7 +152,7 @@ func (rw *RecordWalker) WalkStation(ctx context.Context, handler RecordHandler, 
 
 	rw.wg.Wait()
 
-	elapsed := time.Now().Sub(rw.started)
+	elapsed := time.Since(rw.started)
 
 	if err := handler.OnDone(ctx); err != nil {
 		return err
@@ -163,11 +163,13 @@ func (rw *RecordWalker) WalkStation(ctx context.Context, handler RecordHandler, 
 	return errors.ErrorOrNil()
 }
 
+/*
 func (rw *RecordWalker) processBatchInTransaction(ctx context.Context, handler RecordHandler, progress WalkerProgressFunc, params *WalkParameters, offset, batchSize int64) error {
 	return rw.db.WithNewTransaction(ctx, func(txCtx context.Context) error {
 		return rw.processBatch(txCtx, handler, progress, params, offset, batchSize)
 	})
 }
+*/
 
 func (rw *RecordWalker) queryStatistics(ctx context.Context, params *WalkParameters) (*WalkStatistics, error) {
 	log := Logger(ctx).Sugar()
@@ -269,6 +271,7 @@ func (rw *RecordWalker) queryBatch(ctx context.Context, params *WalkParameters, 
 	return rows, nil
 }
 
+/*
 func (rw *RecordWalker) processBatch(ctx context.Context, handler RecordHandler, progress WalkerProgressFunc, params *WalkParameters, offset, batchSize int64) error {
 	rows, err := rw.queryBatch(ctx, params, offset, batchSize)
 	if err != nil {
@@ -283,6 +286,7 @@ func (rw *RecordWalker) processBatch(ctx context.Context, handler RecordHandler,
 
 	return nil
 }
+*/
 
 func (rw *RecordWalker) handleRecord(ctx context.Context, handler RecordHandler, progress WalkerProgressFunc, record *data.DataRecord) error {
 	if provision, err := rw.loadProvision(ctx, record.ProvisionID); err != nil {
@@ -300,7 +304,7 @@ func (rw *RecordWalker) handleRecord(ctx context.Context, handler RecordHandler,
 	rw.dataRecords += 1
 
 	if rw.dataRecords%1000 == 0 {
-		elapsed := time.Now().Sub(rw.started)
+		elapsed := time.Since(rw.started)
 		percentage := float64(rw.dataRecords) / float64(rw.statistics.Records) * 100.0
 		rps := float64(rw.dataRecords) / elapsed.Seconds()
 		log := Logger(ctx).Sugar()

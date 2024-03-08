@@ -3,8 +3,8 @@ package repositories
 import (
 	"context"
 
-	"gitlab.com/fieldkit/cloud/server/common/sqlxcache"
 	"github.com/jmoiron/sqlx"
+	"gitlab.com/fieldkit/cloud/server/common/sqlxcache"
 
 	"gitlab.com/fieldkit/cloud/server/data"
 )

@@ -33,10 +33,6 @@ import (
 	"gitlab.com/fieldkit/cloud/server/messages"
 )
 
-var (
-	ids = logging.NewIdGenerator()
-)
-
 type IngesterOptions struct {
 	Database   *sqlxcache.DB
 	Files      files.FileArchive
@@ -235,7 +231,7 @@ type IngestionSuccessful struct {
 	UploadID string `json:"upload_id"`
 }
 
-func writeSuccess(ctx context.Context, w http.ResponseWriter, req *http.Request, ingestion *data.Ingestion) error {
+func writeSuccess(_ context.Context, w http.ResponseWriter, _ *http.Request, ingestion *data.Ingestion) error {
 	payload, err := json.Marshal(IngestionSuccessful{
 		ID:       ingestion.ID,
 		UploadID: ingestion.UploadID,

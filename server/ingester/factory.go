@@ -113,7 +113,7 @@ func getAwsSessionOptions(config *Config) session.Options {
 	}
 }
 
-func createFileArchive(ctx context.Context, config *Config, awsSession *session.Session, metrics *logging.Metrics) (files.FileArchive, error) {
+func createFileArchive(_ context.Context, config *Config, awsSession *session.Session, metrics *logging.Metrics) (files.FileArchive, error) {
 	switch config.Archiver {
 	case "default":
 		return files.NewLocalFilesArchive(), nil

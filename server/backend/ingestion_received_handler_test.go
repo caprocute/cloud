@@ -54,7 +54,7 @@ func TestIngestionReceivedCorruptedFile(t *testing.T) {
 	publisher := jobs.NewDevNullMessagePublisher()
 	mc := jobs.NewMessageContext(publisher, nil)
 	files := tests.NewInMemoryArchive(map[string][]byte{
-		"/file": []byte{},
+		"/file": {},
 	})
 	handler := NewIngestionReceivedHandler(e.DB, e.DbPool, files, logging.NewMetrics(e.Ctx, &logging.MetricsSettings{}), publisher, nil)
 

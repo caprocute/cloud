@@ -130,6 +130,9 @@ func (e *TestEnv) NewTokenForUser(user *data.User) string {
 
 	token := user.NewToken(now, refreshToken)
 	signedToken, err := token.SignedString(e.JWTHMACKey)
+	if err != nil {
+		panic(err)
+	}
 
 	return signedToken
 }

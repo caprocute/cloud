@@ -42,7 +42,6 @@ type AggregatingHandler struct {
 	stationIDs        map[int64]int32
 	stationConfig     *data.StationConfiguration
 	stationModules    map[uint32]*data.StationModule
-	aggregator        *Aggregator
 	sensors           map[string]*data.Sensor
 	tableSuffix       string
 	completely        bool
@@ -191,7 +190,7 @@ func (v *AggregatingHandler) OnData(ctx context.Context, p *data.Provision, r *p
 	return nil
 }
 
-func (v *AggregatingHandler) saveStorage(ctx context.Context, sampled time.Time, location []float64, sensorKey *AggregateSensorKey, value float64) error {
+func (v *AggregatingHandler) saveStorage(ctx context.Context, sampled time.Time, _ []float64, sensorKey *AggregateSensorKey, value float64) error {
 	stationID, ok := v.stationIDs[v.provisionID]
 	if !ok {
 		return fmt.Errorf("missing station id")

@@ -9,9 +9,9 @@ import (
 
 	"go.uber.org/zap"
 
+	"github.com/jackc/pgx/v5/pgxpool"
 	"gitlab.com/fieldkit/cloud/server/common/sqlxcache"
 	"gitlab.com/fieldkit/cloud/server/storage"
-	"github.com/jackc/pgx/v5/pgxpool"
 
 	"gitlab.com/fieldkit/cloud/server/common/jobs"
 	"gitlab.com/fieldkit/cloud/server/common/logging"
@@ -167,10 +167,6 @@ func (h *IngestionReceivedHandler) Start(ctx context.Context, m *messages.Ingest
 	}
 
 	sr := repositories.NewStationRepository(h.db)
-	if err != nil {
-		return err
-	}
-
 	station, err := sr.QueryStationByDeviceID(ctx, i.DeviceID)
 	if err != nil {
 		if err == sql.ErrNoRows {

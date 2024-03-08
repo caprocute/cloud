@@ -427,7 +427,7 @@ func (e *TestEnv) NewHttpStatusReply(s *data.Station) *pbapp.HttpReply {
 		},
 		NetworkSettings: &pbapp.NetworkSettings{},
 		Streams: []*pbapp.DataStream{
-			&pbapp.DataStream{
+			{
 				Id:      0,
 				Time:    0,
 				Size:    0,
@@ -436,7 +436,7 @@ func (e *TestEnv) NewHttpStatusReply(s *data.Station) *pbapp.HttpReply {
 				Name:    "data.fkpb",
 				Path:    "/fk/v1/download/data",
 			},
-			&pbapp.DataStream{
+			{
 				Id:      1,
 				Time:    0,
 				Size:    0,
@@ -447,7 +447,7 @@ func (e *TestEnv) NewHttpStatusReply(s *data.Station) *pbapp.HttpReply {
 			},
 		},
 		Modules: []*pbapp.ModuleCapabilities{
-			&pbapp.ModuleCapabilities{
+			{
 				Position: 0,
 				Flags:    1,
 				Name:     "modules.diagnostics",
@@ -458,7 +458,7 @@ func (e *TestEnv) NewHttpStatusReply(s *data.Station) *pbapp.HttpReply {
 					Version:      1,
 				},
 				Sensors: []*pbapp.SensorCapabilities{
-					&pbapp.SensorCapabilities{
+					{
 						Number:        0,
 						Name:          "memory",
 						UnitOfMeasure: "bytes",
@@ -466,7 +466,7 @@ func (e *TestEnv) NewHttpStatusReply(s *data.Station) *pbapp.HttpReply {
 					},
 				},
 			},
-			&pbapp.ModuleCapabilities{
+			{
 				Position: 0,
 				Name:     "modules.water.ph",
 				Id:       hashString(fmt.Sprintf("ph-%v-%v", s.DeviceID, e.Seed)),
@@ -476,7 +476,7 @@ func (e *TestEnv) NewHttpStatusReply(s *data.Station) *pbapp.HttpReply {
 					Version:      1,
 				},
 				Sensors: []*pbapp.SensorCapabilities{
-					&pbapp.SensorCapabilities{
+					{
 						Number:        0,
 						Name:          "ph",
 						UnitOfMeasure: "",
@@ -484,7 +484,7 @@ func (e *TestEnv) NewHttpStatusReply(s *data.Station) *pbapp.HttpReply {
 					},
 				},
 			},
-			&pbapp.ModuleCapabilities{
+			{
 				Position: 1,
 				Name:     "modules.water.do",
 				Id:       hashString(fmt.Sprintf("do-%v-%v", s.DeviceID, e.Seed)),
@@ -494,7 +494,7 @@ func (e *TestEnv) NewHttpStatusReply(s *data.Station) *pbapp.HttpReply {
 					Version:      1,
 				},
 				Sensors: []*pbapp.SensorCapabilities{
-					&pbapp.SensorCapabilities{
+					{
 						Number:        0,
 						Name:          "do",
 						UnitOfMeasure: "",
@@ -502,7 +502,7 @@ func (e *TestEnv) NewHttpStatusReply(s *data.Station) *pbapp.HttpReply {
 					},
 				},
 			},
-			&pbapp.ModuleCapabilities{
+			{
 				Position: 2,
 				Name:     "modules.water.ec",
 				Id:       hashString(fmt.Sprintf("ec-%v-%v", s.DeviceID, e.Seed)),
@@ -512,25 +512,25 @@ func (e *TestEnv) NewHttpStatusReply(s *data.Station) *pbapp.HttpReply {
 					Version:      1,
 				},
 				Sensors: []*pbapp.SensorCapabilities{
-					&pbapp.SensorCapabilities{
+					{
 						Number:        0,
 						Name:          "ec",
 						UnitOfMeasure: "µS/cm",
 						Frequency:     60,
 					},
-					&pbapp.SensorCapabilities{
+					{
 						Number:        1,
 						Name:          "temperature",
 						UnitOfMeasure: "C",
 						Frequency:     60,
 					},
-					&pbapp.SensorCapabilities{
+					{
 						Number:        2,
 						Name:          "depth",
 						UnitOfMeasure: "m",
 						Frequency:     60,
 					},
-					&pbapp.SensorCapabilities{
+					{
 						Number:        2,
 						Name:          "depth (mv)",
 						UnitOfMeasure: "mv",
@@ -565,7 +565,7 @@ func (e *TestEnv) NewLiveReadingsReply(s *data.Station) *pbapp.HttpReply {
 	}
 
 	status.LiveReadings = []*pbapp.LiveReadings{
-		&pbapp.LiveReadings{
+		{
 			Time:    uint64(0),
 			Modules: moduleLiveReadings,
 		},
@@ -584,7 +584,7 @@ func (e *TestEnv) NewMetaLayout(record uint64) *SignedRecordAndData {
 			Name: "",
 		},
 		Modules: []*pb.ModuleInfo{
-			&pb.ModuleInfo{
+			{
 				Position: 0,
 				Name:     "random-module-1",
 				Id:       hashString(fmt.Sprintf("random-module-1-%d", e.Seed)),
@@ -595,29 +595,29 @@ func (e *TestEnv) NewMetaLayout(record uint64) *SignedRecordAndData {
 				},
 				Firmware: &pb.Firmware{},
 				Sensors: []*pb.SensorInfo{
-					&pb.SensorInfo{
+					{
 						Name:          "random_0",
 						UnitOfMeasure: "C",
 					},
-					&pb.SensorInfo{
+					{
 						Name:          "random_1",
 						UnitOfMeasure: "C",
 					},
-					&pb.SensorInfo{
+					{
 						Name:          "random_2",
 						UnitOfMeasure: "C",
 					},
-					&pb.SensorInfo{
+					{
 						Name:          "random_3",
 						UnitOfMeasure: "C",
 					},
-					&pb.SensorInfo{
+					{
 						Name:          "random_4",
 						UnitOfMeasure: "C",
 					},
 				},
 			},
-			&pb.ModuleInfo{
+			{
 				Position: 1,
 				Name:     "random-module-2",
 				Id:       hashString(fmt.Sprintf("random-module-2-%d", e.Seed)),
@@ -628,43 +628,43 @@ func (e *TestEnv) NewMetaLayout(record uint64) *SignedRecordAndData {
 				},
 				Firmware: &pb.Firmware{},
 				Sensors: []*pb.SensorInfo{
-					&pb.SensorInfo{
+					{
 						Name:          "random_0",
 						UnitOfMeasure: "C",
 					},
-					&pb.SensorInfo{
+					{
 						Name:          "random_1",
 						UnitOfMeasure: "C",
 					},
-					&pb.SensorInfo{
+					{
 						Name:          "random_2",
 						UnitOfMeasure: "C",
 					},
-					&pb.SensorInfo{
+					{
 						Name:          "random_3",
 						UnitOfMeasure: "C",
 					},
-					&pb.SensorInfo{
+					{
 						Name:          "random_4",
 						UnitOfMeasure: "C",
 					},
-					&pb.SensorInfo{
+					{
 						Name:          "random_5",
 						UnitOfMeasure: "C",
 					},
-					&pb.SensorInfo{
+					{
 						Name:          "random_6",
 						UnitOfMeasure: "C",
 					},
-					&pb.SensorInfo{
+					{
 						Name:          "random_7",
 						UnitOfMeasure: "C",
 					},
-					&pb.SensorInfo{
+					{
 						Name:          "random_8",
 						UnitOfMeasure: "C",
 					},
-					&pb.SensorInfo{
+					{
 						Name:          "random_9",
 						UnitOfMeasure: "C",
 					},

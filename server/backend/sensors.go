@@ -418,9 +418,9 @@ type DataRow struct {
 	TimeGroup *int32 `db:"time_group" json:"-"`
 
 	// TSDB
-	BucketSamples *int32     `json:"-",omitempty`
-	DataStart     *time.Time `json:"-",omitempty`
-	DataEnd       *time.Time `json:"-",omitempty`
+	BucketSamples *int32     `json:"-"`
+	DataStart     *time.Time `json:"-"`
+	DataEnd       *time.Time `json:"-"`
 	AverageValue  *float64   `json:"avg,omitempty"`
 	MinimumValue  *float64   `json:"min,omitempty"`
 	MaximumValue  *float64   `json:"max,omitempty"`

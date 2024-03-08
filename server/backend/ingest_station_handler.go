@@ -4,9 +4,9 @@ import (
 	"context"
 	"encoding/json"
 
+	"github.com/jackc/pgx/v5/pgxpool"
 	"gitlab.com/fieldkit/cloud/server/common/sqlxcache"
 	"gitlab.com/fieldkit/cloud/server/storage"
-	"github.com/jackc/pgx/v5/pgxpool"
 
 	"gitlab.com/fieldkit/cloud/server/common/logging"
 
@@ -138,7 +138,7 @@ func (h *IngestStationHandler) startIngestion(ctx context.Context, mc *jobs.Mess
 		return err
 	} else {
 		if err := mc.Publish(ctx, &messages.ProcessIngestion{
-			messages.IngestionReceived{
+			IngestionReceived: messages.IngestionReceived{
 				QueuedID:    id,
 				IngestionID: &ingestion.ID,
 				UserID:      body.UserID,

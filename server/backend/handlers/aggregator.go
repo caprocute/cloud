@@ -187,56 +187,56 @@ func NewAggregator(db *sqlxcache.DB, tableSuffix string, stationID int32, batchS
 			make([]*Aggregated, 0, batchSize),
 		},
 		aggregations: []*aggregation{
-			&aggregation{
+			{
 				interval: time.Second * 10,
 				name:     "10s",
 				table:    fmt.Sprintf("fieldkit.aggregated%s_10s", tableSuffix),
 				values:   make(map[AggregateSensorKey][]float64),
 				config:   config,
 			},
-			&aggregation{
+			{
 				interval: time.Minute * 1,
 				name:     "1m",
 				table:    fmt.Sprintf("fieldkit.aggregated%s_1m", tableSuffix),
 				values:   make(map[AggregateSensorKey][]float64),
 				config:   config,
 			},
-			&aggregation{
+			{
 				interval: time.Minute * 10,
 				name:     "10m",
 				table:    fmt.Sprintf("fieldkit.aggregated%s_10m", tableSuffix),
 				values:   make(map[AggregateSensorKey][]float64),
 				config:   config,
 			},
-			&aggregation{
+			{
 				interval: time.Minute * 30,
 				name:     "30m",
 				table:    fmt.Sprintf("fieldkit.aggregated%s_30m", tableSuffix),
 				values:   make(map[AggregateSensorKey][]float64),
 				config:   config,
 			},
-			&aggregation{
+			{
 				interval: time.Hour * 1,
 				name:     "1h",
 				table:    fmt.Sprintf("fieldkit.aggregated%s_1h", tableSuffix),
 				values:   make(map[AggregateSensorKey][]float64),
 				config:   config,
 			},
-			&aggregation{
+			{
 				interval: time.Hour * 6,
 				name:     "6h",
 				table:    fmt.Sprintf("fieldkit.aggregated%s_6h", tableSuffix),
 				values:   make(map[AggregateSensorKey][]float64),
 				config:   config,
 			},
-			&aggregation{
+			{
 				interval: time.Hour * 12,
 				name:     "12h",
 				table:    fmt.Sprintf("fieldkit.aggregated%s_12h", tableSuffix),
 				values:   make(map[AggregateSensorKey][]float64),
 				config:   config,
 			},
-			&aggregation{
+			{
 				interval: time.Hour * 24,
 				name:     "24h",
 				table:    fmt.Sprintf("fieldkit.aggregated%s_24h", tableSuffix),
@@ -360,26 +360,6 @@ func (v *Aggregator) AddSample(ctx context.Context, sampled time.Time, location 
 	return nil
 }
 
-func (v *Aggregator) addMap(ctx context.Context, sampled time.Time, location []float64, data map[AggregateSensorKey]float64) error {
-	for _, child := range v.aggregations {
-		time := child.getTime(sampled)
-
-		if !child.canAdd(time) {
-			return fmt.Errorf("wow, NextTime call failed or missing")
-		}
-
-		for key, value := range data {
-			if err := child.add(time, key, location, value); err != nil {
-				return fmt.Errorf("error adding: %w", err)
-			}
-		}
-	}
-
-	v.samples += 1
-
-	return nil
-}
-
 func (v *Aggregator) NextTime(ctx context.Context, sampled time.Time) error {
 	for index, child := range v.aggregations {
 		time := child.getTime(sampled)
@@ -422,7 +402,7 @@ func (v *Aggregator) closeChild(ctx context.Context, index int, tail bool) error
 }
 
 func (v *Aggregator) Close(ctx context.Context) error {
-	for index, _ := range v.aggregations {
+	for index := range v.aggregations {
 		if err := v.closeChild(ctx, index, true); err != nil {
 			return err
 		}

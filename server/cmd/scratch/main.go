@@ -13,7 +13,7 @@ type Options struct {
 	PostgresURL string `split_words:"true" default:"postgres://fieldkit:password@127.0.0.1/fieldkit?sslmode=disable" required:"true"`
 }
 
-func process(ctx context.Context, options *Options) error {
+func process(ctx context.Context, _ *Options) error {
 	log := logging.Logger(ctx).Sugar()
 
 	log.Infow("starting")

@@ -353,7 +353,7 @@ func (config *Options) getAwsSessionOptions() session.Options {
 	}
 }
 
-func processIngestion(ctx context.Context, options *Options, db *sqlxcache.DB, dbpool *pgxpool.Pool, resolver *Resolver, handler MoveDataHandler, ingestionID int64) error {
+func processIngestion(ctx context.Context, options *Options, db *sqlxcache.DB, dbpool *pgxpool.Pool, _ *Resolver, _ MoveDataHandler, ingestionID int64) error {
 	publisher := jobs.NewDevNullMessagePublisher()
 	mc := jobs.NewMessageContext(publisher, nil)
 	metrics := logging.NewMetrics(ctx, &logging.MetricsSettings{})
@@ -420,7 +420,7 @@ func (options *Options) timeScaleConfig() *storage.TimeScaleDBConfig {
 	return &storage.TimeScaleDBConfig{Url: options.TimeScaleURL}
 }
 
-func (options *Options) createDestinationHandler(ctx context.Context) (MoveDataHandler, error) {
+func (options *Options) createDestinationHandler(_ context.Context) (MoveDataHandler, error) {
 	tsConfig := options.timeScaleConfig()
 	if tsConfig != nil {
 		handler := NewMoveDataToTimeScaleDBHandler(tsConfig)

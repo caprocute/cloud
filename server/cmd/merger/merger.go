@@ -244,7 +244,7 @@ func (s *StationMerger) ProcessProvisions(ctx context.Context, options *Options,
 			return fmt.Errorf("deleting configuration %w", err)
 		}
 
-		for moduleID, _ := range sensorsByModule {
+		for moduleID := range sensorsByModule {
 			if int64(moduleID) == goodModuleID {
 				log.Infow("fixing", "module_id", moduleID)
 

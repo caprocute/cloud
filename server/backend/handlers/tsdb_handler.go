@@ -166,7 +166,7 @@ func (v *TsDBHandler) OnDone(ctx context.Context) error {
 	return nil
 }
 
-func (v *TsDBHandler) saveStorage(ctx context.Context, sampled time.Time, location []float64, sensorKey *AggregateSensorKey, value float64) error {
+func (v *TsDBHandler) saveStorage(ctx context.Context, sampled time.Time, _ []float64, sensorKey *AggregateSensorKey, value float64) error {
 	stationID, ok := v.stationIDs[v.provisionID]
 	if !ok {
 		return fmt.Errorf("missing station id")

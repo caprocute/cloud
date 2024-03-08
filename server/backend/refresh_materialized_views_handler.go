@@ -68,7 +68,7 @@ var (
 	ErrEmptyRefresh = errors.New("empty refresh")
 )
 
-func (h *RefreshMaterializedViewsHandler) getRefreshSQL(ctx context.Context, m *messages.RefreshMaterializedView, view *storage.MaterializedView) (string, []interface{}, error) {
+func (h *RefreshMaterializedViewsHandler) getRefreshSQL(_ context.Context, m *messages.RefreshMaterializedView, view *storage.MaterializedView) (string, []interface{}, error) {
 	if m.Start.IsZero() || m.End.IsZero() {
 		return view.MakeRefreshAllSQL()
 	}
