@@ -24,7 +24,6 @@ import (
 	"github.com/vgarvardt/gue/v4/adapter/pgxv5"
 
 	"gitlab.com/fieldkit/cloud/server/backend"
-	"gitlab.com/fieldkit/cloud/server/backend/handlers"
 	"gitlab.com/fieldkit/cloud/server/common/errors"
 	"gitlab.com/fieldkit/cloud/server/common/jobs"
 	"gitlab.com/fieldkit/cloud/server/common/logging"
@@ -229,14 +228,8 @@ func main() {
 			}
 		} else {
 			if options.StationID > 0 {
-				if options.Fake {
-					if err := generateFake(ctx, db, int32(options.StationID)); err != nil {
-						errors = multierror.Append(errors, err)
-					}
-				} else {
-					if err := processStation(ctx, db, tsConfig, int32(options.StationID), options.Recently); err != nil {
-						errors = multierror.Append(errors, err)
-					}
+				if err := processStation(ctx, db, tsConfig, int32(options.StationID), options.Recently); err != nil {
+					errors = multierror.Append(errors, err)
 				}
 			}
 		}
@@ -267,66 +260,6 @@ func processStation(ctx context.Context, db *sqlxcache.DB, tsConfig *storage.Tim
 }
 
 type SampleFunc func(t time.Time) float64
-
-func generateFake(ctx context.Context, db *sqlxcache.DB, stationID int32) error {
-	sampled := time.Now().Add(-100 * 24 * time.Hour)
-	end := time.Now()
-	interval := time.Minute * 1
-
-	aggregator := handlers.NewAggregator(db, "", stationID, 1000, handlers.NewDefaultAggregatorConfig())
-
-	sinFunc := func(period int64) SampleFunc {
-		return func(t time.Time) float64 {
-			scaled := float64(t.Unix()%period) / float64(period)
-			radians := scaled * math.Pi * 2
-			return math.Sin(radians)
-		}
-	}
-
-	sawFunc := func(period int64, h float64) SampleFunc {
-		return func(t time.Time) float64 {
-			scaled := float64(t.Unix()%period) / float64(period)
-			return scaled * h
-		}
-	}
-
-	funcs := map[string]SampleFunc{
-		"fk.testing.sin":        sinFunc(SecondsPerWeek),
-		"fk.testing.saw.weekly": sawFunc(SecondsPerWeek, 1000),
-	}
-
-	location := NewRandomLocation()
-
-	for sampled.Before(end) {
-		if err := aggregator.NextTime(ctx, sampled); err != nil {
-			return fmt.Errorf("error adding: %w", err)
-		}
-
-		location.Move(sampled)
-
-		for sensorKey, fn := range funcs {
-			value := fn(sampled)
-			key := handlers.AggregateSensorKey{
-				SensorKey: sensorKey,
-				ModuleID:  int64(0),
-			}
-			if key.ModuleID == 0 {
-				panic("TODO")
-			}
-			if err := aggregator.AddSample(ctx, sampled, location.Coords, key, value); err != nil {
-				return err
-			}
-		}
-
-		sampled = sampled.Add(interval)
-	}
-
-	if err := aggregator.Close(ctx); err != nil {
-		return nil
-	}
-
-	return nil
-}
 
 type IDRow struct {
 	ID int64 `db:"id"`

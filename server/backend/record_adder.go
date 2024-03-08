@@ -39,7 +39,7 @@ func NewRecordAdder(db *sqlxcache.DB, files files.FileArchive, metrics *logging.
 		handler:             handler,
 		stationRepository:   repositories.NewStationRepository(db),
 		provisionRepository: repositories.NewProvisionRepository(db),
-		recordRepository:    repositories.NewRecordRepository(db, saveData),
+		recordRepository:    repositories.NewRecordRepository(db),
 		statistics:          &newRecordStatistics{},
 		provision:           nil,
 		ingestion:           nil,

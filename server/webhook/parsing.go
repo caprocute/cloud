@@ -93,7 +93,7 @@ func (m *EvaluationError) Error() string {
 	return "EvaluationError"
 }
 
-func (m *WebHookMessage) evaluate(ctx context.Context, cache *JqCache, source interface{}, query string) (value interface{}, err error) {
+func (m *WebHookMessage) evaluate(_ context.Context, cache *JqCache, source interface{}, query string) (value interface{}, err error) {
 	if query == "" {
 		return "", fmt.Errorf("empty query")
 	}
@@ -448,7 +448,7 @@ func (m *WebHookMessage) tryParse(ctx context.Context, cache *JqCache, schemaReg
 	}, nil
 }
 
-func (m *WebHookMessage) unrollArrays(ctx context.Context, source interface{}) ([]interface{}, error) {
+func (m *WebHookMessage) unrollArrays(_ context.Context, source interface{}) ([]interface{}, error) {
 	if array, ok := source.([]interface{}); ok {
 		return array, nil
 	}

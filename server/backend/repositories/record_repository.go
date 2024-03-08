@@ -17,14 +17,12 @@ import (
 type RecordRepository struct {
 	db        *sqlxcache.DB
 	metaCache map[int64]*data.MetaRecord
-	saveData  bool
 }
 
-func NewRecordRepository(db *sqlxcache.DB, saveData bool) *RecordRepository {
+func NewRecordRepository(db *sqlxcache.DB) *RecordRepository {
 	return &RecordRepository{
 		db:        db,
 		metaCache: make(map[int64]*data.MetaRecord),
-		saveData:  saveData,
 	}
 }
 
@@ -246,17 +244,6 @@ func (r *RecordRepository) AddDataRecord(ctx context.Context, p *data.Provision,
 
 	if err := dataRecord.SetData(prepareForMarshalToJson(dr)); err != nil {
 		return nil, nil, fmt.Errorf("error setting data json: %w", err)
-	}
-
-	if r.saveData {
-		if err := r.db.NamedGetContext(ctx, dataRecord, `
-			INSERT INTO fieldkit.data_record (provision_id, time, number, meta_record_id, location, raw, pb)
-			VALUES (:provision_id, :time, :number, :meta_record_id, ST_SetSRID(ST_GeomFromText(:location), 4326), :raw, :pb)
-			ON CONFLICT (provision_id, number) DO UPDATE SET number = EXCLUDED.number, time = EXCLUDED.time, location = EXCLUDED.location, raw = EXCLUDED.raw, pb = EXCLUDED.pb
-			RETURNING id
-			`, dataRecord); err != nil {
-			return nil, nil, err
-		}
 	}
 
 	return dataRecord, metaRecord, nil

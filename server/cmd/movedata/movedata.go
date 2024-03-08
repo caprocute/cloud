@@ -428,17 +428,6 @@ func (options *Options) createDestinationHandler(_ context.Context) (MoveDataHan
 		return handler, nil
 	}
 
-	if options.InfluxDbURL != "" {
-		influx := NewInflux(options.InfluxDbURL, options.InfluxDbToken, options.InfluxDbOrg, options.InfluxDbBucket)
-		if err := influx.Open(ctx); err != nil {
-			return nil, err
-		}
-
-		handler := NewMoveDataIntoInfluxHandler(influx)
-
-		return handler, nil
-	}
-
 	return nil, fmt.Errorf("invalid destination configuration")
 }
 

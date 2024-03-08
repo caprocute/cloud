@@ -394,8 +394,8 @@ func (e *TestEnv) NewHttpStatusReply(s *data.Station) *pbapp.HttpReply {
 			Uptime:  1,
 			Time:    uint64(now.Unix()),
 			Identity: &pbapp.Identity{
-				Name:       s.Name,
-				DeviceId:   deviceID,
+				Name:         s.Name,
+				DeviceId:     deviceID,
 				GenerationId: generation,
 			},
 			Recording: &pbapp.Recording{
@@ -835,7 +835,7 @@ type MetaAndData struct {
 }
 
 func (e *TestEnv) AddMetaAndData(station *data.Station, user *data.User, numberData int) (*MetaAndData, error) {
-	recordRepository := repositories.NewRecordRepository(e.DB, true)
+	recordRepository := repositories.NewRecordRepository(e.DB)
 
 	_, di, err := e.AddIngestion(user, "url", data.DataTypeName, station.DeviceID, 0)
 	if err != nil {

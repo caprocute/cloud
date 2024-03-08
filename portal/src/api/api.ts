@@ -1408,30 +1408,6 @@ class FKApi {
         });
     }
 
-    // Think twice before you use this. Every pending ingestion_queue should have a que_job.
-    protected adminProcessPending(): Promise<void> {
-        return this.invoke({
-            auth: Auth.Required,
-            method: "POST",
-            url: this.baseUrl + `/data/process`,
-        });
-    }
-
-    public adminProcessStation(stationId: number, completely: boolean, skipManual: boolean): Promise<void> {
-        const qp = new URLSearchParams();
-        if (completely) {
-            qp.append("completely", "true");
-        }
-        if (skipManual) {
-            qp.append("skipManual", "true");
-        }
-        return this.invoke({
-            auth: Auth.Required,
-            method: "POST",
-            url: this.baseUrl + `/data/stations/${stationId}/process?` + qp.toString(),
-        });
-    }
-
     public deleteStation(stationId: number): Promise<any> {
         return this.invoke({
             auth: Auth.Required,

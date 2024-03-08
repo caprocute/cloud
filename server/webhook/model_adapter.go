@@ -339,7 +339,7 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 	return m.cache[deviceKey].station, nil
 }
 
-func (m *ModelAdapter) updateLinkedFields(ctx context.Context, log *zap.SugaredLogger, station *WebHookStation, pm *ParsedMessage) error {
+func (m *ModelAdapter) updateLinkedFields(_ context.Context, log *zap.SugaredLogger, station *WebHookStation, pm *ParsedMessage) error {
 	for _, parsedReading := range pm.Data {
 		if parsedReading.Battery {
 			battery := float32(parsedReading.Value)

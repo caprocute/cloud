@@ -36,70 +36,10 @@ func (c *IngestionService) WalkEverything(ctx context.Context, payload *ingestio
 }
 
 func (c *IngestionService) ProcessPending(ctx context.Context, payload *ingestion.ProcessPendingPayload) (err error) {
-	log := Logger(ctx).Sugar()
-
-	p, err := NewPermissions(ctx, c.options).Unwrap()
-	if err != nil {
-		return err
-	}
-
-	ir := repositories.NewIngestionRepository(c.options.Database)
-
-	queued, err := ir.QueryPending(ctx)
-	if err != nil {
-		return err
-	}
-
-	log.Infow("queued", "queued", len(queued), "user_id", p.UserID())
-
-	for _, q := range queued {
-		if err := c.options.Publisher.Publish(ctx, &messages.ProcessIngestion{
-			IngestionReceived: messages.IngestionReceived{
-				QueuedID:    q.ID,
-				IngestionID: nil,
-				UserID:      p.UserID(),
-				Verbose:     true,
-			},
-		}); err != nil {
-			log.Warnw("publishing", "err", err)
-		}
-	}
-
 	return nil
 }
 
 func (c *IngestionService) ProcessStation(ctx context.Context, payload *ingestion.ProcessStationPayload) (err error) {
-	log := Logger(ctx).Sugar()
-
-	log.Infow("processing", "station_id", payload.StationID)
-
-	p, err := NewPermissions(ctx, c.options).ForStationByID(int(payload.StationID))
-	if err != nil {
-		return err
-	}
-
-	if err := p.CanModify(); err != nil {
-		return err
-	}
-
-	completely := false
-	if payload.Completely != nil {
-		completely = *payload.Completely
-	}
-	skipManual := false
-	if payload.SkipManual != nil {
-		skipManual = *payload.SkipManual
-	}
-	if err := c.options.Publisher.Publish(ctx, &messages.RefreshStation{
-		StationID:   payload.StationID,
-		HowRecently: 0,
-		Completely:  completely,
-		SkipManual:  skipManual,
-		UserID:      p.UserID(),
-	}); err != nil {
-		log.Errorw("publishing", "err", err)
-	}
-
 	return nil
 }
 

@@ -53,7 +53,7 @@ func process(ctx context.Context, options *Options) error {
 
 	tsConfig := options.timeScaleConfig()
 
-	aggregator := webhook.NewSourceAggregator(db, tsConfig, options.Verbose, !options.NoLegacy)
+	aggregator := webhook.NewSourceAggregator(db, tsConfig, options.Verbose)
 	startTime := time.Time{}
 
 	var source webhook.MessageSource
