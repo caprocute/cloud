@@ -1254,6 +1254,15 @@ class FKApi {
         });
     }
 
+    public deleteAccount(payload) {
+        return this.invoke({
+            auth: Auth.Required,
+            method: "DELETE",
+            url: this.baseUrl + "/auth/delete-account",
+            data: payload,
+        });
+    }
+
     public adminDeleteUser(payload) {
         return this.invoke({
             auth: Auth.Required,

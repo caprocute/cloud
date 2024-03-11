@@ -535,11 +535,18 @@
         "stationDescription": "Station description",
         "editModuleName": "Module name",
         "studyObjective": "Study objective",
-        "sitePurpose":"Site purpose",
+        "sitePurpose": "Site purpose",
         "siteCriteria": "Site criteria",
         "siteDescription": "Site description",
         "customKey": "Custom note field",
         "newFieldNote": "New Field note",
         "editFieldNote": "Edited Field note"
+    },
+    "deleteAccount": {
+        "heading": "Delete My Account",
+        "button": "Delete Account",
+        "warning": "Warning, continuing will delete your account and all associated data. To confirm, please enter your email address.",
+        "done": "Your account has been deleted.",
+        "sameEmail": "Does not match your email."
     }
 }
