@@ -120,17 +120,16 @@ export default Vue.extend({
         async afterAuth(payload): Promise<void> {
             this.email = payload.email;
             this.authenticated = true;
-            console.log("authenticated", this.email);
         },
         async deleteAccount(): Promise<void> {
-            console.log(this.form, this.email);
             this.$v.form.$touch();
             if (this.busy || this.$v.form.$pending || this.$v.form.$error) {
                 return;
             }
-            console.log("delete");
             await this.$services.api.deleteAccount({});
             this.deleted = true;
+
+            await this.$store.dispatch({ type: ActionTypes.LOGOUT, skipNavigation: true });
         },
     },
 });
