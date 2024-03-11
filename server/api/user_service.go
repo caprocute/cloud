@@ -754,13 +754,71 @@ func (s *UserService) DownloadPhoto(ctx context.Context, payload *user.DownloadP
 	}, nil
 }
 
-func (s *UserService) DeleteAccount(outerCtx context.Context, payload *user.DeleteAccountPayload) error {
+func (s *UserService) deleteUser(ctx context.Context, userID int32) error {
+	log := Logger(ctx).Sugar()
+
+	log.Infow("deleting", "user_id", userID)
+
+	queries := []string{
+		`DELETE FROM fieldkit.project_invite WHERE user_id = $1`,
+		`DELETE FROM fieldkit.project_follower WHERE follower_id = $1`,
+		`DELETE FROM fieldkit.project_user WHERE user_id = $1`,
+
+		`UPDATE fieldkit.station SET photo_id = NULL WHERE owner_id = $1`,
+
+		`DELETE FROM fieldkit.aggregated_sensor_updated WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
+
+		`DELETE FROM fieldkit.notes_media_link WHERE note_id IN (SELECT id FROM fieldkit.notes WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1))`,
+		`DELETE FROM fieldkit.notes_media_link WHERE note_id IN (SELECT id FROM fieldkit.notes WHERE author_id = $1)`,
+		`DELETE FROM fieldkit.notes_media_link WHERE media_id IN (SELECT id FROM fieldkit.notes_media WHERE user_id = $1)`,
+		`DELETE FROM fieldkit.notes_media_link WHERE media_id IN (SELECT media_id FROM fieldkit.notes_media_link WHERE note_id IN (SELECT id FROM fieldkit.notes WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)))`,
+		`DELETE FROM fieldkit.notes_media_link WHERE note_id IN (SELECT media_id FROM fieldkit.notes_media WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1))`,
+		`DELETE FROM fieldkit.notes_media WHERE id IN (SELECT media_id FROM fieldkit.notes_media_link WHERE note_id IN (SELECT id FROM fieldkit.notes WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)))`,
+		`DELETE FROM fieldkit.notes_media WHERE user_id = $1`,
+		`DELETE FROM fieldkit.notes_media WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
+		`DELETE FROM fieldkit.notes WHERE author_id = $1`,
+		`DELETE FROM fieldkit.notes WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
+
+		`DELETE FROM fieldkit.data_event WHERE user_id = $1`,
+		`DELETE FROM fieldkit.data_export WHERE user_id = $1`,
+		`DELETE FROM fieldkit.discussion_post WHERE user_id = $1`,
+		`DELETE FROM fieldkit.project_update WHERE author_id = $1`,
+
+		`DELETE FROM fieldkit.visible_configuration WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
+		`DELETE FROM fieldkit.project_station WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
+		`DELETE FROM fieldkit.station_activity WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
+		`DELETE FROM fieldkit.station_ingestion WHERE uploader_id = $1`,
+		`DELETE FROM fieldkit.station WHERE owner_id = $1`,
+		`DELETE FROM fieldkit.user WHERE id = $1`,
+	}
+
+	for _, query := range queries {
+		log.Infow("executing", "sql", query, "user_id", userID)
+		if _, err := s.options.Database.ExecContext(ctx, query, userID); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 
-func (s *UserService) AdminDelete(outerCtx context.Context, payload *user.AdminDeletePayload) error {
-	log := Logger(outerCtx).Sugar()
+func (s *UserService) DeleteAccount(outerCtx context.Context, payload *user.DeleteAccountPayload) error {
+	return s.options.Database.WithNewTransaction(outerCtx, func(ctx context.Context) error {
+		p, err := NewPermissions(ctx, s.options).Unwrap()
+		if err != nil {
+			return err
+		}
 
+		deleting := &data.User{}
+		if err := s.options.Database.GetContext(ctx, deleting, `SELECT * FROM fieldkit.user WHERE id = $1`, p.UserID()); err != nil {
+			return user.MakeForbidden(errors.New("forbidden"))
+		}
+
+		return s.deleteUser(ctx, deleting.ID)
+	})
+}
+
+func (s *UserService) AdminDelete(outerCtx context.Context, payload *user.AdminDeletePayload) error {
 	return s.options.Database.WithNewTransaction(outerCtx, func(ctx context.Context) error {
 		p, err := NewPermissions(ctx, s.options).Unwrap()
 		if err != nil {
@@ -782,32 +840,7 @@ func (s *UserService) AdminDelete(outerCtx context.Context, payload *user.AdminD
 			return user.MakeForbidden(errors.New("forbidden"))
 		}
 
-		log.Infow("deleting", "user_id", deleting.ID)
-
-		queries := []string{
-			`DELETE FROM fieldkit.project_invite WHERE user_id = $1`,
-			`DELETE FROM fieldkit.project_follower WHERE follower_id = $1`,
-			`DELETE FROM fieldkit.project_user WHERE user_id = $1`,
-			`DELETE FROM fieldkit.notes_media WHERE user_id = $1`,
-			`DELETE FROM fieldkit.notes WHERE author_id = $1`,
-			`DELETE FROM fieldkit.notes WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
-			`DELETE FROM fieldkit.notes_media WHERE id IN (SELECT media_id FROM fieldkit.notes_media_link WHERE note_id IN (SELECT id FROM fieldkit.notes WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)))`,
-			`DELETE FROM fieldkit.notes_media_link WHERE note_id IN (SELECT id FROM fieldkit.notes WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1))`,
-			`DELETE FROM fieldkit.notes WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
-			`DELETE FROM fieldkit.visible_configuration WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
-			`DELETE FROM fieldkit.project_station WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
-			`DELETE FROM fieldkit.station_activity WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
-			`DELETE FROM fieldkit.station_ingestion WHERE uploader_id = $1`,
-			`DELETE FROM fieldkit.station WHERE owner_id = $1`,
-			`DELETE FROM fieldkit.user WHERE id = $1`,
-		}
-
-		for _, query := range queries {
-			if _, err := s.options.Database.ExecContext(ctx, query, deleting.ID); err != nil {
-				return err
-			}
-		}
-		return nil
+		return s.deleteUser(ctx, deleting.ID)
 	})
 }
 
