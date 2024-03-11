@@ -2791,6 +2791,130 @@ func DecodeAdminTermsAndConditionsResponse(decoder func(*http.Response) goahttp.
 	}
 }
 
+// BuildDeleteAccountRequest instantiates a HTTP request object with method and
+// path set to call the "user" service "delete account" endpoint
+func (c *Client) BuildDeleteAccountRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: DeleteAccountUserPath()}
+	req, err := http.NewRequest("DELETE", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("user", "delete account", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeDeleteAccountRequest returns an encoder for requests sent to the user
+// delete account server.
+func EncodeDeleteAccountRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*user.DeleteAccountPayload)
+		if !ok {
+			return goahttp.ErrInvalidType("user", "delete account", "*user.DeleteAccountPayload", v)
+		}
+		{
+			head := p.Auth
+			if !strings.Contains(head, " ") {
+				req.Header.Set("Authorization", "Bearer "+head)
+			} else {
+				req.Header.Set("Authorization", head)
+			}
+		}
+		return nil
+	}
+}
+
+// DecodeDeleteAccountResponse returns a decoder for responses returned by the
+// user delete account endpoint. restoreBody controls whether the response body
+// should be restored after having been read.
+// DecodeDeleteAccountResponse may return the following errors:
+//   - "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//   - "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//   - "not-found" (type *goa.ServiceError): http.StatusNotFound
+//   - "bad-request" (type *goa.ServiceError): http.StatusBadRequest
+//   - error: internal error
+func DecodeDeleteAccountResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusNoContent:
+			return nil, nil
+		case http.StatusUnauthorized:
+			var (
+				body DeleteAccountUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("user", "delete account", err)
+			}
+			err = ValidateDeleteAccountUnauthorizedResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("user", "delete account", err)
+			}
+			return nil, NewDeleteAccountUnauthorized(&body)
+		case http.StatusForbidden:
+			var (
+				body DeleteAccountForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("user", "delete account", err)
+			}
+			err = ValidateDeleteAccountForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("user", "delete account", err)
+			}
+			return nil, NewDeleteAccountForbidden(&body)
+		case http.StatusNotFound:
+			var (
+				body DeleteAccountNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("user", "delete account", err)
+			}
+			err = ValidateDeleteAccountNotFoundResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("user", "delete account", err)
+			}
+			return nil, NewDeleteAccountNotFound(&body)
+		case http.StatusBadRequest:
+			var (
+				body DeleteAccountBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("user", "delete account", err)
+			}
+			err = ValidateDeleteAccountBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("user", "delete account", err)
+			}
+			return nil, NewDeleteAccountBadRequest(&body)
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("user", "delete account", resp.StatusCode, string(body))
+		}
+	}
+}
+
 // BuildAdminDeleteRequest instantiates a HTTP request object with method and
 // path set to call the "user" service "admin delete" endpoint
 func (c *Client) BuildAdminDeleteRequest(ctx context.Context, v interface{}) (*http.Request, error) {

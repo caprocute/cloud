@@ -754,6 +754,10 @@ func (s *UserService) DownloadPhoto(ctx context.Context, payload *user.DownloadP
 	}, nil
 }
 
+func (s *UserService) DeleteAccount(outerCtx context.Context, payload *user.DeleteAccountPayload) error {
+	return nil
+}
+
 func (s *UserService) AdminDelete(outerCtx context.Context, payload *user.AdminDeletePayload) error {
 	log := Logger(outerCtx).Sugar()
 

@@ -91,6 +91,10 @@ type Client struct {
 	// admin terms and conditions endpoint.
 	AdminTermsAndConditionsDoer goahttp.Doer
 
+	// DeleteAccount Doer is the HTTP client used to make requests to the delete
+	// account endpoint.
+	DeleteAccountDoer goahttp.Doer
+
 	// AdminDelete Doer is the HTTP client used to make requests to the admin
 	// delete endpoint.
 	AdminDeleteDoer goahttp.Doer
@@ -146,6 +150,7 @@ func NewClient(
 		IssueTransmissionTokenDoer:  doer,
 		ProjectRolesDoer:            doer,
 		AdminTermsAndConditionsDoer: doer,
+		DeleteAccountDoer:           doer,
 		AdminDeleteDoer:             doer,
 		AdminSearchDoer:             doer,
 		MentionablesDoer:            doer,
@@ -623,6 +628,30 @@ func (c *Client) AdminTermsAndConditions() goa.Endpoint {
 		resp, err := c.AdminTermsAndConditionsDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("user", "admin terms and conditions", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// DeleteAccount returns an endpoint that makes HTTP requests to the user
+// service delete account server.
+func (c *Client) DeleteAccount() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeDeleteAccountRequest(c.encoder)
+		decodeResponse = DecodeDeleteAccountResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildDeleteAccountRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.DeleteAccountDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("user", "delete account", err)
 		}
 		return decodeResponse(resp)
 	}

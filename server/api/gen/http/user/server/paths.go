@@ -111,6 +111,11 @@ func AdminTermsAndConditionsUserPath() string {
 	return "/admin/user/tnc"
 }
 
+// DeleteAccountUserPath returns the URL path to the user service delete account HTTP endpoint.
+func DeleteAccountUserPath() string {
+	return "/auth/delete-account"
+}
+
 // AdminDeleteUserPath returns the URL path to the user service admin delete HTTP endpoint.
 func AdminDeleteUserPath() string {
 	return "/admin/user"
