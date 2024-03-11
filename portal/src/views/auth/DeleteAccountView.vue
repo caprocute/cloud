@@ -87,13 +87,12 @@ export default Vue.extend({
         };
     },
     validations() {
-        console.log("validations", this.email);
         return {
             form: {
                 email: {
                     required,
                     email,
-                    sameAsRawValue: sameAs(function () {
+                    sameAsRawValue: sameAs(function (this: any) {
                         return this.email;
                     }),
                 },
