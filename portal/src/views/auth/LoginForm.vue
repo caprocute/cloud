@@ -1,6 +1,9 @@
 <template>
     <form class="form" @submit.prevent="save">
         <h1 class="form-title">{{ heading }}</h1>
+        <p v-if="message">
+            {{ message }}
+        </p>
         <div class="form-group" v-if="spoofing">
             <TextField v-model="form.spoofEmail" :label="$t('login.form.spoofEmail.label')" />
             <div class="form-errors" v-if="$v.form.spoofEmail.$error">
@@ -83,6 +86,10 @@ export default Vue.extend({
         showCreateAccount: {
             type: Boolean,
             default: true,
+        },
+        message: {
+            type: String,
+            default: null,
         },
     },
     data(): {

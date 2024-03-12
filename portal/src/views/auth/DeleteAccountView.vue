@@ -10,6 +10,7 @@
                 :busy="busy"
                 @login="save"
                 :heading="$t('deleteAccount.heading')"
+                :message="$t('deleteAccount.welcome')"
             />
         </div>
         <div v-if="authenticated && !deleted">
