@@ -545,6 +545,7 @@
     "deleteAccount": {
         "heading": "Delete My Account",
         "button": "Delete Account",
+        "welcome": "Welcome, this form can be used to request that all of your FieldKit account information and data be deleted from our servers. This includes stations, photos, notes or personal projects and any associated location or diagnostic information. This deletion will take effect immediately, so please be careful before proceeding.",
         "warning": "Warning, continuing will delete your account and all associated data. To confirm, please enter your email address.",
         "done": "Your account has been deleted.",
         "sameEmail": "Does not match your email."
