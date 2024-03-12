@@ -541,5 +541,12 @@
         "customKey": "Campo de nota personalizado",
         "newFieldNote": "Nueva nota de campo",
         "editFieldNote": "Nota de campo editada"
+    },
+    "deleteAccount": {
+        "heading": "Delete My Account",
+        "button": "Delete Account",
+        "warning": "Warning, continuing will delete your account and all associated data. To confirm, please enter your email address.",
+        "done": "Your account has been deleted.",
+        "sameEmail": "Does not match your email."
     }
 }
