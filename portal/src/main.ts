@@ -21,9 +21,7 @@ import Config from "./secrets";
 import App from "./App.vue";
 import { format as d3format } from "d3-format";
 
-import VueI18n from "vue-i18n";
-import { languages } from "./locales/index.js";
-import { defaultLocale } from "./locales/index.js";
+import i18n from "./i18n";
 
 const services = new Services();
 
@@ -164,12 +162,6 @@ store.commit(MutationTypes.INITIALIZE);
 
 const router = routerFactory(store);
 sync(store, router);
-
-const messages = Object.assign(languages);
-const i18n = new VueI18n({
-    locale: defaultLocale,
-    messages,
-});
 
 new Vue({
     i18n,
