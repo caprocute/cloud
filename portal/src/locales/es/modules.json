@@ -4,7 +4,7 @@
             "name": "Agua"
         },
         "water.ec": {
-            "name": "Conductividad del Agua",
+            "name": "Conductividad de agua",
             "sensors": {
                 "ec": "Conductividad",
                 "tds": "SDT",
@@ -12,13 +12,13 @@
             }
         },
         "water.ph": {
-            "name": "pH del Agua",
+            "name": "pH de agua",
             "sensors": {
                 "ph": "pH"
             }
         },
         "water.do": {
-            "name": "Oxígeno Disuelto en el Agua",
+            "name": "Oxígeno disuelto de agua",
             "sensors": {
                 "do": "OD",
                 "temperature": "Temperatura",
@@ -26,19 +26,19 @@
             }
         },
         "water.dox": {
-            "name": "Oxígeno Disuelto en el Agua",
+            "name": "Oxígeno disuelto de agua",
             "sensors": {
                 "dox": "OD"
             }
         },
         "water.temp": {
-            "name": "Temperatura del Agua",
+            "name": "Temperatura de agua",
             "sensors": {
                 "temp": "Temperatura"
             }
         },
         "water.orp": {
-            "name": "ORP del Agua",
+            "name": "ORP de agua",
             "sensors": {
                 "orp": "ORP"
             }
@@ -58,15 +58,15 @@
                 "wind_mv": "Viento ADC Raw",
                 "wind_speed": "Velocidad del viento",
                 "wind_dir": "Dirección del viento",
-                "wind_dir_mv": "Viento ADC Crudo Dirección",
-                "wind_hr_max_speed": "Velocidad Máx. del Viento (1 hora)",
-                "wind_hr_max_dir": "Dirección Máx. del Viento (1 hora)",
-                "wind_10m_max_speed": "Velocidad Máx. del Viento (10 min)",
-                "wind_10m_max_dir": "Dirección Máx. del Viento (10 min)",
-                "wind_2m_avg_speed": "Velocidad Prom. del Viento (2 min)",
-                "wind_2m_avg_dir": "Dirección Prom. del Viento (2 min)",
-                "rain_this_hour": "Lluvia Esta Hora",
-                "rain_prev_hour": "Lluvia Hora Anterior"
+                "wind_dir_mv": "Dirección del viento ADC Raw",
+                "wind_hr_max_speed": "Velocidad máxima del viento (1 hora)",
+                "wind_hr_max_dir": "Dirección máxima del viento (1 hora)",
+                "wind_10m_max_speed": "Velocidad máxima del viento (10 min)",
+                "wind_10m_max_dir": "Dirección máxima del viento (10 min)",
+                "wind_2m_avg_speed": "Velocidad media del viento (2 min)",
+                "wind_2m_avg_dir": "Dirección media del viento (2 min)",
+                "rain_this_hour": "Lluvia esta hora",
+                "rain_prev_hour": "Lluvia de hora anterior"
             }
         },
         "distance": {
@@ -80,20 +80,20 @@
             }
         },
         "diagnostics": {
-            "name": "Diagnósticos",
+            "name": "Diagnóstico",
             "sensors": {
-                "battery_charge": "Carga de Batería",
-                "battery_voltage": "Voltaje de Batería",
-                "battery_vbus": "Voltaje Bus Batería",
-                "battery_vs": "Voltaje Derivación Batería",
-                "battery_ma": "Corriente de Batería",
-                "battery_power": "Potencia de Batería",
-                "solar_vbus": "Voltaje Bus Solar",
-                "solar_vs": "Voltaje Derivación Solar",
-                "solar_ma": "Corriente Solar",
-                "solar_power": "Potencia Solar",
-                "free_memory": "Memoria Libre",
-                "uptime": "Tiempo de Actividad",
+                "battery_charge": "Carga de batería",
+                "battery_voltage": "Voltaje de batería",
+                "battery_vbus": "Voltaje de batería bus",
+                "battery_vs": "Voltaje de batería shunt",
+                "battery_ma": "Corriente de batería",
+                "battery_power": "Potencia de batería",
+                "solar_vbus": "Voltaje solar bus",
+                "solar_vs": "Voltaje solar shunt",
+                "solar_ma": "Corriente solar",
+                "solar_power": "Potencia solar",
+                "free_memory": "Memoria libre",
+                "uptime": "Tiempo de funcionamiento",
                 "temperature": "Temperatura"
             }
         },
@@ -114,8 +114,8 @@
         },
         "testing": {
             "sensors": {
-                "sin": "Sen(x)",
-                "saw.weekly": "Sierra(x)"
+                "sin": "Sin(x)",
+                "saw.weekly": "Saw(x)"
             }
         },
         "wh.floodnet": {
@@ -124,8 +124,8 @@
                 "battery": "Batería",
                 "distance": "Distancia",
                 "depth": "Profundidad",
-                "depthUnfiltered": "Profundidad (No Filtrada)",
-                "tideFeet": "Nivel de Marea",
+                "depthUnfiltered": "Profundidad (sin filtro)",
+                "tideFeet": "Nivel de marea",
                 "altitude": "Altitud",
                 "temperature": "Temperatura",
                 "pressure": "Presión",
