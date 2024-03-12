@@ -12,6 +12,7 @@ import { AuthenticationRequiredError } from "@/api";
 import { getPartnerCustomization, PartnerCustomization } from "./views/shared/partners";
 import SnackBar from "@/views/shared/SnackBar.vue";
 import {Locales} from '@/views/shared/LanguageSelector.vue';
+import moment from 'moment';
 
 export default Vue.extend({
     components: {
@@ -71,6 +72,7 @@ export default Vue.extend({
         changeLang(locale: Locales) {
             this.$i18n.locale = locale;
             localStorage.setItem("locale", locale);
+            moment.locale(locale);
         },
         useSavedLocale() {
             const locale = localStorage.getItem("locale") as Locales;
