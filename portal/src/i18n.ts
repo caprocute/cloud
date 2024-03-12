@@ -102,10 +102,10 @@ function loadLocaleMessages(): LocaleMessages {
         })
         .fromPairs()
         .value();
-
+    console.log("Radoi loca", localStorage);
     Object.assign(messages.en, keys);
     Object.assign(messages.en, moduleKeys);
-
+    console.log("radoi", messages);
     return messages;
 }
 
