@@ -68,11 +68,9 @@ export const VizGroup = Vue.extend({
         },
     },
     template: `
-        <div v-bind:class="{ 'group-container': true, 'busy': false, 'group-no-data': isGroupEmpty() }">
-            <div v-if="isGroupEmpty()" class="group-no-data-msg"> {{$tc('dataView.noData')}} </div>
+        <div v-bind:class="{ 'group-container': true, 'busy': false}">
             <div v-for="(viz, index) in group.vizes" :key="viz.id" v-bind:class="{ 'viz-container': true, 'busy': false }">
                 <div style="display: none;">Group:{{group.id}} Viz:{{viz.id}} {{isLinked(index)}} {{index}} {{topGroup}}</div>
-
                 <div class="icons-container" v-if="!topGroup || index > 0" v-bind:class="{ 'linked': isLinked(index), 'unlinked': !isLinked(index) }">
                     <div class="invisible-spacing-icon"></div>
                     <div class="icon" v-on:click="(ev) => raiseChangeLinkage(viz, !isLinked(index))" v-bind:class="{ 'icon-open-link': !isLinked(index), 'icon-link': isLinked(index) }"></div>
