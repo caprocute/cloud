@@ -1104,7 +1104,9 @@ export default Vue.extend({
 }
 
 ::v-deep .group-no-data {
-    .viz .viz,
+    position: relative;
+
+    .viz,
     .scrubber {
         opacity: 0.4;
         pointer-events: none;

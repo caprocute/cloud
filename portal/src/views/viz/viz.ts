@@ -335,6 +335,10 @@ export class Graph extends Viz {
         return [];
     }
 
+    public isDataSetEmpty(): boolean {
+        return this.loadedDataSets.some(ds => ds.all?.empty);
+    }
+
     public allSeries(vizInfoFactory: VizInfoFactory): SeriesData[] {
         return this.loadedDataSets.map((ds) => {
             if (!ds.graphing) throw new Error(`viz: No data`);
