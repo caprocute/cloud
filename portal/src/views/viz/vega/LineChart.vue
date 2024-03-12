@@ -218,7 +218,6 @@ export default Vue.extend({
 
 .vega-embed summary {
     border-radius: 0px !important;
-    width: 70px;
     height: 1em;
     display: flex;
     align-items: center;
