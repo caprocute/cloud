@@ -5,7 +5,7 @@ stages:
   - db
 
 variables:
-  VERSION: 0.3.57
+  VERSION: 0.3.58
 
 test:go:
   stage: test
