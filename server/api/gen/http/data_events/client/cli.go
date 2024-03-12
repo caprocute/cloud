@@ -74,7 +74,7 @@ func BuildUpdateDataEventPayload(dataEventsUpdateDataEventBody string, dataEvent
 	{
 		err = json.Unmarshal([]byte(dataEventsUpdateDataEventBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"description\": \"Enim qui nam rerum voluptatem ipsam ipsum.\",\n      \"end\": 2498772306149528305,\n      \"start\": 9162650411330587069,\n      \"title\": \"Qui et voluptas.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"description\": \"Rerum voluptatem.\",\n      \"end\": 2898834277194477025,\n      \"start\": 4808730696518469450,\n      \"title\": \"Et voluptas totam enim qui.\"\n   }'")
 		}
 	}
 	var eventID int64

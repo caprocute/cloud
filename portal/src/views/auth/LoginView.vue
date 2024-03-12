@@ -2,7 +2,14 @@
     <div class="form-container" v-if="!sso">
         <ForbiddenBanner v-if="errorMessage" :title="errorMessage" :subtitle="$t('login.loginError')"></ForbiddenBanner>
         <Logo class="form-header-logo"></Logo>
-        <LoginForm :forwardAfterQuery="forwardAfterQuery" :spoofing="spoofing" :failed="failed" :busy="busy" @login="save" />
+        <LoginForm
+            :forwardAfterQuery="forwardAfterQuery"
+            :spoofing="spoofing"
+            :failed="failed"
+            :busy="busy"
+            @login="save"
+            heading="Log In to Your Account"
+        />
     </div>
 </template>
 

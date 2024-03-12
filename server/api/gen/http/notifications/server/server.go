@@ -12,8 +12,8 @@ import (
 	"net/http"
 	"regexp"
 
-	notifications "gitlab.com/fieldkit/cloud/server/api/gen/notifications"
 	"github.com/gorilla/websocket"
+	notifications "gitlab.com/fieldkit/cloud/server/api/gen/notifications"
 	goahttp "goa.design/goa/v3/http"
 	goa "goa.design/goa/v3/pkg"
 	"goa.design/plugins/v3/cors"
