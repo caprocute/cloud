@@ -806,5 +806,8 @@
             "exploreData": "Explorar datos",
             "transfer": "Transfer"
         }
+    },
+    "pagination": {
+        "of": "of"
     }
 }
