@@ -692,6 +692,14 @@
             "histogram": "Histogram",
             "range": "Range",
             "map": "Map"
+        },
+        "viewBy": {
+            "btn": "View by:",
+            "day": "Day",
+            "week": "Week",
+            "month": "Month",
+            "year": "Year",
+            "all": "All"
         }
     },
     "edit": "Edit",

@@ -105,7 +105,7 @@ function loadLocaleMessages(): LocaleMessages {
 
     Object.assign(messages.en, keys);
     Object.assign(messages.en, moduleKeys);
-    console.log("Radoi mesages", messages);
+
     return messages;
 }
 
