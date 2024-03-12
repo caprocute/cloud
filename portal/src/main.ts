@@ -8,6 +8,7 @@ import VueConfirmDialog from "vue-confirm-dialog";
 import Multiselect from "vue-multiselect";
 import { BadgePlugin } from "bootstrap-vue";
 import VueSilentbox from "vue-silentbox";
+import VueGtag from "vue-gtag";
 
 import prettyBytes from "pretty-bytes";
 import moment from "moment";
@@ -20,6 +21,7 @@ import ConfigurationPlugin from "./config";
 import Config from "./secrets";
 import App from "./App.vue";
 import { format as d3format } from "d3-format";
+import { getPartnerCustomization, isCustomisationEnabled } from "@/views/shared/partners";
 
 import i18n from "./i18n";
 
@@ -65,6 +67,16 @@ Vue.component("vue-confirm-dialog", VueConfirmDialog.default);
 Vue.component("multiselect", Multiselect);
 Vue.use(BadgePlugin);
 Vue.use(VueSilentbox);
+
+// Initialize GA script for dev/prod server on Floodnet domain only
+if (process.env.NODE_ENV === "production" && isCustomisationEnabled() && getPartnerCustomization()?.googleTagManagerIds) {
+    const ids = getPartnerCustomization()?.googleTagManagerIds;
+    const hostname = Config.partners.hostOverride || window.location.hostname;
+    const isStaging = hostname.indexOf("fkdev.") >= 0;
+    Vue.use(VueGtag, {
+        config: { id: isStaging ? ids?.staging : ids?.prod },
+    });
+}
 
 Vue.config.productionTip = false;
 

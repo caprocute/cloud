@@ -3,7 +3,7 @@
 // project service
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package project
 
@@ -11,7 +11,7 @@ import (
 	"context"
 	"io"
 
-	projectviews "github.com/fieldkit/cloud/server/api/gen/project/views"
+	projectviews "gitlab.com/fieldkit/cloud/server/api/gen/project/views"
 	goa "goa.design/goa/v3/pkg"
 	"goa.design/goa/v3/security"
 )

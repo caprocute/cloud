@@ -3,7 +3,7 @@
 // station HTTP client CLI support package
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package client
 
@@ -12,7 +12,7 @@ import (
 	"fmt"
 	"strconv"
 
-	station "github.com/fieldkit/cloud/server/api/gen/station"
+	station "gitlab.com/fieldkit/cloud/server/api/gen/station"
 )
 
 // BuildAddPayload builds the payload for the station add endpoint from CLI

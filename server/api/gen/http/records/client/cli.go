@@ -3,7 +3,7 @@
 // records HTTP client CLI support package
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package client
 
@@ -11,7 +11,7 @@ import (
 	"fmt"
 	"strconv"
 
-	records "github.com/fieldkit/cloud/server/api/gen/records"
+	records "gitlab.com/fieldkit/cloud/server/api/gen/records"
 )
 
 // BuildDataPayload builds the payload for the records data endpoint from CLI

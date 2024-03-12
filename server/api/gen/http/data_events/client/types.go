@@ -3,13 +3,13 @@
 // data events HTTP client types
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package client
 
 import (
-	dataevents "github.com/fieldkit/cloud/server/api/gen/data_events"
-	dataeventsviews "github.com/fieldkit/cloud/server/api/gen/data_events/views"
+	dataevents "gitlab.com/fieldkit/cloud/server/api/gen/data_events"
+	dataeventsviews "gitlab.com/fieldkit/cloud/server/api/gen/data_events/views"
 	goa "goa.design/goa/v3/pkg"
 )
 

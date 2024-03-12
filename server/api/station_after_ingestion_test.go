@@ -9,13 +9,13 @@ import (
 	"github.com/kinbiko/jsonassert"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/fieldkit/cloud/server/common/jobs"
-	"github.com/fieldkit/cloud/server/common/logging"
+	"gitlab.com/fieldkit/cloud/server/common/jobs"
+	"gitlab.com/fieldkit/cloud/server/common/logging"
 
-	"github.com/fieldkit/cloud/server/backend"
-	"github.com/fieldkit/cloud/server/data"
-	"github.com/fieldkit/cloud/server/messages"
-	"github.com/fieldkit/cloud/server/tests"
+	"gitlab.com/fieldkit/cloud/server/backend"
+	"gitlab.com/fieldkit/cloud/server/data"
+	"gitlab.com/fieldkit/cloud/server/messages"
+	"gitlab.com/fieldkit/cloud/server/tests"
 )
 
 func TestQueryStationWithConfigurations(t *testing.T) {
@@ -47,7 +47,7 @@ func TestQueryStationWithConfigurations(t *testing.T) {
 
 	req, _ := http.NewRequest("POST", "/user/stations", bytes.NewReader(payload))
 	req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(user))
-	rr := tests.ExecuteRequest(req, api)
+	tests.ExecuteRequest(req, api)
 
 	files, err := e.NewFilePair(4, 16)
 	assert.NoError(err)
@@ -88,7 +88,7 @@ func TestQueryStationWithConfigurations(t *testing.T) {
 
 	req, _ = http.NewRequest("GET", "/user/stations", nil)
 	req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(user))
-	rr = tests.ExecuteRequest(req, api)
+	rr := tests.ExecuteRequest(req, api)
 
 	assert.Equal(http.StatusOK, rr.Code)
 

@@ -8,11 +8,11 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	"github.com/fieldkit/cloud/server/common/jobs"
-	"github.com/fieldkit/cloud/server/common/logging"
-	"github.com/fieldkit/cloud/server/common/txs"
-	"github.com/fieldkit/cloud/server/messages"
-	"github.com/fieldkit/cloud/server/storage"
+	"gitlab.com/fieldkit/cloud/server/common/jobs"
+	"gitlab.com/fieldkit/cloud/server/common/logging"
+	"gitlab.com/fieldkit/cloud/server/common/txs"
+	"gitlab.com/fieldkit/cloud/server/messages"
+	"gitlab.com/fieldkit/cloud/server/storage"
 )
 
 type RefreshMaterializedViewsHandler struct {
@@ -68,7 +68,7 @@ var (
 	ErrEmptyRefresh = errors.New("empty refresh")
 )
 
-func (h *RefreshMaterializedViewsHandler) getRefreshSQL(ctx context.Context, m *messages.RefreshMaterializedView, view *storage.MaterializedView) (string, []interface{}, error) {
+func (h *RefreshMaterializedViewsHandler) getRefreshSQL(_ context.Context, m *messages.RefreshMaterializedView, view *storage.MaterializedView) (string, []interface{}, error) {
 	if m.Start.IsZero() || m.End.IsZero() {
 		return view.MakeRefreshAllSQL()
 	}

@@ -1,7 +1,7 @@
 package jobs
 
 import (
-	"github.com/fieldkit/cloud/server/common/logging"
+	"gitlab.com/fieldkit/cloud/server/common/logging"
 )
 
 type CompletionIDs struct {

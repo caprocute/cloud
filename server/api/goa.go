@@ -18,84 +18,84 @@ import (
 
 	goahttp "goa.design/goa/v3/http"
 
-	"github.com/fieldkit/cloud/server/api/design"
+	"gitlab.com/fieldkit/cloud/server/api/design"
 	"goa.design/plugins/v3/cors"
 
-	"github.com/fieldkit/cloud/server/common"
-	"github.com/fieldkit/cloud/server/common/logging"
-	"github.com/fieldkit/cloud/server/webhook"
+	"gitlab.com/fieldkit/cloud/server/common"
+	"gitlab.com/fieldkit/cloud/server/common/logging"
+	"gitlab.com/fieldkit/cloud/server/webhook"
 
-	testSvr "github.com/fieldkit/cloud/server/api/gen/http/test/server"
-	test "github.com/fieldkit/cloud/server/api/gen/test"
+	testSvr "gitlab.com/fieldkit/cloud/server/api/gen/http/test/server"
+	test "gitlab.com/fieldkit/cloud/server/api/gen/test"
 
-	tasksSvr "github.com/fieldkit/cloud/server/api/gen/http/tasks/server"
-	tasks "github.com/fieldkit/cloud/server/api/gen/tasks"
+	tasksSvr "gitlab.com/fieldkit/cloud/server/api/gen/http/tasks/server"
+	tasks "gitlab.com/fieldkit/cloud/server/api/gen/tasks"
 
-	modulesSvr "github.com/fieldkit/cloud/server/api/gen/http/modules/server"
-	modules "github.com/fieldkit/cloud/server/api/gen/modules"
+	modulesSvr "gitlab.com/fieldkit/cloud/server/api/gen/http/modules/server"
+	modules "gitlab.com/fieldkit/cloud/server/api/gen/modules"
 
-	following "github.com/fieldkit/cloud/server/api/gen/following"
-	followingSvr "github.com/fieldkit/cloud/server/api/gen/http/following/server"
+	following "gitlab.com/fieldkit/cloud/server/api/gen/following"
+	followingSvr "gitlab.com/fieldkit/cloud/server/api/gen/http/following/server"
 
-	activity "github.com/fieldkit/cloud/server/api/gen/activity"
-	activitySvr "github.com/fieldkit/cloud/server/api/gen/http/activity/server"
+	activity "gitlab.com/fieldkit/cloud/server/api/gen/activity"
+	activitySvr "gitlab.com/fieldkit/cloud/server/api/gen/http/activity/server"
 
-	projectSvr "github.com/fieldkit/cloud/server/api/gen/http/project/server"
-	project "github.com/fieldkit/cloud/server/api/gen/project"
+	projectSvr "gitlab.com/fieldkit/cloud/server/api/gen/http/project/server"
+	project "gitlab.com/fieldkit/cloud/server/api/gen/project"
 
-	stationSvr "github.com/fieldkit/cloud/server/api/gen/http/station/server"
-	station "github.com/fieldkit/cloud/server/api/gen/station"
+	stationSvr "gitlab.com/fieldkit/cloud/server/api/gen/http/station/server"
+	station "gitlab.com/fieldkit/cloud/server/api/gen/station"
 
-	userSvr "github.com/fieldkit/cloud/server/api/gen/http/user/server"
-	user "github.com/fieldkit/cloud/server/api/gen/user"
+	userSvr "gitlab.com/fieldkit/cloud/server/api/gen/http/user/server"
+	user "gitlab.com/fieldkit/cloud/server/api/gen/user"
 
-	ingestionSvr "github.com/fieldkit/cloud/server/api/gen/http/ingestion/server"
-	ingestion "github.com/fieldkit/cloud/server/api/gen/ingestion"
+	ingestionSvr "gitlab.com/fieldkit/cloud/server/api/gen/http/ingestion/server"
+	ingestion "gitlab.com/fieldkit/cloud/server/api/gen/ingestion"
 
-	informationSvr "github.com/fieldkit/cloud/server/api/gen/http/information/server"
-	information "github.com/fieldkit/cloud/server/api/gen/information"
+	informationSvr "gitlab.com/fieldkit/cloud/server/api/gen/http/information/server"
+	information "gitlab.com/fieldkit/cloud/server/api/gen/information"
 
-	sensorSvr "github.com/fieldkit/cloud/server/api/gen/http/sensor/server"
-	sensor "github.com/fieldkit/cloud/server/api/gen/sensor"
+	sensorSvr "gitlab.com/fieldkit/cloud/server/api/gen/http/sensor/server"
+	sensor "gitlab.com/fieldkit/cloud/server/api/gen/sensor"
 
-	notesSvr "github.com/fieldkit/cloud/server/api/gen/http/notes/server"
-	notes "github.com/fieldkit/cloud/server/api/gen/notes"
+	notesSvr "gitlab.com/fieldkit/cloud/server/api/gen/http/notes/server"
+	notes "gitlab.com/fieldkit/cloud/server/api/gen/notes"
 
-    stationNotesSvr "github.com/fieldkit/cloud/server/api/gen/http/station_note/server"
-    stationNotes "github.com/fieldkit/cloud/server/api/gen/station_note"
+	stationNotesSvr "gitlab.com/fieldkit/cloud/server/api/gen/http/station_note/server"
+	stationNotes "gitlab.com/fieldkit/cloud/server/api/gen/station_note"
 
-	recordsSvr "github.com/fieldkit/cloud/server/api/gen/http/records/server"
-	records "github.com/fieldkit/cloud/server/api/gen/records"
+	recordsSvr "gitlab.com/fieldkit/cloud/server/api/gen/http/records/server"
+	records "gitlab.com/fieldkit/cloud/server/api/gen/records"
 
-	firmware "github.com/fieldkit/cloud/server/api/gen/firmware"
-	firmwareSvr "github.com/fieldkit/cloud/server/api/gen/http/firmware/server"
+	firmware "gitlab.com/fieldkit/cloud/server/api/gen/firmware"
+	firmwareSvr "gitlab.com/fieldkit/cloud/server/api/gen/http/firmware/server"
 
-	datas "github.com/fieldkit/cloud/server/api/gen/data"
-	datasSvr "github.com/fieldkit/cloud/server/api/gen/http/data/server"
+	datas "gitlab.com/fieldkit/cloud/server/api/gen/data"
+	datasSvr "gitlab.com/fieldkit/cloud/server/api/gen/http/data/server"
 
-	csvService "github.com/fieldkit/cloud/server/api/gen/csv"
-	csvServiceSvr "github.com/fieldkit/cloud/server/api/gen/http/csv/server"
+	csvService "gitlab.com/fieldkit/cloud/server/api/gen/csv"
+	csvServiceSvr "gitlab.com/fieldkit/cloud/server/api/gen/http/csv/server"
 
-	exportService "github.com/fieldkit/cloud/server/api/gen/export"
-	exportServiceSvr "github.com/fieldkit/cloud/server/api/gen/http/export/server"
+	exportService "gitlab.com/fieldkit/cloud/server/api/gen/export"
+	exportServiceSvr "gitlab.com/fieldkit/cloud/server/api/gen/http/export/server"
 
-	discService "github.com/fieldkit/cloud/server/api/gen/discussion"
-	discServiceSvr "github.com/fieldkit/cloud/server/api/gen/http/discussion/server"
+	discService "gitlab.com/fieldkit/cloud/server/api/gen/discussion"
+	discServiceSvr "gitlab.com/fieldkit/cloud/server/api/gen/http/discussion/server"
 
-	eventsService "github.com/fieldkit/cloud/server/api/gen/data_events"
-	eventsServiceSvr "github.com/fieldkit/cloud/server/api/gen/http/data_events/server"
+	eventsService "gitlab.com/fieldkit/cloud/server/api/gen/data_events"
+	eventsServiceSvr "gitlab.com/fieldkit/cloud/server/api/gen/http/data_events/server"
 
-	discourseService "github.com/fieldkit/cloud/server/api/gen/discourse"
-	discourseServiceSvr "github.com/fieldkit/cloud/server/api/gen/http/discourse/server"
+	discourseService "gitlab.com/fieldkit/cloud/server/api/gen/discourse"
+	discourseServiceSvr "gitlab.com/fieldkit/cloud/server/api/gen/http/discourse/server"
 
-	oidcServiceSvr "github.com/fieldkit/cloud/server/api/gen/http/oidc/server"
-	oidcService "github.com/fieldkit/cloud/server/api/gen/oidc"
+	oidcServiceSvr "gitlab.com/fieldkit/cloud/server/api/gen/http/oidc/server"
+	oidcService "gitlab.com/fieldkit/cloud/server/api/gen/oidc"
 
-	ttnServiceSvr "github.com/fieldkit/cloud/server/api/gen/http/ttn/server"
-	ttnService "github.com/fieldkit/cloud/server/api/gen/ttn"
+	ttnServiceSvr "gitlab.com/fieldkit/cloud/server/api/gen/http/ttn/server"
+	ttnService "gitlab.com/fieldkit/cloud/server/api/gen/ttn"
 
-	notificationsServiceSvr "github.com/fieldkit/cloud/server/api/gen/http/notifications/server"
-	notificationsService "github.com/fieldkit/cloud/server/api/gen/notifications"
+	notificationsServiceSvr "gitlab.com/fieldkit/cloud/server/api/gen/http/notifications/server"
+	notificationsService "gitlab.com/fieldkit/cloud/server/api/gen/notifications"
 )
 
 func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.Handler, error) {
@@ -129,14 +129,14 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	informationSvc := NewInformationService(ctx, options)
 	informationEndpoints := information.NewEndpoints(informationSvc)
 
-	sensorSvc := NewSensorService(ctx, options, options.influxConfig, options.timeScaleConfig)
+	sensorSvc := NewSensorService(ctx, options, options.timeScaleConfig)
 	sensorEndpoints := sensor.NewEndpoints(sensorSvc)
 
 	notesSvc := NewNotesService(ctx, options)
 	notesEndpoints := notes.NewEndpoints(notesSvc)
 
-    stationNotesSvc := NewStationNoteService(ctx, options)
-    stationNotesEndpoints := stationNotes.NewEndpoints(stationNotesSvc)
+	stationNotesSvc := NewStationNoteService(ctx, options)
+	stationNotesEndpoints := stationNotes.NewEndpoints(stationNotesSvc)
 
 	recordsSvc := NewRecordsService(ctx, options)
 	recordsEndpoints := records.NewEndpoints(recordsSvc)
@@ -340,8 +340,8 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 		log.Infow("mount", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
 	}
 	for _, m := range stationNotesServer.Mounts {
-    		log.Infow("mount", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
-    	}
+		log.Infow("mount", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
+	}
 	for _, m := range recordsServer.Mounts {
 		log.Infow("mount", "method", m.Method, "verb", m.Verb, "pattern", m.Pattern)
 	}

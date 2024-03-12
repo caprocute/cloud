@@ -1,6 +1,9 @@
 <template>
     <form class="form" @submit.prevent="save">
-        <h1 class="form-title">{{$t('login.form.title')}}</h1>
+        <h1 class="form-title">{{ heading }}</h1>
+        <p v-if="message">
+            {{ message }}
+        </p>
         <div class="form-group" v-if="spoofing">
             <TextField v-model="form.spoofEmail" :label="$t('login.form.spoofEmail.label')" />
             <div class="form-errors" v-if="$v.form.spoofEmail.$error">
@@ -36,7 +39,7 @@
                 {{ $t("login.loginButton") }}
             </template>
         </button>
-        <div>
+        <div v-if="showCreateAccount">
             <router-link :to="{ name: 'register', query: forwardAfterQuery }" class="form-link">
                 {{ $t("login.createAccountLink") }}
             </router-link>
@@ -49,10 +52,9 @@ import _ from "lodash";
 import Vue, { PropType } from "vue";
 import CommonComponents from "@/views/shared";
 
-import { required, email, minLength, sameAs, requiredIf } from "vuelidate/lib/validators";
+import { required, email, minLength, requiredIf } from "vuelidate/lib/validators";
 
-import FKApi, { LoginPayload } from "@/api/api";
-import { ActionTypes } from "@/store";
+import { LoginPayload } from "@/api/api";
 
 export default Vue.extend({
     name: "LoginForm",
@@ -70,11 +72,24 @@ export default Vue.extend({
         },
         forwardAfterQuery: {
             type: Object as PropType<{ after?: string }>,
-            default: () => { return { after: null }; },
+            default: () => {
+                return { after: null };
+            },
+        },
+        heading: {
+            type: String,
         },
         busy: {
             type: Boolean,
             default: false,
+        },
+        showCreateAccount: {
+            type: Boolean,
+            default: true,
+        },
+        message: {
+            type: String,
+            default: null,
         },
     },
     data(): {
@@ -97,7 +112,7 @@ export default Vue.extend({
             form: {
                 spoofEmail: {
                     // eslint-disable-next-line
-                    required: requiredIf(function(this: any) {
+                    required: requiredIf(function (this: any) {
                         return this.spoofing;
                     }),
                     email,
@@ -137,7 +152,6 @@ export default Vue.extend({
 }
 
 .loading-spinner {
-
     &-wrap {
         @include position(absolute, 50% null null 50%);
         @include flex(center, center);

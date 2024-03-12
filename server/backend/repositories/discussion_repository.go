@@ -3,10 +3,10 @@ package repositories
 import (
 	"context"
 
-	"github.com/fieldkit/cloud/server/common/sqlxcache"
 	"github.com/jmoiron/sqlx"
+	"gitlab.com/fieldkit/cloud/server/common/sqlxcache"
 
-	"github.com/fieldkit/cloud/server/data"
+	"gitlab.com/fieldkit/cloud/server/data"
 )
 
 type DiscussionRepository struct {

@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/fieldkit/cloud/server/common/logging"
+	"gitlab.com/fieldkit/cloud/server/common/logging"
 )
 
 type GitStatus struct {
@@ -86,7 +86,7 @@ func StatusHandler(ctx context.Context) http.Handler {
 	})
 }
 
-func RobotsHandler(ctx context.Context) http.Handler {
+func RobotsHandler(ctx context.Context, production bool) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		setupResponse(&w, req)
 
@@ -102,9 +102,16 @@ func RobotsHandler(ctx context.Context) http.Handler {
 		log.Infow("status", "headers", req.Header)
 
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`
+		if production {
+			w.Write([]byte(`
 User-agent: *
 Allow: /
 `))
+		} else {
+			w.Write([]byte(`
+User-agent: *
+Disallow: /
+`))
+		}
 	})
 }

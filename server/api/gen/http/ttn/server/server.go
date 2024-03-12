@@ -3,7 +3,7 @@
 // ttn HTTP server
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package server
 
@@ -12,7 +12,7 @@ import (
 	"net/http"
 	"regexp"
 
-	ttn "github.com/fieldkit/cloud/server/api/gen/ttn"
+	ttn "gitlab.com/fieldkit/cloud/server/api/gen/ttn"
 	goahttp "goa.design/goa/v3/http"
 	goa "goa.design/goa/v3/pkg"
 	"goa.design/plugins/v3/cors"

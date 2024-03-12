@@ -14,13 +14,13 @@ import (
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 
-	"github.com/fieldkit/cloud/server/common/sqlxcache"
+	"gitlab.com/fieldkit/cloud/server/common/sqlxcache"
 
-	"github.com/fieldkit/cloud/server/common"
-	"github.com/fieldkit/cloud/server/common/logging"
+	"gitlab.com/fieldkit/cloud/server/common"
+	"gitlab.com/fieldkit/cloud/server/common/logging"
 
-	"github.com/fieldkit/cloud/server/data"
-	"github.com/fieldkit/cloud/server/files"
+	"gitlab.com/fieldkit/cloud/server/data"
+	"gitlab.com/fieldkit/cloud/server/files"
 )
 
 type options struct {
@@ -32,11 +32,11 @@ type options struct {
 
 func createAwsSession() (s *session.Session, err error) {
 	configs := []aws.Config{
-		aws.Config{
+		{
 			Region:                        aws.String("us-east-1"),
 			CredentialsChainVerboseErrors: aws.Bool(true),
 		},
-		aws.Config{
+		{
 			Region:                        aws.String("us-east-1"),
 			Credentials:                   credentials.NewEnvCredentials(),
 			CredentialsChainVerboseErrors: aws.Bool(true),
@@ -54,7 +54,7 @@ func createAwsSession() (s *session.Session, err error) {
 		}
 	}
 
-	return nil, fmt.Errorf("Error creating AWS session: %w", err)
+	return nil, fmt.Errorf("error creating AWS session: %w", err)
 }
 
 type EnvServices struct {
@@ -263,6 +263,4 @@ func main() {
 			panic(err)
 		}
 	}
-
-	return
 }

@@ -10,15 +10,15 @@ import (
 
 	"github.com/jackc/pgx/v5"
 
-	"github.com/fieldkit/cloud/server/common/logging"
-	"github.com/fieldkit/cloud/server/common/sqlxcache"
-	"github.com/fieldkit/cloud/server/storage"
+	"gitlab.com/fieldkit/cloud/server/common/logging"
+	"gitlab.com/fieldkit/cloud/server/common/sqlxcache"
+	"gitlab.com/fieldkit/cloud/server/storage"
 
 	"github.com/montanaflynn/stats"
 
-	"github.com/fieldkit/cloud/server/backend/handlers"
-	"github.com/fieldkit/cloud/server/backend/repositories"
-	"github.com/fieldkit/cloud/server/data"
+	"gitlab.com/fieldkit/cloud/server/backend/handlers"
+	"gitlab.com/fieldkit/cloud/server/backend/repositories"
+	"gitlab.com/fieldkit/cloud/server/data"
 )
 
 const (
@@ -58,18 +58,16 @@ type SourceAggregator struct {
 	tsConfig *storage.TimeScaleDBConfig
 	handlers *handlers.InterestingnessHandler
 	verbose  bool
-	legacy   bool
 	sensors  map[string]int64
 	records  [][]interface{}
 }
 
-func NewSourceAggregator(db *sqlxcache.DB, tsConfig *storage.TimeScaleDBConfig, verbose, legacy bool) *SourceAggregator {
+func NewSourceAggregator(db *sqlxcache.DB, tsConfig *storage.TimeScaleDBConfig, verbose bool) *SourceAggregator {
 	return &SourceAggregator{
 		db:       db,
 		tsConfig: tsConfig,
 		handlers: handlers.NewInterestingnessHandler(db),
 		verbose:  verbose,
-		legacy:   legacy,
 		records:  make([][]interface{}, 0),
 	}
 }
@@ -180,10 +178,6 @@ func (i *SourceAggregator) processBatches(ctx context.Context, batch *MessageBat
 
 	jqCache := &JqCache{}
 
-	config := NewSourceAggregatorConfig()
-
-	aggregators := make(map[int32]*handlers.Aggregator)
-
 	schemas := NewMessageSchemaRepository(i.db)
 
 	for {
@@ -223,18 +217,9 @@ func (i *SourceAggregator) processBatches(ctx context.Context, batch *MessageBat
 					if saved, err := model.Save(ctx, parsed); err != nil {
 						return err
 					} else if parsed.ReceivedAt != nil {
-						if aggregators[saved.Station.ID] == nil {
-							aggregators[saved.Station.ID] = handlers.NewAggregator(i.db, "", saved.Station.ID, AggregatingBatchSize, config)
-						}
-						aggregator := aggregators[saved.Station.ID]
+						for _, savedSensor := range saved.Sensors {
+							parsedSensor := savedSensor.parsed
 
-						if i.legacy {
-							if err := aggregator.NextTime(ctx, *parsed.ReceivedAt); err != nil {
-								return fmt.Errorf("adding: %w", err)
-							}
-						}
-
-						for _, parsedSensor := range parsed.Data {
 							key := parsedSensor.Key
 							if key == "" {
 								return fmt.Errorf("parsed-sensor has no sensor key")
@@ -248,20 +233,9 @@ func (i *SourceAggregator) processBatches(ctx context.Context, batch *MessageBat
 							if !parsedSensor.Transient {
 								sensorKey := fmt.Sprintf("%s.%s", saved.SensorPrefix, key)
 
-								ask := handlers.AggregateSensorKey{
-									SensorKey: sensorKey,
-									ModuleID:  saved.Module.ID,
-								}
-
-								if i.legacy {
-									if err := aggregator.AddSample(ctx, *parsed.ReceivedAt, nil, ask, parsedSensor.Value); err != nil {
-										return fmt.Errorf("adding: %w", err)
-									}
-								}
-
 								ir := &data.IncomingReading{
 									StationID: saved.Station.ID,
-									ModuleID:  saved.Module.ID,
+									ModuleID:  savedSensor.sensor.ModuleID,
 									SensorID:  sensorID,
 									SensorKey: sensorKey,
 									Time:      *parsed.ReceivedAt,
@@ -279,27 +253,12 @@ func (i *SourceAggregator) processBatches(ctx context.Context, batch *MessageBat
 		}
 	}
 
-	stationIDs := make([]int32, 0)
-	if i.legacy {
-		for id, aggregator := range aggregators {
-			if err := aggregator.Close(ctx); err != nil {
-				return err
-			}
-
-			stationIDs = append(stationIDs, id)
-		}
-	}
-
 	if err := model.Close(ctx); err != nil {
 		return err
 	}
 
 	if err := i.handlers.Close(ctx); err != nil {
 		return err
-	}
-
-	if i.legacy && len(stationIDs) == 0 {
-		Logger(ctx).Sugar().Warnw("wh:zero-stations")
 	}
 
 	return nil

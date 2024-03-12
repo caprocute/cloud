@@ -3,7 +3,7 @@
 // station_note HTTP client CLI support package
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package client
 
@@ -12,7 +12,7 @@ import (
 	"fmt"
 	"strconv"
 
-	stationnote "github.com/fieldkit/cloud/server/api/gen/station_note"
+	stationnote "gitlab.com/fieldkit/cloud/server/api/gen/station_note"
 )
 
 // BuildStationPayload builds the payload for the station_note station endpoint

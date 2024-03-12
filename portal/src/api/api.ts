@@ -1254,6 +1254,15 @@ class FKApi {
         });
     }
 
+    public deleteAccount(payload) {
+        return this.invoke({
+            auth: Auth.Required,
+            method: "DELETE",
+            url: this.baseUrl + "/auth/delete-account",
+            data: payload,
+        });
+    }
+
     public adminDeleteUser(payload) {
         return this.invoke({
             auth: Auth.Required,
@@ -1405,30 +1414,6 @@ class FKApi {
             auth: Auth.Required,
             method: "POST",
             url: this.baseUrl + `/data/ingestions/${ingestionId}/process?` + qp.toString(),
-        });
-    }
-
-    // Think twice before you use this. Every pending ingestion_queue should have a que_job.
-    protected adminProcessPending(): Promise<void> {
-        return this.invoke({
-            auth: Auth.Required,
-            method: "POST",
-            url: this.baseUrl + `/data/process`,
-        });
-    }
-
-    public adminProcessStation(stationId: number, completely: boolean, skipManual: boolean): Promise<void> {
-        const qp = new URLSearchParams();
-        if (completely) {
-            qp.append("completely", "true");
-        }
-        if (skipManual) {
-            qp.append("skipManual", "true");
-        }
-        return this.invoke({
-            auth: Auth.Required,
-            method: "POST",
-            url: this.baseUrl + `/data/stations/${stationId}/process?` + qp.toString(),
         });
     }
 

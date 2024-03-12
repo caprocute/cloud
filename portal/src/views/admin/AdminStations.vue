@@ -1,21 +1,21 @@
 <template>
     <StandardLayout>
         <div class="container">
-            <router-link :to="{ name: 'adminMain' }" class="link">{{ $t("admin.backBtn") }}</router-link>
+            <router-link :to="{ name: 'adminMain' }" class="link">Back to Admin</router-link>
 
             <table class="stations">
                 <thead>
                     <tr class="header">
-                        <th>{{ $t("admin.stations.id") }}</th>
-                        <th>{{ $t("admin.stations.name") }}</th>
-                        <th>{{ $t("admin.stations.deviceId") }}</th>
-                        <th>{{ $t("admin.stations.owner") }}</th>
-                        <th>{{ $t("admin.stations.recording") }}</th>
-                        <th>{{ $t("admin.stations.lastIngestion") }}</th>
-                        <th>{{ $t("admin.stations.created") }}</th>
-                        <th>{{ $t("admin.stations.updated") }}</th>
-                        <th>{{ $t("admin.stations.firmware") }}</th>
-                        <th>{{ $t("admin.stations.location") }}</th>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Device ID</th>
+                        <th>Owner</th>
+                        <th>Recording</th>
+                        <th>Last Ingestion</th>
+                        <th>Created</th>
+                        <th>Updated</th>
+                        <th>Firmware</th>
+                        <th>Location</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -40,23 +40,23 @@
                             </div>
                         </td>
                         <td>
-                            <div class="button" @click.stop="deleteStation(station)">{{ $t("admin.stations.delete") }}</div>
+                            <div class="button" @click.stop="deleteStation(station)">Delete</div>
                         </td>
                     </tr>
                     <tr v-if="focused && focused.id == station.id">
                         <td colspan="11" class="focused">
                             <div class="row">
                                 <div class="uploads" v-if="focused.uploads.length > 0">
-                                    <h3>{{ $t("admin.stations.uploads.heading") }}</h3>
+                                    <h3>Uploads</h3>
                                     <table>
                                         <thead>
                                             <tr>
-                                                <th>{{ $t("admin.stations.uploads.id") }}</th>
-                                                <th>{{ $t("admin.stations.uploads.date") }}</th>
-                                                <th>{{ $t("admin.stations.uploads.type") }}</th>
-                                                <th>{{ $t("admin.stations.uploads.size") }}</th>
-                                                <th>{{ $t("admin.stations.uploads.blocks") }}</th>
-                                                <th>{{ $t("admin.stations.uploads.url") }}</th>
+                                                <th>ID</th>
+                                                <th>Date</th>
+                                                <th>Type</th>
+                                                <th>Size</th>
+                                                <th>Blocks</th>
+                                                <th>URL</th>
                                                 <th></th>
                                             </tr>
                                         </thead>
@@ -74,9 +74,9 @@
                                     </table>
                                 </div>
                                 <div class="tools">
-                                    <h3>{{ $t("admin.stations.information") }}</h3>
+                                    <h3>Information</h3>
                                     <div v-if="focused.data">
-                                        {{ $t("admin.stations.data") }}
+                                        Data:
                                         <div>
                                             <b>{{ focused.data.start | prettyTime }}</b>
                                         </div>
@@ -85,35 +85,21 @@
                                         </div>
                                         <div>
                                             <b>{{ focused.data.numberOfSamples }}</b>
-                                            {{ $t("admin.stations.samples") }}
+                                            Samples
                                         </div>
                                     </div>
                                     <div>
-                                        {{ $t("admin.stations.serverLogs") }}
-                                        <a :href="urlForServerLogs(station)" target="_blank">{{ $t("admin.stations.10days") }}</a>
+                                        Server Logs:
+                                        <a :href="urlForServerLogs(station)" target="_blank">10 days</a>
                                     </div>
                                     <div>
-                                        <button v-on:click="onProcessData(station)" class="button">
-                                            {{ $t("admin.stations.processData") }}
-                                        </button>
+                                        <button v-on:click="onProcessData(station)" class="button">Process Data</button>
                                     </div>
                                     <div>
-                                        <button v-on:click="onProcessRecords(station, false)" class="button">
-                                            {{ $t("admin.stations.processRecs") }}
-                                        </button>
+                                        <button v-on:click="onExplore(station)" class="button">Explore Data</button>
                                     </div>
-                                    <div>
-                                        <button v-on:click="onProcessRecords(station, true)" class="button">
-                                            {{ $t("admin.stations.transfer") }}
-                                        </button>
-                                    </div>
-                                    <div>
-                                        <button v-on:click="onExplore(station)" class="button">
-                                            {{ $t("admin.stations.exploreData") }}
-                                        </button>
-                                    </div>
-                                    <h3>{{ $t("admin.stations.transfer") }}</h3>
-                                    <div>{{ $t("admin.stations.owner") }}: {{ station.owner.name }} ({{ station.owner.email }})</div>
+                                    <h3>Transfer</h3>
+                                    <div>Owner: {{ station.owner.name }} ({{ station.owner.email }})</div>
                                     <div>
                                         <TransferStation :station="station" @transferred="(user) => onTransferred(station, user)" />
                                     </div>
@@ -232,20 +218,6 @@ export default Vue.extend({
                 callback: async (confirm) => {
                     if (confirm) {
                         await this.$services.api.adminProcessStationData(station.id);
-                    }
-                },
-            });
-        },
-        async onProcessRecords(station: EssentialStation, skipManual: boolean): Promise<void> {
-            await this.$confirm({
-                message: `Are you sure? This could take a while for certain stations.`,
-                button: {
-                    no: "No",
-                    yes: "Yes",
-                },
-                callback: async (confirm) => {
-                    if (confirm) {
-                        await this.$services.api.adminProcessStation(station.id, true, skipManual);
                     }
                 },
             });

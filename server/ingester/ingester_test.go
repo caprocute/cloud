@@ -13,9 +13,9 @@ import (
 
 	"github.com/bxcodec/faker/v3"
 
-	"github.com/fieldkit/cloud/server/common"
-	"github.com/fieldkit/cloud/server/data"
-	"github.com/fieldkit/cloud/server/tests"
+	"gitlab.com/fieldkit/cloud/server/common"
+	"gitlab.com/fieldkit/cloud/server/data"
+	"gitlab.com/fieldkit/cloud/server/tests"
 )
 
 func TestAnyUnauthenticatedGetReturnsUnauthorized(t *testing.T) {

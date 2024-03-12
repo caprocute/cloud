@@ -7,10 +7,10 @@ import (
 
 	"goa.design/goa/v3/security"
 
-	"github.com/fieldkit/cloud/server/common"
-	"github.com/fieldkit/cloud/server/data"
+	"gitlab.com/fieldkit/cloud/server/common"
+	"gitlab.com/fieldkit/cloud/server/data"
 
-	datas "github.com/fieldkit/cloud/server/api/gen/data"
+	datas "gitlab.com/fieldkit/cloud/server/api/gen/data"
 )
 
 type DataService struct {

@@ -3,7 +3,7 @@
 // user HTTP client CLI support package
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package client
 
@@ -13,7 +13,7 @@ import (
 	"strconv"
 	"unicode/utf8"
 
-	user "github.com/fieldkit/cloud/server/api/gen/user"
+	user "gitlab.com/fieldkit/cloud/server/api/gen/user"
 	goa "goa.design/goa/v3/pkg"
 )
 
@@ -269,7 +269,7 @@ func BuildAddPayload(userAddBody string) (*user.AddPayload, error) {
 	{
 		err = json.Unmarshal([]byte(userAddBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"etag\": \"Laborum soluta.\",\n      \"logicalAddress\": 4422962753143748848,\n      \"meta\": \"Consequatur quia reprehenderit quod itaque totam.\",\n      \"module\": \"Autem quo nihil dicta eum eveniet.\",\n      \"profile\": \"Est nostrum.\",\n      \"url\": \"Fugiat natus eum.\",\n      \"version\": \"Ab numquam.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"etag\": \"Dicta eum eveniet.\",\n      \"logicalAddress\": 7095361522028688695,\n      \"meta\": \"Error sed.\",\n      \"module\": \"Est nostrum.\",\n      \"profile\": \"Ab numquam.\",\n      \"url\": \"Consequatur quia reprehenderit quod itaque totam.\",\n      \"version\": \"Fugiat natus eum.\"\n   }'")
 		}
 		err = goa.MergeErrors(err, goa.ValidatePattern("body.name", body.Name, "\\S"))
 		if utf8.RuneCountInString(body.Name) > 256 {
@@ -511,6 +511,19 @@ func BuildAdminTermsAndConditionsPayload(userAdminTermsAndConditionsBody string,
 	return res, nil
 }
 
+// BuildDeleteAccountPayload builds the payload for the user delete account
+// endpoint from CLI flags.
+func BuildDeleteAccountPayload(userDeleteAccountAuth string) (*user.DeleteAccountPayload, error) {
+	var auth string
+	{
+		auth = userDeleteAccountAuth
+	}
+	v := &user.DeleteAccountPayload{}
+	v.Auth = auth
+
+	return v, nil
+}
+
 // BuildAdminDeletePayload builds the payload for the user admin delete
 // endpoint from CLI flags.
 func BuildAdminDeletePayload(userAdminDeleteBody string, userAdminDeleteAuth string) (*user.AdminDeletePayload, error) {
@@ -519,7 +532,7 @@ func BuildAdminDeletePayload(userAdminDeleteBody string, userAdminDeleteAuth str
 	{
 		err = json.Unmarshal([]byte(userAdminDeleteBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"Sunt aut adipisci voluptas inventore sapiente.\",\n      \"password\": \"Neque et.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"Neque et.\",\n      \"password\": \"Expedita eaque.\"\n   }'")
 		}
 	}
 	var auth string

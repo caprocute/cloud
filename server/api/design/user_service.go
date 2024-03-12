@@ -431,6 +431,23 @@ var _ = Service("user", func() {
 		})
 	})
 
+	Method("delete account", func() {
+		Security(JWTAuth, func() {
+			Scope("api:access")
+		})
+
+		Payload(func() {
+			Token("auth")
+			Required("auth")
+		})
+
+		HTTP(func() {
+			DELETE("auth/delete-account")
+
+			httpAuthentication()
+		})
+	})
+
 	Method("admin delete", func() {
 		Security(JWTAuth, func() {
 			Scope("api:admin")

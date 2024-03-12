@@ -3,7 +3,6 @@ package data
 type Role struct {
 	ID              int32
 	Name            string
-	persisted       bool
 	readOnlyProject bool
 }
 

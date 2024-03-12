@@ -108,6 +108,4 @@ func findMigrationsDirectory(relative string) (string, error) {
 
 		path = filepath.Dir(path)
 	}
-
-	return "", fmt.Errorf("unable to find migrations directory")
 }

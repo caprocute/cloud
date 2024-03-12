@@ -12,10 +12,6 @@ import (
 	"github.com/lucasb-eyer/go-colorful"
 )
 
-const (
-	float64MaxUint64 = float64(math.MaxUint64)
-)
-
 func UserDefaultPicture(id int64) ([]byte, error) {
 	r := rand.New(rand.NewSource(id))
 

@@ -3,7 +3,7 @@
 // sensor HTTP client CLI support package
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package client
 
@@ -11,7 +11,7 @@ import (
 	"fmt"
 	"strconv"
 
-	sensor "github.com/fieldkit/cloud/server/api/gen/sensor"
+	sensor "gitlab.com/fieldkit/cloud/server/api/gen/sensor"
 )
 
 // BuildStationMetaPayload builds the payload for the sensor station meta
