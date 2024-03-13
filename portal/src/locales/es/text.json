@@ -97,7 +97,8 @@
         "backProject": "Volver a {name}",
         "backToStations": "Volver a las estaciones",
         "backToSensors": "Volver al mapa de sensores",
-        "backStationDashboard": "Volver a la pantalla principal de la estación"
+        "backStationDashboard": "Volver a la pantalla principal de la estación",
+        "backDashboard": "Volver a la pantalla principal"
     },
     "projects": {
         "title": {
@@ -119,7 +120,17 @@
         "recentActivity": "Actividad reciente",
         "follow": "Seguir",
         "unfollow": "Dejar de seguir",
-        "activity": "Actividad",
+        "activity": {
+            "button": "Actividad",
+            "title": "Historial de actividades",
+            "uploadedData": "Datos subidos",
+            "readingsUploaded": "{records} lecturas subidas de {name}, con {errorText}",
+            "noErrors": "sin errores.",
+            "withError": "un error.",
+            "deployedStation": "Estación desplegada",
+            "activityDeployed": "{activityName} fue desplegado.",
+            "empty": "No hay actividad reciente."
+        },
         "dashboard": "Pantalla principal del proyecto",
         "stations": {
             "title": "Estaciones",
@@ -141,22 +152,27 @@
         },
         "form": {
             "name": {
+                "label": "Nombre del proyecto",
                 "required": "El nombre es un campo obligatorio.",
                 "maxLength": "Este campo tiene un límite de 100 caracteres."
             },
             "description": {
+                "label": "Descripción breve",
                 "required": "La descripción es un campo obligatorio.",
                 "maxLength": "Este campo tiene un límite de 100 caracteres."
             },
             "goal": {
+                "label": "Objetivo del proyecto",
                 "required": "El objetivo es un campo obligatorio.",
                 "maxLength": "Este campo tiene un límite de 100 caracteres."
             },
             "location": {
+                "label": "Ubicación",
                 "required": "La ubicación es un campo obligatorio.",
                 "maxLength": "Este campo tiene un límite de 100 caracteres."
             },
             "tags": {
+                "label": "Etiquetas",
                 "help": "Presione Enter para separar etiquetas.",
                 "maxLength": "Este campo tiene un límite de 100 caracteres."
             },
@@ -175,7 +191,8 @@
             "mapHint": "Desplazar o ampliar para establecer la vista del mapa",
             "startDate": "Fecha de inicio",
             "endDate": "Fecha de fin",
-            "confirmLeavePopupMessage": "Tienes cambios sin guardar. ¿Estás seguro de que quieres salir?"
+            "confirmLeavePopupMessage": "Tienes cambios sin guardar. ¿Estás seguro de que quieres salir?",
+            "confirmDelete": "¿Estás seguro de que quieres eliminar este proyecto?"
         },
         "invite": {
             "accept": "Aceptar invitación",
@@ -191,12 +208,44 @@
         "updateSuccess": "Los detalles del proyecto ya están actualizados.",
         "addSuccess": "El proyecto ya está agregado.",
         "privateBannerTitle": "Este proyecto es privado",
-        "privateBannerSubtitle": "No tienes acceso para ver este proyecto"
+        "privateBannerSubtitle": "No tienes acceso para ver este proyecto",
+        "team": "Equipo",
+        "modules": "Módulos",
+        "dataFiles": "Archivos de datos",
+        "noDataFiles": "Aún no se han subido lecturas.",
+        "share": "Compartir",
+        "update": {
+            "needLogin": {
+                "part1": "Por favor",
+                "part2": "iniciar sesión",
+                "part3": "para ver proyectos."
+            },
+            "label": "Introduce la actualización de tu proyecto a continuación.",
+            "delete": "Eliminar esta actualización"
+        },
+        "teamManager": {
+            "heading": "Administrar el equipo",
+            "members": "Socios",
+            "role": "Rol",
+            "updateRole": "Actualizar rol",
+            "invitePending": "Invitación pendiente",
+            "newMember": {
+                "placeholder": "Correo del nuevo miembro",
+                "emailRequired": "El correo electrónico es un campo obligatorio.",
+                "emailValid": "Debe ser una dirección válida de correo electrónico.",
+                "duplicate": "Este usuario ya está invitado.",
+                "selectRole": "Seleccionar rol"
+            },
+            "invite": "Invitar",
+            "confirmRemove": "¿Estás seguro de que quieres eliminar este miembro del equipo?"
+        }
     },
     "station": {
         "readings": {
             "title": "Últimas lecturas",
-            "empty": "No hay ninguna estación en este proyecto."
+            "empty": "No hay ninguna estación en este proyecto.",
+            "none": "Aún no hay lecturas.",
+            "loading": "Cargando"
         },
         "deployed": "Implementado",
         "deployedOn": "Implementado en",
@@ -228,7 +277,21 @@
         "data": "Datos",
         "exploreData": "Explorar datos",
         "descriptionUpdateSuccess": "La descripción de la estación ya está actualizada con éxito.",
-        "moduleNameUpdateSuccess": "El nombre del módulo ya está actualizado con éxito."
+        "moduleNameUpdateSuccess": "El nombre del módulo ya está actualizado con éxito.",
+        "photo": {
+            "module": {
+                "alt": "Icono del módulo"
+            },
+            "alt": "Imagen de la estación",
+            "default": {
+                "alt": "Imagen por defecto de la estación"
+            }
+        },
+        "nativeLands": " Tierras indígenas:"
+    },
+    "stations": {
+        "addNew": "Agregar una nueva estación",
+        "noStations": "No tienes ninguna estación. Descarga la aplicación FieldKit, inicia sesión y conéctate a tu estación para añadirla a tu cuenta."
     },
     "user": {
         "profile": {
@@ -284,8 +347,60 @@
             }
         }
     },
+    "reset": {
+        "form": {
+            "title": "Restablecer contraseña",
+            "name": {
+                "label": "Nombre",
+                "required": "El nombre es un campo obligatorio."
+            },
+            "email": {
+                "label": "Correo electrónico",
+                "required": "El correo electrónico es un campo obligatorio.",
+                "valid": "Debe ser una dirección válida de correo electrónico.",
+                "taken": "Parece que este correo ya está registrado."
+            },
+            "password": {
+                "label": "Contraseña",
+                "required": "Este es un campo obligatorio.",
+                "valid": "La contraseña debe contener al menos 10 caracteres."
+            },
+            "passwordConfirmation": {
+                "label": "Confirmar contraseña",
+                "required": "La confirmación es un campo obligatorio.",
+                "valid": "Las contraseñas deben coincidir."
+            },
+            "backButton": "Volver a iniciar sesión",
+            "successTitle": "¡Éxito!",
+            "failedTitle": "La contraseña no está restablecida",
+            "failedSubtitle": "Desafortunadamente no podemos restablecer tu contraseña.",
+            "retry": {
+                "please": "Por favor",
+                "contactUs": "contáctanos",
+                "assitance": "si te gustaría ayuda."
+            }
+        }
+    },
+    "recover": {
+        "form": {
+            "title": "Recuperar cuenta",
+            "subtitle": "Introduce tu dirección de correo electrónico a continuación y se enviarán las instrucciones para restablecer la contraseña tuya.",
+            "button": "Recuperar",
+            "sentTitle": "Hemos enviado el correo de restablecimiento de contraseña",
+            "sentSubtitle": "Visita tu bandeja de entrada para ver el correo electrónico con un enlace para restablecer tu contraseña.",
+            "resending": "Reenviando",
+            "backButton": "Volver a iniciar sesión",
+            "email": {
+                "label": "Correo electrónico",
+                "required": "El correo electrónico es un campo obligatorio.",
+                "valid": "Debe ser una dirección válida de correo electrónico.",
+                "taken": "Parece que este correo ya está registrado."
+            }
+        }
+    },
     "login": {
         "form": {
+            "title": "Inicia sesión en tu cuenta",
             "spoofEmail": {
                 "label": "Correo Spoof",
                 "required": "Correo Spoof es un campo obligatorio.",
@@ -313,7 +428,6 @@
     "createAccount": {
         "form": {
             "title": "Crear tu cuenta",
-            "recover": "Recuperar cuenta",
             "name": {
                 "label": "Nombre",
                 "required": "El nombre es un campo obligatorio."
@@ -369,7 +483,10 @@
             "comment": "Comentar",
             "reply": "Responder",
             "mention": "Mención"
-        }
+        },
+        "userReplied": "respondió a tu comentario",
+        "userCommented": "opinó sobre tus datos",
+        "userMentioned": "te mencionó en un comentario"
     },
     "comments": {
         "loginToComment": {
@@ -389,7 +506,8 @@
         },
         "commentForm": {
             "placeholder": "¡Únete a la discusión!",
-            "saveLabel": "Publicar"
+            "saveLabel": "Publicar",
+            "saveEditLabel": "Guardar"
         },
         "eventTypeSelector": {
             "allProjectSensors": {
@@ -454,7 +572,14 @@
         "stationDescriptionEditLabel": "Modificar",
         "stationDescriptionSaveLabel": "Guardar",
         "moduleNameEditLabel": "Modificar",
-        "moduleNameSaveLabel": "Guardar"
+        "moduleNameSaveLabel": "Guardar",
+        "fields": {
+            "studyObjective": "Objetivo del estudio",
+            "sitePurpose": "Propósito de la ubicación del sitio",
+            "siteCriteria": "Criterios del sitio",
+            "siteDescription": "Descripción del sitio",
+            "customKey": "Campo de nota personalizado"
+        }
     },
     "fieldNotes": {
         "title": "Notas de campo",
@@ -474,11 +599,20 @@
         "emptyNoteCannotSave": "No hay nada que guardar.",
         "noData": "Aún no hay notas de campo. ¡Sé el primero en publicar algo!",
         "finishEditingFirst": "Por favor, cancela o actualiza la nota que estás editando actualmente antes de guardar una nueva.",
-        "finishEditingFirstBeforeNewOne": "Por favor, cancela o actualiza la nota que estás editando actualmente antes de editar una nueva."
+        "finishEditingFirstBeforeNewOne": "Por favor, cancela o actualiza la nota que estás editando actualmente antes de editar una nueva.",
+        "form": {
+            "saveLabel": "Guardar",
+            "placeholder": "¡Únete a la discusión!"
+        },
+        "monthRow": {
+            "entries": "Entradas",
+            "lastUpdated": "Última actualización:"
+        }
     },
     "unauthorized": "No autorizado",
     "unauthorizedStation": "No tienes acceso para ver esta estación",
     "sharePanel": {
+        "title": "Compartir",
         "copyUrl": "Copiar URL",
         "copyBtn": "Copiar",
         "linkCopied": "Enlace copiado",
@@ -486,7 +620,25 @@
         "emailSubject": {
             "fieldkit": "¡Mira estos datos en FieldKit!",
             "floodnet": "¡Mira estos datos en FloodNet!"
-        }
+        },
+        "alt": {
+            "twitter": "Compartir en Twitter",
+            "facebook": "Compartir en Facebook"
+        },
+        "twitterText": "¡Mira estos datos en FieldKit!"
+    },
+    "exportPanel": {
+        "title": "Exportar",
+        "previous": {
+            "heading": "Exportaciones anteriores",
+            "noItems": "No hay exportaciones anteriores.",
+            "download": "Descargar"
+        },
+        "downloaded": "Descargado"
+    },
+    "followPanel": {
+        "follow": "Seguir",
+        "follows": "Seguideras"
     },
     "linkToFloodnet": {
         "desktop": "Información del proyecto, metodología y fuentes de datos",
@@ -524,7 +676,31 @@
     "dataView": {
         "computerTip": "Para una mejor experiencia de análisis de datos, ve estos datos en tu computadora.",
         "swipeTip": "Desliza el gráfico para ver más datos.",
-        "noData": "No hay datos que mostrar."
+        "noData": "No hay datos que mostrar.",
+        "title": "Vista de datos",
+        "buttons": {
+            "addChart": "Añadir gráfica",
+            "share": "Compartir",
+            "export": "Exportar"
+        },
+        "noSensors": "Parece que esta estación no tiene ningún sensor para mostrarte.",
+        "nothingSelected": "Nada está seleccionado para visualizar, por favor elige una estación o proyecto de la izquierda.",
+        "saveAs": "Guardar como",
+        "chartTypes": {
+            "timeSeries": "Serie cronológica",
+            "bar": "Barras",
+            "histogram": "Histograma",
+            "range": "Rango",
+            "map": "Mapa"
+        },
+        "viewBy": {
+            "btn": "View by:",
+            "day": "Day",
+            "week": "Week",
+            "month": "Month",
+            "year": "Year",
+            "all": "Todas"
+        }
     },
     "edit": "Modificar",
     "save": "Guardar",
@@ -541,6 +717,103 @@
         "customKey": "Campo de nota personalizado",
         "newFieldNote": "Nueva nota de campo",
         "editFieldNote": "Nota de campo editada"
+    },
+    "languageSelector": {
+        "english": "Inglés",
+        "spanish": "Español"
+    },
+    "iconAlts": {
+        "close": "Cerrar"
+    },
+    "admin": {
+        "serverLogs": {
+            "heading": "Server Logs",
+            "all": "fkprd and fkdev: all",
+            "errors": "fkprd and fkdev: errors",
+            "ingestions": "fkprd and fkdev: ingestions",
+            "conflicts": "fkprd and fkdev: conflicts"
+        },
+        "status": {
+            "server": "Server",
+            "tag": "Tag",
+            "name": "Nombre",
+            "git": "GIT"
+        },
+        "userPicker": {
+            "placeholder": "User's name or email",
+            "noResult": "Oops! No users found."
+        },
+        "transfer": {
+            "button": "Transfer"
+        },
+        "playground": {
+            "modal": "Modal"
+        },
+        "backBtn": "Back to Admin",
+        "deleteUser": "Delete User",
+        "deleteForm": {
+            "email": {
+                "label": "Buh-bye Email",
+                "required": "El correo electrónico es un campo obligatorio.",
+                "valid": "Debe ser una dirección válida de correo electrónico."
+            },
+            "password": {
+                "label": "Your password",
+                "required": "Password is a required field.",
+                "valid": "La contraseña debe contener al menos 10 caracteres."
+            },
+            "button": "Bye bye bye",
+            "failed": "Oops, there was a problem",
+            "success": "They're toast."
+        },
+        "tnc": {
+            "failed": "Oops, there was a problem.",
+            "success": "Done, cleared that user's TNC status.",
+            "clear": "Clear TNC",
+            "form": {
+                "email": {
+                    "label": "Correo electrónico",
+                    "required": "El correo electrónico es un campo obligatorio.",
+                    "valid": "Debe ser una dirección válida de correo electrónico."
+                },
+                "button": "Clear Terms and Conditions"
+            }
+        },
+        "stations": {
+            "id": "ID",
+            "name": "Nombre",
+            "deviceId": "Device ID",
+            "owner": "Owner",
+            "recording": "Recording",
+            "lastIngestion": "Last Ingestion",
+            "created": "Created",
+            "updated": "Updated",
+            "firmware": "Firmware",
+            "location": "Ubicación",
+            "delete": "Borrar",
+            "uploads": {
+                "heading": "Uploads",
+                "id": "ID",
+                "date": "Date",
+                "type": "Type",
+                "size": "Size",
+                "blocks": "Blocks",
+                "url": "URL"
+            },
+            "information": "Information",
+            "data": "Data:",
+            "samples": "Samples",
+            "serverLogs": "Server logs",
+            "10days": "10 days",
+            "processData": "Process Data",
+            "processRecs": "Process Recs",
+            "processRecsTsdb": "Process Recs (TsDB only)",
+            "exploreData": "Explorar datos",
+            "transfer": "Transfer"
+        }
+    },
+    "pagination": {
+        "of": "of"
     },
     "deleteAccount": {
         "heading": "Delete My Account",
