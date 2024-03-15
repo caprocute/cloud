@@ -13,6 +13,7 @@ import { getPartnerCustomization, PartnerCustomization } from "./views/shared/pa
 import SnackBar from "@/views/shared/SnackBar.vue";
 import {Locales} from '@/views/shared/LanguageSelector.vue';
 import moment from 'moment';
+import i18n from '@/i18n';
 
 export default Vue.extend({
     components: {
@@ -70,7 +71,7 @@ export default Vue.extend({
             }
         },
         changeLang(locale: Locales) {
-            this.$i18n.locale = locale;
+            i18n.locale = locale;
             localStorage.setItem("locale", locale);
             moment.locale(locale);
         },
