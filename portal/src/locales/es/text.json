@@ -578,7 +578,7 @@
             "sitePurpose": "Propósito de la ubicación del sitio",
             "siteCriteria": "Criterios del sitio",
             "siteDescription": "Descripción del sitio",
-            "customKey": "Campo de nota personalizado"
+            "customKey": "Your own custom title"
         }
     },
     "fieldNotes": {
@@ -700,6 +700,10 @@
             "month": "Month",
             "year": "Year",
             "all": "Todas"
+        },
+        "stationTree": {
+            "add": "Agregar",
+            "remove": "Quitar"
         }
     },
     "edit": "Modificar",
