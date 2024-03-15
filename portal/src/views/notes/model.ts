@@ -124,7 +124,7 @@ export class AddedPhoto {
     }
 }
 
-export const NoteCustomTitleDefault = i18n.tc('notes.yourOwnCustomTitle');
+export const NoteCustomTitleDefault = i18n.tc("notes.fields.customKey");
 
 export class Notes {
     static Keys = ["studyObjective", "sitePurpose", "siteCriteria", "siteDescription", "customKey"];

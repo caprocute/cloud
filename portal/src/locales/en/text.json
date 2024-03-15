@@ -578,9 +578,8 @@
             "sitePurpose": "Purpose of Site Location",
             "siteCriteria": "Site Criteria",
             "siteDescription": "Site Description",
-            "customKey": "Custom note field"
-        },
-        "yourOwnCustomTitle": "Your own custom title"
+            "customKey": "Your own custom title"
+        }
     },
     "fieldNotes": {
         "title": "Field Notes",
