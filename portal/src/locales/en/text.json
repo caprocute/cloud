@@ -578,7 +578,7 @@
             "sitePurpose": "Purpose of Site Location",
             "siteCriteria": "Site Criteria",
             "siteDescription": "Site Description",
-            "customKey": "Custom note field"
+            "customKey": "Your own custom title"
         }
     },
     "fieldNotes": {
@@ -700,6 +700,10 @@
             "month": "Month",
             "year": "Year",
             "all": "All"
+        },
+        "stationTree": {
+            "add": "Add",
+            "remove": "Remove"
         }
     },
     "edit": "Edit",
