@@ -192,8 +192,8 @@ export const SelectionControls = Vue.extend({
                 <div class="tree-key" :style="{color: getKeyColor(index)}">&#9632;</div>
                 <SensorSelectionRow :viz="viz" :ds="ds" :workspace="workspace" :stationOptions="stationOptions" :sensorOptions="sensorOptions(ds.vizSensor)" @viz-change-series="(newSeries) => raiseChangeSeries(index, newSeries)"/>
                 <div class="actions" v-if="showAdd || showRemove">
-                    <div class="button" alt="Add" @click="() => addSeries()" v-if="showAdd">Add</div>
-                    <div class="button" alt="Remove" @click="() => removeSeries(index)" v-if="showRemove">Remove</div>
+                    <div class="button" :alt="$t('dataView.stationTree.add')" @click="() => addSeries()" v-if="showAdd"> {{ $t('dataView.stationTree.add') }} </div>
+                    <div class="button" :alt="$t('dataView.stationTree.remove')" @click="() => removeSeries(index)" v-if="showRemove"> {{ $t('dataView.stationTree.remove') }} </div>
                 </div>
             </div>
         </div>

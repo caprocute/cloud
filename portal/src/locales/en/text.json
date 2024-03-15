@@ -700,6 +700,10 @@
             "month": "Month",
             "year": "Year",
             "all": "All"
+        },
+        "stationTree": {
+            "add": "Add",
+            "remove": "Remove"
         }
     },
     "edit": "Edit",

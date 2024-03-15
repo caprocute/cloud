@@ -785,7 +785,7 @@ export default Vue.extend({
 
 .controls-container .right.half {
     align-items: flex-start;
-    flex: 0 0 110px;
+    flex: 0 0 140px;
 
     @include bp-down($sm) {
         display: none;
