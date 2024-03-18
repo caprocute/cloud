@@ -34,7 +34,7 @@ export * from "./common";
 
 type SensorReadAtType = string;
 
-const localeKey = (localStorage.getItem("locale") as Locales).replace("-", "");
+const localeKey = (localStorage.getItem("locale") as Locales)?.replace("-", "");
 
 function getString(d) {
     return d[localeKey] || d["enUS"] || d["enUs"] || d["en-US"]; // HACK
