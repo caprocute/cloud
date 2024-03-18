@@ -43,9 +43,9 @@ export default Vue.extend({
         },
         status(this: any) {
             if (this.station.deployedAt) {
-                return "Deployed";
+                return this.$t('station.deployed');
             }
-            return "Ready to Deploy";
+          return this.$t('station.readyToDeploy');
         },
     },
     methods: {

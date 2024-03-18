@@ -11,7 +11,7 @@
                 >
                     <div class="activity-button" v-if="isAdministrator" v-on:click="onActivityToggle">
                         <i class="icon icon-notification"></i>
-                        {{ $t("project.activity") }}
+                        {{ $t("project.activity.button") }}
                     </div>
                 </DoubleHeader>
 

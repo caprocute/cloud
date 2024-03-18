@@ -13,7 +13,6 @@ import VueGtag from "vue-gtag";
 import prettyBytes from "pretty-bytes";
 import moment from "moment";
 import { sync } from "vuex-router-sync";
-import i18n from "./i18n";
 import * as MutationTypes from "./store/mutations";
 import { Services } from "@/api";
 import storeFactory from "./store";
@@ -23,6 +22,8 @@ import Config from "./secrets";
 import App from "./App.vue";
 import { format as d3format } from "d3-format";
 import { getPartnerCustomization, isCustomisationEnabled } from "@/views/shared/partners";
+
+import i18n from "./i18n";
 
 const services = new Services();
 

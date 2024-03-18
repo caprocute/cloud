@@ -1,5 +1,6 @@
 import _ from "lodash";
 import moment from "moment";
+import i18n from "@/i18n";
 
 export class ExistingFieldNote {
     constructor(
@@ -7,7 +8,7 @@ export class ExistingFieldNote {
         public readonly key: string,
         public readonly body: string,
         public readonly mediaIds: number[],
-        public readonly title: string,
+        public readonly title: string
     ) {}
 }
 
@@ -93,9 +94,7 @@ export class NoteForm {
 }
 
 function getPathTimestamp(ts): string {
-    return moment(ts)
-        .utc()
-        .format("YYYYMMDD_hhmmss");
+    return moment(ts).utc().format("YYYYMMDD_hhmmss");
 }
 
 function getExtension(fn: string, type: string): string {
@@ -125,15 +124,15 @@ export class AddedPhoto {
     }
 }
 
-export const NoteCustomTitleDefault = "Your own custom title";
+export const NoteCustomTitleDefault = i18n.tc("notes.fields.customKey");
 
 export class Notes {
     static Keys = ["studyObjective", "sitePurpose", "siteCriteria", "siteDescription", "customKey"];
 
-    public readonly studyObjective: NoteForm = new NoteForm("", new NoteHelp("Study Objective"));
-    public readonly sitePurpose: NoteForm = new NoteForm("", new NoteHelp("Purpose of Site Location"));
-    public readonly siteCriteria: NoteForm = new NoteForm("", new NoteHelp("Site Criteria"));
-    public readonly siteDescription: NoteForm = new NoteForm("", new NoteHelp("Site Description"));
+    public readonly studyObjective: NoteForm = new NoteForm("", new NoteHelp(i18n.tc("notes.fields.studyObjective")));
+    public readonly sitePurpose: NoteForm = new NoteForm("", new NoteHelp(i18n.tc("notes.fields.sitePurpose")));
+    public readonly siteCriteria: NoteForm = new NoteForm("", new NoteHelp(i18n.tc("notes.fields.siteCriteria")));
+    public readonly siteDescription: NoteForm = new NoteForm("", new NoteHelp(i18n.tc("notes.fields.siteDescription")));
     public readonly customKey: NoteForm = new NoteForm("", new NoteHelp(NoteCustomTitleDefault));
 
     constructor(public readonly addedPhotos: AddedPhoto[] = []) {}
@@ -200,8 +199,12 @@ export function mergeNotes(portalNotes: PortalStationNotesReply, notesForm: Note
         })
         .values()
         .value();
-    const creating = modifications.map((v) => v.creating).filter((v) => v !== null && (v.body.length > 0 || v.title !== NoteCustomTitleDefault)) as NewFieldNote[];
-    const updating = modifications.map((v) => v.updating).filter((v) => v !== null && v.title !== NoteCustomTitleDefault) as ExistingFieldNote[];
+    const creating = modifications
+        .map((v) => v.creating)
+        .filter((v) => v !== null && (v.body.length > 0 || v.title !== NoteCustomTitleDefault)) as NewFieldNote[];
+    const updating = modifications
+        .map((v) => v.updating)
+        .filter((v) => v !== null && v.title !== NoteCustomTitleDefault) as ExistingFieldNote[];
 
     return new PatchPortalNote(creating, updating);
 }

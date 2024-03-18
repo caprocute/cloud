@@ -2,12 +2,12 @@
     <div v-if="loading" class="station-photo loading-container">
         <Spinner class="spinner" />
     </div>
-    <img v-else-if="station.photos && photo" :src="photo" class="station-photo photo" alt="Station Image" />
+    <img v-else-if="station.photos && photo" :src="photo" class="station-photo photo"  :alt="$t('station.photo.alt')" />
     <img
         v-else
         :src="$loadAsset(interpolatePartner('station-image-placeholder-') + '.png')"
         class="station-photo photo"
-        alt="Default Station Image"
+        :alt="$t('station.photo.default.alt')"
     />
 </template>
 

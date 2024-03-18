@@ -69,49 +69,54 @@ function loadLocaleMessages(): LocaleMessages {
         }
     });
 
-    const keys = _(messages.en.modules as unknown as Record<string, ModuleLocales>)
-        .map((m, moduleKey) => {
-            return _(m.sensors)
-                .map((sensorName, sensorKey) => {
-                    const normalizedKey = sensorKey
-                        .split(".")
-                        .map((p) => _.camelCase(p).replace("10M", "10m").replace("2M", "2m"))
-                        .join(".");
+    Object.keys(messages).forEach((key) => {
+        const keys = _(messages[key].modules as unknown as Record<string, ModuleLocales>)
+            .map((m, moduleKey) => {
+                return _(m.sensors)
+                    .map((sensorName, sensorKey) => {
+                        const normalizedKey = sensorKey
+                            .split(".")
+                            .map((p) => _.camelCase(p).replace("10M", "10m").replace("2M", "2m"))
+                            .join(".");
 
-                    if (moduleKey.indexOf("wh.") == 0) {
-                        const fullKey = [moduleKey, normalizedKey].join(".");
+                        if (moduleKey.indexOf("wh.") == 0) {
+                            const fullKey = [moduleKey, normalizedKey].join(".");
+                            return [fullKey, sensorName];
+                        }
+
+                        const fullKey = ["fk", moduleKey, normalizedKey].join(".");
                         return [fullKey, sensorName];
-                    }
+                    })
+                    .value();
+            })
+            .flatten()
+            .fromPairs()
+            .value();
 
-                    const fullKey = ["fk", moduleKey, normalizedKey].join(".");
-                    return [fullKey, sensorName];
-                })
-                .value();
-        })
-        .flatten()
-        .fromPairs()
-        .value();
+        const moduleKeys = _(messages[key].modules as unknown as Record<string, ModuleLocales>)
+            .map((m, moduleKey) => {
+                if (moduleKey.startsWith("wh.")) {
+                    // HACK
+                    return [moduleKey, m.name];
+                }
+                return ["fk." + moduleKey, m.name];
+            })
+            .fromPairs()
+            .value();
 
-    const moduleKeys = _(messages.en.modules as unknown as Record<string, ModuleLocales>)
-        .map((m, moduleKey) => {
-            if (moduleKey.startsWith("wh.")) {
-                // HACK
-                return [moduleKey, m.name];
-            }
-            return ["fk." + moduleKey, m.name];
-        })
-        .fromPairs()
-        .value();
-
-    Object.assign(messages.en, keys);
-    Object.assign(messages.en, moduleKeys);
+        Object.assign(messages[key], keys);
+        Object.assign(messages[key], moduleKeys);
+    });
 
     return messages;
 }
 
-export default new VueI18n({
+const i18n = new VueI18n({
     locale: process.env.VUE_APP_I18N_LOCALE || "en",
     fallbackLocale: process.env.VUE_APP_I18N_FALLBACK_LOCALE || "en",
     messages: loadLocaleMessages(),
-    formatter: new MessageFormatFormatter(),
+    formatter: new MessageFormatFormatter(), // If you have defined MessageFormatFormatter,
+    silentTranslationWarn: true,
 });
+
+export default i18n;

@@ -1,6 +1,6 @@
 <template>
     <form @submit.prevent="saveForm">
-        <h3 class="heading">Change Password</h3>
+        <h3 class="heading">{{$t('user.profile.form.password.title')}}</h3>
         <div>
             <TextField v-model="form.existing" :label="$t('user.profile.form.password.existing.label')" type="password" />
 

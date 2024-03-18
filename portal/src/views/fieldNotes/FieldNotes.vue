@@ -16,8 +16,8 @@
                 <div class="new-field-note-wrap">
                     <Tiptap
                         v-model="newNoteText"
-                        placeholder="Join the discussion!"
-                        saveLabel="Save"
+                        :placeholder="$tc('fieldNotes.form.placeholder')"
+                        :saveLabel="$tc('fieldNotes.form.saveLabel')"
                         :disable-mentions="true"
                         @editor-focus="checkEditingFieldNote()"
                         @input="$store.dispatch(ActionTypes.NEW_DIRTY_FIELD, 'newFieldNote')"
@@ -57,8 +57,8 @@
             >
                 <div class="month-row" @click="toggleFieldNoteGroup('field-note-group-' + index)">
                     <i class="icon icon-chevron-right"></i>
-                    <div class="month-name">{{ getMonthName(month) }} Entries</div>
-                    <div class="month-last-updated">Last updated: {{ getMonthLastUpdated(monthItems) }}</div>
+                    <div class="month-name">{{ getMonthName(month) }} {{$tc('fieldNotes.monthRow.entries')}}</div>
+                    <div class="month-last-updated">{{$tc('fieldNotes.monthRow.lastUpdated')}} {{ getMonthLastUpdated(monthItems) }}</div>
                 </div>
 
                 <transition-group name="fade">

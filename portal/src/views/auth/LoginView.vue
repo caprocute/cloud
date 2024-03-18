@@ -3,12 +3,12 @@
         <ForbiddenBanner v-if="errorMessage" :title="errorMessage" :subtitle="$t('login.loginError')"></ForbiddenBanner>
         <Logo class="form-header-logo"></Logo>
         <LoginForm
+            :heading="$t('login.form.title')"
             :forwardAfterQuery="forwardAfterQuery"
             :spoofing="spoofing"
             :failed="failed"
             :busy="busy"
             @login="save"
-            heading="Log In to Your Account"
         />
     </div>
 </template>

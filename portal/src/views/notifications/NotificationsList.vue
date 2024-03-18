@@ -61,11 +61,11 @@ export default Vue.extend({
         display(notification: Notification): string {
             switch (notification.kind) {
                 case "reply":
-                    return "replied to your comment";
+                    return this.$tc("notifications.userReplied");
                 case "comment":
-                    return "commented on your data";
+                    return this.$tc("notifications.userCommented");
                 case "mention":
-                    return "mentioned you in a comment";
+                    return this.$tc("notifications.userMentioned");
             }
 
             return "Notification";
