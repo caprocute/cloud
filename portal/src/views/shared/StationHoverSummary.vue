@@ -254,6 +254,7 @@ export default Vue.extend({
         width: 100% !important;
         left: 0 !important;
         top: 0 !important;
+        transform: translate(0, 0) !important;
         border-radius: 10px;
         padding: 25px 10px 12px 10px;
 
