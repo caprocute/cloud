@@ -366,8 +366,9 @@ export default Vue.extend({
 
 ::v-deep .station-hover-summary {
     width: 359px;
-    top: calc(50% - 100px);
-    left: calc(50% - 180px);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 .stations-list {
