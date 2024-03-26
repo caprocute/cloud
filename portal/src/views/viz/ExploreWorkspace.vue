@@ -14,32 +14,32 @@
                 <DoubleHeader :backTitle="$tc(backLabelKey)" @back="onBack">
                     <template v-slot:title>
                         <div class="one">
-                            {{$tc('dataView.title')}}
+                            {{ $tc("dataView.title") }}
 
                             <InfoTooltip :message="$tc('dataView.computerTip')"></InfoTooltip>
 
                             <div class="button compare" alt="Add Chart" @click="addChart">
                                 <img :src="addIcon" />
-                                <div>  {{$tc('dataView.buttons.addChart')}}</div>
+                                <div>{{ $tc("dataView.buttons.addChart") }}</div>
                             </div>
                         </div>
                     </template>
                     <template v-slot:default>
                         <div class="button-submit" @click="openShare">
                             <i class="icon icon-share"></i>
-                            <span class="button-submit-text"> {{$tc('dataView.buttons.share')}}</span>
+                            <span class="button-submit-text">{{ $tc("dataView.buttons.share") }}</span>
                         </div>
                         <div class="button-submit" @click="openExports" v-if="exportSupported()">
                             <i class="icon icon-export"></i>
-                            <span class="button-submit-text"> {{$tc('dataView.buttons.export')}}</span>
+                            <span class="button-submit-text">{{ $tc("dataView.buttons.export") }}</span>
                         </div>
                     </template>
                 </DoubleHeader>
             </div>
 
-            <div v-if="showNoSensors" class="notification">{{$tc('dataView.noSensors')}}</div>
+            <div v-if="showNoSensors" class="notification">{{ $tc("dataView.noSensors") }}</div>
 
-            <div v-if="!workspace && !bookmark">{{$tc('dataView.nothingSelected')}}</div>
+            <div v-if="!workspace && !bookmark">{{ $tc("dataView.nothingSelected") }}</div>
 
             <div class="workspace-container" v-if="!workspace && currentStation">
                 <div class="station-summary">
@@ -687,7 +687,7 @@ export default Vue.extend({
     align-items: center;
     min-height: 60px;
 
-    @include bp-down($sm) {
+    @include bp-down($md) {
         min-height: unset;
         padding: 0;
         border: 0;
@@ -771,8 +771,18 @@ export default Vue.extend({
 
 .controls-container .right {
     display: flex;
+    flex-wrap: wrap;
     justify-content: flex-end;
     align-items: center;
+
+    @include bp-down($md) {
+        position: absolute;
+        bottom: 45px;
+        max-width: 500px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100%;
+    }
 
     &.time {
         margin-left: auto;
@@ -787,34 +797,41 @@ export default Vue.extend({
     align-items: flex-start;
     flex: 0 0 140px;
 
-    @include bp-down($sm) {
+    @include bp-down($md) {
         display: none;
     }
 }
 
 .controls-container .view-by {
     margin: 0px 10px 0 10px;
+
+    @include bp-down($md) {
+        margin: 10px;
+    }
 }
 
 .controls-container .fast-time {
-    margin: 0px 10px 0 10px;
+    padding: 0px 10px 0 10px;
     cursor: pointer;
+
+    @include bp-down($md) {
+        padding: 10px;
+    }
 }
 
 .controls-container .fast-time-container {
     display: flex;
 
-    @include bp-down($sm) {
-        display: none;
+    @include bp-down($md) {
+        flex: 100%;
+        justify-content: space-between;
     }
 }
 
 .controls-container .date-picker {
     margin-left: 20px;
 
-    @include bp-down($sm) {
-        position: absolute;
-        bottom: 70px;
+    @include bp-down($md) {
         width: 100%;
         margin: 0;
 
@@ -1083,7 +1100,7 @@ export default Vue.extend({
 }
 
 ::v-deep .scrubber {
-    @include bp-down($sm) {
+    @include bp-down($md) {
         padding-bottom: 120px;
     }
 }

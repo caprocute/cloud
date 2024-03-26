@@ -224,7 +224,7 @@ export default Vue.extend({
     margin-right: 3.2em !important;
 
     @include bp-down($sm) {
-        bottom: -195px;
+        bottom: -233px;
         top: unset !important;
         left: 50%;
         transform: translateX(-50%);
