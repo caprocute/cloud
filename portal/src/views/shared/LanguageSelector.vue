@@ -38,12 +38,17 @@ export default Vue.extend({
 
 .language-selector {
     margin-right: 20px;
+    margin-top: -3px;
     padding: 10px;
     position: relative;
     height: 100%;
     display: flex;
     align-items: center;
     box-sizing: border-box;
+
+    @include bp-down($sm) {
+      margin-right: 5px;
+    }
 
     .triangle {
         opacity: 0;
