@@ -22,9 +22,9 @@
         <div v-if="attempted" class="form success">
             <div v-if="!resending">
                 <img alt="Success" src="@/assets/icon-success.svg" width="57px" class="form-header-icon" />
-                <h1 class="form-title">{{ $t("recover.sentTitle") }}</h1>
-                <div class="form-subtitle">{{ $t("recover.sentSubtitle") }}</div>
-                <button class="form-submit" v-on:click="resend">{{ $t('recover.form.created.resend') }}</button>
+                <h1 class="form-title">{{ $t("recover.form.sentTitle") }}</h1>
+                <div class="form-subtitle">{{ $t("recover.form.sentSubtitle") }}</div>
+                <button class="form-submit" v-on:click="resend">{{ $t('recover.form.resendButton') }}</button>
                 <router-link :to="{ name: 'login' }" class="form-link">{{ $t("recover.form.backButton") }}</router-link>
             </div>
             <div v-if="resending">
