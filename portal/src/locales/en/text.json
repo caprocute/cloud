@@ -390,6 +390,7 @@
             "sentSubtitle": "Check your inbox for the email with a link to reset your password.",
             "resending": "Resending",
             "backButton": "Back to Log in",
+            "resendButton": "Resend",
             "email": {
                 "label": "Email",
                 "required": "Email is a required field.",
