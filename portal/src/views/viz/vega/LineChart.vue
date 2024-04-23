@@ -19,6 +19,7 @@ import { ChartSettings } from "./SpecFactory";
 import chartStyles from "./chartStyles";
 import { TimeSeriesSpecFactory } from "./TimeSeriesSpecFactory";
 import Spinner from "@/views/shared/Spinner.vue";
+import { ActionTypes } from "@/store";
 
 type DragTimeSignal = [number, number] | null;
 
@@ -79,7 +80,6 @@ export default Vue.extend({
             const factory = new TimeSeriesSpecFactory(this.series, this.settings, brushable, draggable);
 
             const spec = factory.create();
-
             const vegaInfo = await vegaEmbed(this.$el as HTMLElement, spec as VisualizationSpec, {
                 renderer: "svg",
                 downloadFileName: this.getFileName(this.series[0]),
@@ -118,7 +118,7 @@ export default Vue.extend({
                                 "</g>";
                             const saveLabel = document.createElement("span");
                             saveLabel.setAttribute("class", "save-label");
-                            saveLabel.innerHTML = this.$tc('dataView.saveAs');
+                            saveLabel.innerHTML = this.$tc("dataView.saveAs");
                             button.appendChild(saveLabel);
                         }
                     }

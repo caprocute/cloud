@@ -14,32 +14,32 @@
                 <DoubleHeader :backTitle="$tc(backLabelKey)" @back="onBack">
                     <template v-slot:title>
                         <div class="one">
-                            {{$tc('dataView.title')}}
+                            {{ $tc("dataView.title") }}
 
                             <InfoTooltip :message="$tc('dataView.computerTip')"></InfoTooltip>
 
                             <div class="button compare" alt="Add Chart" @click="addChart">
                                 <img :src="addIcon" />
-                                <div>  {{$tc('dataView.buttons.addChart')}}</div>
+                                <div>{{ $tc("dataView.buttons.addChart") }}</div>
                             </div>
                         </div>
                     </template>
                     <template v-slot:default>
                         <div class="button-submit" @click="openShare">
                             <i class="icon icon-share"></i>
-                            <span class="button-submit-text"> {{$tc('dataView.buttons.share')}}</span>
+                            <span class="button-submit-text">{{ $tc("dataView.buttons.share") }}</span>
                         </div>
                         <div class="button-submit" @click="openExports" v-if="exportSupported()">
                             <i class="icon icon-export"></i>
-                            <span class="button-submit-text"> {{$tc('dataView.buttons.export')}}</span>
+                            <span class="button-submit-text">{{ $tc("dataView.buttons.export") }}</span>
                         </div>
                     </template>
                 </DoubleHeader>
             </div>
 
-            <div v-if="showNoSensors" class="notification">{{$tc('dataView.noSensors')}}</div>
+            <div v-if="showNoSensors" class="notification">{{ $tc("dataView.noSensors") }}</div>
 
-            <div v-if="!workspace && !bookmark">{{$tc('dataView.nothingSelected')}}</div>
+            <div v-if="!workspace && !bookmark">{{ $tc("dataView.nothingSelected") }}</div>
 
             <div class="workspace-container" v-if="!workspace && currentStation">
                 <div class="station-summary">
@@ -120,7 +120,7 @@ import StationSummaryContent from "../shared/StationSummaryContent.vue";
 import PaginationControls from "@/views/shared/PaginationControls.vue";
 import { getPartnerCustomization, getPartnerCustomizationWithDefault, interpolatePartner, PartnerCustomization } from "../shared/partners";
 import { mapState, mapGetters } from "vuex";
-import { DisplayStation } from "@/store";
+import {ActionTypes, DisplayStation} from "@/store";
 import { GlobalState } from "@/store/modules/global";
 import { SensorsResponse } from "./api";
 import { Workspace, Bookmark, Time, VizSensor, ChartType, FastTime, VizSettings } from "./viz";
@@ -252,8 +252,13 @@ export default Vue.extend({
                     }
                 });
         }
+        await this.$store.dispatch(ActionTypes.SET_REFRESH_WORKSPACE_FN, this.onLangChange);
     },
     methods: {
+        onLangChange() {
+            this.workspace = null;
+            this.createWorkspaceIfNecessary();
+        },
         async onBack() {
             if (this.bookmark.c) {
                 if (this.bookmark.c.map) {

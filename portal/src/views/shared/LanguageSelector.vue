@@ -11,6 +11,7 @@
 
 <script lang="ts">
 import Vue from "vue";
+import {ActionTypes} from '@/store';
 
 export enum Locales {
     enUS = "en-US",
@@ -28,6 +29,7 @@ export default Vue.extend({
         changeLang(locale: Locales) {
             this.$i18n.locale = locale;
             localStorage.setItem("locale", locale);
+            this.$store.dispatch(ActionTypes.REFRESH_WORKSPACE);
         },
     },
 });
