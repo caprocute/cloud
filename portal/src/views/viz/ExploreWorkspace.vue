@@ -120,7 +120,7 @@ import StationSummaryContent from "../shared/StationSummaryContent.vue";
 import PaginationControls from "@/views/shared/PaginationControls.vue";
 import { getPartnerCustomization, getPartnerCustomizationWithDefault, interpolatePartner, PartnerCustomization } from "../shared/partners";
 import { mapState, mapGetters } from "vuex";
-import {ActionTypes, DisplayStation} from "@/store";
+import { ActionTypes, DisplayStation } from "@/store";
 import { GlobalState } from "@/store/modules/global";
 import { SensorsResponse } from "./api";
 import { Workspace, Bookmark, Time, VizSensor, ChartType, FastTime, VizSettings } from "./viz";
