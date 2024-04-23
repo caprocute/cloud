@@ -17,6 +17,7 @@ import { ChartSettings } from "./SpecFactory";
 import chartStyles from "./chartStyles";
 import { TimeSeriesSpecFactory } from "./TimeSeriesSpecFactory";
 import ExportChartButton from "@/views/viz/vega/ExportChartButton.vue";
+import { ActionTypes } from "@/store";
 
 type DragTimeSignal = [number, number] | null;
 

@@ -14,6 +14,7 @@
 
 <script lang="ts">
 import Vue from "vue";
+import { ActionTypes } from "@/store";
 import { isSmallScreen } from "@/utilities";
 
 export enum Locales {
@@ -41,6 +42,7 @@ export default Vue.extend({
         changeLang(locale: Locales) {
             this.$i18n.locale = locale;
             localStorage.setItem("locale", locale);
+            this.$store.dispatch(ActionTypes.REFRESH_WORKSPACE);
         },
         onMouseOver(): void {
             if (!isSmallScreen()) {

@@ -7,7 +7,8 @@ import { ExportingState } from "./exporting";
 import { NotificationsState } from "./notifications";
 import { DiscussionState, NotesState, FieldNotesState } from "@/store";
 import { SnackbarState } from "@/store/modules/snackbar";
-import {DirtyState} from '@/store/modules/dirty';
+import { DirtyState } from "@/store/modules/dirty";
+import { ExploreViewState } from "@/store/modules/exploreView";
 import {VizState} from '@/store/modules/viz';
 
 export interface RouteState {
@@ -35,6 +36,7 @@ export interface GlobalState {
     readonly snackbar: SnackbarState;
     readonly discussion: DiscussionState;
     readonly dirty: DirtyState;
+    readonly exploreView: ExploreViewState;
     readonly viz: VizState;
 }
 

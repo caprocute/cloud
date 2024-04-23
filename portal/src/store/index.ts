@@ -34,6 +34,7 @@ import { notes } from "@/store/modules/notes";
 import { snackbar } from "@/store/modules/snackbar";
 import {fieldNotes} from '@/store/modules/fieldNotes';
 import {dirty} from '@/store/modules/dirty';
+import {exploreView} from '@/store/modules/exploreView';
 import {viz} from '@/store/modules/viz';
 
 export { MutationTypes, ActionTypes };
@@ -87,6 +88,7 @@ export default function (services: Services) {
             snackbar: snackbar(),
             discussion: dataEvents(services),
             dirty: dirty(),
+            exploreView: exploreView(),
             viz: viz(),
         },
         // This was causing a call stack error (_traverse)
