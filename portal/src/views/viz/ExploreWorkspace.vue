@@ -127,7 +127,7 @@ import {
     PartnerCustomization,
 } from "../shared/partners";
 import { mapGetters, mapState } from "vuex";
-import {ActionTypes, DisplayStation} from "@/store";
+import { ActionTypes, DisplayStation } from "@/store";
 import { GlobalState } from "@/store/modules/global";
 import { SensorsResponse } from "./api";
 import { Bookmark, ChartType, FastTime, Time, VizSensor, VizSettings, Workspace } from "./viz";
