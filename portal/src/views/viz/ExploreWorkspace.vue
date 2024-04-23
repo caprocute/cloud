@@ -265,10 +265,10 @@ export default Vue.extend({
                     }
                 });
         }
-        await this.$store.dispatch(ActionTypes.SET_REFRESH_WORKSPACE_FN, this.onLangChange);
+        await this.$store.dispatch(ActionTypes.SET_REFRESH_WORKSPACE_FN, this.refreshWorkspace);
     },
     methods: {
-        onLangChange() {
+        refreshWorkspace() {
             this.workspace = null;
             this.createWorkspaceIfNecessary();
         },
