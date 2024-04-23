@@ -708,7 +708,8 @@
         "stationTree": {
             "add": "Add",
             "remove": "Remove"
-        }
+        },
+        "timeSeriesXAxisLabel": "Time ({timeZone})"
     },
     "edit": "Edit",
     "save": "Save",
