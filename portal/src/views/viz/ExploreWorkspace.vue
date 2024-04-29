@@ -830,6 +830,7 @@ export default Vue.extend({
 
 .controls-container .date-picker {
     margin-left: 20px;
+    gap: 8px;
 
     @include bp-down($md) {
         width: 100%;
@@ -843,27 +844,26 @@ export default Vue.extend({
             width: 100%;
         }
     }
-
-    span {
-        &:nth-of-type(1) {
-            margin-right: 5px;
-        }
-    }
-
+  
     input {
-        height: 18px;
+        height: 32px;
+        padding: 7px 11px 4px 11px;
+        border: 1px solid $color-border;
+        border-radius: 2px;
+        cursor: pointer;
+        font-family: $font-family-medium;
+        box-sizing: border-box;
+
+        @include bp-down($md) {
+            height: 29px;
+            color: #000;
+            font-size: 10px;
+        }
     }
 
     .vc-day-layer {
         left: -2px;
     }
-}
-
-.controls-container .date-picker input {
-    padding: 5px;
-    border: 1px solid rgb(215, 220, 225);
-    border-radius: 4px;
-    cursor: pointer;
 }
 
 .controls-container .fast-time.selected {
