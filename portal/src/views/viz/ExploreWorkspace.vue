@@ -778,7 +778,7 @@ export default Vue.extend({
     @include bp-down($md) {
         position: absolute;
         bottom: 45px;
-        max-width: 500px;
+        max-width: 400px;
         left: 50%;
         transform: translateX(-50%);
         width: 100%;
@@ -803,19 +803,21 @@ export default Vue.extend({
 }
 
 .controls-container .view-by {
-    margin: 0px 10px 0 10px;
+    margin: 0 10px 0 10px;
 
     @include bp-down($md) {
-        margin: 10px;
+        display: none;
     }
 }
 
 .controls-container .fast-time {
     padding: 0px 10px 0 10px;
     cursor: pointer;
+    color: #6a6d71;
 
     @include bp-down($md) {
-        padding: 10px;
+        padding: 4px 6px;
+        font-size: 11px;
     }
 }
 
@@ -825,6 +827,7 @@ export default Vue.extend({
     @include bp-down($md) {
         flex: 100%;
         justify-content: space-between;
+        margin-bottom: 15px;
     }
 }
 
@@ -844,7 +847,7 @@ export default Vue.extend({
             width: 100%;
         }
     }
-  
+
     input {
         height: 32px;
         padding: 7px 11px 4px 11px;
@@ -867,8 +870,16 @@ export default Vue.extend({
 }
 
 .controls-container .fast-time.selected {
-    text-decoration: underline;
-    font-weight: bold;
+    font-weight: 900;
+    color: #fff;
+    background: $color-primary;
+    border: 1px solid $color-primary;
+    border-radius: 2px;
+
+    body.floodnet & {
+        background: $color-floodnet-dark;
+        border-color: $color-floodnet-dark;
+    }
 }
 
 .controls-container .left .button {
