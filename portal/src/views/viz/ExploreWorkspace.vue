@@ -811,7 +811,7 @@ export default Vue.extend({
 }
 
 .controls-container .fast-time {
-    padding: 0px 10px 0 10px;
+    padding: 4px 10px 3px 10px;
     cursor: pointer;
     color: #6a6d71;
 
@@ -823,6 +823,7 @@ export default Vue.extend({
 
 .controls-container .fast-time-container {
     display: flex;
+    align-items: center;
 
     @include bp-down($md) {
         flex: 100%;
