@@ -1326,8 +1326,7 @@ header {
     border: 1px solid #ff6600;
 }
 .comment-toggle {
-    margin-top: 20px;
-    //margin-left: 20px;
+    margin-top: 22px;
 }
 
 .edit-event {

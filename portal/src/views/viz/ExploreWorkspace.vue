@@ -777,7 +777,7 @@ export default Vue.extend({
 
     @include bp-down($md) {
         position: absolute;
-        bottom: 45px;
+        bottom: 35px;
         max-width: 400px;
         left: 50%;
         transform: translateX(-50%);
