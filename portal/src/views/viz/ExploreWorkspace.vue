@@ -816,7 +816,7 @@ export default Vue.extend({
     color: #6a6d71;
 
     @include bp-down($md) {
-        padding: 4px 6px;
+        padding: 4px 6px 3px 6px;
         font-size: 11px;
     }
 }
