@@ -437,6 +437,19 @@ export default Vue.extend({
 
 <style lang="scss">
 @import "../../scss/layout";
+.vue-treeselect__control {
+  @include bp-down($sm) {
+    height: 29px;
+    font-size: 12px;
+  }
+}
+
+.vue-treeselect__placeholder,
+.vue-treeselect__single-value {
+  @include bp-down($sm) {
+    line-height: 29px;
+  }
+}
 
 #vg-tooltip-element {
     background-color: #f4f5f7;
@@ -761,6 +774,7 @@ export default Vue.extend({
     font-size: 40px;
 
     @include bp-down($sm) {
+        line-height: 27px;
         margin-right: 7px;
     }
 
@@ -861,7 +875,7 @@ export default Vue.extend({
         @include bp-down($md) {
             height: 29px;
             color: #000;
-            font-size: 10px;
+            font-size: 12px;
         }
     }
 
