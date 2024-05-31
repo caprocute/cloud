@@ -47,7 +47,9 @@ export default Vue.extend({
         },
         querier: {
             type: SensorDataQuerier,
-            required: true,
+            default() {
+                return new SensorDataQuerier(this.$services.api);
+            },
         },
         moduleKey: {
             type: String,

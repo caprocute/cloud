@@ -162,7 +162,6 @@
                             :moduleKey="getModuleKey(module)"
                             :station-id="station.id"
                             :station="station"
-                            :querier="sensorDataQuerier"
                         />
                     </li>
                 </ul>
