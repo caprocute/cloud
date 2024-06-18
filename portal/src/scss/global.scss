@@ -209,3 +209,15 @@ a {
 .cursor-pointer {
     cursor: pointer;
 }
+
+.hide-mob {
+    @include bp-down($sm) {
+        display: none !important;
+    }
+}
+
+.hide-desktop {
+    @include bp-up($sm) {
+        display: none !important;
+    }
+}

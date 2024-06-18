@@ -725,7 +725,8 @@
     },
     "languageSelector": {
         "english": "English",
-        "spanish": "Español"
+        "spanish": "Español",
+        "toggleText": "Language"
     },
     "iconAlts": {
         "close": "Close"

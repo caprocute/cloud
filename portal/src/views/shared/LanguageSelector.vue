@@ -1,8 +1,11 @@
 <template>
-    <div class="language-selector">
-        <span class="triangle"></span>
-        <i class="icon icon-globe"></i>
-        <ul class="language-list">
+    <div class="language-selector" :class="{ opened: isLangListVisible }">
+        <div class="lang-toggle" @click="isLangListVisible = !isLangListVisible" @mouseover="onMouseOver()" @mosueout="onMouseOut()">
+            <i class="icon icon-globe"></i>
+            <span class="triangle"></span>
+            <span class="toggle-text">{{ $t("languageSelector.toggleText") }}</span>
+        </div>
+        <ul v-if="showLangList" class="language-list">
             <li @click="changeLang(Locales.enUS)">{{ $t("languageSelector.english") }}</li>
             <li @click="changeLang(Locales.esEs)">{{ $t("languageSelector.spanish") }}</li>
         </ul>
@@ -11,6 +14,7 @@
 
 <script lang="ts">
 import Vue from "vue";
+import { isSmallScreen } from "@/utilities";
 
 export enum Locales {
     enUS = "en-US",
@@ -22,12 +26,31 @@ export default Vue.extend({
     data() {
         return {
             Locales: Locales,
+            isLangListVisible: false,
         };
+    },
+    computed: {
+        showLangList(): boolean {
+            if (!isSmallScreen()) {
+                return true;
+            }
+            return this.isLangListVisible;
+        },
     },
     methods: {
         changeLang(locale: Locales) {
             this.$i18n.locale = locale;
             localStorage.setItem("locale", locale);
+        },
+        onMouseOver(): void {
+            if (!isSmallScreen()) {
+                this.isLangListVisible = true;
+            }
+        },
+        onMouseOut(): void {
+            if (!isSmallScreen()) {
+                this.isLangListVisible = false;
+            }
         },
     },
 });
@@ -35,6 +58,19 @@ export default Vue.extend({
 
 <style scoped lang="scss">
 @import "../../scss/mixins";
+
+.toggle-text {
+    display: none;
+    text-transform: uppercase;
+    font-size: 11px;
+    font-weight: 900;
+    margin-right: auto;
+    margin-left: auto;
+
+    @include bp-down($sm) {
+        display: block;
+    }
+}
 
 .language-selector {
     margin-right: 20px;
@@ -47,7 +83,10 @@ export default Vue.extend({
     box-sizing: border-box;
 
     @include bp-down($sm) {
-      margin-right: 5px;
+        margin-right: 5px;
+        flex-direction: column;
+        height: auto;
+        padding: 7px 4px;
     }
 
     .triangle {
@@ -76,14 +115,19 @@ export default Vue.extend({
 
         @include bp-down($lg) {
             right: 0;
-        }
-
-        @include bp-down($sm) {
-            display: none;
+            top: 25px;
         }
     }
 
-    &:hover {
+    @include bp-up($sm) {
+        &:hover {
+            &:after {
+                transform: rotate(180deg) translateY(50%);
+            }
+        }
+    }
+
+    &.opened {
         &:after {
             transform: rotate(180deg) translateY(50%);
         }
@@ -102,8 +146,16 @@ export default Vue.extend({
     visibility: hidden;
     padding-top: 10px;
 
-    @include bp-down($xs) {
-        top: 55px;
+    @include bp-down($sm) {
+        position: unset;
+        visibility: visible;
+        opacity: 1;
+        width: calc(100% + 30px + 12px);
+        margin-left: 6px;
+        padding-bottom: 10px;
+        background: #f4f5f7;
+        border: none;
+        box-shadow: none;
     }
 
     li {
@@ -116,10 +168,28 @@ export default Vue.extend({
         &:hover {
             background-color: #f4f5f7;
         }
+
+        @include bp-down($sm) {
+            font-size: 11px;
+            font-weight: 900;
+            text-align: center;
+        }
     }
 }
 
 .icon-globe {
     font-size: 16px;
+
+    @include bp-down($sm) {
+        margin-top: -3px;
+    }
+}
+
+.lang-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    height: 40px;
 }
 </style>

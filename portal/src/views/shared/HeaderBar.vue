@@ -3,7 +3,7 @@
         <router-link :to="{ name: 'root' }">
             <Logo />
         </router-link>
-        <LanguageSelector></LanguageSelector>
+        <LanguageSelector class="hide-mob"></LanguageSelector>
         <div
             class="header-account"
             :class="isAuthenticated ? 'loggedin' : ''"
@@ -166,6 +166,7 @@ export default Vue.extend({
 
 <style scoped lang="scss">
 @import "../../scss/mixins";
+@import "../../scss/global";
 
 .header {
     background: #fff;

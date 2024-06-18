@@ -9,6 +9,10 @@ export function isMobile(): boolean {
     return window.screen.availWidth < 1040;
 }
 
+export function isSmallScreen(): boolean {
+    return window.screen.availWidth < 768;
+}
+
 export function getFeaturesEnabled(): FeatureFlags {
     return {
         tsdb: window.localStorage["fk:backend"] === "tsdb",
