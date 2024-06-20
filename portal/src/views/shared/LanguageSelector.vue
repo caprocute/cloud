@@ -113,6 +113,7 @@ export default Vue.extend({
     &:after {
         content: "";
         background: url("../../assets/icon-chevron-dropdown.svg") no-repeat center center;
+        background-size: 12px;
         width: 10px;
         height: 10px;
         transition: all 0.33s;
@@ -121,7 +122,7 @@ export default Vue.extend({
         @include position(absolute, 50% null null calc(100% - 5px));
 
         @include bp-down($lg) {
-            top: 25px;
+            top: 26px;
             right: 15px;
             left: unset;
         }
