@@ -1,6 +1,6 @@
 <template>
     <div class="language-selector" :class="{ opened: isLangListVisible }">
-        <div class="lang-toggle" @click="isLangListVisible = !isLangListVisible" @mouseover="onMouseOver()" @mosueout="onMouseOut()">
+        <div class="lang-toggle" @click="toggleLangList()" @mouseover="onMouseOver()" @mosueout="onMouseOut()">
             <i class="icon icon-globe"></i>
             <span class="triangle"></span>
             <span class="toggle-text">{{ $t("languageSelector.toggleText") }}</span>
@@ -52,6 +52,11 @@ export default Vue.extend({
                 this.isLangListVisible = false;
             }
         },
+        toggleLangList(): void {
+            if (isSmallScreen()) {
+                this.isLangListVisible = !this.isLangListVisible;
+            }
+        },
     },
 });
 </script>
@@ -66,6 +71,7 @@ export default Vue.extend({
     font-weight: 900;
     margin-right: auto;
     margin-left: auto;
+    user-select: none;
 
     @include bp-down($sm) {
         display: block;
@@ -83,10 +89,11 @@ export default Vue.extend({
     box-sizing: border-box;
 
     @include bp-down($sm) {
-        margin-right: 5px;
+        margin-right: 0;
         flex-direction: column;
         height: auto;
-        padding: 7px 4px;
+        padding: 7px 19px 0;
+        border-bottom: solid 1px #f4f5f7;
     }
 
     .triangle {
@@ -114,8 +121,9 @@ export default Vue.extend({
         @include position(absolute, 50% null null calc(100% - 5px));
 
         @include bp-down($lg) {
-            right: 0;
             top: 25px;
+            right: 15px;
+            left: unset;
         }
     }
 

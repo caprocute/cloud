@@ -10,7 +10,7 @@ export function isMobile(): boolean {
 }
 
 export function isSmallScreen(): boolean {
-    return window.screen.availWidth < 768;
+    return window.innerWidth < 768;
 }
 
 export function getFeaturesEnabled(): FeatureFlags {
