@@ -244,10 +244,12 @@ export default Vue.extend({
     @at-root .container-side.active & {
         opacity: 1;
         visibility: visible;
+        width: 240px;
     }
 
     @include bp-down($sm) {
         padding: 0;
+        width: auto;
     }
 }
 .nav-section {
