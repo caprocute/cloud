@@ -179,7 +179,7 @@ export default Vue.extend({
         }
 
         @include bp-down($sm) {
-            font-size: 11px;
+            font-size: 12px;
             font-weight: 900;
             text-align: center;
         }
