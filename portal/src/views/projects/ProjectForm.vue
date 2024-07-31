@@ -5,13 +5,13 @@
             <h2 v-if="project && project.id">{{ $t("project.edit.title") }}</h2>
 
             <div class="close-form-button" v-on:click="closeForm">
-                <img alt="Close" src="@/assets/icon-close.svg" />
+                <img :alt="$t('iconAlts.close')" src="@/assets/icon-close.svg" />
             </div>
         </div>
 
         <form id="form" @submit.prevent="saveForm">
             <div class="outer-input-container">
-                <TextField v-model="form.name" @input="$emit('change')" label="Project Name" />
+                <TextField v-model="form.name" @input="$emit('change')" :label="$tc('project.form.name.label')" />
 
                 <div class="validation-errors" v-if="$v.form.name.$error">
                     <div v-if="!$v.form.name.required">{{ $t("project.form.name.required") }}</div>
@@ -19,7 +19,7 @@
                 </div>
             </div>
             <div class="outer-input-container">
-                <TextField v-model="form.description" @input="$emit('change')" label="Short Description" />
+                <TextField v-model="form.description" @input="$emit('change')" :label="$tc('project.form.description.label')" />
 
                 <div class="validation-errors" v-if="$v.form.description.$error">
                     <div v-if="!$v.form.description.required">{{ $t("project.form.description.required") }}</div>
@@ -27,7 +27,7 @@
                 </div>
             </div>
             <div class="outer-input-container">
-                <TextField v-model="form.goal" @input="$emit('change')" label="Project Goal" />
+                <TextField v-model="form.goal" @input="$emit('change')" :label="$tc('project.form.goal.label')" />
 
                 <div class="validation-errors" v-if="$v.form.goal.$error">
                     <div v-if="!$v.form.goal.required">{{ $t("project.form.goal.required") }}</div>
@@ -38,7 +38,7 @@
                 <ImageUploader :image="{ url: project ? project.photo : null }" :placeholder="imagePlaceholder" @change="onImage" />
             </div>
             <div class="outer-input-container">
-                <TextField v-model="form.location" @input="$emit('change')" label="Location" />
+                <TextField v-model="form.location" @input="$emit('change')" :label="$tc('project.form.location.label')" />
 
                 <div class="validation-errors" v-if="$v.form.location.$error">
                     <div v-if="!$v.form.location.required">{{ $t("project.form.location.required") }}</div>
@@ -52,7 +52,7 @@
             </div>
 
             <div class="outer-input-container tags-container">
-                <span v-bind:class="{ focused: smallTagsLabel }">Tags</span>
+                <span v-bind:class="{ focused: smallTagsLabel }">{{ $tc('project.form.tags.label') }}</span>
                 <vue-tags-input
                     v-model="form.tag"
                     :tags="form.tags"
@@ -373,7 +373,7 @@ export default Vue.extend({
             });
         },
         async deleteProject(): Promise<void> {
-            if (window.confirm("Are you sure you want to delete this project?")) {
+            if (window.confirm(this.$tc("project.form.confirmDelete"))) {
                 await this.$store.dispatch(ActionTypes.DELETE_PROJECT, { projectId: this.project.id }).then(() => {
                     return this.$router.push({ name: "projects" });
                 });

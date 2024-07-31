@@ -5,14 +5,14 @@ import (
 
 	_ "github.com/aws/aws-sdk-go/aws/session"
 
-	"github.com/fieldkit/cloud/server/common/sqlxcache"
+	"gitlab.com/fieldkit/cloud/server/common/sqlxcache"
 
 	"goa.design/goa/v3/security"
 
 	_ "github.com/vgarvardt/gue"
 
-	"github.com/fieldkit/cloud/server/common/jobs"
-	_ "github.com/fieldkit/cloud/server/common/logging"
+	"gitlab.com/fieldkit/cloud/server/common/jobs"
+	_ "gitlab.com/fieldkit/cloud/server/common/logging"
 )
 
 type GenerateError func(string) error

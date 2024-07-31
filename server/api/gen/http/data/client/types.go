@@ -3,12 +3,12 @@
 // data HTTP client types
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package client
 
 import (
-	dataviews "github.com/fieldkit/cloud/server/api/gen/data/views"
+	dataviews "gitlab.com/fieldkit/cloud/server/api/gen/data/views"
 	goa "goa.design/goa/v3/pkg"
 )
 

@@ -11,13 +11,22 @@ import * as ActionTypes from "@/store/actions";
 import { AuthenticationRequiredError } from "@/api";
 import { getPartnerCustomization, PartnerCustomization } from "./views/shared/partners";
 import SnackBar from "@/views/shared/SnackBar.vue";
+import {Locales} from '@/views/shared/LanguageSelector.vue';
+import moment from 'moment';
+import i18n from '@/i18n';
 
 export default Vue.extend({
     components: {
         SnackBar,
     },
+    data() {
+        return {
+            Locales: Locales,
+        };
+    },
     async beforeMount(): Promise<void> {
         try {
+            this.useSavedLocale();
             this.applyCustomClasses();
             await this.$store.dispatch(ActionTypes.INITIALIZE);
         } catch (err) {
@@ -59,6 +68,17 @@ export default Vue.extend({
         setCustomPageTitle(): void {
             if (this.partnerCustomization != null) {
                 document.title = this.partnerCustomization.title;
+            }
+        },
+        changeLang(locale: Locales) {
+            i18n.locale = locale;
+            localStorage.setItem("locale", locale);
+            moment.locale(locale);
+        },
+        useSavedLocale() {
+            const locale = localStorage.getItem("locale") as Locales;
+            if (locale) {
+                this.changeLang(locale);
             }
         },
     },
@@ -219,6 +239,14 @@ li {
 .vc-popover-caret {
     @include bp-down($sm) {
         display: none !important;
+    }
+}
+
+.vc-container {
+    max-width: 90vw;
+
+    .vc-text {
+        white-space: break-spaces;
     }
 }
 

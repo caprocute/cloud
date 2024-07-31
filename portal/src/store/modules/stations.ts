@@ -32,6 +32,7 @@ import {
 import { VizSensor, VizConfig } from "@/views/viz/viz";
 
 import * as d3 from "d3";
+import { SnackbarStyle } from "@/store/modules/snackbar";
 
 export const NEED_SENSOR_META = "NEED_SENSOR_META";
 export const HAVE_USER_STATIONS = "HAVE_USER_STATIONS";
@@ -223,7 +224,7 @@ export class StationReadings {
     }
 }
 
-type StationSortTuiple = [number, number, string];
+type StationSortTuple = [number, number, string];
 
 export class DisplayStation {
     public readonly id: number;
@@ -277,7 +278,7 @@ export class DisplayStation {
         return null;
     }
 
-    public getSortOrder(which: VisibleReadings): StationSortTuiple {
+    public getSortOrder(which: VisibleReadings): StationSortTuple {
         if (this.inactive) {
             return [3, 0, this.name];
         }
@@ -352,7 +353,6 @@ export class DisplayStation {
         }
 
         this.firmwareNumber = station.firmwareNumber;
-
     }
 }
 
@@ -661,15 +661,18 @@ const actions = (services: Services) => {
         },
         [ActionTypes.UPDATE_STATION]: async (
             { commit, dispatch, state }: { commit: any; dispatch: any; state: StationsState },
-            payload: {id: number, name: string, description: string | null }
+            payload: { id: number; name: string; description: string | null }
         ) => {
             commit(MutationTypes.LOADING, { stations: true });
 
-            services.api.updateStation(payload).then((station) => {
-                commit(STATION_UPDATE, { station });
-            });
-
-            commit(MutationTypes.LOADING, { stations: false });
+            return services.api
+                .updateStation(payload)
+                .then((station) => {
+                    commit(STATION_UPDATE, { station });
+                })
+                .finally(() => {
+                    commit(MutationTypes.LOADING, { stations: false });
+                });
         },
         [ActionTypes.CLEAR_STATION]: async (
             { commit, dispatch, state }: { commit: any; dispatch: any; state: StationsState },
@@ -681,7 +684,7 @@ const actions = (services: Services) => {
             { commit, dispatch, state }: { commit: any; dispatch: any; state: StationsState },
             payload: { stationId: number; moduleId: number; label: string }
         ) => {
-            await services.api.updateModule(payload).then((station) => {
+            return services.api.updateModule(payload).then((station) => {
                 commit(STATION_UPDATE, { station });
             });
         },

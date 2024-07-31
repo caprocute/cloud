@@ -3,13 +3,13 @@
 // firmware HTTP server types
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package server
 
 import (
-	firmware "github.com/fieldkit/cloud/server/api/gen/firmware"
-	firmwareviews "github.com/fieldkit/cloud/server/api/gen/firmware/views"
+	firmware "gitlab.com/fieldkit/cloud/server/api/gen/firmware"
+	firmwareviews "gitlab.com/fieldkit/cloud/server/api/gen/firmware/views"
 	goa "goa.design/goa/v3/pkg"
 )
 

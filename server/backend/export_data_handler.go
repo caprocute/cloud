@@ -12,14 +12,14 @@ import (
 
 	"github.com/pkg/profile"
 
-	"github.com/fieldkit/cloud/server/common/sqlxcache"
-	"github.com/fieldkit/cloud/server/data"
-	pb "github.com/fieldkit/data-protocol"
+	"gitlab.com/fieldkit/cloud/server/common/sqlxcache"
+	"gitlab.com/fieldkit/cloud/server/data"
+	pb "gitlab.com/fieldkit/libraries/data-protocol"
 
-	"github.com/fieldkit/cloud/server/backend/repositories"
-	"github.com/fieldkit/cloud/server/common/logging"
-	"github.com/fieldkit/cloud/server/files"
-	"github.com/fieldkit/cloud/server/messages"
+	"gitlab.com/fieldkit/cloud/server/backend/repositories"
+	"gitlab.com/fieldkit/cloud/server/common/logging"
+	"gitlab.com/fieldkit/cloud/server/files"
+	"gitlab.com/fieldkit/cloud/server/messages"
 )
 
 const (
@@ -231,7 +231,7 @@ func (e *JsonLinesExporter) OnData(ctx context.Context, rawRecord *pb.DataRecord
 	return e.write(ctx, rawRecord)
 }
 
-func (e *JsonLinesExporter) write(ctx context.Context, value interface{}) (err error) {
+func (e *JsonLinesExporter) write(_ context.Context, value interface{}) (err error) {
 	b, err := json.Marshal(value)
 	if err != nil {
 		return err
@@ -377,7 +377,7 @@ func (e *CsvExporter) Prepare(ctx context.Context, urls []string) error {
 
 const CompactFieldSets = true
 
-func (e *CsvExporter) compactFieldSets(ctx context.Context) error {
+func (e *CsvExporter) compactFieldSets(_ context.Context) error {
 	unassigned := make(map[string]*fieldSet)
 	compacted := make([]*fieldSet, 0)
 	for id, fs := range e.prepared.modules {
@@ -394,29 +394,29 @@ func (e *CsvExporter) compactFieldSets(ctx context.Context) error {
 	// the first field set that returns a value.
 	for _, id := range e.prepared.order {
 		if fs, ok := unassigned[id]; ok {
-			assigned_ids := make([]string, 0)
-			assigned_ids = append(assigned_ids, id)
+			assignedIds := make([]string, 0)
+			assignedIds = append(assignedIds, id)
 			candidates := make([]*fieldSet, 1)
 			candidates[0] = fs
 
 			if CompactFieldSets {
 				conflicts := e.prepared.conflicts[id]
-				for maybe_id, maybe := range unassigned {
-					if maybe_id != id {
+				for maybeId, maybe := range unassigned {
+					if maybeId != id {
 						if maybe.kind == fs.kind {
 							if len(maybe.fields) != len(fs.fields) {
 								panic("What, same kind different fields?")
 							}
-							if conflicts == nil || !conflicts[maybe_id] {
+							if conflicts == nil || !conflicts[maybeId] {
 								candidates = append(candidates, maybe)
-								assigned_ids = append(assigned_ids, maybe_id)
+								assignedIds = append(assignedIds, maybeId)
 							}
 						}
 					}
 				}
 			}
 
-			for _, id := range assigned_ids {
+			for _, id := range assignedIds {
 				delete(unassigned, id)
 			}
 
@@ -500,7 +500,12 @@ func (e *CsvExporter) prepare(ctx context.Context, rawRecord *pb.DataRecord) err
 			modulesInRow = append(modulesInRow, hex.EncodeToString(module.Id))
 		}
 
-		for moduleIndex, module := range rawRecord.Modules {
+		for loopIndex, loopModule := range rawRecord.Modules {
+			// Capture loop variables in locals to avoid this common pitfall:
+			// https://go.dev/wiki/CommonMistakes#using-goroutines-on-loop-iterator-variables
+			moduleIndex := loopIndex
+			module := loopModule
+
 			id := hex.EncodeToString(module.Id)
 
 			// Track which modules "conflict" in the sense that they were both

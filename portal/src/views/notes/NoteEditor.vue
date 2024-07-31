@@ -1,9 +1,9 @@
 <template>
     <div class="note-editor">
         <div class="title">
-            <TextAreaField v-if="editingTitle" :data-cy="'customKeyTitle'" v-model="title" />
+            <TextAreaField v-if="editingTitle"  v-model="title" :data-cy="'customKeyTitle'" />
             <template v-else>{{ title }}</template>
-            <a data-cy="editCustomKey" class="edit-btn" v-if="editableTitle && !editingTitle && !readonly" @click="editingTitle = !editingTitle">
+            <a class="edit-btn" v-if="editableTitle && !editingTitle && !readonly" @click="editingTitle = !editingTitle" data-cy="editCustomKey">
                 {{ $t("notes.customTitleEditLabel") }}
             </a>
         </div>

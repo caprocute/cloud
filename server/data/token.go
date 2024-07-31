@@ -8,8 +8,8 @@ import (
 )
 
 var (
-	invalidTokenError = errors.New("invalid token")
-	tokenEncoding     = base64.URLEncoding.WithPadding(base64.NoPadding)
+	errInvalidToken = errors.New("invalid token")
+	tokenEncoding   = base64.URLEncoding.WithPadding(base64.NoPadding)
 )
 
 type Token []byte
@@ -58,7 +58,7 @@ func (t Token) String() string {
 func (id *Token) Scan(src interface{}) error {
 	data, ok := src.([]byte)
 	if !ok {
-		return invalidTokenError
+		return errInvalidToken
 	}
 
 	return id.UnmarshalBinary(data)

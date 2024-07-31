@@ -11,8 +11,8 @@ import (
 	"github.com/vgarvardt/gue/v4"
 	"github.com/vgarvardt/gue/v4/adapter/pgxv5"
 
-	"github.com/fieldkit/cloud/server/common/logging"
-	"github.com/fieldkit/cloud/server/common/txs"
+	"gitlab.com/fieldkit/cloud/server/common/logging"
+	"gitlab.com/fieldkit/cloud/server/common/txs"
 )
 
 var (

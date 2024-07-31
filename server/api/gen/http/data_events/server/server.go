@@ -3,7 +3,7 @@
 // data events HTTP server
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package server
 
@@ -12,7 +12,7 @@ import (
 	"net/http"
 	"regexp"
 
-	dataevents "github.com/fieldkit/cloud/server/api/gen/data_events"
+	dataevents "gitlab.com/fieldkit/cloud/server/api/gen/data_events"
 	goahttp "goa.design/goa/v3/http"
 	goa "goa.design/goa/v3/pkg"
 	"goa.design/plugins/v3/cors"

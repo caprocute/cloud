@@ -8,13 +8,13 @@ import (
 
 	_ "github.com/lib/pq"
 
-	"github.com/fieldkit/cloud/server/common/sqlxcache"
+	"gitlab.com/fieldkit/cloud/server/common/sqlxcache"
 
 	"github.com/kelseyhightower/envconfig"
 
-	"github.com/fieldkit/cloud/server/common/logging"
-	"github.com/fieldkit/cloud/server/storage"
-	"github.com/fieldkit/cloud/server/webhook"
+	"gitlab.com/fieldkit/cloud/server/common/logging"
+	"gitlab.com/fieldkit/cloud/server/storage"
+	"gitlab.com/fieldkit/cloud/server/webhook"
 )
 
 type Options struct {
@@ -53,7 +53,7 @@ func process(ctx context.Context, options *Options) error {
 
 	tsConfig := options.timeScaleConfig()
 
-	aggregator := webhook.NewSourceAggregator(db, tsConfig, options.Verbose, !options.NoLegacy)
+	aggregator := webhook.NewSourceAggregator(db, tsConfig, options.Verbose)
 	startTime := time.Time{}
 
 	var source webhook.MessageSource

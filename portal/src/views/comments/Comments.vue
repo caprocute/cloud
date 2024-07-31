@@ -119,7 +119,7 @@
                         </div>
                     </template>
                     <template v-else>
-                        <p class="need-login-msg" @click="test()">
+                        <p class="need-login-msg">
                             {{ $tc("comments.loginToComment.part1") }}
                             <router-link
                                 :to="{ name: 'login', query: { after: $route.path, params: JSON.stringify($route.query) } }"
@@ -171,8 +171,6 @@
             </template>
         </div>
 
-        <div v-if="errorMessage" class="error">{{ errorMessage }}</div>
-
         <div v-if="!isLoading && postsAndEvents.length === 0" class="no-comments">
             {{ viewType === "data" ? $tc("comments.noEventsComments") : $tc("comments.noComments") }}
         </div>
@@ -214,10 +212,10 @@
                                 v-if="item.body"
                                 v-model="item.body"
                                 :readonly="item.readonly"
-                                saveLabel="Save"
-                                @input="$store.dispatch(ActionTypes.NEW_DIRTY_FIELD, 'editComment-' + item.id)"
-                                @empty="$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, 'editComment-' + item.id)"
-                                @save="saveEdit(item.id, item.body, 'editComment-' + item.id)"
+                                :saveLabel="$tc('comments.commentForm.saveEditLabel')"
+                                @input="$store.dispatch(ActionTypes.NEW_DIRTY_FIELD, 'editComment#' + item.id)"
+                                @empty="$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, 'editComment#' + item.id)"
+                                @save="saveEdit(item.id, item.body, 'editComment#' + item.id)"
                             />
                             <div v-else class="edit-event">
                                 <Tiptap
@@ -226,8 +224,8 @@
                                     :placeholder="$tc('comments.eventForm.title.placeholder')"
                                     :saveLabel="$tc('comments.eventForm.title.saveLabel')"
                                     :showSaveButton="false"
-                                    @input="$store.dispatch(ActionTypes.NEW_DIRTY_FIELD, 'editEventTitle-' + item.id)"
-                                    @empty="$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, 'editEventTitle-' + item.id)"
+                                    @input="$store.dispatch(ActionTypes.NEW_DIRTY_FIELD, 'editEventTitle#' + item.id)"
+                                    @empty="$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, 'editEventTitle#' + item.id)"
                                     @save="saveEditDataEvent(item)"
                                 />
                                 <div class="event-range">{{ item.start | prettyDateTime }} - {{ item.end | prettyDateTime }}</div>
@@ -236,8 +234,8 @@
                                     :readonly="item.readonly"
                                     :placeholder="$tc('comments.eventForm.description.placeholder')"
                                     :saveLabel="$tc('comments.eventForm.description.saveLabel')"
-                                    @input="$store.dispatch(ActionTypes.NEW_DIRTY_FIELD, 'editEventDesc-' + item.id)"
-                                    @empty="$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, 'editEventDesc-' + item.id)"
+                                    @input="$store.dispatch(ActionTypes.NEW_DIRTY_FIELD, 'editEventDesc#' + item.id)"
+                                    @empty="$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, 'editEventDesc#' + item.id)"
                                     @save="saveEditDataEvent(item)"
                                 />
                             </div>
@@ -269,9 +267,9 @@
                                             v-model="reply.body"
                                             :readonly="reply.readonly"
                                             :saveLabel="$tc('comments.reply.saveLabel')"
-                                            @input="$store.dispatch(ActionTypes.NEW_DIRTY_FIELD, 'editCommentReply-' + reply.id)"
-                                            @empty="$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, 'editCommentReply-' + reply.id)"
-                                            @save="saveEdit(reply.id, reply.body, 'editCommentReply-' + reply.id)"
+                                            @input="$store.dispatch(ActionTypes.NEW_DIRTY_FIELD, 'editCommentReply#' + reply.id)"
+                                            @empty="$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, 'editCommentReply#' + reply.id)"
+                                            @save="saveEdit(reply.id, reply.body, 'editCommentReply#' + reply.id)"
                                         />
                                     </div>
                                 </div>
@@ -330,6 +328,7 @@ import { ActionTypes, DisplayProject } from "@/store";
 import { interpolatePartner, isCustomisationEnabled } from "@/views/shared/partners";
 import InfoTooltip from "@/views/shared/InfoTooltip.vue";
 import { PortalStationFieldNotes } from "@/views/fieldNotes/model";
+import { SnackbarStyle } from "@/store/modules/snackbar";
 
 export default Vue.extend({
     name: "Comments",
@@ -377,7 +376,6 @@ export default Vue.extend({
             description: string | null;
             title: string | null;
         };
-        errorMessage: string | null;
         logMode: string;
     } {
         return {
@@ -403,7 +401,6 @@ export default Vue.extend({
                 description: "",
                 title: "",
             },
-            errorMessage: null,
             logMode: "comment",
         };
     },
@@ -480,7 +477,8 @@ export default Vue.extend({
             await this.getDataEvents();
             return this.getComments();
         },
-        $route(): void {
+        async $route(): Promise<void> {
+            await this.getComments();
             this.highlightComment();
         },
         dataEventsFromState(): void {
@@ -509,8 +507,6 @@ export default Vue.extend({
             }
         },
         async saveDataEvent(dataEvent: NewDataEvent): Promise<void> {
-            this.errorMessage = null;
-
             const bookmark = this.parentBookmark;
             if (bookmark != null) {
                 if (this.viewType === "data") {
@@ -528,19 +524,25 @@ export default Vue.extend({
                     if (response) {
                         this.newDataEvent.title = "";
                         this.newDataEvent.description = "";
+
                         this.getDataEvents();
+                        this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
+                            message: this.$tc("comments.dataEventSuccess"),
+                            type: SnackbarStyle.success,
+                        });
                         this.$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, "newDataEventTitle");
                         this.$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, "newDataEventDesc");
                     }
                 })
                 .catch((e) => {
                     console.error(e);
-                    this.errorMessage = CommentsErrorsEnum.postComment;
+                    this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
+                        message: this.$tc("somethingWentWrong"),
+                        type: SnackbarStyle.fail,
+                    });
                 });
         },
         async save(comment: NewComment, dirtyInputId: string): Promise<void> {
-            this.errorMessage = null;
-
             if (this.viewType === "data") {
                 comment.bookmark = JSON.stringify(this.parentData);
             }
@@ -564,7 +566,7 @@ export default Vue.extend({
                                         response.post.updatedAt
                                     )
                                 );
-                            this.newReply.body = "";
+                            this.resetNewReply();
                         } else {
                             console.warn(`posts is null`);
                         }
@@ -586,10 +588,17 @@ export default Vue.extend({
                             console.log(`posts is null`);
                         }
                     }
+                    this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
+                        message: this.$tc("comments.saveSuccess"),
+                        type: SnackbarStyle.success,
+                    });
                 })
                 .catch((e) => {
                     console.log("e", e);
-                    this.errorMessage = CommentsErrorsEnum.postComment;
+                    this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
+                        message: this.$tc("somethingWentWrong"),
+                        type: SnackbarStyle.fail,
+                    });
                 });
         },
         formatTimestamp(timestamp: number): string {
@@ -599,7 +608,6 @@ export default Vue.extend({
             if (this.newReply.body && post.id === this.newReply.threadId) {
                 return;
             }
-            this.errorMessage = null;
             this.newReply.threadId = post.id;
             this.newReply.body = "";
         },
@@ -626,7 +634,10 @@ export default Vue.extend({
                     this.highlightComment();
                 })
                 .catch(() => {
-                    this.errorMessage = CommentsErrorsEnum.getComments;
+                    this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
+                        message: this.$tc("somethingWentWrong"),
+                        type: SnackbarStyle.fail,
+                    });
                 })
                 .finally(() => {
                     this.isLoading = false;
@@ -644,12 +655,22 @@ export default Vue.extend({
                 .then((response) => {
                     if (response) {
                         this.getComments();
+                        this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
+                            message: this.$tc("comments.deleteSuccess"),
+                            type: SnackbarStyle.success,
+                        });
                     } else {
-                        this.errorMessage = CommentsErrorsEnum.deleteComment;
+                        this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
+                            message: this.$tc("somethingWentWrong"),
+                            type: SnackbarStyle.fail,
+                        });
                     }
                 })
                 .catch(() => {
-                    this.errorMessage = CommentsErrorsEnum.deleteComment;
+                    this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
+                        message: this.$tc("somethingWentWrong"),
+                        type: SnackbarStyle.fail,
+                    });
                 });
         },
         startEditing(item: Comment | DataEvent): void {
@@ -660,14 +681,24 @@ export default Vue.extend({
                 .editComment(commentID, body)
                 .then((response) => {
                     if (response) {
-                      this.$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, dirtyInputId);
-                      this.getComments();
+                        this.$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, dirtyInputId);
+                        this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
+                            message: this.$tc("comments.saveSuccess"),
+                            type: SnackbarStyle.success,
+                        });
+                        this.getComments();
                     } else {
-                        this.errorMessage = CommentsErrorsEnum.deleteComment;
+                        this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
+                            message: this.$tc("somethingWentWrong"),
+                            type: SnackbarStyle.fail,
+                        });
                     }
                 })
                 .catch(() => {
-                    this.errorMessage = CommentsErrorsEnum.editComment;
+                    this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
+                        message: this.$tc("somethingWentWrong"),
+                        type: SnackbarStyle.fail,
+                    });
                 });
         },
         async getDataEvents(): Promise<void> {
@@ -679,7 +710,10 @@ export default Vue.extend({
             await this.$store
                 .dispatch(ActionTypes.NEED_DATA_EVENTS, { bookmark: JSON.stringify(this.parentData) })
                 .catch(() => {
-                    this.errorMessage = DataEventsErrorsEnum.getDataEvents;
+                    this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
+                        message: this.$tc("somethingWentWrong"),
+                        type: SnackbarStyle.fail,
+                    });
                 })
                 .finally(() => {
                     this.isLoading = false;
@@ -710,13 +744,20 @@ export default Vue.extend({
                     if (response) {
                         this.newDataEvent.title = "";
                         this.newDataEvent.description = "";
-                        this.$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, 'editEventDesc-' + dataEvent.id)
+                        this.$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, "editEventDesc#" + dataEvent.id);
                         this.getDataEvents();
+                        this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
+                            message: this.$tc("comments.dataEventSuccess"),
+                            type: SnackbarStyle.success,
+                        });
                     }
                 })
                 .catch((e) => {
                     console.error(e);
-                    this.errorMessage = DataEventsErrorsEnum.postDataEvent;
+                    this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
+                        message: this.$tc("somethingWentWrong"),
+                        type: SnackbarStyle.fail,
+                    });
                 });
         },
         deleteDataEvent(dataEventID: number): Promise<void> {
@@ -725,12 +766,22 @@ export default Vue.extend({
                 .then((response) => {
                     if (response) {
                         this.getDataEvents();
+                        this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
+                            message: this.$tc("comments.dataEventDeleteSuccess"),
+                            type: SnackbarStyle.success,
+                        });
                     } else {
-                        this.errorMessage = DataEventsErrorsEnum.deleteDataEvent;
+                        this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
+                            message: this.$tc("somethingWentWrong"),
+                            type: SnackbarStyle.fail,
+                        });
                     }
                 })
                 .catch(() => {
-                    this.errorMessage = CommentsErrorsEnum.deleteComment;
+                    this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
+                        message: this.$tc("somethingWentWrong"),
+                        type: SnackbarStyle.fail,
+                    });
                 });
         },
         onListItemOptionClick(event: string, item: Comment | DataEvent): void {
@@ -781,7 +832,7 @@ export default Vue.extend({
                     const el = document.querySelector(location.hash);
 
                     if (el) {
-                        el.scrollIntoView({ behavior: "smooth" });
+                        el.scrollIntoView({ behavior: "smooth", block: "center" });
                         el.classList.add("highlight");
                         setTimeout(() => {
                             el.classList.remove("highlight");
@@ -828,10 +879,17 @@ export default Vue.extend({
         },
         onEditCommentInput(comment: any, event: string) {
             if (JSON.stringify(event) !== comment.body) {
-                this.$store.dispatch(ActionTypes.NEW_DIRTY_FIELD, "editComment-" + comment.id);
+                this.$store.dispatch(ActionTypes.NEW_DIRTY_FIELD, "editComment#" + comment.id);
             } else {
-                this.$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, "editComment-" + comment.id);
+                this.$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, "editComment#" + comment.id);
             }
+        },
+        resetNewReply() {
+            this.newReply = {
+                ...this.newReply,
+                body: null,
+                threadId: null,
+            };
         },
     },
 });
@@ -1138,11 +1196,6 @@ header {
     transition: opacity 0.25s ease-in-out;
 }
 
-.error {
-    color: $color-danger;
-    margin-bottom: 10px;
-}
-
 .column-reply,
 .column-post {
     position: relative;
@@ -1205,7 +1258,7 @@ header {
 .event-level-selector {
     display: flex;
     flex-direction: row;
-    align-items: center;
+    align-items: stretch;
     justify-content: center;
     margin-bottom: 15px;
 
@@ -1232,7 +1285,8 @@ header {
 }
 .event-level-radio {
     width: 340px;
-    height: 115px;
+    min-height: 115px;
+    height: 100%;
     border: solid 1px #d8dce0;
     padding: 15px;
     padding-bottom: 10px;

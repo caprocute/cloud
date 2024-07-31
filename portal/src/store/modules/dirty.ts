@@ -1,6 +1,6 @@
 import * as ActionTypes from "@/store/actions";
 import Vue from "vue";
-import {GlobalState} from '@/store';
+import { GlobalState } from "@/store";
 
 export class DirtyState {
     dirtyInputs: string[] = [];
@@ -44,7 +44,6 @@ const mutations = {
     },
     ["CLEAR_DIRTY_FIELD"]: (state: DirtyState, payload: string) => {
         const newState = state.dirtyInputs.filter((input) => input !== payload);
-        console.log("new state", newState);
         Vue.set(state, "dirtyInputs", newState);
     },
     ["CLEAR_ALL_DIRTY_FIELDS"]: (state: DirtyState) => {
@@ -69,9 +68,31 @@ export function confirmLeaveWithDirtyCheck(
     component: Vue & { $confirm(message: string, options: any): void; $store: { state: GlobalState } }
 ) {
     const { dirtyInputs } = component.$store.state.dirty;
+    let dirtyFieldsDesc = "";
+
+    dirtyInputs.forEach((input: string) => {
+        const inputKey = input.split("#")[0]; // strip id from input (for editing fields)
+        const translationKey = "notes.fields." + inputKey;
+
+        // check if trans key-value pair exists & make sure its not a duplicate
+        if (component.$tc(translationKey) !== translationKey && !dirtyFieldsDesc.includes(component.$tc(translationKey))) {
+            dirtyFieldsDesc += component.$tc(translationKey) + "\n";
+        }
+    });
+
+    let message = "";
+
+    if (dirtyFieldsDesc.length > 0) {
+        message += component.$tc("dirtyInputs.confirmLeaveDetailedTitle") + "\n\n";
+        message += dirtyFieldsDesc;
+        message += "\n" + component.$tc("dirtyInputs.confirmLeaveDetailedMsg");
+    } else {
+        message = component.$tc("dirtyInputs.confirmLeaveBasic");
+    }
+
     if (dirtyInputs.length > 0) {
         component.$confirm({
-            message: component.$tc("notes.confirmLeavePopupMessage"),
+            message: message,
             button: {
                 no: component.$tc("no"),
                 yes: component.$tc("yes"),

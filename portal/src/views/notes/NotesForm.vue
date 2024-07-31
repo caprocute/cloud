@@ -127,7 +127,7 @@ export default Vue.extend({
                 });
         },
         onChange(key: string): void {
-            if (this.form[key].body !== this.formBeforeChanges[key].body) {
+            if (this.form[key].body !== this.formBeforeChanges[key].body || this.form[key].title !== this.formBeforeChanges[key].title) {
                 this.$store.dispatch(ActionTypes.NEW_DIRTY_FIELD, key);
             } else {
                 this.$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, key);

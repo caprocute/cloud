@@ -4,9 +4,9 @@ import (
 	"context"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/fieldkit/cloud/server/common/sqlxcache"
+	"gitlab.com/fieldkit/cloud/server/common/sqlxcache"
 
-	"github.com/fieldkit/cloud/server/data"
+	"gitlab.com/fieldkit/cloud/server/data"
 )
 
 type EventRepository struct {

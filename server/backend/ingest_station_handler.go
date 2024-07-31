@@ -4,17 +4,17 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/fieldkit/cloud/server/common/sqlxcache"
-	"github.com/fieldkit/cloud/server/storage"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"gitlab.com/fieldkit/cloud/server/common/sqlxcache"
+	"gitlab.com/fieldkit/cloud/server/storage"
 
-	"github.com/fieldkit/cloud/server/common/logging"
+	"gitlab.com/fieldkit/cloud/server/common/logging"
 
-	"github.com/fieldkit/cloud/server/common/jobs"
-	"github.com/fieldkit/cloud/server/files"
-	"github.com/fieldkit/cloud/server/messages"
+	"gitlab.com/fieldkit/cloud/server/common/jobs"
+	"gitlab.com/fieldkit/cloud/server/files"
+	"gitlab.com/fieldkit/cloud/server/messages"
 
-	"github.com/fieldkit/cloud/server/backend/repositories"
+	"gitlab.com/fieldkit/cloud/server/backend/repositories"
 )
 
 type StationIngestionSaga struct {
@@ -138,7 +138,7 @@ func (h *IngestStationHandler) startIngestion(ctx context.Context, mc *jobs.Mess
 		return err
 	} else {
 		if err := mc.Publish(ctx, &messages.ProcessIngestion{
-			messages.IngestionReceived{
+			IngestionReceived: messages.IngestionReceived{
 				QueuedID:    id,
 				IngestionID: &ingestion.ID,
 				UserID:      body.UserID,

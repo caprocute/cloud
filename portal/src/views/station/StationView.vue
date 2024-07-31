@@ -276,6 +276,7 @@ import { BookmarkFactory, serializeBookmark } from "@/views/viz/viz";
 import { ExploreContext } from "@/views/viz/common";
 import FieldNotes from "@/views/fieldNotes/FieldNotes.vue";
 import { confirmLeaveWithDirtyCheck } from "@/store/modules/dirty";
+import { SnackbarStyle } from "@/store/modules/snackbar";
 
 export default Vue.extend({
     name: "StationView",
@@ -392,7 +393,7 @@ export default Vue.extend({
             return isCustomisationEnabled();
         },
         isModuleNameEditable(): boolean {
-          return !this.isPartnerCustomisationEnabled && !this.station.readOnly;
+            return !this.isPartnerCustomisationEnabled && !this.station.readOnly;
         },
     },
     beforeRouteLeave(to: any, from: any, next: any) {
@@ -447,11 +448,29 @@ export default Vue.extend({
             }).href;
             window.open(url, "_blank");
         },
-        saveStationDescription(): void {
+        async saveStationDescription(): Promise<void> {
             const payload = { id: this.station.id, name: this.station.name, ...this.form };
-            this.$store.dispatch(ActionTypes.UPDATE_STATION, payload);
-            this.$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, "stationDescription");
-            this.editingDescription = false;
+
+            this.$store
+                .dispatch(ActionTypes.UPDATE_STATION, payload)
+                .then(() => {
+                    this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
+                        message: this.$tc("station.descriptionUpdateSuccess"),
+                        type: SnackbarStyle.success,
+                    });
+                })
+                .catch(() => {
+                    this.form.description = this.station.description;
+                    this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
+                        message: this.$tc("somethingWentWrong"),
+                        type: SnackbarStyle.fail,
+                    });
+                })
+                .finally(() => {
+                  this.$store.dispatch(ActionTypes.UPDATE_STATION, payload);
+                  this.$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, "stationDescription");
+                    this.editingDescription = false;
+                });
         },
         onEditModuleNameClick(module: DisplayModule): void {
             this.editedModule = JSON.parse(JSON.stringify(module));
@@ -465,11 +484,24 @@ export default Vue.extend({
                 return;
             }
             const payload = { stationId: this.station.id, moduleId: this.editedModule.id, label: this.editedModule.label };
-            this.$store.dispatch(ActionTypes.UPDATE_STATION_MODULE, payload).then(() => {
-                this.selectedModule = this.editedModule;
-                this.editedModule = null;
-                this.$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, "editModuleName");
-            });
+            this.$store
+                .dispatch(ActionTypes.UPDATE_STATION_MODULE, payload)
+                .then(() => {
+                    this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
+                        message: this.$tc("station.moduleNameUpdateSuccess"),
+                        type: SnackbarStyle.success,
+                    });
+                })
+                .catch(() => {
+                    this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
+                        message: this.$tc("somethingWentWrong"),
+                        type: SnackbarStyle.fail,
+                    });
+                })
+                .finally(() => {
+                    this.editedModule = null;
+                    this.$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, "editModuleName");
+                });
         },
         selectModule(module: DisplayModule) {
             this.selectedModule = module;

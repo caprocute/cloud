@@ -3,7 +3,7 @@
 // data HTTP server encoders and decoders
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package server
 
@@ -12,7 +12,7 @@ import (
 	"net/http"
 	"strings"
 
-	dataviews "github.com/fieldkit/cloud/server/api/gen/data/views"
+	dataviews "gitlab.com/fieldkit/cloud/server/api/gen/data/views"
 	goahttp "goa.design/goa/v3/http"
 	goa "goa.design/goa/v3/pkg"
 )

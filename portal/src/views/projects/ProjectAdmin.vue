@@ -50,7 +50,7 @@
 
                 <div class="details-bottom">
                     <div class="details-team">
-                        <div class="title">Team</div>
+                        <div class="title">{{ $t("project.team") }}</div>
                         <div
                             class="team-member"
                             v-for="(projectUser, index) in displayProject.users"
@@ -62,7 +62,7 @@
                         </div>
                     </div>
                     <div class="details-modules">
-                        <div class="title">Modules</div>
+                        <div class="title">{{ $t("project.modules") }}</div>
 
                         <img
                             v-for="module in projectModules"
@@ -96,8 +96,8 @@
 </template>
 
 <script lang="ts">
-import Vue, {PropType} from "vue";
-import {CurrentUser, DisplayProject, DisplayStation, Project, ProjectModule, ProjectUser} from "@/store";
+import Vue, { PropType } from "vue";
+import { CurrentUser, DisplayProject, DisplayStation, Project, ProjectModule, ProjectUser } from "@/store";
 import CommonComponents from "@/views/shared";
 import ProjectStations from "./ProjectStations.vue";
 import ProjectDataFiles from "./ProjectDataFiles.vue";
@@ -105,7 +105,7 @@ import StationsReadings from "./StationsReadings.vue";
 import Comments from "../comments/Comments.vue";
 import TeamManager from "./TeamManager.vue";
 import * as utils from "../../utilities";
-import {twitterCardMeta} from "@/social";
+import { twitterCardMeta } from "@/social";
 
 export default Vue.extend({
     name: "ProjectAdmin",

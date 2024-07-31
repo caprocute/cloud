@@ -4,7 +4,7 @@
             v-model="selected"
             label="name"
             track-by="id"
-            placeholder="User's name or email"
+            :placeholder="$t('admin.userPicker.placeholder')"
             open-direction="bottom"
             :options="users"
             :multiple="false"
@@ -28,7 +28,7 @@
                     <span class="option__title">{{ props.option.name }} ({{ props.option.email }})</span>
                 </div>
             </template>
-            <span slot="noResult">Oops! No users found.</span>
+            <span slot="noResult">{{$t('admin.userPicker.noResult')}}</span>
         </multiselect>
     </div>
 </template>

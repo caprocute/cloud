@@ -24,7 +24,7 @@ export FIELDKIT_WORKERS=5
 # Most of the time, development should be fine using this when jumping from
 # working on a local machine to accessing that machine over the LAN for testing
 # mobile.
-export FIELDKIT_API_DOMAIN="{_:127\.0\.0\.1|192\.168\.0\.100}:8080"
+export FIELDKIT_API_DOMAIN="{_:127\.0\.0\.1|192\.168\.\d+\.\d+}:8080"
 
 
 # This may need adjustment for testing scenarios where the server returns a URL.

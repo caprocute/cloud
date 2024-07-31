@@ -14,7 +14,7 @@
                 ●
             </div>
         </div>
-        <div v-if="textual">{{ page + 1 }} of {{ totalPages }}</div>
+        <div v-if="textual">{{ page + 1 }} {{ $t('pagination.of') }} {{ totalPages }}</div>
         <div class="button next" v-on:click="onNext" v-bind:class="{ enabled: canPageNext }">
             <span class="arrow"></span>
         </div>

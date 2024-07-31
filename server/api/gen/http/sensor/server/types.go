@@ -3,13 +3,13 @@
 // sensor HTTP server types
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package server
 
 import (
-	sensor "github.com/fieldkit/cloud/server/api/gen/sensor"
-	sensorviews "github.com/fieldkit/cloud/server/api/gen/sensor/views"
+	sensor "gitlab.com/fieldkit/cloud/server/api/gen/sensor"
+	sensorviews "gitlab.com/fieldkit/cloud/server/api/gen/sensor/views"
 	goa "goa.design/goa/v3/pkg"
 )
 
@@ -1111,9 +1111,10 @@ func NewTailPayload(stations *string, backend *string, auth *string) *sensor.Tai
 }
 
 // NewRecentlyPayload builds a sensor service recently endpoint payload.
-func NewRecentlyPayload(stations *string, auth *string) *sensor.RecentlyPayload {
+func NewRecentlyPayload(stations *string, windows *string, auth *string) *sensor.RecentlyPayload {
 	v := &sensor.RecentlyPayload{}
 	v.Stations = stations
+	v.Windows = windows
 	v.Auth = auth
 
 	return v

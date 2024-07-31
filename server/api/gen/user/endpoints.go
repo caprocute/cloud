@@ -3,7 +3,7 @@
 // user endpoints
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package user
 
@@ -37,6 +37,7 @@ type Endpoints struct {
 	IssueTransmissionToken  goa.Endpoint
 	ProjectRoles            goa.Endpoint
 	AdminTermsAndConditions goa.Endpoint
+	DeleteAccount           goa.Endpoint
 	AdminDelete             goa.Endpoint
 	AdminSearch             goa.Endpoint
 	Mentionables            goa.Endpoint
@@ -76,6 +77,7 @@ func NewEndpoints(s Service) *Endpoints {
 		IssueTransmissionToken:  NewIssueTransmissionTokenEndpoint(s, a.JWTAuth),
 		ProjectRoles:            NewProjectRolesEndpoint(s),
 		AdminTermsAndConditions: NewAdminTermsAndConditionsEndpoint(s, a.JWTAuth),
+		DeleteAccount:           NewDeleteAccountEndpoint(s, a.JWTAuth),
 		AdminDelete:             NewAdminDeleteEndpoint(s, a.JWTAuth),
 		AdminSearch:             NewAdminSearchEndpoint(s, a.JWTAuth),
 		Mentionables:            NewMentionablesEndpoint(s, a.JWTAuth),
@@ -104,6 +106,7 @@ func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.IssueTransmissionToken = m(e.IssueTransmissionToken)
 	e.ProjectRoles = m(e.ProjectRoles)
 	e.AdminTermsAndConditions = m(e.AdminTermsAndConditions)
+	e.DeleteAccount = m(e.DeleteAccount)
 	e.AdminDelete = m(e.AdminDelete)
 	e.AdminSearch = m(e.AdminSearch)
 	e.Mentionables = m(e.Mentionables)
@@ -439,6 +442,25 @@ func NewAdminTermsAndConditionsEndpoint(s Service, authJWTFn security.AuthJWTFun
 			return nil, err
 		}
 		return nil, s.AdminTermsAndConditions(ctx, p)
+	}
+}
+
+// NewDeleteAccountEndpoint returns an endpoint function that calls the method
+// "delete account" of service "user".
+func NewDeleteAccountEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*DeleteAccountPayload)
+		var err error
+		sc := security.JWTScheme{
+			Name:           "jwt",
+			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
+			RequiredScopes: []string{"api:access"},
+		}
+		ctx, err = authJWTFn(ctx, p.Auth, &sc)
+		if err != nil {
+			return nil, err
+		}
+		return nil, s.DeleteAccount(ctx, p)
 	}
 }
 

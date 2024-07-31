@@ -3,7 +3,7 @@
 // notes client HTTP transport
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package client
 
@@ -11,7 +11,7 @@ import (
 	"context"
 	"net/http"
 
-	notes "github.com/fieldkit/cloud/server/api/gen/notes"
+	notes "gitlab.com/fieldkit/cloud/server/api/gen/notes"
 	goahttp "goa.design/goa/v3/http"
 	goa "goa.design/goa/v3/pkg"
 )

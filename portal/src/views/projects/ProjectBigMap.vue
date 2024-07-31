@@ -366,8 +366,9 @@ export default Vue.extend({
 
 ::v-deep .station-hover-summary {
     width: 359px;
-    top: calc(50% - 100px);
-    left: calc(50% - 180px);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 .stations-list {
@@ -395,6 +396,7 @@ export default Vue.extend({
 
     ::v-deep .station-hover-summary {
         position: unset;
+        transform: translate(0, 0) !important;
     }
 
     ::v-deep .summary-container {
@@ -403,7 +405,7 @@ export default Vue.extend({
         margin: 20px;
         flex-basis: 389px;
         box-sizing: border-box;
-        box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.5);
+        box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.07);
 
         @include bp-down($md) {
             padding: 19px 11px;

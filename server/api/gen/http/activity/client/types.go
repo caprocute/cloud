@@ -3,12 +3,12 @@
 // activity HTTP client types
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package client
 
 import (
-	activityviews "github.com/fieldkit/cloud/server/api/gen/activity/views"
+	activityviews "gitlab.com/fieldkit/cloud/server/api/gen/activity/views"
 	goa "goa.design/goa/v3/pkg"
 )
 

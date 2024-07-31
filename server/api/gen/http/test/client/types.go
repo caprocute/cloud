@@ -3,12 +3,12 @@
 // test HTTP client types
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package client
 
 import (
-	test "github.com/fieldkit/cloud/server/api/gen/test"
+	test "gitlab.com/fieldkit/cloud/server/api/gen/test"
 	goa "goa.design/goa/v3/pkg"
 )
 

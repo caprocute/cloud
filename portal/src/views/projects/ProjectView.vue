@@ -11,7 +11,7 @@
                 >
                     <div class="activity-button" v-if="isAdministrator" v-on:click="onActivityToggle">
                         <i class="icon icon-notification"></i>
-                        {{ $t("project.activity") }}
+                        {{ $t("project.activity.button") }}
                     </div>
                 </DoubleHeader>
 
@@ -32,6 +32,13 @@
                     :userStations="stations"
                 />
             </template>
+            <template v-else-if="!isBusy">
+                <ForbiddenBanner
+                    class="project-forbidden-banner"
+                    :title="$tc('project.privateBannerTitle')"
+                    :subtitle="$tc('project.privateBannerSubtitle')"
+                ></ForbiddenBanner>
+            </template>
         </div>
     </StandardLayout>
 </template>
@@ -49,6 +56,7 @@ import { GlobalState } from "@/store/modules/global";
 import { AuthenticationRequiredError, ForbiddenError } from "@/api";
 import { getPartnerCustomizationWithDefault, isCustomisationEnabled, PartnerCustomization } from "@/views/shared/partners";
 import { confirmLeaveWithDirtyCheck } from "@/store/modules/dirty";
+import ForbiddenBanner from "@/views/shared/ForbiddenBanner.vue";
 
 export default Vue.extend({
     name: "ProjectView",
@@ -58,6 +66,7 @@ export default Vue.extend({
         ProjectPublic,
         ProjectAdmin,
         ProjectActivity,
+        ForbiddenBanner,
     },
     props: {
         id: {
@@ -111,15 +120,23 @@ export default Vue.extend({
     beforeMount() {
         return this.$store.dispatch(ActionTypes.NEED_PROJECT, { id: this.id }).catch((e) => {
             if (ForbiddenError.isInstance(e)) {
-                return this.$router.push({
-                    name: "login",
-                    params: { errorMessage: this.$t("login.privateProject").toString() },
-                    query: { after: this.$route.path },
-                });
+                if (!this.$store.getters.isAuthenticated) {
+                    return this.$router.push({
+                        name: "login",
+                        params: { errorMessage: this.$t("login.privateProject").toString() },
+                        query: { after: this.$route.path },
+                    });
+                }
             }
         });
     },
     beforeRouteLeave(to: any, from: any, next: any) {
+        confirmLeaveWithDirtyCheck(() => {
+            next();
+        }, this);
+    },
+    // needed for project nav from sidebar menu (route is not changed, only route param)
+    beforeRouteUpdate(to: any, from: any, next: any) {
         confirmLeaveWithDirtyCheck(() => {
             next();
         }, this);
@@ -245,6 +262,15 @@ export default Vue.extend({
         border: 0;
         margin: 0;
         transform: translateY(2px);
+    }
+}
+
+::v-deep .project-forbidden-banner {
+    background: #fcfcfc;
+    margin: 0 auto;
+
+    img {
+        width: 28px;
     }
 }
 </style>

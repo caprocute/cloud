@@ -3,7 +3,7 @@
 // firmware service
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package firmware
 
@@ -11,7 +11,7 @@ import (
 	"context"
 	"io"
 
-	firmwareviews "github.com/fieldkit/cloud/server/api/gen/firmware/views"
+	firmwareviews "gitlab.com/fieldkit/cloud/server/api/gen/firmware/views"
 	goa "goa.design/goa/v3/pkg"
 	"goa.design/goa/v3/security"
 )

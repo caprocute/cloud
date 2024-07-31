@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/fieldkit/cloud/server/common/logging"
+	"gitlab.com/fieldkit/cloud/server/common/logging"
 )
 
 type DescribeLocations struct {

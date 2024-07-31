@@ -1,13 +1,12 @@
 package api
 
 import (
-	"fmt"
 	"net/http"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/fieldkit/cloud/server/tests"
+	"gitlab.com/fieldkit/cloud/server/tests"
 )
 
 func TestProcessPending(t *testing.T) {
@@ -21,7 +20,7 @@ func TestProcessPending(t *testing.T) {
 	api, err := NewTestableApi(e)
 	assert.NoError(err)
 
-	req, _ := http.NewRequest("POST", fmt.Sprintf("/data/process"), nil)
+	req, _ := http.NewRequest("POST", "/data/process", nil)
 	req.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(user))
 	rr := tests.ExecuteRequest(req, api)
 

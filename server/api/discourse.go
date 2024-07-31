@@ -14,12 +14,12 @@ import (
 
 	"goa.design/goa/v3/security"
 
-	discourse "github.com/fieldkit/cloud/server/api/gen/discourse"
-	userService "github.com/fieldkit/cloud/server/api/gen/user"
+	discourse "gitlab.com/fieldkit/cloud/server/api/gen/discourse"
+	userService "gitlab.com/fieldkit/cloud/server/api/gen/user"
 
-	"github.com/fieldkit/cloud/server/backend/repositories"
-	"github.com/fieldkit/cloud/server/common"
-	"github.com/fieldkit/cloud/server/data"
+	"gitlab.com/fieldkit/cloud/server/backend/repositories"
+	"gitlab.com/fieldkit/cloud/server/common"
+	"gitlab.com/fieldkit/cloud/server/data"
 )
 
 var (

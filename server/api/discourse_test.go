@@ -9,9 +9,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	discourse "github.com/fieldkit/cloud/server/api/gen/discourse"
+	discourse "gitlab.com/fieldkit/cloud/server/api/gen/discourse"
 
-	"github.com/fieldkit/cloud/server/tests"
+	"gitlab.com/fieldkit/cloud/server/tests"
 )
 
 func init() {

@@ -13,9 +13,11 @@
         </div>
         <div v-if="noCurrentUser" class="no-user-message">
             <p>
-                Please
-                <router-link :to="{ name: 'login', query: { redirect: $route.fullPath } }" class="show-link">log in</router-link>
-                to view projects.
+                {{ $t("project.update.needLogin.part1") }}
+                <router-link :to="{ name: 'login', query: { redirect: $route.fullPath } }" class="show-link">
+                    {{ $t("project.update.needLogin.part2") }}
+                </router-link>
+                {{ $t("project.update.needLogin.part3") }}
             </p>
         </div>
     </StandardLayout>

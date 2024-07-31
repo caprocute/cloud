@@ -2,9 +2,10 @@ stages:
   - test
   - build
   - deploy
+  - db
 
 variables:
-  VERSION: 0.3.52
+  VERSION: 0.3.60
 
 test:go:
   stage: test
@@ -42,6 +43,28 @@ test:js:
     - cp src/secrets.ts.template src/secrets.ts
     - node_modules/.bin/vue-cli-service build
     - node_modules/.bin/vue-cli-service test:unit
+
+build:tools-amd64:
+  stage: build
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_COMMIT_TAG
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_BRANCH == "main"
+  image: golang:latest
+  script:
+    - mkdir build
+    - (cd server/cmd/fktool && go build -o ../../../build/fktool *.go)
+    - (cd server/cmd/fkdata && go build -o ../../../build/fkdata *.go)
+    - (cd server/cmd/sanitizer && go build -o ../../../build/sanitizer *.go)
+    - (cd server/cmd/scratch && go build -o ../../../build/scratch *.go)
+  artifacts:
+    name: "cloud-tools-amd64-${CI_COMMIT_REF_NAME}"
+    paths:
+      - build/fktool
+      - build/fkdata
+      - build/sanitizer
+      - build/scratch
 
 build:compile:
   stage: build
@@ -94,12 +117,12 @@ build:images:
 
 build:migrations:
   stage: build
+  image: golang:latest
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
     - if: $CI_COMMIT_TAG
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
     - if: $CI_COMMIT_BRANCH == "main"
-  image: golang:latest
   script:
     - cd migrations && go build -o migrate *.go
   artifacts:
@@ -109,10 +132,79 @@ build:migrations:
       - migrations/tsdb
       - migrations/primary
 
+db:primary:prod:clone:
+  stage: db
+  image: docker:24.0.5
+  when: manual
+  timeout: 3h
+  services:
+    - name: docker:24.0.5-dind
+      alias: docker
+  variables:
+    DOCKER_HOST: tcp://docker:2375/
+    DOCKER_TLS_CERTDIR: ""
+    DATABASE: primary
+  script:
+    - cd tools
+    - docker build -t conservify/fk-cloud-tools:latest .
+    - docker run -e DEPLOY_HOST=${DEPLOY_HOST} -e SYNC_COPY_TARGET_DBS=${SYNC_COPY_TARGET_DBS} -e SYNC_COPY_TARGET_DBS_PATH=${SYNC_COPY_TARGET_DBS_PATH} -e CI_JOB_TOKEN=${CI_JOB_TOKEN} -e CI_PROJECT_ID=${CI_PROJECT_ID} -e DATABASE=${DATABASE} conservify/fk-cloud-tools /work/db-clone.sh
+
+db:ts:prod:clone:
+  stage: db
+  image: docker:24.0.5
+  when: manual
+  timeout: 6h
+  services:
+    - name: docker:24.0.5-dind
+      alias: docker
+  variables:
+    DOCKER_HOST: tcp://docker:2375/
+    DOCKER_TLS_CERTDIR: ""
+    DATABASE: ts
+  script:
+    - cd tools
+    - docker build -t conservify/fk-cloud-tools:latest .
+    - docker run -e DEPLOY_HOST=${DEPLOY_HOST} -e SYNC_COPY_TARGET_DBS=${SYNC_COPY_TARGET_DBS} -e SYNC_COPY_TARGET_DBS_PATH=${SYNC_COPY_TARGET_DBS_PATH} -e CI_JOB_TOKEN=${CI_JOB_TOKEN} -e CI_PROJECT_ID=${CI_PROJECT_ID} -e DATABASE=${DATABASE} conservify/fk-cloud-tools /work/db-clone.sh
+
+db:primary:dev:restore:
+  stage: db
+  image: docker:24.0.5
+  when: manual
+  timeout: 3h
+  services:
+    - name: docker:24.0.5-dind
+      alias: docker
+  variables:
+    DOCKER_HOST: tcp://docker:2375/
+    DOCKER_TLS_CERTDIR: ""
+    DATABASE: primary
+  script:
+    - cd tools
+    - docker build -t conservify/fk-cloud-tools:latest .
+    - docker run -e DEPLOY_HOST=${DEPLOY_HOST} -e SYNC_COPY_TARGET_DBS_PATH=${SYNC_COPY_TARGET_DBS_PATH} -e CI_JOB_TOKEN=${CI_JOB_TOKEN} -e CI_PROJECT_ID=${CI_PROJECT_ID} -e DATABASE=${DATABASE} conservify/fk-cloud-tools /work/db-restore.sh
+
+db:ts:dev:restore:
+  stage: db
+  image: docker:24.0.5
+  when: manual
+  timeout: 3h
+  services:
+    - name: docker:24.0.5-dind
+      alias: docker
+  variables:
+    DOCKER_HOST: tcp://docker:2375/
+    DOCKER_TLS_CERTDIR: ""
+    DATABASE: ts
+  script:
+    - cd tools
+    - docker build -t conservify/fk-cloud-tools:latest .
+    - docker run -e DEPLOY_HOST=${DEPLOY_HOST} -e SYNC_COPY_TARGET_DBS_PATH=${SYNC_COPY_TARGET_DBS_PATH} -e CI_JOB_TOKEN=${CI_JOB_TOKEN} -e CI_PROJECT_ID=${CI_PROJECT_ID} -e DATABASE=${DATABASE} conservify/fk-cloud-tools /work/db-restore.sh
+
 deploy:staging:
   stage: deploy
-  needs: ["build:images", "build:migrations"]
-  image: ruby:3.1
+  needs: ["build:images"]
+  image: docker:24.0.5
+  timeout: 1h
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       when: manual
@@ -120,32 +212,67 @@ deploy:staging:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
       when: manual
       allow_failure: true
+  services:
+    - name: docker:24.0.5-dind
+      alias: docker
+  variables:
+    DOCKER_HOST: tcp://docker:2375/
+    DOCKER_TLS_CERTDIR: ""
+    TERRAFORM_ENV: .secure_files/dev.json
+    SSH_KEY: .secure_files/deploy.pem
+    PRIMARY_MIGRATIONS_PATH: migrations/primary
+    TSDB_MIGRATIONS_PATH: migrations/tsdb
+    ARCHIVE: dev-ops-main/amis/build/portal-stack.tar
+    ENV: dev
+    POLL_URL: https://api.fkdev.org/status
   script:
+    - apk add wget curl unzip bash jq
     - curl --silent "https://gitlab.com/gitlab-org/incubation-engineering/mobile-devops/download-secure-files/-/raw/main/installer" | bash
-    - chmod 0600 .secure_files/deploy.pem
-    - ssh -i .secure_files/deploy.pem -o StrictHostKeyChecking=no ${DEPLOY_HOST} "rm -rf dev-ops/deploy && mkdir -p dev-ops/deploy"
-    - scp -i .secure_files/deploy.pem -o StrictHostKeyChecking=no -r migrations/migrate migrations/primary migrations/tsdb "${DEPLOY_HOST}:dev-ops/deploy"
-    - scp -i .secure_files/deploy.pem -o StrictHostKeyChecking=no dev-ops-main/amis/build/*.tar "${DEPLOY_HOST}:dev-ops/deploy"
-    - ssh -i .secure_files/deploy.pem -o StrictHostKeyChecking=no ${DEPLOY_HOST} dev-ops/deploy.sh dev portal-stack
+    - chmod 0600 "${SSH_KEY}"
+    - (cd migrations && docker build --progress=plain -t conservify/fk-cloud-migrations:latest .)
+    - (cd tools && docker build --progress=plain -t conservify/fk-cloud-tools:latest .)
+    - MIGRATE_DATABASE_URL=`jq -r .database_url.value ${TERRAFORM_ENV}`
+    - docker run -e MIGRATE_PATH=/migrations -e MIGRATE_DATABASE_URL=${MIGRATE_DATABASE_URL} -v `pwd`/${PRIMARY_MIGRATIONS_PATH}:/migrations conservify/fk-cloud-migrations migrate
+    - MIGRATE_DATABASE_URL=`jq -r .timescaledb_url.value ${TERRAFORM_ENV}`
+    - docker run -e MIGRATE_PATH=/migrations -e MIGRATE_DATABASE_URL=${MIGRATE_DATABASE_URL} -v `pwd`/${TSDB_MIGRATIONS_PATH}:/migrations conservify/fk-cloud-migrations migrate
+    - docker run -v $(pwd)/.secure_files:/work/.secure_files -v $(pwd)/dev-ops-main:/work/dev-ops-main conservify/fk-cloud-tools /work/deployer deploy --cert ${SSH_KEY} --terraform ${TERRAFORM_ENV} --archive ${ARCHIVE} --poll ${POLL_URL}
   environment:
     name: staging
     url: https://portal.fkdev.org
 
 deploy:prod:
   stage: deploy
-  needs: ["build:images", "build:migrations"]
-  image: ruby:3.1
+  needs: ["build:images"]
+  image: docker:24.0.5
+  timeout: 1h
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
       when: manual
       allow_failure: true
+  services:
+    - name: docker:24.0.5-dind
+      alias: docker
+  variables:
+    DOCKER_HOST: tcp://docker:2375/
+    DOCKER_TLS_CERTDIR: ""
+    TERRAFORM_ENV: .secure_files/prod.json
+    SSH_KEY: .secure_files/deploy.pem
+    PRIMARY_MIGRATIONS_PATH: migrations/primary
+    TSDB_MIGRATIONS_PATH: migrations/tsdb
+    ARCHIVE: dev-ops-main/amis/build/portal-stack.tar
+    ENV: dev
+    POLL_URL: https://api.fieldkit.org/status
   script:
+    - apk add wget curl unzip bash jq
     - curl --silent "https://gitlab.com/gitlab-org/incubation-engineering/mobile-devops/download-secure-files/-/raw/main/installer" | bash
-    - chmod 0600 .secure_files/deploy.pem
-    - ssh -i .secure_files/deploy.pem -o StrictHostKeyChecking=no ${DEPLOY_HOST} "rm -rf dev-ops/deploy && mkdir -p dev-ops/deploy"
-    - scp -i .secure_files/deploy.pem -o StrictHostKeyChecking=no -r migrations/migrate migrations/primary migrations/tsdb "${DEPLOY_HOST}:dev-ops/deploy"
-    - scp -i .secure_files/deploy.pem -o StrictHostKeyChecking=no dev-ops-main/amis/build/*.tar "${DEPLOY_HOST}:dev-ops/deploy"
-    - ssh -i .secure_files/deploy.pem -o StrictHostKeyChecking=no ${DEPLOY_HOST} dev-ops/deploy.sh prod portal-stack
+    - chmod 0600 "${SSH_KEY}"
+    - (cd migrations && docker build --progress=plain -t conservify/fk-cloud-migrations:latest .)
+    - (cd tools && docker build --progress=plain -t conservify/fk-cloud-tools:latest .)
+    - MIGRATE_DATABASE_URL=`jq -r .database_url.value ${TERRAFORM_ENV}`
+    - docker run -e MIGRATE_PATH=/migrations -e MIGRATE_DATABASE_URL=${MIGRATE_DATABASE_URL} -v `pwd`/${PRIMARY_MIGRATIONS_PATH}:/migrations conservify/fk-cloud-migrations migrate
+    - MIGRATE_DATABASE_URL=`jq -r .timescaledb_url.value ${TERRAFORM_ENV}`
+    - docker run -e MIGRATE_PATH=/migrations -e MIGRATE_DATABASE_URL=${MIGRATE_DATABASE_URL} -v `pwd`/${TSDB_MIGRATIONS_PATH}:/migrations conservify/fk-cloud-migrations migrate
+    - docker run -v $(pwd)/.secure_files:/work/.secure_files -v $(pwd)/dev-ops-main:/work/dev-ops-main conservify/fk-cloud-tools /work/deployer deploy --cert ${SSH_KEY} --terraform ${TERRAFORM_ENV} --archive ${ARCHIVE} --poll ${POLL_URL}
   environment:
     name: production
     url: https://portal.fieldkit.org

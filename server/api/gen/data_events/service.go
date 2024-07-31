@@ -3,14 +3,14 @@
 // data events service
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package dataevents
 
 import (
 	"context"
 
-	dataeventsviews "github.com/fieldkit/cloud/server/api/gen/data_events/views"
+	dataeventsviews "gitlab.com/fieldkit/cloud/server/api/gen/data_events/views"
 	goa "goa.design/goa/v3/pkg"
 	"goa.design/goa/v3/security"
 )

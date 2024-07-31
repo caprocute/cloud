@@ -3,7 +3,7 @@
 // test HTTP client encoders and decoders
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package client
 
@@ -15,7 +15,7 @@ import (
 	"net/url"
 	"strings"
 
-	test "github.com/fieldkit/cloud/server/api/gen/test"
+	test "gitlab.com/fieldkit/cloud/server/api/gen/test"
 	goahttp "goa.design/goa/v3/http"
 )
 

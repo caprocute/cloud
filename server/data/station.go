@@ -11,7 +11,7 @@ import (
 	"github.com/paulmach/orb"
 	"github.com/paulmach/orb/encoding/wkb"
 
-	pb "github.com/fieldkit/app-protocol"
+	pb "gitlab.com/fieldkit/libraries/app-protocol"
 )
 
 const (
@@ -130,7 +130,7 @@ func (s *Station) UpdateFromStatus(ctx context.Context, raw string) error {
 				}{
 					Name:         status.Identity.Name,
 					DeviceID:     hex.EncodeToString(status.Identity.DeviceId),
-					GenerationID: hex.EncodeToString(status.Identity.Generation),
+					GenerationID: hex.EncodeToString(status.Identity.GenerationId),
 					Firmware:     status.Identity.Firmware,
 					Build:        status.Identity.Build,
 				})
@@ -210,13 +210,6 @@ func (s *Station) DeviceIDHex() string {
 	return hex.EncodeToString(s.DeviceID)
 }
 
-type AggregatedDataSummary struct {
-	StationID     int32      `db:"station_id"`
-	Start         *time.Time `db:"start"`
-	End           *time.Time `db:"end"`
-	NumberSamples *int64     `db:"number_samples"`
-}
-
 type StationFull struct {
 	Station         *Station
 	Model           *StationModel
@@ -228,7 +221,6 @@ type StationFull struct {
 	Configurations  []*StationConfiguration
 	Modules         []*StationModule
 	Sensors         []*ModuleSensor
-	DataSummary     *AggregatedDataSummary
 	HasImages       bool
 	ProjectIDs      []int32
 }

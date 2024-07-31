@@ -3,7 +3,7 @@
 // firmware HTTP client encoders and decoders
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package client
 
@@ -17,8 +17,8 @@ import (
 	"strconv"
 	"strings"
 
-	firmware "github.com/fieldkit/cloud/server/api/gen/firmware"
-	firmwareviews "github.com/fieldkit/cloud/server/api/gen/firmware/views"
+	firmware "gitlab.com/fieldkit/cloud/server/api/gen/firmware"
+	firmwareviews "gitlab.com/fieldkit/cloud/server/api/gen/firmware/views"
 	goahttp "goa.design/goa/v3/http"
 	goa "goa.design/goa/v3/pkg"
 )

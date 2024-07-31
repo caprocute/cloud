@@ -3,7 +3,7 @@
 // HTTP request path constructors for the user service.
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package client
 
@@ -109,6 +109,11 @@ func ProjectRolesUserPath() string {
 // AdminTermsAndConditionsUserPath returns the URL path to the user service admin terms and conditions HTTP endpoint.
 func AdminTermsAndConditionsUserPath() string {
 	return "/admin/user/tnc"
+}
+
+// DeleteAccountUserPath returns the URL path to the user service delete account HTTP endpoint.
+func DeleteAccountUserPath() string {
+	return "/auth/delete-account"
 }
 
 // AdminDeleteUserPath returns the URL path to the user service admin delete HTTP endpoint.

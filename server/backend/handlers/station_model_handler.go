@@ -4,14 +4,14 @@ import (
 	"context"
 	"time"
 
-	"github.com/fieldkit/cloud/server/common/sqlxcache"
+	"gitlab.com/fieldkit/cloud/server/common/sqlxcache"
 
-	pb "github.com/fieldkit/data-protocol"
+	pb "gitlab.com/fieldkit/libraries/data-protocol"
 
-	"github.com/fieldkit/cloud/server/common/errors"
+	"gitlab.com/fieldkit/cloud/server/common/errors"
 
-	"github.com/fieldkit/cloud/server/backend/repositories"
-	"github.com/fieldkit/cloud/server/data"
+	"gitlab.com/fieldkit/cloud/server/backend/repositories"
+	"gitlab.com/fieldkit/cloud/server/data"
 )
 
 type stationModelRecordHandler struct {
@@ -145,20 +145,20 @@ func (h *stationModelRecordHandler) OnDone(ctx context.Context) error {
 	for sgIndex, sg := range h.dataRecord.Readings.SensorGroups {
 		for sIndex, sr := range sg.Readings {
 			if sr == nil {
-				log.Errorw("sensor group with null reading", "meta_record_id", h.dbMeta.ID, "data_record_id", h.dbData.ID)
-				return errors.Structured("sensor group with null reading", "meta_record_id", h.dbMeta.ID, "data_record_id", h.dbData.ID)
+				log.Errorw("sensor group with null reading", "meta_record_id", h.dbMeta.ID)
+				return errors.Structured("sensor group with null reading", "meta_record_id", h.dbMeta.ID)
 			}
 
 			if sgIndex >= len(sensorsByModule) {
-				log.Errorw("sensor group cardinality mismatch", "meta_record_id", h.dbMeta.ID, "data_record_id", h.dbData.ID)
-				return errors.Structured("sensor group cardinality mismatch", "meta_record_id", h.dbMeta.ID, "data_record_id", h.dbData.ID)
+				log.Errorw("sensor group cardinality mismatch", "meta_record_id", h.dbMeta.ID)
+				return errors.Structured("sensor group cardinality mismatch", "meta_record_id", h.dbMeta.ID)
 			}
 
 			m := sensorsByModule[sgIndex]
 
 			if sIndex >= len(m) {
-				log.Errorw("sensor reading cardinality mismatch", "meta_record_id", h.dbMeta.ID, "data_record_id", h.dbData.ID)
-				return errors.Structured("sensor reading cardinality mismatch", "meta_record_id", h.dbMeta.ID, "data_record_id", h.dbData.ID)
+				log.Errorw("sensor reading cardinality mismatch", "meta_record_id", h.dbMeta.ID)
+				return errors.Structured("sensor reading cardinality mismatch", "meta_record_id", h.dbMeta.ID)
 			}
 
 			s := m[sIndex]

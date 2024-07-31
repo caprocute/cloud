@@ -14,10 +14,10 @@ import (
 
 	"github.com/coreos/go-oidc"
 
-	oidcService "github.com/fieldkit/cloud/server/api/gen/oidc"
+	oidcService "gitlab.com/fieldkit/cloud/server/api/gen/oidc"
 
-	"github.com/fieldkit/cloud/server/backend/repositories"
-	"github.com/fieldkit/cloud/server/data"
+	"gitlab.com/fieldkit/cloud/server/backend/repositories"
+	"gitlab.com/fieldkit/cloud/server/data"
 )
 
 type OidcAuthConfig struct {
@@ -111,7 +111,7 @@ func NewOidcService(ctx context.Context, options *ControllerOptions) *OidcServic
 		for {
 			auth, err := NewOidcAuth(ctx, s.options, s.config)
 			if err != nil {
-				if time.Now().Sub(started) < time.Duration(1)*time.Minute {
+				if time.Since(started) < time.Duration(1)*time.Minute {
 					log.Warnw("oidc", "error", err)
 				} else {
 					log.Errorw("oidc", "error", err)

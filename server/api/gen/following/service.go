@@ -3,14 +3,14 @@
 // following service
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package following
 
 import (
 	"context"
 
-	followingviews "github.com/fieldkit/cloud/server/api/gen/following/views"
+	followingviews "gitlab.com/fieldkit/cloud/server/api/gen/following/views"
 	goa "goa.design/goa/v3/pkg"
 	"goa.design/goa/v3/security"
 )

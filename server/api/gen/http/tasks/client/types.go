@@ -3,12 +3,12 @@
 // tasks HTTP client types
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package client
 
 import (
-	tasks "github.com/fieldkit/cloud/server/api/gen/tasks"
+	tasks "gitlab.com/fieldkit/cloud/server/api/gen/tasks"
 	goa "goa.design/goa/v3/pkg"
 )
 

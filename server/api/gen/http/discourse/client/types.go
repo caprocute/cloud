@@ -3,12 +3,12 @@
 // discourse HTTP client types
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package client
 
 import (
-	discourse "github.com/fieldkit/cloud/server/api/gen/discourse"
+	discourse "gitlab.com/fieldkit/cloud/server/api/gen/discourse"
 	goa "goa.design/goa/v3/pkg"
 )
 

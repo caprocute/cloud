@@ -1,19 +1,17 @@
 <template>
     <div :class="'share-panel ' + containerClass">
         <div class="heading">
-            <div class="title">Share</div>
+            <div class="title">{{ $tc("sharePanel.title") }}</div>
             <div class="close-button icon icon-close" v-on:click="onClose"></div>
         </div>
         <div class="share-options">
             <a class="share-button" :href="twitterUrl" target="blank">
-                <i class="icon icon-twitter" aria-label="Share on Twitter"></i>
+                <i class="icon icon-twitter" :aria-label="$tc('sharePanel.alt.twitter')"></i>
                 Twitter
             </a>
             <a class="share-button" :href="facebookUrl" target="blank">
-                <i class="icon icon-facebook" aria-label="Share on Facebook"></i>
-                <span>
-                    Facebook
-                </span>
+                <i class="icon icon-facebook" :aria-label="$tc('sharePanel.alt.facebook')"></i>
+                <span>Facebook</span>
             </a>
             <a class="share-button" @click="openMailClient()">
                 <i class="icon icon-mail"></i>
@@ -92,7 +90,7 @@ export default Vue.extend({
             if (partnerCustomization != null) {
                 qs.append("text", partnerCustomization.sharing.viz);
             } else {
-                qs.append("text", "Check out this data on FieldKit!");
+                qs.append("text", this.$tc('sharePanel.twitterText'));
             }
             return `https://twitter.com/intent/tweet?${qs.toString()}`;
         },

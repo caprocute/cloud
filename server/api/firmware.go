@@ -14,11 +14,11 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/s3"
 
-	"github.com/fieldkit/cloud/server/backend"
-	"github.com/fieldkit/cloud/server/common"
-	"github.com/fieldkit/cloud/server/data"
+	"gitlab.com/fieldkit/cloud/server/backend"
+	"gitlab.com/fieldkit/cloud/server/common"
+	"gitlab.com/fieldkit/cloud/server/data"
 
-	firmware "github.com/fieldkit/cloud/server/api/gen/firmware"
+	firmware "gitlab.com/fieldkit/cloud/server/api/gen/firmware"
 )
 
 type FirmwareService struct {

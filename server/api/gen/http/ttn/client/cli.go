@@ -3,7 +3,7 @@
 // ttn HTTP client CLI support package
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package client
 
@@ -11,7 +11,7 @@ import (
 	"fmt"
 	"strconv"
 
-	ttn "github.com/fieldkit/cloud/server/api/gen/ttn"
+	ttn "gitlab.com/fieldkit/cloud/server/api/gen/ttn"
 )
 
 // BuildWebhookPayload builds the payload for the ttn webhook endpoint from CLI

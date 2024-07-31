@@ -1,13 +1,14 @@
+<!-- TODO: confirm if it can be deleted -->
 <template>
     <StandardLayout>
         <div class="container-wrap notes-view">
             <DoubleHeader
-                :title="project.name"
-                subtitle="Field Notes"
-                backTitle="Back to Project Dashboard"
-                backRoute="viewProject"
-                :backRouteParams="{ id: projectId }"
                 v-if="project"
+                :title="project.name"
+                :subtitle="$tc('fieldNotes.title')"
+                :backTitle="$tc('layout.backProjectDashboard')"
+                backRoute="v iewProject"
+                :backRouteParams="{ id: projectId }"
             />
             <DoubleHeader title="My Stations" subtitle="Field Notes" backTitle="Back to Dashboard" backRoute="projects" v-if="!project" />
 

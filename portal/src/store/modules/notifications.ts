@@ -38,7 +38,7 @@ const getters = {
 
 const actions = (services: Services) => {
     return {
-        [ActionTypes.INITIALIZE]: async ({ commit }: ActionParameters) => {
+        [ActionTypes.NOTIFICATIONS_INITIALIZE]: async ({ commit }: ActionParameters) => {
             const send = await services.api.listenForNotifications(
                 async (message: Notification) => {
                     commit(NOTIFIED, message);
