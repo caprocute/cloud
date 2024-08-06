@@ -49,7 +49,7 @@ var StationNotes = ResultType("application/vnd.app.station.notes", func() {
 var _ = Service("station_note", func() {
 	Method("station", func() {
 		Security(JWTAuth, func() {
-			Scope("api:access")
+			// Optional
 		})
 
 		Payload(func() {
