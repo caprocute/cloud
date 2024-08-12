@@ -140,6 +140,7 @@ func (s *UserService) Add(ctx context.Context, payload *user.AddPayload) (*user.
 		Email:    payload.User.Email,
 		Username: payload.User.Email,
 		TncDate:  tncDate,
+		Valid:    false,
 		Bio:      "",
 	}
 

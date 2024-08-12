@@ -89,8 +89,8 @@ func (r *UserRepository) NewRecoveryToken(ctx context.Context, user *data.User, 
 
 func (r *UserRepository) Add(ctx context.Context, user *data.User) error {
 	if err := r.db.NamedGetContext(ctx, user, `
-		INSERT INTO fieldkit.user (name, username, email, password, bio, created_at, updated_at, tnc_date)
-		VALUES (:name, :email, :email, :password, :bio, NOW(), NOW(), :tnc_date) RETURNING *
+		INSERT INTO fieldkit.user (name, username, email, password, bio, created_at, updated_at, tnc_date, valid)
+		VALUES (:name, :email, :email, :password, :bio, NOW(), NOW(), :tnc_date, :valid) RETURNING *
 		`, user); err != nil {
 		return err
 	}
