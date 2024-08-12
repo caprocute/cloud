@@ -15,36 +15,6 @@ import (
 )
 
 func main() {
-	options := &pg.Options{
-		Addr:     "",
-		User:     "",
-		Database: "",
-		Password: "",
-		OnConnect: func(ctx context.Context, conn *pg.Conn) error {
-			log.Printf("Creating schema...")
-
-			if _, err := conn.Exec("CREATE SCHEMA IF NOT EXISTS fieldkit"); err != nil {
-				return fmt.Errorf("error creating: %w", err)
-			}
-
-			if _, err := conn.Exec("GRANT USAGE ON SCHEMA fieldkit TO fieldkit"); err != nil {
-				return fmt.Errorf("error granting: %w", err)
-			}
-
-			if _, err := conn.Exec("GRANT CREATE ON SCHEMA fieldkit TO fieldkit"); err != nil {
-				return fmt.Errorf("error granting: %w", err)
-			}
-
-			if _, err := conn.Exec("SET search_path TO fieldkit, public;"); err != nil {
-				return fmt.Errorf("error granting: %w", err)
-			}
-
-			log.Printf("Done creating schema...")
-
-			return nil
-		},
-	}
-
 	url := os.Getenv("MIGRATE_DATABASE_URL")
 	if url == "" {
 		log.Fatalln("MIGRATE_DATABASE_URL is requied")
@@ -55,7 +25,29 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	options = o
+	o.OnConnect = func(ctx context.Context, conn *pg.Conn) error {
+		log.Printf("Creating schema...")
+
+		if _, err := conn.Exec("CREATE SCHEMA IF NOT EXISTS fieldkit"); err != nil {
+			return fmt.Errorf("error creating: %w", err)
+		}
+
+		if _, err := conn.Exec("GRANT USAGE ON SCHEMA fieldkit TO fieldkit"); err != nil {
+			return fmt.Errorf("error granting: %w", err)
+		}
+
+		if _, err := conn.Exec("GRANT CREATE ON SCHEMA fieldkit TO fieldkit"); err != nil {
+			return fmt.Errorf("error granting: %w", err)
+		}
+
+		if _, err := conn.Exec("SET search_path TO fieldkit, public;"); err != nil {
+			return fmt.Errorf("error granting: %w", err)
+		}
+
+		log.Printf("Done creating schema...")
+
+		return nil
+	}
 
 	directory := os.Getenv("MIGRATE_PATH")
 	if directory == "" {
@@ -95,7 +87,7 @@ func main() {
 		migrations.Register(fileOnly, up, down, opts)
 	}
 
-	db := pg.Connect(options)
+	db := pg.Connect(o)
 
 	if err := migrations.Run(db, directory, os.Args); err != nil {
 		log.Fatalln(err)
