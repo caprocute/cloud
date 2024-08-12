@@ -48,8 +48,8 @@ Cypress.Commands.add('login', () => {
             method: 'POST',
             url: apiUrl + 'login',
             body: {
-                email: 'jacob@conservify.org',
-                password: 'asdfasdfasdf',
+                email: "test@conservify.org",
+                password: "asdfasdfasdf",
             },
         }).then((response) => {
             const token = response.headers.authorization;
