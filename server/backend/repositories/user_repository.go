@@ -158,7 +158,7 @@ func (r *UserRepository) Delete(outerCtx context.Context, id int32) (err error) 
 		if _, err := r.db.ExecContext(ctx, `DELETE FROM fieldkit.notes_media WHERE user_id = $1`, id); err != nil {
 			return err
 		}
-		if _, err := r.db.ExecContext(ctx, `DELETE FROM fieldkit.notes WHERE user_id = $1`, id); err != nil {
+		if _, err := r.db.ExecContext(ctx, `DELETE FROM fieldkit.notes WHERE author_id = $1`, id); err != nil {
 			return err
 		}
 		if _, err := r.db.ExecContext(ctx, `DELETE FROM fieldkit.station_ingestion WHERE uploader_id = $1`, id); err != nil {
