@@ -79,6 +79,34 @@ func tryMigrate(url string) error {
 			return fmt.Errorf("error granting: %w", err)
 		}
 
+		if _, err := conn.Exec("SET search_path TO fieldkit, public;"); err != nil {
+			return fmt.Errorf("error granting: %w", err)
+		}
+
+		var names []string
+		if _, err := conn.Query(&names, "SELECT name FROM migrations"); err != nil {
+			log.Printf("%v", err)
+		}
+		for _, r := range names {
+			log.Printf("%s", r)
+		}
+
+		var schema []string
+		if _, err := conn.Query(&schema, "SELECT current_schema"); err != nil {
+			log.Printf("%v", err)
+		}
+		for _, r := range schema {
+			log.Printf("%s", r)
+		}
+
+		var tables []string
+		if _, err := conn.Query(&tables, "SELECT table_catalog || '.' || table_schema || '.' || table_name FROM information_schema.tables"); err != nil {
+			log.Printf("%v", err)
+		}
+		for _, r := range tables {
+			log.Printf("%s", r)
+		}
+
 		log.Printf("done creating schema...")
 
 		return nil

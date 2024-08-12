@@ -35,6 +35,10 @@ func main() {
 				return fmt.Errorf("error granting: %w", err)
 			}
 
+			if _, err := conn.Exec("SET search_path TO fieldkit, public;"); err != nil {
+				return fmt.Errorf("error granting: %w", err)
+			}
+
 			log.Printf("Done creating schema...")
 
 			return nil
