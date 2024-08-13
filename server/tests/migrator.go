@@ -53,7 +53,9 @@ func tryMigrate(url string) error {
 
 			opts := migrations.MigrationOptions{}
 
-			migrations.Register(file, up, down, opts)
+			_, fileOnly := filepath.Split(file)
+
+			migrations.Register(fileOnly, up, down, opts)
 		}
 
 		registered = true

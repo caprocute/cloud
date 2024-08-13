@@ -71,6 +71,7 @@ test:cypress:
     - (cd portal && npm install && cp src/secrets.ts.template src/secrets.ts)
     - (cd migrations && go build -o migrate *.go)
     - MIGRATE_PATH=migrations/primary MIGRATE_DATABASE_URL=${FIELDKIT_POSTGRES_URL} migrations/migrate migrate
+    - MIGRATE_PATH=migrations/primary MIGRATE_DATABASE_URL=${FIELDKIT_POSTGRES_URL} migrations/migrate migrate
     - MIGRATE_PATH=migrations/tsdb MIGRATE_DATABASE_URL=${FIELDKIT_TIME_SCALE_URL} migrations/migrate migrate
     - (cd server && go test -p 1 -coverprofile=coverage.data ./...)
     - build/server &
