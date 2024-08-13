@@ -924,10 +924,20 @@ class FKApi {
         });
     }
 
+    addStation(data: {name: string, deviceId: string, locationName?: string, statusPb: string, description: string}) {
+
+        return this.invoke({
+            auth: Auth.Required,
+            method: "POST",
+            url: this.baseUrl + "/stations",
+        });
+    }
+
     addStationToProject(data) {
         return this.invoke({
             auth: Auth.Required,
             method: "POST",
+            data,
             url: this.baseUrl + "/projects/" + data.projectId + "/stations/" + data.stationId,
         });
     }
