@@ -37,23 +37,24 @@
 // }
 //import {Services} from "../../src/api";
 
-export const apiUrl = 'http://127.0.0.1:8080/';
+export const apiUrl = "http://127.0.0.1:8080/";
 
-Cypress.Commands.add('login', () => {
-
+Cypress.Commands.add("login", () => {
     const existingToken = window.localStorage["fktoken"];
+
+    cy.log("login");
 
     if (!existingToken) {
         cy.request({
-            method: 'POST',
-            url: apiUrl + 'login',
+            method: "POST",
+            url: apiUrl + "login",
             body: {
                 email: "test@conservify.org",
                 password: "asdfasdfasdf",
             },
         }).then((response) => {
             const token = response.headers.authorization;
-            if (typeof token === 'string') {
+            if (typeof token === "string") {
                 console.log("saved new token", token);
                 const sanitized = token.replace("Bearer ", "");
                 window.localStorage["fktoken"] = JSON.stringify(sanitized);
@@ -62,24 +63,24 @@ Cypress.Commands.add('login', () => {
     }
 });
 
-Cypress.Commands.add('addStation', () => {
-
+Cypress.Commands.add("addStation", () => {
     const headers = {
         "Content-Type": "application/json",
     };
-    const token = 'Bearer ' + JSON.parse(window.localStorage["fktoken"]);
+    const token = "Bearer " + JSON.parse(window.localStorage["fktoken"]);
     headers["Authorization"] = token;
 
     cy.request({
-        method: 'POST',
+        method: "POST",
         headers,
-        url: apiUrl + 'stations',
+        url: apiUrl + "stations",
         body: {
-            name: 'Test Station',
-            deviceId: '706C616365686F6C646572',
+            name: "Test Station",
+            deviceId: "706C616365686F6C646572",
         },
     }).then((response) => {
         cy.log(response.body);
-        cy.wrap('/station/' + response.body.id).as('stationPageUrl');
+        cy.wrap(response.body.id).as("stationId");
+        cy.wrap("/station/" + response.body.id).as("stationPageUrl");
     });
 });
