@@ -2,6 +2,7 @@ package api
 
 import (
 	"testing"
+	"time"
 
 	"github.com/bxcodec/faker/v3"
 	"github.com/stretchr/testify/assert"
@@ -22,6 +23,7 @@ func TestAddCypressData(t *testing.T) {
 		Email:    "test@conservify.org",
 		Bio:      faker.Sentence(),
 		Valid:    true,
+		TncDate:  time.Now(),
 	}
 
 	user.SetPassword("asdfasdfasdf")
