@@ -10,7 +10,7 @@ RUN npm run build
 
 RUN for e in css csv html js json map svg txt; do find . -iname '*.$e' -exec gzip -k9 {} \; ; done
 
-FROM golang:latest AS golang
+FROM golang:1.22-bookworm AS golang
 WORKDIR /app
 
 COPY ./migrations/ /app/migrations

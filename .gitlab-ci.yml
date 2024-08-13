@@ -67,6 +67,7 @@ test:cypress:
       alias: tsdb
   script:
     - apt update -qyy && apt install -qyy xvfb libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libgtk-3-0 libgdm1 libgbm1 libasound2 golang
+    - go version
     - make server
     - (cd portal && npm install && cp src/secrets.ts.template src/secrets.ts)
     - (cd migrations/cli && go build -o migrate *.go)
