@@ -69,9 +69,9 @@ test:cypress:
     - apt update -qyy && apt install -qyy xvfb libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libgtk-3-0 libgdm1 libgbm1 libasound2 golang
     - make server
     - (cd portal && npm install && cp src/secrets.ts.template src/secrets.ts)
-    - (cd migrations && go build -o migrate *.go)
-    - MIGRATE_PATH=migrations/primary MIGRATE_DATABASE_URL=${FIELDKIT_POSTGRES_URL} migrations/migrate migrate
-    - MIGRATE_PATH=migrations/tsdb MIGRATE_DATABASE_URL=${FIELDKIT_TIME_SCALE_URL} migrations/migrate migrate
+    - (cd migrations/cli && go build -o migrate *.go)
+    - MIGRATE_PATH=migrations/primary MIGRATE_DATABASE_URL=${FIELDKIT_POSTGRES_URL} migrations/cli/migrate migrate
+    - MIGRATE_PATH=migrations/tsdb MIGRATE_DATABASE_URL=${FIELDKIT_TIME_SCALE_URL} migrations/cli/migrate migrate
     - (cd server && go test -p 1 -coverprofile=coverage.data ./...)
     - build/server &
     - (cd portal && npm run serve) &
@@ -158,7 +158,7 @@ build:migrations:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
     - if: $CI_COMMIT_BRANCH == "main"
   script:
-    - cd migrations && go build -o migrate *.go
+    - cd migrations/cli && go build -o migrate *.go
   artifacts:
     name: "cloud-migrations-${CI_COMMIT_REF_NAME}"
     paths:
