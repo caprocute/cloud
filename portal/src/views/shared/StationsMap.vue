@@ -1,5 +1,7 @@
 <template v-if="mapped.valid && ready">
     <div class="map-wrap" :class="{ 'hide-markers': !showStations }">
+        <StationsMapHeader></StationsMapHeader>
+        <StationsMapSidebar :mapped="mapped"></StationsMapSidebar>
         <mapbox
             class="stations-map"
             :access-token="mapbox.token"
@@ -34,6 +36,8 @@ import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
 import Vue, { PropType } from "vue";
 import ValueMarker from "./ValueMarker.vue";
 import Mapbox from "mapbox-gl-vue";
+import StationsMapHeader from "@/views/shared/StationsMapHeader.vue";
+import StationsMapSidebar from "@/views/shared/StationsMapSidebar.vue";
 
 export interface ProtectedData {
     map: any;
@@ -43,6 +47,8 @@ export interface ProtectedData {
 export default Vue.extend({
     name: "StationsMap",
     components: {
+        StationsMapSidebar,
+        StationsMapHeader,
         Mapbox,
         ValueMarker,
     },
@@ -158,6 +164,7 @@ export default Vue.extend({
         newBounds() {
             const map = this.protectedData.map;
             const bounds = map.getBounds();
+            console.log("RADOI UPDATE BOUNDS", bounds);
             this.$emit("input", new BoundingRectangle([bounds._sw.lng, bounds._sw.lat], [bounds._ne.lng, bounds._ne.lat]));
         },
         updateMap(): void {

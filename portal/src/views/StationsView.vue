@@ -76,6 +76,7 @@ import TinyChart from "@/views/viz/TinyChart.vue";
 import SnackBar from "@/views/shared/SnackBar.vue";
 import MapViewTypeToggle from "@/views/shared/MapViewTypeToggle.vue";
 import { MapViewType } from "@/api/api";
+import StationsMapHeader from "@/views/shared/StationsMapHeader.vue";
 
 export default Vue.extend({
     name: "StationsView",

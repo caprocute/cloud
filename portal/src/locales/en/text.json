@@ -662,6 +662,17 @@
         },
         "legend": {
             "noData": "No Data or Inactive"
+        },
+        "header": {
+            "title": "Stations",
+            "subtitle": "Explore station data"
+        },
+        "sidebar": {
+            "viewing": {
+                "heading": "Viewing {stationsLength} Station(s)",
+                "updateMapCheckbox": "Update results based on map view",
+                "exploreBtn": "Explore All Data"
+            }
         }
     },
     "confirmDeletePhoto": "Are you sure you want to delete this photo?",
