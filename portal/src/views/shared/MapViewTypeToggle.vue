@@ -23,7 +23,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import {MapViewType} from '@/api';
+import { MapViewType } from "@/api";
 
 export default Vue.extend({
     name: "MapViewTypeToggle",
@@ -77,7 +77,7 @@ export default Vue.extend({
         margin: 0;
         box-sizing: border-box;
         @include flex(center, center);
-        @include position(absolute, 90px 25px null null);
+        @include position(absolute, 90px 62px null null);
 
         @include bp-down($sm) {
             @include position(absolute, 115px 10px null null);
@@ -96,7 +96,6 @@ export default Vue.extend({
     > a {
         flex-basis: 50%;
         height: 100%;
-        font-family: $font-family-light;
         @include flex(center, center);
 
         &:nth-of-type(1) {
@@ -108,7 +107,7 @@ export default Vue.extend({
         }
 
         &.active {
-            font-family: $font-family-bold;
+            font-weight: 900;
         }
     }
 
