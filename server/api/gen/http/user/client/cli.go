@@ -3,7 +3,7 @@
 // user HTTP client CLI support package
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package client
 
@@ -13,7 +13,7 @@ import (
 	"strconv"
 	"unicode/utf8"
 
-	user "github.com/fieldkit/cloud/server/api/gen/user"
+	user "gitlab.com/fieldkit/cloud/server/api/gen/user"
 	goa "goa.design/goa/v3/pkg"
 )
 
@@ -269,7 +269,7 @@ func BuildAddPayload(userAddBody string) (*user.AddPayload, error) {
 	{
 		err = json.Unmarshal([]byte(userAddBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"etag\": \"Laborum soluta.\",\n      \"logicalAddress\": 4422962753143748848,\n      \"meta\": \"Consequatur quia reprehenderit quod itaque totam.\",\n      \"module\": \"Autem quo nihil dicta eum eveniet.\",\n      \"profile\": \"Est nostrum.\",\n      \"url\": \"Fugiat natus eum.\",\n      \"version\": \"Ab numquam.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"etag\": \"Pariatur et nemo.\",\n      \"logicalAddress\": 8498200775563835365,\n      \"meta\": \"Ut ut et eos dolor error.\",\n      \"module\": \"Est debitis ducimus laboriosam earum.\",\n      \"profile\": \"Qui dolorem.\",\n      \"url\": \"Ut quo incidunt quibusdam.\",\n      \"version\": \"Et doloremque labore.\"\n   }'")
 		}
 		err = goa.MergeErrors(err, goa.ValidatePattern("body.name", body.Name, "\\S"))
 		if utf8.RuneCountInString(body.Name) > 256 {
@@ -309,7 +309,7 @@ func BuildUpdatePayload(userUpdateBody string, userUpdateUserID string, userUpda
 	{
 		err = json.Unmarshal([]byte(userUpdateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"bounds\": {\n         \"max\": [\n            0.7756333709879861,\n            0.12851610098529084,\n            0.21710422047453748,\n            0.6135650519129959\n         ],\n         \"min\": [\n            0.09919410034289564,\n            0.6949960414904242,\n            0.544298778333374\n         ]\n      },\n      \"description\": \"Tenetur omnis nam.\",\n      \"endTime\": \"Consequatur tenetur ipsa odio alias quis.\",\n      \"goal\": \"Aliquam corrupti ut recusandae placeat nemo voluptatem.\",\n      \"location\": \"Ut quis quam.\",\n      \"name\": \"Consequatur ad sint qui ex tempore rem.\",\n      \"privacy\": 1205957887,\n      \"showStations\": false,\n      \"startTime\": \"Sit at consectetur iste voluptatum quisquam.\",\n      \"tags\": \"Necessitatibus rerum vel temporibus laboriosam vel.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"bounds\": {\n         \"max\": [\n            0.4705127852895901,\n            0.5775864852464522,\n            0.8798373175918136\n         ],\n         \"min\": [\n            0.6904405053507462,\n            0.1757248840412704\n         ]\n      },\n      \"description\": \"Alias quis animi.\",\n      \"endTime\": \"Voluptate tempora.\",\n      \"goal\": \"Quia reiciendis laborum sint.\",\n      \"location\": \"Expedita voluptatem provident.\",\n      \"name\": \"Iste voluptatum quisquam dolorum consequatur tenetur ipsa.\",\n      \"privacy\": 1001191008,\n      \"showStations\": false,\n      \"startTime\": \"Sit eos non voluptatem voluptatem laboriosam.\",\n      \"tags\": \"Atque voluptatem mollitia hic quia commodi.\"\n   }'")
 		}
 		err = goa.MergeErrors(err, goa.ValidatePattern("body.name", body.Name, "\\S"))
 		if utf8.RuneCountInString(body.Name) > 256 {
@@ -493,7 +493,7 @@ func BuildAdminTermsAndConditionsPayload(userAdminTermsAndConditionsBody string,
 	{
 		err = json.Unmarshal([]byte(userAdminTermsAndConditionsBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"Eos tempore sint beatae.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"Expedita eaque.\"\n   }'")
 		}
 	}
 	var auth string
@@ -511,6 +511,19 @@ func BuildAdminTermsAndConditionsPayload(userAdminTermsAndConditionsBody string,
 	return res, nil
 }
 
+// BuildDeleteAccountPayload builds the payload for the user delete account
+// endpoint from CLI flags.
+func BuildDeleteAccountPayload(userDeleteAccountAuth string) (*user.DeleteAccountPayload, error) {
+	var auth string
+	{
+		auth = userDeleteAccountAuth
+	}
+	v := &user.DeleteAccountPayload{}
+	v.Auth = auth
+
+	return v, nil
+}
+
 // BuildAdminDeletePayload builds the payload for the user admin delete
 // endpoint from CLI flags.
 func BuildAdminDeletePayload(userAdminDeleteBody string, userAdminDeleteAuth string) (*user.AdminDeletePayload, error) {
@@ -519,7 +532,7 @@ func BuildAdminDeletePayload(userAdminDeleteBody string, userAdminDeleteAuth str
 	{
 		err = json.Unmarshal([]byte(userAdminDeleteBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"Sunt aut adipisci voluptas inventore sapiente.\",\n      \"password\": \"Neque et.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"Porro iste consequatur deserunt possimus.\",\n      \"password\": \"Consequatur tempora tempore.\"\n   }'")
 		}
 	}
 	var auth string

@@ -11,11 +11,11 @@ import (
 
 	"goa.design/goa/v3/security"
 
-	activity "github.com/fieldkit/cloud/server/api/gen/activity"
+	activity "gitlab.com/fieldkit/cloud/server/api/gen/activity"
 
-	"github.com/fieldkit/cloud/server/backend/repositories"
-	"github.com/fieldkit/cloud/server/common"
-	"github.com/fieldkit/cloud/server/data"
+	"gitlab.com/fieldkit/cloud/server/backend/repositories"
+	"gitlab.com/fieldkit/cloud/server/common"
+	"gitlab.com/fieldkit/cloud/server/data"
 )
 
 type ActivityService struct {

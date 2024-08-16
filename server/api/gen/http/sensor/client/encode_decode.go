@@ -3,7 +3,7 @@
 // sensor HTTP client encoders and decoders
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package client
 
@@ -16,8 +16,8 @@ import (
 	"net/url"
 	"strings"
 
-	sensor "github.com/fieldkit/cloud/server/api/gen/sensor"
-	sensorviews "github.com/fieldkit/cloud/server/api/gen/sensor/views"
+	sensor "gitlab.com/fieldkit/cloud/server/api/gen/sensor"
+	sensorviews "gitlab.com/fieldkit/cloud/server/api/gen/sensor/views"
 	goahttp "goa.design/goa/v3/http"
 )
 
@@ -714,6 +714,9 @@ func EncodeRecentlyRequest(encoder func(*http.Request) goahttp.Encoder) func(*ht
 		values := req.URL.Query()
 		if p.Stations != nil {
 			values.Add("stations", *p.Stations)
+		}
+		if p.Windows != nil {
+			values.Add("windows", *p.Windows)
 		}
 		req.URL.RawQuery = values.Encode()
 		return nil

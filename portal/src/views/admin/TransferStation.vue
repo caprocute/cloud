@@ -1,7 +1,7 @@
 <template>
     <div class="transfer-station">
         <UserPicker @select="onUser" />
-        <button :disabled="!user" v-on:click="transfer" class="button">Transfer</button>
+        <button :disabled="!user" v-on:click="transfer" class="button">{{ $t("admin.transfer.button") }}</button>
     </div>
 </template>
 

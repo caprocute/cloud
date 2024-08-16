@@ -3,7 +3,7 @@
 // data events HTTP client CLI support package
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package client
 
@@ -12,7 +12,7 @@ import (
 	"fmt"
 	"strconv"
 
-	dataevents "github.com/fieldkit/cloud/server/api/gen/data_events"
+	dataevents "gitlab.com/fieldkit/cloud/server/api/gen/data_events"
 	goa "goa.design/goa/v3/pkg"
 )
 
@@ -74,7 +74,7 @@ func BuildUpdateDataEventPayload(dataEventsUpdateDataEventBody string, dataEvent
 	{
 		err = json.Unmarshal([]byte(dataEventsUpdateDataEventBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"description\": \"Enim qui nam rerum voluptatem ipsam ipsum.\",\n      \"end\": 2498772306149528305,\n      \"start\": 9162650411330587069,\n      \"title\": \"Qui et voluptas.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"description\": \"Animi magni incidunt.\",\n      \"end\": 5214147865942919815,\n      \"start\": 2184572179484137041,\n      \"title\": \"Aut ullam sit.\"\n   }'")
 		}
 	}
 	var eventID int64

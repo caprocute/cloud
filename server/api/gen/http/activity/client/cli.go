@@ -3,7 +3,7 @@
 // activity HTTP client CLI support package
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package client
 
@@ -11,7 +11,7 @@ import (
 	"fmt"
 	"strconv"
 
-	activity "github.com/fieldkit/cloud/server/api/gen/activity"
+	activity "gitlab.com/fieldkit/cloud/server/api/gen/activity"
 )
 
 // BuildStationPayload builds the payload for the activity station endpoint

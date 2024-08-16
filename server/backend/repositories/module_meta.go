@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/fieldkit/cloud/server/common/errors"
-	"github.com/fieldkit/cloud/server/common/sqlxcache"
+	"gitlab.com/fieldkit/cloud/server/common/errors"
+	"gitlab.com/fieldkit/cloud/server/common/sqlxcache"
 )
 
 const (
@@ -163,7 +163,7 @@ func (r *ModuleMetaRepository) FindSensorMeta(ctx context.Context, m *HeaderFiel
 
 func (r *ModuleMetaRepository) FindAllModulesMeta(ctx context.Context) (mm *AllModuleMeta, err error) {
 	modules := []*PersistedModuleMeta{}
-	if err := r.db.SelectContext(ctx, &modules, `SELECT id, key, manufacturer, kinds, version, internal FROM fieldkit.module_meta`); err != nil {
+	if err := r.db.SelectContext(ctx, &modules, `SELECT id, key, manufacturer, kinds, version, internal, ordering FROM fieldkit.module_meta ORDER BY ordering`); err != nil {
 		return nil, err
 	}
 
@@ -184,6 +184,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta(ctx context.Context) (mm *AllM
 				Version:      toUint32Array(pmm.Version)[0],
 			},
 			Internal: pmm.Internal,
+			Order:    pmm.Ordering,
 			Sensors:  make([]*SensorMeta, 0),
 		}
 
@@ -240,7 +241,7 @@ func (r *ModuleMetaRepository) FindAllModulesMeta(ctx context.Context) (mm *AllM
 
 func toUint32Array(a []int32) []uint32 {
 	u := make([]uint32, len(a))
-	for i, _ := range a {
+	for i := range a {
 		u[i] = uint32(a[i])
 	}
 	return u

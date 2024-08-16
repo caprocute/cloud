@@ -3,7 +3,7 @@
 // sensor HTTP server encoders and decoders
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package server
 
@@ -13,8 +13,8 @@ import (
 	"strconv"
 	"strings"
 
-	sensor "github.com/fieldkit/cloud/server/api/gen/sensor"
-	sensorviews "github.com/fieldkit/cloud/server/api/gen/sensor/views"
+	sensor "gitlab.com/fieldkit/cloud/server/api/gen/sensor"
+	sensorviews "gitlab.com/fieldkit/cloud/server/api/gen/sensor/views"
 	goahttp "goa.design/goa/v3/http"
 	goa "goa.design/goa/v3/pkg"
 )
@@ -573,17 +573,22 @@ func DecodeRecentlyRequest(mux goahttp.Muxer, decoder func(*http.Request) goahtt
 	return func(r *http.Request) (interface{}, error) {
 		var (
 			stations *string
+			windows  *string
 			auth     *string
 		)
 		stationsRaw := r.URL.Query().Get("stations")
 		if stationsRaw != "" {
 			stations = &stationsRaw
 		}
+		windowsRaw := r.URL.Query().Get("windows")
+		if windowsRaw != "" {
+			windows = &windowsRaw
+		}
 		authRaw := r.Header.Get("Authorization")
 		if authRaw != "" {
 			auth = &authRaw
 		}
-		payload := NewRecentlyPayload(stations, auth)
+		payload := NewRecentlyPayload(stations, windows, auth)
 		if payload.Auth != nil {
 			if strings.Contains(*payload.Auth, " ") {
 				// Remove authorization scheme prefix (e.g. "Bearer")

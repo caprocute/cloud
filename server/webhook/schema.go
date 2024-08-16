@@ -28,6 +28,7 @@ type MessageSchemaExtractor struct {
 type MessageSchemaModule struct {
 	Key     string                 `json:"key"`
 	Name    *string                `json:"name"`
+	Bay     *int                   `json:"bay"`
 	Sensors []*MessageSchemaSensor `json:"sensors"`
 }
 
@@ -58,6 +59,15 @@ type MessageSchemaStation struct {
 	Extractors           []*MessageSchemaExtractor `json:"extractors"`
 	Modules              []*MessageSchemaModule    `json:"modules"`
 	Attributes           []*MessageSchemaAttribute `json:"attributes"`
+}
+
+func (mss *MessageSchemaStation) AllModulesHaveBays() bool {
+	for _, m := range mss.Modules {
+		if m.Bay == nil {
+			return false
+		}
+	}
+	return true
 }
 
 type MessageSchema struct {

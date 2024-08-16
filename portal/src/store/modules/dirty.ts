@@ -72,7 +72,7 @@ export function confirmLeaveWithDirtyCheck(
 
     dirtyInputs.forEach((input: string) => {
         const inputKey = input.split("#")[0]; // strip id from input (for editing fields)
-        const translationKey = "dirtyInputs." + inputKey;
+        const translationKey = "notes.fields." + inputKey;
 
         // check if trans key-value pair exists & make sure its not a duplicate
         if (component.$tc(translationKey) !== translationKey && !dirtyFieldsDesc.includes(component.$tc(translationKey))) {

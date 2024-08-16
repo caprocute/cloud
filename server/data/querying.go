@@ -7,7 +7,7 @@ import (
 
 	"github.com/jmoiron/sqlx"
 
-	"github.com/fieldkit/cloud/server/common/sqlxcache"
+	"gitlab.com/fieldkit/cloud/server/common/sqlxcache"
 )
 
 type MapFunc func(*sqlx.Rows) (interface{}, error)
@@ -75,7 +75,7 @@ func QueryAsObject(ctx context.Context, db *sqlxcache.DB, query string) ([]map[s
 
 	rawValues := make([][]byte, len(columns))
 	temporary := make([]interface{}, len(columns))
-	for i, _ := range rawValues {
+	for i := range rawValues {
 		temporary[i] = &rawValues[i]
 	}
 

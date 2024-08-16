@@ -12,14 +12,14 @@ import (
 
 	"github.com/pkg/profile"
 
-	"github.com/fieldkit/cloud/server/common/sqlxcache"
-	"github.com/fieldkit/cloud/server/data"
-	pb "github.com/fieldkit/data-protocol"
+	"gitlab.com/fieldkit/cloud/server/common/sqlxcache"
+	"gitlab.com/fieldkit/cloud/server/data"
+	pb "gitlab.com/fieldkit/libraries/data-protocol"
 
-	"github.com/fieldkit/cloud/server/backend/repositories"
-	"github.com/fieldkit/cloud/server/common/logging"
-	"github.com/fieldkit/cloud/server/files"
-	"github.com/fieldkit/cloud/server/messages"
+	"gitlab.com/fieldkit/cloud/server/backend/repositories"
+	"gitlab.com/fieldkit/cloud/server/common/logging"
+	"gitlab.com/fieldkit/cloud/server/files"
+	"gitlab.com/fieldkit/cloud/server/messages"
 )
 
 const (
@@ -231,7 +231,7 @@ func (e *JsonLinesExporter) OnData(ctx context.Context, rawRecord *pb.DataRecord
 	return e.write(ctx, rawRecord)
 }
 
-func (e *JsonLinesExporter) write(ctx context.Context, value interface{}) (err error) {
+func (e *JsonLinesExporter) write(_ context.Context, value interface{}) (err error) {
 	b, err := json.Marshal(value)
 	if err != nil {
 		return err
@@ -377,7 +377,7 @@ func (e *CsvExporter) Prepare(ctx context.Context, urls []string) error {
 
 const CompactFieldSets = true
 
-func (e *CsvExporter) compactFieldSets(ctx context.Context) error {
+func (e *CsvExporter) compactFieldSets(_ context.Context) error {
 	unassigned := make(map[string]*fieldSet)
 	compacted := make([]*fieldSet, 0)
 	for id, fs := range e.prepared.modules {

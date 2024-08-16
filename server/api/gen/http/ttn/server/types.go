@@ -3,12 +3,12 @@
 // ttn HTTP server types
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package server
 
 import (
-	ttn "github.com/fieldkit/cloud/server/api/gen/ttn"
+	ttn "gitlab.com/fieldkit/cloud/server/api/gen/ttn"
 	goa "goa.design/goa/v3/pkg"
 )
 

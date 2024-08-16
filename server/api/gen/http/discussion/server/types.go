@@ -3,13 +3,13 @@
 // discussion HTTP server types
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package server
 
 import (
-	discussion "github.com/fieldkit/cloud/server/api/gen/discussion"
-	discussionviews "github.com/fieldkit/cloud/server/api/gen/discussion/views"
+	discussion "gitlab.com/fieldkit/cloud/server/api/gen/discussion"
+	discussionviews "gitlab.com/fieldkit/cloud/server/api/gen/discussion/views"
 	goa "goa.design/goa/v3/pkg"
 )
 

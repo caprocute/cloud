@@ -5,8 +5,8 @@ import (
 	"database/sql"
 	"time"
 
-	"github.com/fieldkit/cloud/server/common/sqlxcache"
-	"github.com/fieldkit/cloud/server/data"
+	"gitlab.com/fieldkit/cloud/server/common/sqlxcache"
+	"gitlab.com/fieldkit/cloud/server/data"
 
 	gonanoid "github.com/matoous/go-nanoid/v2"
 )

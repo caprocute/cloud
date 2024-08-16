@@ -4,23 +4,25 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strconv"
+	"strings"
 	"time"
 
 	_ "github.com/lib/pq"
 
-	"github.com/fieldkit/cloud/server/common/sqlxcache"
+	"gitlab.com/fieldkit/cloud/server/common/sqlxcache"
 
 	"goa.design/goa/v3/security"
 
-	sensor "github.com/fieldkit/cloud/server/api/gen/sensor"
+	sensor "gitlab.com/fieldkit/cloud/server/api/gen/sensor"
 
-	"github.com/fieldkit/cloud/server/backend"
-	"github.com/fieldkit/cloud/server/backend/repositories"
-	"github.com/fieldkit/cloud/server/common"
-	"github.com/fieldkit/cloud/server/data"
-	"github.com/fieldkit/cloud/server/storage"
+	"gitlab.com/fieldkit/cloud/server/backend"
+	"gitlab.com/fieldkit/cloud/server/backend/repositories"
+	"gitlab.com/fieldkit/cloud/server/common"
+	"gitlab.com/fieldkit/cloud/server/data"
+	"gitlab.com/fieldkit/cloud/server/storage"
 
-	"github.com/fieldkit/cloud/server/api/querying"
+	"gitlab.com/fieldkit/cloud/server/api/querying"
 )
 
 type StationsMeta struct {
@@ -53,45 +55,40 @@ func NewRawQueryParamsFromSensorData(payload *sensor.DataPayload) (*backend.RawQ
 
 type SensorService struct {
 	options         *ControllerOptions
-	influxConfig    *querying.InfluxDBConfig
 	timeScaleConfig *storage.TimeScaleDBConfig
 	db              *sqlxcache.DB
 	tsdb            querying.DataBackend
 }
 
-func NewSensorService(ctx context.Context, options *ControllerOptions, influxConfig *querying.InfluxDBConfig, timeScaleConfig *storage.TimeScaleDBConfig) *SensorService {
+func NewSensorService(ctx context.Context, options *ControllerOptions, timeScaleConfig *storage.TimeScaleDBConfig) *SensorService {
 	return &SensorService{
 		options:         options,
-		influxConfig:    influxConfig,
 		timeScaleConfig: timeScaleConfig,
 		db:              options.Database,
 	}
 }
 
-func (c *SensorService) chooseBackend(ctx context.Context, backend *string) (querying.DataBackend, error) {
-	if backend == nil || *backend == "tsdb" {
-		if c.tsdb == nil {
-			if c.timeScaleConfig == nil {
-				log := Logger(ctx).Sugar()
-				log.Errorw("tsdb:no-configuration")
+func (c *SensorService) chooseBackend(ctx context.Context) (querying.DataBackend, error) {
+	if c.tsdb == nil {
+		if c.timeScaleConfig == nil {
+			log := Logger(ctx).Sugar()
+			log.Errorw("tsdb:no-configuration")
+		} else {
+			sensors := repositories.NewSensorsRepository(c.db)
+
+			queryingSpec, err := sensors.QueryQueryingSpec(ctx)
+			if err != nil {
+				return nil, fmt.Errorf("error querying for querying spec: %w", err)
+			}
+
+			if tsdb, err := querying.NewTimeScaleDBBackend(c.timeScaleConfig, c.db, c.options.Metrics, queryingSpec); err != nil {
+				return nil, err
 			} else {
-				sensors := repositories.NewSensorsRepository(c.db)
-
-				queryingSpec, err := sensors.QueryQueryingSpec(ctx)
-				if err != nil {
-					return nil, fmt.Errorf("error querying for querying spec: %w", err)
-				}
-
-				if tsdb, err := querying.NewTimeScaleDBBackend(c.timeScaleConfig, c.db, c.options.Metrics, queryingSpec); err != nil {
-					return nil, err
-				} else {
-					c.tsdb = tsdb
-				}
+				c.tsdb = tsdb
 			}
 		}
-		return c.tsdb, nil
 	}
-	return querying.NewPostgresBackend(c.db), nil
+	return c.tsdb, nil
 }
 
 func (c *SensorService) tail(ctx context.Context, be querying.DataBackend, stationIDs []int32) (*sensor.DataResult, error) {
@@ -116,7 +113,7 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 		return nil, sensor.MakeBadRequest(err)
 	}
 
-	be, err := c.chooseBackend(ctx, payload.Backend)
+	be, err := c.chooseBackend(ctx)
 	if err != nil {
 		return nil, sensor.MakeBadRequest(err)
 	}
@@ -157,7 +154,7 @@ func (c *SensorService) Tail(ctx context.Context, payload *sensor.TailPayload) (
 		return nil, sensor.MakeBadRequest(fmt.Errorf("stations:empty"))
 	}
 
-	be, err := c.chooseBackend(ctx, payload.Backend)
+	be, err := c.chooseBackend(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -172,21 +169,38 @@ func (c *SensorService) Tail(ctx context.Context, payload *sensor.TailPayload) (
 	}, nil
 }
 
+func (c *SensorService) parseWindows(payload *sensor.RecentlyPayload) []time.Duration {
+	durations := make([]time.Duration, 0)
+
+	if payload.Windows != nil {
+		windows := strings.Split(*payload.Windows, ",")
+		for _, hoursString := range windows {
+			hours, err := strconv.Atoi(hoursString)
+			if err == nil {
+				durations = append(durations, time.Hour*time.Duration(hours))
+			}
+		}
+	}
+
+	return durations
+}
+
 func (c *SensorService) Recently(ctx context.Context, payload *sensor.RecentlyPayload) (*sensor.RecentlyResult, error) {
 	stationIDs := backend.ParseStationIDs(payload.Stations)
 	if len(stationIDs) == 0 {
 		return nil, sensor.MakeBadRequest(fmt.Errorf("stations:empty"))
 	}
 
-	be, err := c.chooseBackend(ctx, nil)
+	be, err := c.chooseBackend(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	durations := []time.Duration{
-		time.Hour * 24,
-		time.Hour * 48,
-		time.Hour * 72,
+	durations := c.parseWindows(payload)
+	if len(durations) == 0 {
+		return &sensor.RecentlyResult{
+			Object: querying.NewRecentlyAggregated(),
+		}, nil
 	}
 
 	data, err := be.QueryRecentlyAggregated(ctx, stationIDs, durations)

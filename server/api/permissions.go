@@ -8,9 +8,9 @@ import (
 
 	"github.com/goadesign/goa/middleware/security/jwt"
 
-	"github.com/fieldkit/cloud/server/backend/repositories"
-	"github.com/fieldkit/cloud/server/common"
-	"github.com/fieldkit/cloud/server/data"
+	"gitlab.com/fieldkit/cloud/server/backend/repositories"
+	"gitlab.com/fieldkit/cloud/server/common"
+	"gitlab.com/fieldkit/cloud/server/data"
 )
 
 type ProjectPermissions interface {
@@ -50,6 +50,13 @@ type Permissions interface {
 	ForDiscussions(discussion *data.DiscussionPost) (permissions DiscussionPermissions, err error)
 }
 
+type authKeyType int
+
+const (
+	authAttemptKey authKeyType = iota
+	authClaimsKey  authKeyType = iota
+)
+
 type unwrappedPermissions struct {
 	userID       *int32
 	scopes       []string
@@ -74,35 +81,37 @@ func NewPermissions(ctx context.Context, options *ControllerOptions) Permissions
 }
 
 func addAuthAttemptToContext(ctx context.Context, aa *common.AuthAttempt) context.Context {
-	newCtx := context.WithValue(ctx, "authAttempt", aa)
+	newCtx := context.WithValue(ctx, authAttemptKey, aa)
 	return newCtx
 }
 
 func getAuthAttempt(ctx context.Context) *common.AuthAttempt {
-	if v, ok := ctx.Value("authAttempt").(*common.AuthAttempt); ok {
+	if v, ok := ctx.Value(authAttemptKey).(*common.AuthAttempt); ok {
 		return v
 	}
 	return nil
 }
 
 func addClaimsToContext(ctx context.Context, claims jwtgo.MapClaims) context.Context {
-	newCtx := context.WithValue(ctx, "claims", claims)
+	newCtx := context.WithValue(ctx, authClaimsKey, claims)
 	return newCtx
 }
 
 func getClaims(ctx context.Context) (jwtgo.MapClaims, bool) {
-	if v, ok := ctx.Value("claims").(jwtgo.MapClaims); ok {
+	if v, ok := ctx.Value(authClaimsKey).(jwtgo.MapClaims); ok {
 		return v, true
 	}
 	return nil, false
 }
 
+/*
 func (p *defaultPermissions) unauthorized(m string) error {
 	if p.authAttempt == nil || p.authAttempt.Unauthorized == nil {
 		return fmt.Errorf("unable to make unauthorized error (%v)", m)
 	}
 	return p.authAttempt.Unauthorized(m)
 }
+*/
 
 func (p *defaultPermissions) forbidden(m string) error {
 	if p.authAttempt == nil || p.authAttempt.Forbidden == nil {

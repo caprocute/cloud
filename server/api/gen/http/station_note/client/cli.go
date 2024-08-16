@@ -3,7 +3,7 @@
 // station_note HTTP client CLI support package
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package client
 
@@ -12,7 +12,7 @@ import (
 	"fmt"
 	"strconv"
 
-	stationnote "github.com/fieldkit/cloud/server/api/gen/station_note"
+	stationnote "gitlab.com/fieldkit/cloud/server/api/gen/station_note"
 )
 
 // BuildStationPayload builds the payload for the station_note station endpoint
@@ -49,7 +49,7 @@ func BuildAddNotePayload(stationNoteAddNoteBody string, stationNoteAddNoteStatio
 	{
 		err = json.Unmarshal([]byte(stationNoteAddNoteBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Recusandae occaecati qui.\",\n      \"userId\": 1028756493\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Ex repellendus id optio.\",\n      \"userId\": 399293871\n   }'")
 		}
 	}
 	var stationID int32
@@ -83,7 +83,7 @@ func BuildUpdateNotePayload(stationNoteUpdateNoteBody string, stationNoteUpdateN
 	{
 		err = json.Unmarshal([]byte(stationNoteUpdateNoteBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Cumque quibusdam similique et.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Quidem provident.\"\n   }'")
 		}
 	}
 	var stationID int32

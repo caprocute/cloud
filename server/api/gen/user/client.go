@@ -3,7 +3,7 @@
 // user client
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package user
 
@@ -36,13 +36,14 @@ type Client struct {
 	IssueTransmissionTokenEndpoint  goa.Endpoint
 	ProjectRolesEndpoint            goa.Endpoint
 	AdminTermsAndConditionsEndpoint goa.Endpoint
+	DeleteAccountEndpoint           goa.Endpoint
 	AdminDeleteEndpoint             goa.Endpoint
 	AdminSearchEndpoint             goa.Endpoint
 	MentionablesEndpoint            goa.Endpoint
 }
 
 // NewClient initializes a "user" service client given the endpoints.
-func NewClient(roles, uploadPhoto, downloadPhoto, login, recoveryLookup, recovery, resume, logout, refresh, sendValidation, validate, add, update, changePassword, acceptTnc, getCurrent, listByProject, issueTransmissionToken, projectRoles, adminTermsAndConditions, adminDelete, adminSearch, mentionables goa.Endpoint) *Client {
+func NewClient(roles, uploadPhoto, downloadPhoto, login, recoveryLookup, recovery, resume, logout, refresh, sendValidation, validate, add, update, changePassword, acceptTnc, getCurrent, listByProject, issueTransmissionToken, projectRoles, adminTermsAndConditions, deleteAccount, adminDelete, adminSearch, mentionables goa.Endpoint) *Client {
 	return &Client{
 		RolesEndpoint:                   roles,
 		UploadPhotoEndpoint:             uploadPhoto,
@@ -64,6 +65,7 @@ func NewClient(roles, uploadPhoto, downloadPhoto, login, recoveryLookup, recover
 		IssueTransmissionTokenEndpoint:  issueTransmissionToken,
 		ProjectRolesEndpoint:            projectRoles,
 		AdminTermsAndConditionsEndpoint: adminTermsAndConditions,
+		DeleteAccountEndpoint:           deleteAccount,
 		AdminDeleteEndpoint:             adminDelete,
 		AdminSearchEndpoint:             adminSearch,
 		MentionablesEndpoint:            mentionables,
@@ -245,6 +247,12 @@ func (c *Client) ProjectRoles(ctx context.Context) (res ProjectRoleCollection, e
 // the "user" service.
 func (c *Client) AdminTermsAndConditions(ctx context.Context, p *AdminTermsAndConditionsPayload) (err error) {
 	_, err = c.AdminTermsAndConditionsEndpoint(ctx, p)
+	return
+}
+
+// DeleteAccount calls the "delete account" endpoint of the "user" service.
+func (c *Client) DeleteAccount(ctx context.Context, p *DeleteAccountPayload) (err error) {
+	_, err = c.DeleteAccountEndpoint(ctx, p)
 	return
 }
 

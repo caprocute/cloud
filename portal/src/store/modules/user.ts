@@ -77,11 +77,15 @@ const actions = (services: Services) => {
                     }
                 });
         },
-        [ActionTypes.LOGOUT]: async ({ commit }: { commit: any }) => {
+        [ActionTypes.LOGOUT]: async ({ commit }: { commit: any }, payload: { skipNavigation: boolean }) => {
             await services.api.logout();
 
             commit(UPDATE_TOKEN, null);
             commit(CURRENT_USER, null);
+
+            if (payload && payload.skipNavigation) {
+                return;
+            }
 
             if (Config.sso && Config.auth && Config.auth.logoutUrl) {
                 window.location.replace(Config.auth.logoutUrl);

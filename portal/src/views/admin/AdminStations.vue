@@ -96,14 +96,6 @@
                                         <button v-on:click="onProcessData(station)" class="button">Process Data</button>
                                     </div>
                                     <div>
-                                        <button v-on:click="onProcessRecords(station, false)" class="button">Process Recs</button>
-                                    </div>
-                                    <div>
-                                        <button v-on:click="onProcessRecords(station, true)" class="button">
-                                            Process Recs (TsDB only)
-                                        </button>
-                                    </div>
-                                    <div>
                                         <button v-on:click="onExplore(station)" class="button">Explore Data</button>
                                     </div>
                                     <h3>Transfer</h3>
@@ -133,7 +125,7 @@ import PaginationControls from "@/views/shared/PaginationControls.vue";
 import FKApi, { Station, SimpleUser, EssentialStation } from "@/api/api";
 import { BookmarkFactory, serializeBookmark } from "@/views/viz/viz";
 import TransferStation from "./TransferStation.vue";
-import { Buffer } from 'buffer';
+import { Buffer } from "buffer";
 
 export default Vue.extend({
     name: "AdminStations",
@@ -226,20 +218,6 @@ export default Vue.extend({
                 callback: async (confirm) => {
                     if (confirm) {
                         await this.$services.api.adminProcessStationData(station.id);
-                    }
-                },
-            });
-        },
-        async onProcessRecords(station: EssentialStation, skipManual: boolean): Promise<void> {
-            await this.$confirm({
-                message: `Are you sure? This could take a while for certain stations.`,
-                button: {
-                    no: "No",
-                    yes: "Yes",
-                },
-                callback: async (confirm) => {
-                    if (confirm) {
-                        await this.$services.api.adminProcessStation(station.id, true, skipManual);
                     }
                 },
             });

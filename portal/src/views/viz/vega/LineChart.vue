@@ -118,7 +118,7 @@ export default Vue.extend({
                                 "</g>";
                             const saveLabel = document.createElement("span");
                             saveLabel.setAttribute("class", "save-label");
-                            saveLabel.innerHTML = "Save As";
+                            saveLabel.innerHTML = this.$tc('dataView.saveAs');
                             button.appendChild(saveLabel);
                         }
                     }
@@ -218,7 +218,6 @@ export default Vue.extend({
 
 .vega-embed summary {
     border-radius: 0px !important;
-    width: 70px;
     height: 1em;
     display: flex;
     align-items: center;

@@ -1,7 +1,7 @@
 <template>
     <div class="double-header">
         <div class="heading">
-            <div class="back" v-on:click="onBack" v-if="backTitle">
+            <div class="back" v-on:click="onBack" v-if="backTitle" data-cy="backBtn">
                 <span class="small-arrow">&lt;</span>
                 {{ backTitle }}
             </div>

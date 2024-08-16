@@ -13,11 +13,11 @@ import (
 
 	"goa.design/goa/v3/security"
 
-	project "github.com/fieldkit/cloud/server/api/gen/project"
+	project "gitlab.com/fieldkit/cloud/server/api/gen/project"
 
-	"github.com/fieldkit/cloud/server/backend/repositories"
-	"github.com/fieldkit/cloud/server/common"
-	"github.com/fieldkit/cloud/server/data"
+	"gitlab.com/fieldkit/cloud/server/backend/repositories"
+	"gitlab.com/fieldkit/cloud/server/common"
+	"gitlab.com/fieldkit/cloud/server/data"
 )
 
 type ProjectService struct {
@@ -64,6 +64,9 @@ func (c *ProjectService) Add(ctx context.Context, payload *project.AddPayload) (
 	}
 
 	jsonBounds, err := json.Marshal(payload.Project.Bounds)
+	if err != nil {
+		return nil, err
+	}
 	jsonTextBounds := types.JSONText(jsonBounds)
 
 	newProject := &data.Project{
@@ -132,6 +135,9 @@ func (c *ProjectService) Update(ctx context.Context, payload *project.UpdatePayl
 	}
 
 	jsonBounds, err := json.Marshal(payload.Project.Bounds)
+	if err != nil {
+		return nil, err
+	}
 	jsonTextBounds := types.JSONText(jsonBounds)
 
 	updating := &data.Project{

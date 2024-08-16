@@ -3,7 +3,7 @@
 // firmware HTTP client CLI support package
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package client
 
@@ -12,7 +12,7 @@ import (
 	"fmt"
 	"strconv"
 
-	firmware "github.com/fieldkit/cloud/server/api/gen/firmware"
+	firmware "gitlab.com/fieldkit/cloud/server/api/gen/firmware"
 )
 
 // BuildDownloadPayload builds the payload for the firmware download endpoint
@@ -42,7 +42,7 @@ func BuildAddPayload(firmwareAddBody string, firmwareAddAuth string) (*firmware.
 	{
 		err = json.Unmarshal([]byte(firmwareAddBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"etag\": \"Laborum soluta.\",\n      \"logicalAddress\": 4422962753143748848,\n      \"meta\": \"Consequatur quia reprehenderit quod itaque totam.\",\n      \"module\": \"Autem quo nihil dicta eum eveniet.\",\n      \"profile\": \"Est nostrum.\",\n      \"url\": \"Fugiat natus eum.\",\n      \"version\": \"Ab numquam.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"etag\": \"Pariatur et nemo.\",\n      \"logicalAddress\": 8498200775563835365,\n      \"meta\": \"Ut ut et eos dolor error.\",\n      \"module\": \"Est debitis ducimus laboriosam earum.\",\n      \"profile\": \"Qui dolorem.\",\n      \"url\": \"Ut quo incidunt quibusdam.\",\n      \"version\": \"Et doloremque labore.\"\n   }'")
 		}
 	}
 	var auth *string

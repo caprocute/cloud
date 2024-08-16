@@ -3,7 +3,7 @@
 // following HTTP client encoders and decoders
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package client
 
@@ -16,8 +16,8 @@ import (
 	"net/url"
 	"strings"
 
-	following "github.com/fieldkit/cloud/server/api/gen/following"
-	followingviews "github.com/fieldkit/cloud/server/api/gen/following/views"
+	following "gitlab.com/fieldkit/cloud/server/api/gen/following"
+	followingviews "gitlab.com/fieldkit/cloud/server/api/gen/following/views"
 	goahttp "goa.design/goa/v3/http"
 )
 

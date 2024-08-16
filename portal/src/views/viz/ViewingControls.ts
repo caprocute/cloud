@@ -192,8 +192,8 @@ export const SelectionControls = Vue.extend({
                 <div class="tree-key" :style="{color: getKeyColor(index)}">&#9632;</div>
                 <SensorSelectionRow :viz="viz" :ds="ds" :workspace="workspace" :stationOptions="stationOptions" :sensorOptions="sensorOptions(ds.vizSensor)" @viz-change-series="(newSeries) => raiseChangeSeries(index, newSeries)"/>
                 <div class="actions" v-if="showAdd || showRemove">
-                    <div class="button" alt="Add" @click="() => addSeries()" v-if="showAdd">Add</div>
-                    <div class="button" alt="Remove" @click="() => removeSeries(index)" v-if="showRemove">Remove</div>
+                    <div class="button" :alt="$t('dataView.stationTree.add')" @click="() => addSeries()" v-if="showAdd"> {{ $t('dataView.stationTree.add') }} </div>
+                    <div class="button" :alt="$t('dataView.stationTree.remove')" @click="() => removeSeries(index)" v-if="showRemove"> {{ $t('dataView.stationTree.remove') }} </div>
                 </div>
             </div>
         </div>
@@ -229,23 +229,23 @@ export const ViewingControls = Vue.extend({
         chartTypes(): { label: string; id: ChartType }[] {
             const allTypes = [
                 {
-                    label: "Time Series",
+                    label: this.$tc("dataView.chartTypes.timeSeries"),
                     id: ChartType.TimeSeries,
                 },
                 {
-                    label: "Bar",
+                    label: this.$tc("dataView.chartTypes.bar"),
                     id: ChartType.Bar,
                 },
                 {
-                    label: "Histogram",
+                    label: this.$tc("dataView.chartTypes.histogram"),
                     id: ChartType.Histogram,
                 },
                 {
-                    label: "Range",
+                    label: this.$tc("dataView.chartTypes.range"),
                     id: ChartType.Range,
                 },
                 {
-                    label: "Map",
+                    label: this.$tc("dataView.chartTypes.map"),
                     id: ChartType.Map,
                 },
             ];
@@ -383,13 +383,13 @@ export const ViewingControls = Vue.extend({
 				</div>
 				<div class="right time">
                     <div class="fast-time-container">
-                        <span class="view-by">View By:</span>
-                        <div class="fast-time" @click="ev => raiseFastTime(ev, 1)" v-bind:class="{ selected: viz.fastTime == 1 }">Day</div>
-                        <div class="fast-time" @click="ev => raiseFastTime(ev, 7)" v-bind:class="{ selected: viz.fastTime == 7 }">Week</div>
-                        <div class="fast-time" @click="ev => raiseFastTime(ev, 14)" v-bind:class="{ selected: viz.fastTime == 14 }">2 Week</div>
-                        <div class="fast-time" @click="ev => raiseFastTime(ev, 30)" v-bind:class="{ selected: viz.fastTime == 30 }">Month</div>
-                        <div class="fast-time" @click="ev => raiseFastTime(ev, 365)" v-bind:class="{ selected: viz.fastTime == 365 }">Year</div>
-                        <div class="fast-time" @click="ev => raiseFastTime(ev, 0)" v-bind:class="{ selected: viz.fastTime == 0 }">All</div>
+                        <span class="view-by"> {{ $t('dataView.viewBy.btn') }}</span>
+                        <div class="fast-time" @click="ev => raiseFastTime(ev, 1)" v-bind:class="{ selected: viz.fastTime == 1 }"> {{ $t('dataView.viewBy.btn') }}</div>
+                        <div class="fast-time" @click="ev => raiseFastTime(ev, 7)" v-bind:class="{ selected: viz.fastTime == 7 }"> {{ $t('dataView.viewBy.week') }}</div>
+                        <div class="fast-time" @click="ev => raiseFastTime(ev, 14)" v-bind:class="{ selected: viz.fastTime == 14 }"> 2 {{ $t('dataView.viewBy.week') }}</div>
+                        <div class="fast-time" @click="ev => raiseFastTime(ev, 30)" v-bind:class="{ selected: viz.fastTime == 30 }"> {{ $t('dataView.viewBy.month') }}</div>
+                        <div class="fast-time" @click="ev => raiseFastTime(ev, 365)" v-bind:class="{ selected: viz.fastTime == 365 }"> {{ $t('dataView.viewBy.year') }}</div>
+                        <div class="fast-time" @click="ev => raiseFastTime(ev, 0)" v-bind:class="{ selected: viz.fastTime == 0 }"> {{ $t('dataView.viewBy.all') }}</div>
                     </div>
 					<div class="date-picker flex" v-if="manualRangeValue">
 						<v-date-picker :value="manualRangeValue.start" @input="raiseManualTime($event, 'start')" mode="date" :masks="{ input: 'MM/DD/YY' }" :select-attribute="datepickerStyles"

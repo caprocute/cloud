@@ -3,12 +3,12 @@
 // oidc HTTP client types
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package client
 
 import (
-	oidc "github.com/fieldkit/cloud/server/api/gen/oidc"
+	oidc "gitlab.com/fieldkit/cloud/server/api/gen/oidc"
 	goa "goa.design/goa/v3/pkg"
 )
 

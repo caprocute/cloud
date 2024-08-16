@@ -3,6 +3,7 @@
         <router-link :to="{ name: 'root' }">
             <Logo />
         </router-link>
+        <LanguageSelector></LanguageSelector>
         <div
             class="header-account"
             :class="isAuthenticated ? 'loggedin' : ''"
@@ -36,10 +37,10 @@
                             {{ $t("layout.header.admin") }}
                         </router-link>
                         <router-link v-if="user" :to="{ name: 'editUser' }" :title="$t('layout.header.myAccount')">
-                            <img src="@/assets/icon-account.svg" alt="My Account" />
+                            <img src="@/assets/icon-account.svg" :alt="$t('layout.header.myAccount')" />
                         </router-link>
                         <a class="log-out" v-if="isAuthenticated" v-on:click="logout" :title="$t('layout.header.logout')">
-                            <img src="@/assets/icon-logout.svg" alt="Logout" />
+                            <img src="@/assets/icon-logout.svg" :alt="$t('layout.header.logout')" />
                         </a>
                     </div>
                 </header>
@@ -65,7 +66,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { mapState, mapGetters } from "vuex";
+import { mapGetters, mapState } from "vuex";
 import * as ActionTypes from "@/store/actions";
 import { MarkNotificationsSeen } from "@/store";
 import CommonComponents from "@/views/shared";
@@ -74,10 +75,12 @@ import { GlobalState } from "@/store/modules/global";
 import Logo from "@/views/shared/Logo.vue";
 import { Notification } from "@/store/modules/notifications";
 import { isMobile } from "@/utilities";
+import LanguageSelector from "@/views/shared/LanguageSelector.vue";
 
 export default Vue.extend({
     name: "HeaderBar",
     components: {
+        LanguageSelector,
         ...CommonComponents,
         NotificationsList,
         Logo,
@@ -173,7 +176,12 @@ export default Vue.extend({
     box-sizing: border-box;
     z-index: $z-index-header;
     flex: 0 0 65px;
+    padding-right: 85px;
     @include flex(center, flex-end);
+
+    @include bp-down($lg) {
+        padding-right: 14px;
+    }
 
     @include bp-down($md) {
         padding: 0 10px;
@@ -191,19 +199,10 @@ export default Vue.extend({
     }
 
     &-account {
-        padding-right: 85px;
         text-align: right;
         position: relative;
         height: 100%;
         @include flex(center);
-
-        @include bp-down($lg) {
-            padding-right: 14px;
-        }
-
-        @include bp-down($sm) {
-            padding-right: 0;
-        }
 
         &-name {
             font-size: 16px;
@@ -225,7 +224,7 @@ export default Vue.extend({
             transition: all 0.33s;
             transform: translateY(-50%);
             cursor: pointer;
-            @include position(absolute, 50% 69px null null);
+            @include position(absolute, 50% null null calc(100% + 5px));
 
             @include bp-down($lg) {
                 right: 0;
@@ -273,7 +272,7 @@ export default Vue.extend({
     }
 }
 
-.triangle {
+::v-deep .triangle {
     @include position(absolute, null null -10px 5px);
     z-index: $z-index-top;
     width: 0;
@@ -377,7 +376,7 @@ button {
         opacity: 0;
         visibility: hidden;
         @include flex();
-        @include position(absolute, calc(100% + 1px) 70px null null);
+        @include position(absolute, calc(100% + 1px) 30px null null);
 
         @include bp-down($lg) {
             top: 100%;
@@ -391,6 +390,7 @@ button {
 
         @include bp-down($xs) {
             width: 100vw;
+            right: -10px;
         }
 
         &.active {

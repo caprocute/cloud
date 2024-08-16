@@ -3,7 +3,7 @@
 // discussion HTTP client CLI support package
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package client
 
@@ -12,7 +12,7 @@ import (
 	"fmt"
 	"strconv"
 
-	discussion "github.com/fieldkit/cloud/server/api/gen/discussion"
+	discussion "gitlab.com/fieldkit/cloud/server/api/gen/discussion"
 	goa "goa.design/goa/v3/pkg"
 )
 
@@ -100,7 +100,7 @@ func BuildUpdateMessagePayload(discussionUpdateMessageBody string, discussionUpd
 	{
 		err = json.Unmarshal([]byte(discussionUpdateMessageBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Architecto est voluptatibus.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Officia dicta necessitatibus aut quod sit voluptatem.\"\n   }'")
 		}
 	}
 	var postID int64

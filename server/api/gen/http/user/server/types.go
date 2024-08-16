@@ -3,15 +3,15 @@
 // user HTTP server types
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package server
 
 import (
 	"unicode/utf8"
 
-	user "github.com/fieldkit/cloud/server/api/gen/user"
-	userviews "github.com/fieldkit/cloud/server/api/gen/user/views"
+	user "gitlab.com/fieldkit/cloud/server/api/gen/user"
+	userviews "gitlab.com/fieldkit/cloud/server/api/gen/user/views"
 	goa "goa.design/goa/v3/pkg"
 )
 
@@ -1678,6 +1678,78 @@ type AdminTermsAndConditionsBadRequestResponseBody struct {
 	Fault bool `form:"fault" json:"fault" xml:"fault"`
 }
 
+// DeleteAccountUnauthorizedResponseBody is the type of the "user" service
+// "delete account" endpoint HTTP response body for the "unauthorized" error.
+type DeleteAccountUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// DeleteAccountForbiddenResponseBody is the type of the "user" service "delete
+// account" endpoint HTTP response body for the "forbidden" error.
+type DeleteAccountForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// DeleteAccountNotFoundResponseBody is the type of the "user" service "delete
+// account" endpoint HTTP response body for the "not-found" error.
+type DeleteAccountNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// DeleteAccountBadRequestResponseBody is the type of the "user" service
+// "delete account" endpoint HTTP response body for the "bad-request" error.
+type DeleteAccountBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
 // AdminDeleteUnauthorizedResponseBody is the type of the "user" service "admin
 // delete" endpoint HTTP response body for the "unauthorized" error.
 type AdminDeleteUnauthorizedResponseBody struct {
@@ -3282,6 +3354,62 @@ func NewAdminTermsAndConditionsBadRequestResponseBody(res *goa.ServiceError) *Ad
 	return body
 }
 
+// NewDeleteAccountUnauthorizedResponseBody builds the HTTP response body from
+// the result of the "delete account" endpoint of the "user" service.
+func NewDeleteAccountUnauthorizedResponseBody(res *goa.ServiceError) *DeleteAccountUnauthorizedResponseBody {
+	body := &DeleteAccountUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewDeleteAccountForbiddenResponseBody builds the HTTP response body from the
+// result of the "delete account" endpoint of the "user" service.
+func NewDeleteAccountForbiddenResponseBody(res *goa.ServiceError) *DeleteAccountForbiddenResponseBody {
+	body := &DeleteAccountForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewDeleteAccountNotFoundResponseBody builds the HTTP response body from the
+// result of the "delete account" endpoint of the "user" service.
+func NewDeleteAccountNotFoundResponseBody(res *goa.ServiceError) *DeleteAccountNotFoundResponseBody {
+	body := &DeleteAccountNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewDeleteAccountBadRequestResponseBody builds the HTTP response body from
+// the result of the "delete account" endpoint of the "user" service.
+func NewDeleteAccountBadRequestResponseBody(res *goa.ServiceError) *DeleteAccountBadRequestResponseBody {
+	body := &DeleteAccountBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
 // NewAdminDeleteUnauthorizedResponseBody builds the HTTP response body from
 // the result of the "admin delete" endpoint of the "user" service.
 func NewAdminDeleteUnauthorizedResponseBody(res *goa.ServiceError) *AdminDeleteUnauthorizedResponseBody {
@@ -3665,6 +3793,15 @@ func NewAdminTermsAndConditionsPayload(body *AdminTermsAndConditionsRequestBody,
 	res.Auth = auth
 
 	return res
+}
+
+// NewDeleteAccountPayload builds a user service delete account endpoint
+// payload.
+func NewDeleteAccountPayload(auth string) *user.DeleteAccountPayload {
+	v := &user.DeleteAccountPayload{}
+	v.Auth = auth
+
+	return v
 }
 
 // NewAdminDeletePayload builds a user service admin delete endpoint payload.

@@ -144,6 +144,7 @@ var _ = Service("sensor", func() {
 		Payload(func() {
 			Token("auth")
 			Attribute("stations", String)
+			Attribute("windows", String)
 		})
 
 		Result(func() {
@@ -156,6 +157,7 @@ var _ = Service("sensor", func() {
 
 			Params(func() {
 				Param("stations")
+				Param("windows")
 			})
 
 			Response(func() {

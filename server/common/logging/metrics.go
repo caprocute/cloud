@@ -107,8 +107,8 @@ func (m *Metrics) FileUpload() *Timing {
 	return &Timing{
 		m:           m,
 		start:       time.Now().UTC(),
-		timingKeys:  []KeyMeta{KeyMeta{key: "files.uploading.time", tags: []string{}}},
-		counterKeys: []KeyMeta{KeyMeta{key: "files.uploaded", tags: []string{}}},
+		timingKeys:  []KeyMeta{{key: "files.uploading.time", tags: []string{}}},
+		counterKeys: []KeyMeta{{key: "files.uploaded", tags: []string{}}},
 	}
 }
 
@@ -118,8 +118,8 @@ func (m *Metrics) TailMultiQuery(batch int) *Timing {
 	return &Timing{
 		m:           m,
 		start:       time.Now().UTC(),
-		timingKeys:  []KeyMeta{KeyMeta{key: "api.data.tail.multi.query.time", tags: []string{}}},
-		counterKeys: []KeyMeta{KeyMeta{key: "api.data.tail.multi.query", tags: []string{}}},
+		timingKeys:  []KeyMeta{{key: "api.data.tail.multi.query.time", tags: []string{}}},
+		counterKeys: []KeyMeta{{key: "api.data.tail.multi.query", tags: []string{}}},
 	}
 }
 
@@ -129,8 +129,8 @@ func (m *Metrics) RecentlyMultiQuery(batch int) *Timing {
 	return &Timing{
 		m:           m,
 		start:       time.Now().UTC(),
-		timingKeys:  []KeyMeta{KeyMeta{key: "api.data.recently.multi.query.time", tags: []string{}}},
-		counterKeys: []KeyMeta{KeyMeta{key: "api.data.recently.multi.query", tags: []string{}}},
+		timingKeys:  []KeyMeta{{key: "api.data.recently.multi.query.time", tags: []string{}}},
+		counterKeys: []KeyMeta{{key: "api.data.recently.multi.query", tags: []string{}}},
 	}
 }
 
@@ -140,8 +140,8 @@ func (m *Metrics) LastTimesQuery(batch int) *Timing {
 	return &Timing{
 		m:           m,
 		start:       time.Now().UTC(),
-		timingKeys:  []KeyMeta{KeyMeta{key: "api.data.lasttimes.query.time", tags: []string{}}},
-		counterKeys: []KeyMeta{KeyMeta{key: "api.data.lasttimes.query", tags: []string{}}},
+		timingKeys:  []KeyMeta{{key: "api.data.lasttimes.query.time", tags: []string{}}},
+		counterKeys: []KeyMeta{{key: "api.data.lasttimes.query", tags: []string{}}},
 	}
 }
 
@@ -149,8 +149,8 @@ func (m *Metrics) DataRangesQuery() *Timing {
 	return &Timing{
 		m:           m,
 		start:       time.Now().UTC(),
-		timingKeys:  []KeyMeta{KeyMeta{key: "api.data.ranges.query.time", tags: []string{}}},
-		counterKeys: []KeyMeta{KeyMeta{key: "api.data.ranges.query", tags: []string{}}},
+		timingKeys:  []KeyMeta{{key: "api.data.ranges.query.time", tags: []string{}}},
+		counterKeys: []KeyMeta{{key: "api.data.ranges.query", tags: []string{}}},
 	}
 }
 
@@ -158,8 +158,8 @@ func (m *Metrics) DailyQuery() *Timing {
 	return &Timing{
 		m:           m,
 		start:       time.Now().UTC(),
-		timingKeys:  []KeyMeta{KeyMeta{key: "api.data.daily.query.time", tags: []string{}}},
-		counterKeys: []KeyMeta{KeyMeta{key: "api.data.daily.query", tags: []string{}}},
+		timingKeys:  []KeyMeta{{key: "api.data.daily.query.time", tags: []string{}}},
+		counterKeys: []KeyMeta{{key: "api.data.daily.query", tags: []string{}}},
 	}
 }
 
@@ -167,8 +167,8 @@ func (m *Metrics) TailQuery() *Timing {
 	return &Timing{
 		m:           m,
 		start:       time.Now().UTC(),
-		timingKeys:  []KeyMeta{KeyMeta{key: "api.data.tail.query.time", tags: []string{}}},
-		counterKeys: []KeyMeta{KeyMeta{key: "api.data.tail.query", tags: []string{}}},
+		timingKeys:  []KeyMeta{{key: "api.data.tail.query.time", tags: []string{}}},
+		counterKeys: []KeyMeta{{key: "api.data.tail.query", tags: []string{}}},
 	}
 }
 
@@ -177,8 +177,8 @@ func (m *Metrics) DataQuery(aggregate string) *Timing {
 	return &Timing{
 		m:           m,
 		start:       time.Now().UTC(),
-		timingKeys:  []KeyMeta{KeyMeta{key: "api.data.query.time", tags: []string{aggregateTag}}, KeyMeta{key: fmt.Sprintf("api.data.query.%s.time", aggregate), tags: []string{}}},
-		counterKeys: []KeyMeta{KeyMeta{key: "api.data.query", tags: []string{aggregateTag}}, KeyMeta{key: fmt.Sprintf("api.data.query.%s", aggregate), tags: []string{}}},
+		timingKeys:  []KeyMeta{{key: "api.data.query.time", tags: []string{aggregateTag}}, {key: fmt.Sprintf("api.data.query.%s.time", aggregate), tags: []string{}}},
+		counterKeys: []KeyMeta{{key: "api.data.query", tags: []string{aggregateTag}}, {key: fmt.Sprintf("api.data.query.%s", aggregate), tags: []string{}}},
 	}
 }
 
@@ -187,8 +187,8 @@ func (m *Metrics) HandleMessage(jobType string) *Timing {
 	return &Timing{
 		m:           m,
 		start:       time.Now().UTC(),
-		timingKeys:  []KeyMeta{KeyMeta{key: "messages.handling.time", tags: []string{jobTypeTag}}, KeyMeta{key: fmt.Sprintf("messages.%s.handling.time", jobType), tags: []string{}}},
-		counterKeys: []KeyMeta{KeyMeta{key: "messages.processed", tags: []string{jobTypeTag}}, KeyMeta{key: fmt.Sprintf("messages.%s.processed", jobType), tags: []string{}}},
+		timingKeys:  []KeyMeta{{key: "messages.handling.time", tags: []string{jobTypeTag}}, {key: fmt.Sprintf("messages.%s.handling.time", jobType), tags: []string{}}},
+		counterKeys: []KeyMeta{{key: "messages.processed", tags: []string{jobTypeTag}}, {key: fmt.Sprintf("messages.%s.processed", jobType), tags: []string{}}},
 	}
 }
 
@@ -196,8 +196,8 @@ func (m *Metrics) ThirdPartyLocationDescribe() *Timing {
 	return &Timing{
 		m:           m,
 		start:       time.Now().UTC(),
-		timingKeys:  []KeyMeta{KeyMeta{key: "api.thirdparty.location.describe.time", tags: []string{}}},
-		counterKeys: []KeyMeta{KeyMeta{key: "api.thirdparty.location.describe.queries", tags: []string{}}},
+		timingKeys:  []KeyMeta{{key: "api.thirdparty.location.describe.time", tags: []string{}}},
+		counterKeys: []KeyMeta{{key: "api.thirdparty.location.describe.queries", tags: []string{}}},
 	}
 }
 
@@ -205,8 +205,8 @@ func (m *Metrics) ThirdPartyLocation(provider string) *Timing {
 	return &Timing{
 		m:           m,
 		start:       time.Now().UTC(),
-		timingKeys:  []KeyMeta{KeyMeta{key: fmt.Sprintf("api.thirdparty.location.%s.time", provider), tags: []string{}}},
-		counterKeys: []KeyMeta{KeyMeta{key: fmt.Sprintf("api.thirdparty.location.%s.queries", provider), tags: []string{}}},
+		timingKeys:  []KeyMeta{{key: fmt.Sprintf("api.thirdparty.location.%s.time", provider), tags: []string{}}},
+		counterKeys: []KeyMeta{{key: fmt.Sprintf("api.thirdparty.location.%s.queries", provider), tags: []string{}}},
 	}
 }
 

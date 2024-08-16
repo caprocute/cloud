@@ -211,7 +211,7 @@
                                 v-if="item.body"
                                 v-model="item.body"
                                 :readonly="item.readonly"
-                                saveLabel="Save"
+                                :saveLabel="$tc('comments.commentForm.saveEditLabel')"
                                 @input="$store.dispatch(ActionTypes.NEW_DIRTY_FIELD, 'editComment#' + item.id)"
                                 @empty="$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, 'editComment#' + item.id)"
                                 @save="saveEdit(item.id, item.body, 'editComment#' + item.id)"
@@ -831,7 +831,7 @@ export default Vue.extend({
                     const el = document.querySelector(location.hash);
 
                     if (el) {
-                        el.scrollIntoView({ behavior: "smooth" });
+                        el.scrollIntoView({ behavior: "smooth", block: "center" });
                         el.classList.add("highlight");
                         setTimeout(() => {
                             el.classList.remove("highlight");
@@ -1235,7 +1235,7 @@ header {
 .event-level-selector {
     display: flex;
     flex-direction: row;
-    align-items: center;
+    align-items: stretch;
     justify-content: center;
     margin-bottom: 15px;
 
@@ -1262,7 +1262,8 @@ header {
 }
 .event-level-radio {
     width: 340px;
-    height: 115px;
+    min-height: 115px;
+    height: 100%;
     border: solid 1px #d8dce0;
     padding: 15px;
     padding-bottom: 10px;

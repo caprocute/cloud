@@ -3,14 +3,14 @@
 // station_note service
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package stationnote
 
 import (
 	"context"
 
-	stationnoteviews "github.com/fieldkit/cloud/server/api/gen/station_note/views"
+	stationnoteviews "gitlab.com/fieldkit/cloud/server/api/gen/station_note/views"
 	goa "goa.design/goa/v3/pkg"
 	"goa.design/goa/v3/security"
 )
