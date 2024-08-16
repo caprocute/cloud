@@ -1,18 +1,19 @@
-FROM golang:1.19.1-buster AS source
+FROM golang:1.22-bookworm AS source
 
 WORKDIR /work
 
-ADD go.* /work/
-ADD *.go /work/
+COPY support/ /work/support
+COPY cli/ /work/cli
 
 RUN ls -alhR
 
+WORKDIR /work/cli
 RUN go get ./...
 RUN go build -o migrate *.go
 
-FROM ubuntu:18.04
+FROM ubuntu:22.04
 
-COPY --from=source /work/migrate /work/migrate
+COPY --from=source /work/cli/migrate /work/migrate
 
 WORKDIR /work
 

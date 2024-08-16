@@ -1,7 +1,7 @@
 package email
 
 import (
-	"github.com/fieldkit/cloud/server/data"
+	"gitlab.com/fieldkit/cloud/server/data"
 )
 
 type Emailer interface {

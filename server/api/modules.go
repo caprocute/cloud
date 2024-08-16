@@ -3,9 +3,9 @@ package api
 import (
 	"context"
 
-	modules "github.com/fieldkit/cloud/server/api/gen/modules"
+	modules "gitlab.com/fieldkit/cloud/server/api/gen/modules"
 
-	"github.com/fieldkit/cloud/server/backend/repositories"
+	"gitlab.com/fieldkit/cloud/server/backend/repositories"
 )
 
 type ModulesService struct {

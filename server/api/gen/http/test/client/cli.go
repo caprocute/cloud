@@ -3,7 +3,7 @@
 // test HTTP client CLI support package
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package client
 
@@ -11,7 +11,7 @@ import (
 	"fmt"
 	"strconv"
 
-	test "github.com/fieldkit/cloud/server/api/gen/test"
+	test "gitlab.com/fieldkit/cloud/server/api/gen/test"
 )
 
 // BuildGetPayload builds the payload for the test get endpoint from CLI flags.

@@ -7,11 +7,11 @@ import (
 
 	goahttp "goa.design/goa/v3/http"
 
-	projectSvr "github.com/fieldkit/cloud/server/api/gen/http/project/server"
-	stationSvr "github.com/fieldkit/cloud/server/api/gen/http/station/server"
-	userSvr "github.com/fieldkit/cloud/server/api/gen/http/user/server"
+	projectSvr "gitlab.com/fieldkit/cloud/server/api/gen/http/project/server"
+	stationSvr "gitlab.com/fieldkit/cloud/server/api/gen/http/station/server"
+	userSvr "gitlab.com/fieldkit/cloud/server/api/gen/http/user/server"
 
-	"github.com/fieldkit/cloud/server/common/logging"
+	"gitlab.com/fieldkit/cloud/server/common/logging"
 )
 
 type StreamAndCacheFriendlyEncoder struct {

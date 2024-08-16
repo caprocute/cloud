@@ -3,7 +3,7 @@
 // project HTTP server encoders and decoders
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package server
 
@@ -14,8 +14,8 @@ import (
 	"strconv"
 	"strings"
 
-	project "github.com/fieldkit/cloud/server/api/gen/project"
-	projectviews "github.com/fieldkit/cloud/server/api/gen/project/views"
+	project "gitlab.com/fieldkit/cloud/server/api/gen/project"
+	projectviews "gitlab.com/fieldkit/cloud/server/api/gen/project/views"
 	goahttp "goa.design/goa/v3/http"
 	goa "goa.design/goa/v3/pkg"
 )

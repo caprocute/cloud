@@ -1,48 +1,48 @@
 <template>
     <StandardLayout>
         <div class="container">
-            <router-link :to="{ name: 'adminMain' }" class="link">Back to Admin</router-link>
+            <router-link :to="{ name: 'adminMain' }" class="link">{{ $t("admin.backBtn") }}</router-link>
 
             <div class="delete-user">
-                <div v-if="deletion.failed" class="notification failed">Oops, there was a problem.</div>
+                <div v-if="deletion.failed" class="notification failed">{{ $t("admin.deleteForm.failed") }}</div>
 
-                <div v-if="deletion.success" class="notification success">They're toast.</div>
+                <div v-if="deletion.success" class="notification success">{{ $t("admin.deleteForm.success") }}</div>
 
                 <form id="delete-user-form" @submit.prevent="deleteUser">
-                    <h2>Delete User</h2>
+                    <h2>{{ $t("admin.deleteUser") }}</h2>
                     <div>
-                        <TextField v-model="deletionForm.email" label="Buh-bye Email" />
+                        <TextField v-model="deletionForm.email" :label="$tc('admin.deleteForm.form.password.required')" />
                         <div class="validation-errors" v-if="$v.deletionForm.email.$error">
-                            <div v-if="!$v.deletionForm.email.required">Email is a required field.</div>
-                            <div v-if="!$v.deletionForm.email.email">Must be a valid email address.</div>
+                            <div v-if="!$v.deletionForm.email.required">{{ $t("admin.deleteForm.email.required") }}</div>
+                            <div v-if="!$v.deletionForm.email.email">{{ $t("admin.deleteForm.email.valid") }}</div>
                         </div>
                     </div>
                     <div>
-                        <TextField v-model="deletionForm.password" label="Your Password" type="password" />
+                        <TextField v-model="deletionForm.password" :label="$tc('admin.deleteForm.form.password.label')" type="password" />
                         <div class="validation-errors" v-if="$v.deletionForm.password.$error">
-                            <div v-if="!$v.deletionForm.password.required">This is a required field.</div>
-                            <div v-if="!$v.deletionForm.password.min">Password must be at least 10 characters.</div>
+                            <div v-if="!$v.deletionForm.password.required">{{ $t("admin.deleteForm.password.required") }}</div>
+                            <div v-if="!$v.deletionForm.password.min">{{ $t("admin.deleteForm.password.valid") }}</div>
                         </div>
                     </div>
-                    <button class="form-save-button" type="submit">Bye bye bye</button>
+                    <button class="form-save-button" type="submit">{{ $t("admin.deleteForm.button") }}</button>
                 </form>
             </div>
 
             <div class="clear-tnc">
-                <div v-if="tnc.failed" class="notification failed">Oops, there was a problem.</div>
+                <div v-if="tnc.failed" class="notification failed">{{ $t("admin.tnc.failed") }}</div>
 
-                <div v-if="tnc.success" class="notification success">Done, cleared that user's TNC status.</div>
+                <div v-if="tnc.success" class="notification success">{{ $t("admin.tnc.success") }}</div>
 
                 <form id="clear-tnc-form" @submit.prevent="clearTermsAndConditions">
-                    <h2>Clear TNC</h2>
+                    <h2>{{ $t("admin.tnc.clear") }}</h2>
                     <div>
-                        <TextField v-model="tncForm.email" label="Email" />
+                        <TextField v-model="tncForm.email" :label="$tc('admin.tnc.form.email.label')" />
                         <div class="validation-errors" v-if="$v.tncForm.email.$error">
-                            <div v-if="!$v.tncForm.email.required">Email is a required field.</div>
-                            <div v-if="!$v.tncForm.email.email">Must be a valid email address.</div>
+                            <div v-if="!$v.tncForm.email.required">{{ $t("admin.tnc.form.email.required") }}</div>
+                            <div v-if="!$v.tncForm.email.email">{{ $t("admin.tnc.form.email.valid") }}</div>
                         </div>
                     </div>
-                    <button class="form-save-button" type="submit">Clear Terms and Conditions</button>
+                    <button class="form-save-button" type="submit">{{ $t("admin.tnc.form.button") }}</button>
                 </form>
             </div>
         </div>

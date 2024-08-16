@@ -1,11 +1,10 @@
 <template>
     <div class="row-section manage-team-container">
-
-        <div class="section-heading">Manage Team</div>
+        <div class="section-heading">{{ $t("project.teamManager.heading") }}</div>
         <div class="users-container">
             <div class="user-row">
-                <div class="cell-heading">Members ({{ displayProject.users.length }})</div>
-                <div class="cell-heading">Role</div>
+                <div class="cell-heading">{{ $t("project.teamManager.members") }} ({{ displayProject.users.length }})</div>
+                <div class="cell-heading">{{ $t("project.teamManager.role") }}</div>
                 <div class="cell-heading"></div>
                 <div class="cell"></div>
             </div>
@@ -30,11 +29,11 @@
                 </div>
 
                 <div class="cell" v-if="edited.email === projectUser.user.email">
-                    <button class="invite-button" v-on:click="submitEditMemberRole()">Update Role</button>
+                    <button class="invite-button" v-on:click="submitEditMemberRole()">{{ $t("project.teamManager.updateRole") }}</button>
                 </div>
                 <div class="cell invite-status" v-else>
                     <template v-if="projectUser.invited">
-                        Invite pending
+                        {{ $t("project.teamManager.invitePending") }}
                     </template>
                 </div>
 
@@ -53,7 +52,7 @@
                 <div class="cell">
                     <input
                         class="text-input"
-                        placeholder="New member email"
+                        :placeholder="$t('project.teamManager.newMember.placeholder')"
                         keyboardType="email"
                         autocorrect="false"
                         autocapitalizationType="none"
@@ -61,21 +60,25 @@
                     />
                     <div class="validation-errors" v-if="$v.form.inviteEmail.$error || form.inviteDuplicate">
                         <span class="validation-error" v-if="!$v.form.inviteEmail.required">
-                            Email is a required field.
+                            {{ $t("project.teamManager.newMember.emailRequired") }}
                         </span>
                         <span class="validation-error" v-if="!$v.form.inviteEmail.email">
-                            Must be a valid email address.
+                            {{ $t("project.teamManager.newMember.emailValid") }}
                         </span>
                         <span class="validation-error" v-if="form.inviteDuplicate">
-                            This user is already invited.
+                            {{ $t("project.teamManager.newMember.duplicate") }}
                         </span>
                     </div>
                 </div>
                 <div class="cell role">
-                    <SelectField :options="roleOptions" v-model="form.selectedRole" :selected-label="'Select Role'" />
+                    <SelectField
+                        :options="roleOptions"
+                        v-model="form.selectedRole"
+                        :selected-label="$tc('project.teamManager.newMember.selectRole')"
+                    />
                 </div>
                 <div class="cell">
-                    <button class="invite-button" v-on:click="sendInvite">Invite</button>
+                    <button class="invite-button" v-on:click="sendInvite">{{ $t("project.teamManager.invite") }}</button>
                 </div>
                 <div class="cell"></div>
             </div>
@@ -212,10 +215,10 @@ export default Vue.extend({
         },
         removeUser(this: any, projectUser) {
             return this.$confirm({
-                message: `Are you sure you want to remove this team member?`,
+                message: this.$t("project.teamManager.confirmRemove"),
                 button: {
-                    no: "No",
-                    yes: "Yes",
+                    no: this.$t("no"),
+                    yes: this.$t("yes"),
                 },
                 callback: (confirm) => {
                     if (confirm) {

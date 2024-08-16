@@ -11,35 +11,35 @@
                         {{ $t(link.text) }} >
                     </a>
                 </div>
-                <DoubleHeader :backTitle="$t(backLabelKey)" @back="onBack">
+                <DoubleHeader :backTitle="$tc(backLabelKey)" @back="onBack">
                     <template v-slot:title>
                         <div class="one">
-                            Data View
+                            {{$tc('dataView.title')}}
 
                             <InfoTooltip :message="$tc('dataView.computerTip')"></InfoTooltip>
 
                             <div class="button compare" alt="Add Chart" @click="addChart">
                                 <img :src="addIcon" />
-                                <div>Add Chart</div>
+                                <div>  {{$tc('dataView.buttons.addChart')}}</div>
                             </div>
                         </div>
                     </template>
                     <template v-slot:default>
                         <div class="button-submit" @click="openShare">
                             <i class="icon icon-share"></i>
-                            <span class="button-submit-text">Share</span>
+                            <span class="button-submit-text"> {{$tc('dataView.buttons.share')}}</span>
                         </div>
                         <div class="button-submit" @click="openExports" v-if="exportSupported()">
                             <i class="icon icon-export"></i>
-                            <span class="button-submit-text">Export</span>
+                            <span class="button-submit-text"> {{$tc('dataView.buttons.export')}}</span>
                         </div>
                     </template>
                 </DoubleHeader>
             </div>
 
-            <div v-if="showNoSensors" class="notification">Oh snap, this station doesn't appear to have any sensors to show you.</div>
+            <div v-if="showNoSensors" class="notification">{{$tc('dataView.noSensors')}}</div>
 
-            <div v-if="!workspace && !bookmark">Nothing selected to visualize, please choose a station or project from the left.</div>
+            <div v-if="!workspace && !bookmark">{{$tc('dataView.nothingSelected')}}</div>
 
             <div class="workspace-container" v-if="!workspace && currentStation">
                 <div class="station-summary">
@@ -785,7 +785,7 @@ export default Vue.extend({
 
 .controls-container .right.half {
     align-items: flex-start;
-    flex: 0 0 110px;
+    flex: 0 0 140px;
 
     @include bp-down($sm) {
         display: none;
@@ -1104,7 +1104,9 @@ export default Vue.extend({
 }
 
 ::v-deep .group-no-data {
-    .viz-container,
+    position: relative;
+
+    .viz,
     .scrubber {
         opacity: 0.4;
         pointer-events: none;

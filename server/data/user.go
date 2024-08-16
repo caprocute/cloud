@@ -14,8 +14,8 @@ const (
 )
 
 var (
-	IncorrectPasswordError = errors.New("incorrect password")
-	UnverifiedUserError    = errors.New("unverified user error")
+	ErrIncorrectPassword = errors.New("incorrect password")
+	ErrUnverifiedUser    = errors.New("unverified user error")
 )
 
 var (
@@ -84,7 +84,7 @@ func (user *User) SetPassword(password string) error {
 func (user *User) CheckPassword(password string) error {
 	hashedPassword, err := compareHashAndPassword(user.Password, password)
 	if err == bcrypt.ErrMismatchedHashAndPassword {
-		return IncorrectPasswordError
+		return ErrIncorrectPassword
 	}
 
 	if err != nil {

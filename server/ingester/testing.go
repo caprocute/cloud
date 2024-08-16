@@ -4,8 +4,8 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/fieldkit/cloud/server/data"
-	"github.com/fieldkit/cloud/server/tests"
+	"gitlab.com/fieldkit/cloud/server/data"
+	"gitlab.com/fieldkit/cloud/server/tests"
 )
 
 var (

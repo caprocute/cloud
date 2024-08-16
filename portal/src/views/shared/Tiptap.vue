@@ -59,6 +59,10 @@ export default Vue.extend({
             type: String,
             default: "Post",
         },
+        disableMentions: {
+            type: Boolean,
+            default: false,
+        },
     },
     data(): {
         editor: Editor | null;
@@ -143,16 +147,11 @@ export default Vue.extend({
 
         // eslint-disable-next-line
         const thisComp = this;
-        this.editor = new Editor({
-            editable: !this.readonly,
-            content: this.asContent(this.value),
-            extensions: [
-                Document,
-                Paragraph,
-                Text,
-                ModifyEnter,
-                CustomNewLine,
-                CharacterCount,
+
+        const extensions = [Document, Paragraph, Text, ModifyEnter, CustomNewLine, CharacterCount];
+
+        if (!this.disableMentions) {
+            extensions.push(
                 Mention.configure({
                     HTMLAttributes: {
                         class: "mention",
@@ -223,8 +222,14 @@ export default Vue.extend({
                             };
                         },
                     },
-                }),
-            ],
+                })
+            );
+        }
+
+        this.editor = new Editor({
+            editable: !this.readonly,
+            content: this.asContent(this.value),
+            extensions: extensions,
             onUpdate({ editor }) {
                 changed(editor);
             },

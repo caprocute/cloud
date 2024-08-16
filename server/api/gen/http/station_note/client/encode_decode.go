@@ -3,7 +3,7 @@
 // station_note HTTP client encoders and decoders
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package client
 
@@ -15,8 +15,8 @@ import (
 	"net/url"
 	"strings"
 
-	stationnote "github.com/fieldkit/cloud/server/api/gen/station_note"
-	stationnoteviews "github.com/fieldkit/cloud/server/api/gen/station_note/views"
+	stationnote "gitlab.com/fieldkit/cloud/server/api/gen/station_note"
+	stationnoteviews "gitlab.com/fieldkit/cloud/server/api/gen/station_note/views"
 	goahttp "goa.design/goa/v3/http"
 )
 

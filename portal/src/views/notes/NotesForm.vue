@@ -4,7 +4,7 @@
             <div class="name">{{ $t("notes.title") }}</div>
             <div class="completed">{{ completed }}% {{ $t("notes.complete") }}</div>
             <div class="buttons" v-if="isAuthenticated">
-                <button type="submit" class="button" @click="onSave">{{ $t("notes.btn.save") }}</button>
+                <button type="submit" class="button" @click="onSave" data-cy="saveNotes">{{ $t("notes.btn.save") }}</button>
             </div>
         </div>
         <div class="site-notes">
@@ -13,14 +13,16 @@
                     v-model="form.studyObjective"
                     :v="$v.form.studyObjective"
                     :readonly="readonly"
+                    :dataCy="'studyObjectiveBody'"
                     @change="onChange('studyObjective')"
                 />
-                <NoteEditor v-model="form.sitePurpose" :v="$v.form.sitePurpose" :readonly="readonly" @change="onChange('sitePurpose')" />
-                <NoteEditor v-model="form.siteCriteria" :v="$v.form.siteCriteria" :readonly="readonly" @change="onChange('siteCriteria')" />
+                <NoteEditor v-model="form.sitePurpose" :v="$v.form.sitePurpose" :readonly="readonly" :dataCy="'sitePurposeBody'" @change="onChange('sitePurpose')" />
+                <NoteEditor v-model="form.siteCriteria" :v="$v.form.siteCriteria" :readonly="readonly" :dataCy="'siteCriteriaBody'" @change="onChange('siteCriteria')" />
                 <NoteEditor
                     v-model="form.siteDescription"
                     :v="$v.form.siteDescription"
                     :readonly="readonly"
+                    :dataCy="'siteDescriptionBody'"
                     @change="onChange('siteDescription')"
                 />
                 <NoteEditor
@@ -28,6 +30,7 @@
                     :v="$v.form.customKey"
                     :readonly="readonly"
                     :editableTitle="true"
+                    :dataCy="'customKeyBody'"
                     @change="onChange('customKey')"
                 />
             </form>
@@ -124,7 +127,7 @@ export default Vue.extend({
                 });
         },
         onChange(key: string): void {
-            if (this.form[key].body !== this.formBeforeChanges[key].body) {
+            if (this.form[key].body !== this.formBeforeChanges[key].body || this.form[key].title !== this.formBeforeChanges[key].title) {
                 this.$store.dispatch(ActionTypes.NEW_DIRTY_FIELD, key);
             } else {
                 this.$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, key);

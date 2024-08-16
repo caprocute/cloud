@@ -3,7 +3,7 @@
 // user HTTP server
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package server
 
@@ -12,7 +12,7 @@ import (
 	"net/http"
 	"regexp"
 
-	user "github.com/fieldkit/cloud/server/api/gen/user"
+	user "gitlab.com/fieldkit/cloud/server/api/gen/user"
 	goahttp "goa.design/goa/v3/http"
 	goa "goa.design/goa/v3/pkg"
 	"goa.design/plugins/v3/cors"
@@ -41,6 +41,7 @@ type Server struct {
 	IssueTransmissionToken  http.Handler
 	ProjectRoles            http.Handler
 	AdminTermsAndConditions http.Handler
+	DeleteAccount           http.Handler
 	AdminDelete             http.Handler
 	AdminSearch             http.Handler
 	Mentionables            http.Handler
@@ -100,6 +101,7 @@ func New(
 			{"IssueTransmissionToken", "GET", "/user/transmission-token"},
 			{"ProjectRoles", "GET", "/projects/roles"},
 			{"AdminTermsAndConditions", "DELETE", "/admin/user/tnc"},
+			{"DeleteAccount", "DELETE", "/auth/delete-account"},
 			{"AdminDelete", "DELETE", "/admin/user"},
 			{"AdminSearch", "POST", "/admin/users/search"},
 			{"Mentionables", "GET", "/mentionables"},
@@ -123,6 +125,7 @@ func New(
 			{"CORS", "OPTIONS", "/user/transmission-token"},
 			{"CORS", "OPTIONS", "/projects/roles"},
 			{"CORS", "OPTIONS", "/admin/user/tnc"},
+			{"CORS", "OPTIONS", "/auth/delete-account"},
 			{"CORS", "OPTIONS", "/admin/user"},
 			{"CORS", "OPTIONS", "/admin/users/search"},
 			{"CORS", "OPTIONS", "/mentionables"},
@@ -147,6 +150,7 @@ func New(
 		IssueTransmissionToken:  NewIssueTransmissionTokenHandler(e.IssueTransmissionToken, mux, decoder, encoder, errhandler, formatter),
 		ProjectRoles:            NewProjectRolesHandler(e.ProjectRoles, mux, decoder, encoder, errhandler, formatter),
 		AdminTermsAndConditions: NewAdminTermsAndConditionsHandler(e.AdminTermsAndConditions, mux, decoder, encoder, errhandler, formatter),
+		DeleteAccount:           NewDeleteAccountHandler(e.DeleteAccount, mux, decoder, encoder, errhandler, formatter),
 		AdminDelete:             NewAdminDeleteHandler(e.AdminDelete, mux, decoder, encoder, errhandler, formatter),
 		AdminSearch:             NewAdminSearchHandler(e.AdminSearch, mux, decoder, encoder, errhandler, formatter),
 		Mentionables:            NewMentionablesHandler(e.Mentionables, mux, decoder, encoder, errhandler, formatter),
@@ -179,6 +183,7 @@ func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.IssueTransmissionToken = m(s.IssueTransmissionToken)
 	s.ProjectRoles = m(s.ProjectRoles)
 	s.AdminTermsAndConditions = m(s.AdminTermsAndConditions)
+	s.DeleteAccount = m(s.DeleteAccount)
 	s.AdminDelete = m(s.AdminDelete)
 	s.AdminSearch = m(s.AdminSearch)
 	s.Mentionables = m(s.Mentionables)
@@ -207,6 +212,7 @@ func Mount(mux goahttp.Muxer, h *Server) {
 	MountIssueTransmissionTokenHandler(mux, h.IssueTransmissionToken)
 	MountProjectRolesHandler(mux, h.ProjectRoles)
 	MountAdminTermsAndConditionsHandler(mux, h.AdminTermsAndConditions)
+	MountDeleteAccountHandler(mux, h.DeleteAccount)
 	MountAdminDeleteHandler(mux, h.AdminDelete)
 	MountAdminSearchHandler(mux, h.AdminSearch)
 	MountMentionablesHandler(mux, h.Mentionables)
@@ -1228,6 +1234,57 @@ func NewAdminTermsAndConditionsHandler(
 	})
 }
 
+// MountDeleteAccountHandler configures the mux to serve the "user" service
+// "delete account" endpoint.
+func MountDeleteAccountHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := handleUserOrigin(h).(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("DELETE", "/auth/delete-account", f)
+}
+
+// NewDeleteAccountHandler creates a HTTP handler which loads the HTTP request
+// and calls the "user" service "delete account" endpoint.
+func NewDeleteAccountHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeDeleteAccountRequest(mux, decoder)
+		encodeResponse = EncodeDeleteAccountResponse(encoder)
+		encodeError    = EncodeDeleteAccountError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "delete account")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "user")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
 // MountAdminDeleteHandler configures the mux to serve the "user" service
 // "admin delete" endpoint.
 func MountAdminDeleteHandler(mux goahttp.Muxer, h http.Handler) {
@@ -1411,6 +1468,7 @@ func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
 	mux.Handle("OPTIONS", "/user/transmission-token", f)
 	mux.Handle("OPTIONS", "/projects/roles", f)
 	mux.Handle("OPTIONS", "/admin/user/tnc", f)
+	mux.Handle("OPTIONS", "/auth/delete-account", f)
 	mux.Handle("OPTIONS", "/admin/user", f)
 	mux.Handle("OPTIONS", "/admin/users/search", f)
 	mux.Handle("OPTIONS", "/mentionables", f)

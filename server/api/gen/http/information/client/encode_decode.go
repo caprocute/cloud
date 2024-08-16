@@ -3,7 +3,7 @@
 // information HTTP client encoders and decoders
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package client
 
@@ -15,8 +15,8 @@ import (
 	"net/url"
 	"strings"
 
-	information "github.com/fieldkit/cloud/server/api/gen/information"
-	informationviews "github.com/fieldkit/cloud/server/api/gen/information/views"
+	information "gitlab.com/fieldkit/cloud/server/api/gen/information"
+	informationviews "gitlab.com/fieldkit/cloud/server/api/gen/information/views"
 	goahttp "goa.design/goa/v3/http"
 )
 

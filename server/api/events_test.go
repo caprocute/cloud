@@ -12,9 +12,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/tidwall/gjson"
 
-	eventsService "github.com/fieldkit/cloud/server/api/gen/data_events"
+	eventsService "gitlab.com/fieldkit/cloud/server/api/gen/data_events"
 
-	"github.com/fieldkit/cloud/server/tests"
+	"gitlab.com/fieldkit/cloud/server/tests"
 )
 
 func TestEventsUpdateMyEvent(t *testing.T) {
@@ -140,7 +140,7 @@ func TestEventsUpdateStrangersEvent(t *testing.T) {
 	)
 	assert.NoError(err)
 
-	reqEvent, _ := http.NewRequest("POST", fmt.Sprintf("/data-events"), bytes.NewReader(payload1))
+	reqEvent, _ := http.NewRequest("POST", "/data-events", bytes.NewReader(payload1))
 	reqEvent.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(stranger))
 	rrEvent := tests.ExecuteRequest(reqEvent, api)
 	assert.Equal(http.StatusOK, rrEvent.Code)
@@ -214,7 +214,7 @@ func TestEventsDeleteMyEvent(t *testing.T) {
 	)
 	assert.NoError(err)
 
-	reqEvent, _ := http.NewRequest("POST", fmt.Sprintf("/data-events"), bytes.NewReader(payload1))
+	reqEvent, _ := http.NewRequest("POST", "/data-events", bytes.NewReader(payload1))
 	reqEvent.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(fd.Owner))
 	rrEvent := tests.ExecuteRequest(reqEvent, api)
 	assert.Equal(http.StatusOK, rrEvent.Code)
@@ -276,7 +276,7 @@ func TestEventsDeleteStrangersEvent(t *testing.T) {
 	)
 	assert.NoError(err)
 
-	reqEvent, _ := http.NewRequest("POST", fmt.Sprintf("/data-events"), bytes.NewReader(payload1))
+	reqEvent, _ := http.NewRequest("POST", "/data-events", bytes.NewReader(payload1))
 	reqEvent.Header.Add("Authorization", e.NewAuthorizationHeaderForUser(stranger))
 	rrEvent := tests.ExecuteRequest(reqEvent, api)
 	assert.Equal(http.StatusOK, rrEvent.Code)

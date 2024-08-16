@@ -3,14 +3,14 @@
         <Logo class="form-header-logo"></Logo>
         <form class="form" @submit.prevent="save">
             <template v-if="!success && !failed">
-                <h1 class="form-title">Reset Password</h1>
+                <h1 class="form-title">{{ $t("reset.form.title") }}</h1>
 
                 <div class="form-group">
                     <TextField v-model="form.password" label="Password" type="password" />
 
                     <div class="form-errors" v-if="$v.form.password.$error">
-                        <div v-if="!$v.form.password.required">This is a required field.</div>
-                        <div v-if="!$v.form.password.min">Password must be at least 10 characters.</div>
+                        <div v-if="!$v.form.password.required">{{ $t("reset.form.password.required") }}</div>
+                        <div v-if="!$v.form.password.min">{{ $t("reset.form.password.valid") }}</div>
                     </div>
                 </div>
 
@@ -18,29 +18,29 @@
                     <TextField v-model="form.passwordConfirmation" label="Confirm Password" type="password" />
 
                     <div class="form-errors" v-if="$v.form.passwordConfirmation.$error">
-                        <div v-if="!$v.form.passwordConfirmation.required">Confirmation is a required field.</div>
-                        <div v-if="!$v.form.passwordConfirmation.sameAsPassword">Passwords must match.</div>
+                        <div v-if="!$v.form.passwordConfirmation.required">{{ $t("reset.form.passwordConfirm.required") }}</div>
+                        <div v-if="!$v.form.passwordConfirmation.sameAsPassword">{{ $t("reset.form.passwordConfirm.required") }}</div>
                     </div>
                 </div>
                 <button class="form-submit" v-on:click="save">Reset</button>
                 <div>
-                    <router-link :to="{ name: 'login' }" class="form-link">Back to Log In</router-link>
+                    <router-link :to="{ name: 'login' }" class="form-link">{{ $t("reset.form.backButton") }}</router-link>
                 </div>
             </template>
             <template v-if="success">
                 <img src="@/assets/icon-success.svg" alt="Success" class="form-header-icon" width="57px" />
-                <h1 class="form-title">Success!</h1>
+                <h1 class="form-title">{{ $t("reset.form.successTitle") }}</h1>
 
-                <router-link :to="{ name: 'login' }" class="form-link">Back to Log In</router-link>
+                <router-link :to="{ name: 'login' }" class="form-link">{{ $t("reset.form.backButton") }}</router-link>
             </template>
             <template v-if="failed">
                 <img src="@/assets/icon-warning-error.svg" alt="Unsuccessful" class="form-header-icon" width="57px" />
-                <h1 class="form-title">Password Not Reset</h1>
-                <div class="form-subtitle">Unfortunately we were unable to reset your password.</div>
+                <h1 class="form-title">{{ $t("reset.form.failedTitle") }}</h1>
+                <div class="form-subtitle">{{ $t("reset.form.failedTitle") }}</div>
                 <d>
-                    Please
-                    <a href="https://www.fieldkit.org/contact/" class="contact-link">contact us</a>
-                    if you would like assistance.
+                    {{ $t("reset.form.retry.please") }}
+                    <a href="https://www.fieldkit.org/contact/" class="contact-link">{{ $t("reset.form.retry.contactUs") }}</a>
+                    {{ $t("reset.form.retry.assistance") }}
                 </d>
             </template>
         </form>

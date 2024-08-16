@@ -9,11 +9,11 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	"github.com/fieldkit/cloud/server/backend"
-	"github.com/fieldkit/cloud/server/common/logging"
-	"github.com/fieldkit/cloud/server/common/sqlxcache"
-	"github.com/fieldkit/cloud/server/data"
-	"github.com/fieldkit/cloud/server/storage"
+	"gitlab.com/fieldkit/cloud/server/backend"
+	"gitlab.com/fieldkit/cloud/server/common/logging"
+	"gitlab.com/fieldkit/cloud/server/common/sqlxcache"
+	"gitlab.com/fieldkit/cloud/server/data"
+	"gitlab.com/fieldkit/cloud/server/storage"
 )
 
 type TimeScaleDBWindow struct {
@@ -114,7 +114,7 @@ func (tsdb *TimeScaleDBBackend) queryIDs(ctx context.Context, qp *backend.QueryP
 	return ids, nil
 }
 
-func (tsdb *TimeScaleDBBackend) scanRows(ctx context.Context, pgRows pgx.Rows) ([]*DataRow, error) {
+func (tsdb *TimeScaleDBBackend) scanRows(_ context.Context, pgRows pgx.Rows) ([]*DataRow, error) {
 	dataRows := make([]*DataRow, 0)
 
 	for pgRows.Next() {
@@ -297,7 +297,7 @@ func (tsdb *TimeScaleDBBackend) getDataQuery(ctx context.Context, qp *backend.Qu
 	return sql, args, aggregate, nil
 }
 
-func (tsdb *TimeScaleDBBackend) createEmpty(ctx context.Context, qp *backend.QueryParams) (*QueriedData, error) {
+func (tsdb *TimeScaleDBBackend) createEmpty(_ context.Context, _ *backend.QueryParams) (*QueriedData, error) {
 	queriedData := &QueriedData{
 		Data:          make([]*backend.DataRow, 0),
 		BucketSize:    0,
@@ -542,12 +542,17 @@ func (tsdb *TimeScaleDBBackend) queryLastTimes(ctx context.Context, stationIDs [
 	return lastTimes, nil
 }
 
-func (tsdb *TimeScaleDBBackend) queryDailyAggregate(ctx context.Context, stationIDs []int32, duration time.Duration, ids *backend.SensorDatabaseIDs) ([]*backend.DataRow, error) {
+func (tsdb *TimeScaleDBBackend) queryAggregate(ctx context.Context, stationIDs []int32, duration time.Duration, ids *backend.SensorDatabaseIDs) ([]*backend.DataRow, error) {
 	queryMetrics := tsdb.metrics.DailyQuery()
 
 	defer queryMetrics.Send()
 
 	since := time.Now()
+
+	aggregateTable := "fieldkit.sensor_data_10m"
+	if duration.Hours() >= 24 {
+		aggregateTable = "fieldkit.sensor_data_24h"
+	}
 
 	sql := fmt.Sprintf(`
 	SELECT
@@ -560,10 +565,10 @@ func (tsdb *TimeScaleDBBackend) queryDailyAggregate(ctx context.Context, station
 		MIN(min_value) AS min_value,
 		MAX(max_value) AS max_value,
 		LAST(last_value, bucket_time) AS last_value
-	FROM fieldkit.sensor_data_24h
+	FROM %s
 	WHERE station_id = ANY($1) AND bucket_time > ($2::TIMESTAMP + interval '-%f seconds')
 	GROUP BY station_id, module_id, sensor_id
-	`, duration.Seconds())
+	`, aggregateTable, duration.Seconds())
 
 	pgRows, err := tsdb.pool.Query(ctx, sql, stationIDs, since)
 	if err != nil {
@@ -644,7 +649,7 @@ func (tsdb *TimeScaleDBBackend) QueryRecentlyAggregated(ctx context.Context, sta
 		byWindow[key] = make([]*backend.DataRow, 0)
 
 		go func(duration time.Duration) {
-			daily, err := tsdb.queryDailyAggregate(ctx, stationIDs, duration, ids)
+			daily, err := tsdb.queryAggregate(ctx, stationIDs, duration, ids)
 			if err != nil {
 				log := Logger(ctx).Sugar()
 				log.Errorw("tsdb:error", "error", err)
@@ -733,7 +738,7 @@ func (tsdb *TimeScaleDBBackend) QueryTail(ctx context.Context, stationIDs []int3
 	}, nil
 }
 
-func (tsdb *TimeScaleDBBackend) rebucketeQuery(ctx context.Context, conn *pgx.Conn, qp *backend.QueryParams, ids *backend.SensorDatabaseIDs, source *SelectedAggregate, duration time.Duration) (string, []interface{}, error) {
+func (tsdb *TimeScaleDBBackend) rebucketeQuery(_ context.Context, _ *pgx.Conn, qp *backend.QueryParams, ids *backend.SensorDatabaseIDs, source *SelectedAggregate, duration time.Duration) (string, []interface{}, error) {
 	sql := fmt.Sprintf(`
 		SELECT
 			time_bucket('%f seconds', "bucket_time") AS bucket_time,

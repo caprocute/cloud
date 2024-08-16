@@ -3,7 +3,7 @@
 // user service
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package user
 
@@ -11,7 +11,7 @@ import (
 	"context"
 	"io"
 
-	userviews "github.com/fieldkit/cloud/server/api/gen/user/views"
+	userviews "gitlab.com/fieldkit/cloud/server/api/gen/user/views"
 	goa "goa.design/goa/v3/pkg"
 	"goa.design/goa/v3/security"
 )
@@ -58,6 +58,8 @@ type Service interface {
 	ProjectRoles(context.Context) (res ProjectRoleCollection, err error)
 	// AdminTermsAndConditions implements admin terms and conditions.
 	AdminTermsAndConditions(context.Context, *AdminTermsAndConditionsPayload) (err error)
+	// DeleteAccount implements delete account.
+	DeleteAccount(context.Context, *DeleteAccountPayload) (err error)
 	// AdminDelete implements admin delete.
 	AdminDelete(context.Context, *AdminDeletePayload) (err error)
 	// AdminSearch implements admin search.
@@ -80,7 +82,7 @@ const ServiceName = "user"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [23]string{"roles", "upload photo", "download photo", "login", "recovery lookup", "recovery", "resume", "logout", "refresh", "send validation", "validate", "add", "update", "change password", "accept tnc", "get current", "list by project", "issue transmission token", "project roles", "admin terms and conditions", "admin delete", "admin search", "mentionables"}
+var MethodNames = [24]string{"roles", "upload photo", "download photo", "login", "recovery lookup", "recovery", "resume", "logout", "refresh", "send validation", "validate", "add", "update", "change password", "accept tnc", "get current", "list by project", "issue transmission token", "project roles", "admin terms and conditions", "delete account", "admin delete", "admin search", "mentionables"}
 
 // RolesPayload is the payload type of the user service roles method.
 type RolesPayload struct {
@@ -256,6 +258,12 @@ type ProjectRoleCollection []*ProjectRole
 type AdminTermsAndConditionsPayload struct {
 	Auth   string
 	Update *AdminTermsAndConditionsFields
+}
+
+// DeleteAccountPayload is the payload type of the user service delete account
+// method.
+type DeleteAccountPayload struct {
+	Auth string
 }
 
 // AdminDeletePayload is the payload type of the user service admin delete

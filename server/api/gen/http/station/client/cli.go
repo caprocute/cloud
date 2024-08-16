@@ -3,7 +3,7 @@
 // station HTTP client CLI support package
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package client
 
@@ -12,7 +12,7 @@ import (
 	"fmt"
 	"strconv"
 
-	station "github.com/fieldkit/cloud/server/api/gen/station"
+	station "gitlab.com/fieldkit/cloud/server/api/gen/station"
 )
 
 // BuildAddPayload builds the payload for the station add endpoint from CLI
@@ -23,7 +23,7 @@ func BuildAddPayload(stationAddBody string, stationAddAuth string) (*station.Add
 	{
 		err = json.Unmarshal([]byte(stationAddBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"description\": \"Provident delectus commodi in.\",\n      \"deviceId\": \"Aut nisi iusto architecto.\",\n      \"locationName\": \"Ab corrupti dicta est.\",\n      \"name\": \"Quas ipsum mollitia laudantium.\",\n      \"statusPb\": \"Ex consequatur ipsam.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"description\": \"Vero eligendi eos consequatur est.\",\n      \"deviceId\": \"Temporibus inventore nemo qui.\",\n      \"locationName\": \"Ab vero rem.\",\n      \"name\": \"Eum eos amet eius similique voluptas.\",\n      \"statusPb\": \"Ipsum totam rerum occaecati voluptatem quibusdam sequi.\"\n   }'")
 		}
 	}
 	var auth string
@@ -146,7 +146,7 @@ func BuildUpdatePayload(stationUpdateBody string, stationUpdateID string, statio
 	{
 		err = json.Unmarshal([]byte(stationUpdateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"description\": \"Dignissimos qui nihil commodi veritatis necessitatibus.\",\n      \"locationName\": \"Eum ex ut aperiam.\",\n      \"name\": \"Omnis beatae in error deserunt.\",\n      \"statusPb\": \"Qui similique nobis.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"description\": \"Quis rem.\",\n      \"locationName\": \"Ab sunt vitae.\",\n      \"name\": \"Placeat aliquam sit nihil nostrum necessitatibus.\",\n      \"statusPb\": \"Commodi dolores quia harum rem.\"\n   }'")
 		}
 	}
 	var id int32
@@ -464,7 +464,7 @@ func BuildUpdateModulePayload(stationUpdateModuleBody string, stationUpdateModul
 	{
 		err = json.Unmarshal([]byte(stationUpdateModuleBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"label\": \"Non placeat aliquam sit.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"label\": \"Repellendus nihil et distinctio cum.\"\n   }'")
 		}
 	}
 	var id int32

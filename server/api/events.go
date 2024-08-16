@@ -6,16 +6,16 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/fieldkit/cloud/server/common/sqlxcache"
 	"github.com/jmoiron/sqlx/types"
+	"gitlab.com/fieldkit/cloud/server/common/sqlxcache"
 
 	"goa.design/goa/v3/security"
 
-	eventsService "github.com/fieldkit/cloud/server/api/gen/data_events"
+	eventsService "gitlab.com/fieldkit/cloud/server/api/gen/data_events"
 
-	"github.com/fieldkit/cloud/server/backend/repositories"
-	"github.com/fieldkit/cloud/server/common"
-	"github.com/fieldkit/cloud/server/data"
+	"gitlab.com/fieldkit/cloud/server/backend/repositories"
+	"gitlab.com/fieldkit/cloud/server/common"
+	"gitlab.com/fieldkit/cloud/server/data"
 )
 
 type EventsService struct {
@@ -99,11 +99,6 @@ func (c *EventsService) DataEventsEndpoint(ctx context.Context, payload *eventsS
 	}, nil
 }
 
-func jsTimeToTime(value int64) *time.Time {
-	t := time.Unix(value/1000, 0)
-	return &t
-}
-
 func (c *EventsService) AddDataEvent(ctx context.Context, payload *eventsService.AddDataEventPayload) (*eventsService.AddDataEventResult, error) {
 	p, err := NewPermissions(ctx, c.options).Unwrap()
 	if err != nil {
@@ -145,7 +140,7 @@ func (c *EventsService) AddDataEvent(ctx context.Context, payload *eventsService
 			stationIDs = append(stationIDs, int64(id))
 		}
 
-		if payload.Event.AllProjectSensors == true {
+		if payload.Event.AllProjectSensors {
 			sr := repositories.NewStationRepository(c.db)
 
 			uniqueProjectIDS := make(map[int32]int32)

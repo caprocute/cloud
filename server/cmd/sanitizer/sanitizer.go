@@ -8,14 +8,14 @@ import (
 
 	_ "github.com/lib/pq"
 
-	"github.com/fieldkit/cloud/server/common/sqlxcache"
+	"gitlab.com/fieldkit/cloud/server/common/sqlxcache"
 
 	"github.com/kelseyhightower/envconfig"
 
 	"github.com/bxcodec/faker/v3"
 
-	"github.com/fieldkit/cloud/server/common/logging"
-	"github.com/fieldkit/cloud/server/data"
+	"gitlab.com/fieldkit/cloud/server/common/logging"
+	"gitlab.com/fieldkit/cloud/server/data"
 )
 
 type Options struct {

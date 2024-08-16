@@ -3,7 +3,7 @@
 // discourse HTTP client CLI support package
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package client
 
@@ -12,7 +12,7 @@ import (
 	"fmt"
 	"unicode/utf8"
 
-	discourse "github.com/fieldkit/cloud/server/api/gen/discourse"
+	discourse "gitlab.com/fieldkit/cloud/server/api/gen/discourse"
 	goa "goa.design/goa/v3/pkg"
 )
 
@@ -24,7 +24,7 @@ func BuildAuthenticatePayload(discourseAuthenticateBody string, discourseAuthent
 	{
 		err = json.Unmarshal([]byte(discourseAuthenticateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"Aperiam saepe sint.\",\n      \"password\": \"f92\",\n      \"sig\": \"Ut iure reprehenderit accusamus architecto.\",\n      \"sso\": \"Fugit repudiandae laboriosam quo fuga saepe.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"Officiis a.\",\n      \"password\": \"t4k\",\n      \"sig\": \"Ipsam et.\",\n      \"sso\": \"Recusandae explicabo ducimus ut accusamus iste et.\"\n   }'")
 		}
 		if body.Password != nil {
 			if utf8.RuneCountInString(*body.Password) < 10 {

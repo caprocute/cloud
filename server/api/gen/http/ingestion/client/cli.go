@@ -3,7 +3,7 @@
 // ingestion HTTP client CLI support package
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package client
 
@@ -11,7 +11,7 @@ import (
 	"fmt"
 	"strconv"
 
-	ingestion "github.com/fieldkit/cloud/server/api/gen/ingestion"
+	ingestion "gitlab.com/fieldkit/cloud/server/api/gen/ingestion"
 )
 
 // BuildProcessPendingPayload builds the payload for the ingestion process

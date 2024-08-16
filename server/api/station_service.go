@@ -19,13 +19,13 @@ import (
 
 	goa "goa.design/goa/v3/pkg"
 
-	station "github.com/fieldkit/cloud/server/api/gen/station"
+	station "gitlab.com/fieldkit/cloud/server/api/gen/station"
 
-	"github.com/fieldkit/cloud/server/backend/repositories"
-	"github.com/fieldkit/cloud/server/common"
-	"github.com/fieldkit/cloud/server/common/sqlxcache"
-	"github.com/fieldkit/cloud/server/data"
-	"github.com/fieldkit/cloud/server/messages"
+	"gitlab.com/fieldkit/cloud/server/backend/repositories"
+	"gitlab.com/fieldkit/cloud/server/common"
+	"gitlab.com/fieldkit/cloud/server/common/sqlxcache"
+	"gitlab.com/fieldkit/cloud/server/data"
+	"gitlab.com/fieldkit/cloud/server/messages"
 )
 
 type StationService struct {
@@ -170,10 +170,6 @@ func (c *StationService) add(ctx context.Context, payload *station.AddPayload) (
 	}
 
 	pr := repositories.NewProjectRepository(c.options.Database)
-	if err != nil {
-		return nil, err
-	}
-
 	if err := pr.AddStationToDefaultProjectMaybe(ctx, adding); err != nil {
 		return nil, err
 	}
@@ -466,7 +462,7 @@ func (c *StationService) ListProjectAssociated(ctx context.Context, payload *sta
 			associated := &station.AssociatedStation{
 				Station: fullStation,
 				Hidden:  fullStation.Model.OnlyVisibleViaAssociation,
-				Project: []*station.AssociatedViaProject{&station.AssociatedViaProject{
+				Project: []*station.AssociatedViaProject{{
 					ID: payload.ProjectID,
 				},
 				},
@@ -579,7 +575,7 @@ func (c *StationService) ListAssociated(ctx context.Context, payload *station.Li
 
 	return &station.AssociatedStations{
 		Stations: []*station.AssociatedStation{
-			&station.AssociatedStation{
+			{
 				Station: get,
 			},
 		},
@@ -781,6 +777,10 @@ func (c *StationService) UpdateModule(ctx context.Context, payload *station.Upda
 	}
 
 	updatingModule, err := sr.QueryStationModuleByID(ctx, payload.ModuleID)
+	if err != nil {
+		return nil, err
+	}
+
 	updatingModule.Label = &payload.Label
 
 	if _, err := sr.UpdateStationModule(ctx, updatingModule); err != nil {
@@ -1007,7 +1007,7 @@ func transformLocation(sf *data.StationFull, preciseLocation bool) *station.Stat
 	return nil
 }
 
-func transformStationFull(signer *Signer, p Permissions, sf *data.StationFull, preciseLocation bool, transformAllConfigurations bool, moduleMeta *repositories.AllModuleMeta) (*station.StationFull, error) {
+func transformStationFull(_ *Signer, p Permissions, sf *data.StationFull, preciseLocation bool, transformAllConfigurations bool, moduleMeta *repositories.AllModuleMeta) (*station.StationFull, error) {
 	readOnly := true
 	if p != nil {
 		sp, err := p.ForStation(sf.Station)
@@ -1043,8 +1043,6 @@ func transformStationFull(signer *Signer, p Permissions, sf *data.StationFull, p
 			}
 		}
 	}
-
-	dataSummary := transformDataSummary(sf.DataSummary)
 
 	location := transformLocation(sf, preciseLocation)
 
@@ -1111,7 +1109,7 @@ func transformStationFull(signer *Signer, p Permissions, sf *data.StationFull, p
 		PlaceNameOther:     sf.Station.PlaceOther,
 		PlaceNameNative:    sf.Station.PlaceNative,
 		Location:           location,
-		Data:               dataSummary,
+		Data:               nil,
 		Hidden:             sf.Station.Hidden,
 		Description:        sf.Station.Description,
 		Status:             sf.Station.Status,
@@ -1142,20 +1140,6 @@ func optionalTime(t *time.Time) *int64 {
 	}
 	value := t.Unix() * 1000
 	return &value
-}
-
-func transformDataSummary(ads *data.AggregatedDataSummary) *station.StationDataSummary {
-	if ads == nil {
-		return nil
-	}
-	if ads.Start == nil || ads.End == nil || ads.NumberSamples == nil {
-		return nil
-	}
-	return &station.StationDataSummary{
-		Start:           (*ads.Start).Unix() * 1000,
-		End:             (*ads.End).Unix() * 1000,
-		NumberOfSamples: *ads.NumberSamples,
-	}
 }
 
 func transformAllStationFull(signer *Signer, p Permissions, sfs []*data.StationFull, preciseLocation bool, transformAllConfigurations bool, moduleMeta *repositories.AllModuleMeta, filtering bool) ([]*station.StationFull, error) {

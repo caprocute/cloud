@@ -3,7 +3,7 @@
 // export HTTP client CLI support package
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package client
 
@@ -11,7 +11,7 @@ import (
 	"fmt"
 	"strconv"
 
-	export "github.com/fieldkit/cloud/server/api/gen/export"
+	export "gitlab.com/fieldkit/cloud/server/api/gen/export"
 )
 
 // BuildListMinePayload builds the payload for the export list mine endpoint

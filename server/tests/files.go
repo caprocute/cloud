@@ -7,7 +7,7 @@ import (
 	"io"
 	"io/ioutil"
 
-	"github.com/fieldkit/cloud/server/files"
+	"gitlab.com/fieldkit/cloud/server/files"
 )
 
 type memoryFile struct {

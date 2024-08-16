@@ -19,18 +19,18 @@ import (
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 
-	"github.com/fieldkit/cloud/server/common/sqlxcache"
+	"gitlab.com/fieldkit/cloud/server/common/sqlxcache"
 
-	"github.com/fieldkit/cloud/server/common/logging"
-	"github.com/fieldkit/cloud/server/data"
-	"github.com/fieldkit/cloud/server/messages"
+	"gitlab.com/fieldkit/cloud/server/common/logging"
+	"gitlab.com/fieldkit/cloud/server/data"
+	"gitlab.com/fieldkit/cloud/server/messages"
 
-	"github.com/fieldkit/cloud/server/backend"
-	"github.com/fieldkit/cloud/server/backend/repositories"
-	"github.com/fieldkit/cloud/server/common/jobs"
-	"github.com/fieldkit/cloud/server/files"
-	"github.com/fieldkit/cloud/server/storage"
-	"github.com/fieldkit/cloud/server/webhook"
+	"gitlab.com/fieldkit/cloud/server/backend"
+	"gitlab.com/fieldkit/cloud/server/backend/repositories"
+	"gitlab.com/fieldkit/cloud/server/common/jobs"
+	"gitlab.com/fieldkit/cloud/server/files"
+	"gitlab.com/fieldkit/cloud/server/storage"
+	"gitlab.com/fieldkit/cloud/server/webhook"
 )
 
 type Options struct {
@@ -146,36 +146,6 @@ type MovedReading struct {
 type MoveDataHandler interface {
 	MoveReadings(ctx context.Context, readings []*MovedReading) error
 	Close(ctx context.Context) error
-}
-
-func processBinary(ctx context.Context, options *Options, db *sqlxcache.DB, handler backend.RecordHandler) error {
-	log := logging.Logger(ctx).Sugar()
-
-	allStationIDs := []int32{}
-	if options.StationID > 0 {
-		allStationIDs = append(allStationIDs, int32(options.StationID))
-	} else {
-		if err := db.SelectContext(ctx, &allStationIDs, "SELECT id FROM fieldkit.station ORDER BY ingestion_at DESC"); err != nil {
-			return err
-		}
-	}
-
-	for _, id := range allStationIDs {
-		walkParams := &backend.WalkParameters{
-			Start:      time.Time{},
-			End:        time.Now(),
-			StationIDs: []int32{id},
-		}
-
-		rw := backend.NewRecordWalker(db)
-		if err := rw.WalkStation(ctx, handler, backend.WalkerProgressNoop, walkParams); err != nil {
-			return err
-		}
-	}
-
-	_ = log
-
-	return nil
 }
 
 func processJsonSchema(ctx context.Context, options *Options, db *sqlxcache.DB, schemaID int32, resolver *Resolver, handler MoveDataHandler) error {
@@ -353,7 +323,7 @@ func (config *Options) getAwsSessionOptions() session.Options {
 	}
 }
 
-func processIngestion(ctx context.Context, options *Options, db *sqlxcache.DB, dbpool *pgxpool.Pool, resolver *Resolver, handler MoveDataHandler, ingestionID int64) error {
+func processIngestion(ctx context.Context, options *Options, db *sqlxcache.DB, dbpool *pgxpool.Pool, _ *Resolver, _ MoveDataHandler, ingestionID int64) error {
 	publisher := jobs.NewDevNullMessagePublisher()
 	mc := jobs.NewMessageContext(publisher, nil)
 	metrics := logging.NewMetrics(ctx, &logging.MetricsSettings{})
@@ -420,21 +390,10 @@ func (options *Options) timeScaleConfig() *storage.TimeScaleDBConfig {
 	return &storage.TimeScaleDBConfig{Url: options.TimeScaleURL}
 }
 
-func (options *Options) createDestinationHandler(ctx context.Context) (MoveDataHandler, error) {
+func (options *Options) createDestinationHandler(_ context.Context) (MoveDataHandler, error) {
 	tsConfig := options.timeScaleConfig()
 	if tsConfig != nil {
 		handler := NewMoveDataToTimeScaleDBHandler(tsConfig)
-
-		return handler, nil
-	}
-
-	if options.InfluxDbURL != "" {
-		influx := NewInflux(options.InfluxDbURL, options.InfluxDbToken, options.InfluxDbOrg, options.InfluxDbBucket)
-		if err := influx.Open(ctx); err != nil {
-			return nil, err
-		}
-
-		handler := NewMoveDataIntoInfluxHandler(influx)
 
 		return handler, nil
 	}
@@ -473,14 +432,6 @@ func process(ctx context.Context, options *Options) error {
 	}
 
 	defer destination.Close(ctx)
-
-	handler := NewMoveBinaryDataHandler(resolver, db, destination)
-
-	if options.BinaryRecords {
-		if err := processBinary(ctx, options, db, handler); err != nil {
-			return err
-		}
-	}
 
 	if options.JsonRecords {
 		if err := processJson(ctx, options, db, resolver, destination); err != nil {

@@ -17,11 +17,11 @@ import (
 	jwtgo "github.com/dgrijalva/jwt-go"
 	"goa.design/goa/v3/security"
 
-	user "github.com/fieldkit/cloud/server/api/gen/user"
+	user "gitlab.com/fieldkit/cloud/server/api/gen/user"
 
-	"github.com/fieldkit/cloud/server/backend/repositories"
-	"github.com/fieldkit/cloud/server/common"
-	"github.com/fieldkit/cloud/server/data"
+	"gitlab.com/fieldkit/cloud/server/backend/repositories"
+	"gitlab.com/fieldkit/cloud/server/common"
+	"gitlab.com/fieldkit/cloud/server/data"
 )
 
 var (
@@ -73,10 +73,10 @@ func (s *UserService) loginForUser(ctx context.Context, payload *user.LoginPaylo
 	s.options.Metrics.AuthTry()
 
 	authed, err := s.authenticateOrSpoof(ctx, payload.Login.Email, payload.Login.Password)
-	if err == data.IncorrectPasswordError {
+	if err == data.ErrIncorrectPassword {
 		return nil, user.MakeUnauthorized(errors.New("invalid email or password"))
 	}
-	if err == data.UnverifiedUserError {
+	if err == data.ErrUnverifiedUser {
 		return nil, user.MakeUserUnverified(errors.New("user unverified"))
 	}
 	if err != nil {
@@ -140,6 +140,7 @@ func (s *UserService) Add(ctx context.Context, payload *user.AddPayload) (*user.
 		Email:    payload.User.Email,
 		Username: payload.User.Email,
 		TncDate:  tncDate,
+		Valid:    false,
 		Bio:      "",
 	}
 
@@ -186,10 +187,6 @@ func (s *UserService) Add(ctx context.Context, payload *user.AddPayload) (*user.
 	s.options.Metrics.EmailVerificationSent()
 
 	pr := repositories.NewProjectRepository(s.options.Database)
-	if err != nil {
-		return nil, err
-	}
-
 	if _, err := pr.AddDefaultProject(ctx, user); err != nil {
 		return nil, err
 	}
@@ -238,7 +235,7 @@ func (s *UserService) ChangePassword(ctx context.Context, payload *user.ChangePa
 	}
 
 	err = updating.CheckPassword(payload.Change.OldPassword)
-	if err == data.IncorrectPasswordError {
+	if err == data.ErrIncorrectPassword {
 		return nil, user.MakeBadRequest(errors.New("bad request"))
 	}
 	if err != nil {
@@ -292,7 +289,7 @@ func (s *UserService) AcceptTnc(ctx context.Context, payload *user.AcceptTncPayl
 		return nil, user.MakeForbidden(errors.New("forbidden"))
 	}
 
-	if payload.Accept.Accept == true {
+	if payload.Accept.Accept {
 		updating.TncDate = time.Now()
 		if err := s.options.Database.NamedGetContext(ctx, updating, `
 		UPDATE fieldkit.user SET tnc_date = :tnc_date WHERE id = :id RETURNING *
@@ -758,9 +755,71 @@ func (s *UserService) DownloadPhoto(ctx context.Context, payload *user.DownloadP
 	}, nil
 }
 
-func (s *UserService) AdminDelete(outerCtx context.Context, payload *user.AdminDeletePayload) error {
-	log := Logger(outerCtx).Sugar()
+func (s *UserService) deleteUser(ctx context.Context, userID int32) error {
+	log := Logger(ctx).Sugar()
 
+	log.Infow("deleting", "user_id", userID)
+
+	queries := []string{
+		`DELETE FROM fieldkit.project_invite WHERE user_id = $1`,
+		`DELETE FROM fieldkit.project_follower WHERE follower_id = $1`,
+		`DELETE FROM fieldkit.project_user WHERE user_id = $1`,
+
+		`UPDATE fieldkit.station SET photo_id = NULL WHERE owner_id = $1`,
+
+		`DELETE FROM fieldkit.aggregated_sensor_updated WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
+
+		`DELETE FROM fieldkit.notes_media_link WHERE note_id IN (SELECT id FROM fieldkit.notes WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1))`,
+		`DELETE FROM fieldkit.notes_media_link WHERE note_id IN (SELECT id FROM fieldkit.notes WHERE author_id = $1)`,
+		`DELETE FROM fieldkit.notes_media_link WHERE media_id IN (SELECT id FROM fieldkit.notes_media WHERE user_id = $1)`,
+		`DELETE FROM fieldkit.notes_media_link WHERE media_id IN (SELECT media_id FROM fieldkit.notes_media_link WHERE note_id IN (SELECT id FROM fieldkit.notes WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)))`,
+		`DELETE FROM fieldkit.notes_media_link WHERE note_id IN (SELECT media_id FROM fieldkit.notes_media WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1))`,
+		`DELETE FROM fieldkit.notes_media WHERE id IN (SELECT media_id FROM fieldkit.notes_media_link WHERE note_id IN (SELECT id FROM fieldkit.notes WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)))`,
+		`DELETE FROM fieldkit.notes_media WHERE user_id = $1`,
+		`DELETE FROM fieldkit.notes_media WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
+		`DELETE FROM fieldkit.notes WHERE author_id = $1`,
+		`DELETE FROM fieldkit.notes WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
+
+		`DELETE FROM fieldkit.data_event WHERE user_id = $1`,
+		`DELETE FROM fieldkit.data_export WHERE user_id = $1`,
+		`DELETE FROM fieldkit.discussion_post WHERE user_id = $1`,
+		`DELETE FROM fieldkit.project_update WHERE author_id = $1`,
+
+		`DELETE FROM fieldkit.visible_configuration WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
+		`DELETE FROM fieldkit.project_station WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
+		`DELETE FROM fieldkit.station_activity WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
+		`DELETE FROM fieldkit.station_ingestion WHERE uploader_id = $1`,
+		`DELETE FROM fieldkit.station WHERE owner_id = $1`,
+		`DELETE FROM fieldkit.user WHERE id = $1`,
+	}
+
+	for _, query := range queries {
+		log.Infow("executing", "sql", query, "user_id", userID)
+		if _, err := s.options.Database.ExecContext(ctx, query, userID); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (s *UserService) DeleteAccount(outerCtx context.Context, payload *user.DeleteAccountPayload) error {
+	return s.options.Database.WithNewTransaction(outerCtx, func(ctx context.Context) error {
+		p, err := NewPermissions(ctx, s.options).Unwrap()
+		if err != nil {
+			return err
+		}
+
+		deleting := &data.User{}
+		if err := s.options.Database.GetContext(ctx, deleting, `SELECT * FROM fieldkit.user WHERE id = $1`, p.UserID()); err != nil {
+			return user.MakeForbidden(errors.New("forbidden"))
+		}
+
+		return s.deleteUser(ctx, deleting.ID)
+	})
+}
+
+func (s *UserService) AdminDelete(outerCtx context.Context, payload *user.AdminDeletePayload) error {
 	return s.options.Database.WithNewTransaction(outerCtx, func(ctx context.Context) error {
 		p, err := NewPermissions(ctx, s.options).Unwrap()
 		if err != nil {
@@ -782,39 +841,7 @@ func (s *UserService) AdminDelete(outerCtx context.Context, payload *user.AdminD
 			return user.MakeForbidden(errors.New("forbidden"))
 		}
 
-		log.Infow("deleting", "user_id", deleting.ID)
-
-		queries := []string{
-			`DELETE FROM fieldkit.project_invite WHERE user_id = $1`,
-			`DELETE FROM fieldkit.project_follower WHERE follower_id = $1`,
-			`DELETE FROM fieldkit.project_user WHERE user_id = $1`,
-			`DELETE FROM fieldkit.notes_media WHERE user_id = $1`,
-			`DELETE FROM fieldkit.notes WHERE author_id = $1`,
-			`DELETE FROM fieldkit.notes WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
-			`DELETE FROM fieldkit.notes_media WHERE id IN (SELECT media_id FROM fieldkit.notes_media_link WHERE note_id IN (SELECT id FROM fieldkit.notes WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)))`,
-			`DELETE FROM fieldkit.notes_media_link WHERE note_id IN (SELECT id FROM fieldkit.notes WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1))`,
-			`DELETE FROM fieldkit.notes WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
-			`DELETE FROM fieldkit.aggregated_24h WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
-			`DELETE FROM fieldkit.aggregated_12h WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
-			`DELETE FROM fieldkit.aggregated_6h WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
-			`DELETE FROM fieldkit.aggregated_1h WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
-			`DELETE FROM fieldkit.aggregated_30m WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
-			`DELETE FROM fieldkit.aggregated_10m WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
-			`DELETE FROM fieldkit.aggregated_1m WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
-			`DELETE FROM fieldkit.visible_configuration WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
-			`DELETE FROM fieldkit.project_station WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
-			`DELETE FROM fieldkit.station_activity WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
-			`DELETE FROM fieldkit.station_ingestion WHERE uploader_id = $1`,
-			`DELETE FROM fieldkit.station WHERE owner_id = $1`,
-			`DELETE FROM fieldkit.user WHERE id = $1`,
-		}
-
-		for _, query := range queries {
-			if _, err := s.options.Database.ExecContext(ctx, query, deleting.ID); err != nil {
-				return err
-			}
-		}
-		return nil
+		return s.deleteUser(ctx, deleting.ID)
 	})
 }
 
@@ -992,7 +1019,7 @@ func (s *UserService) authenticateOrSpoof(ctx context.Context, email, password s
 		return nil, err
 	}
 	if user == nil {
-		return nil, data.IncorrectPasswordError
+		return nil, data.ErrIncorrectPassword
 	}
 
 	log := Logger(ctx).Sugar()
@@ -1019,8 +1046,8 @@ func (s *UserService) authenticateOrSpoof(ctx context.Context, email, password s
 	}
 
 	err = user.CheckPassword(password)
-	if err == data.IncorrectPasswordError {
-		return nil, data.IncorrectPasswordError
+	if err == data.ErrIncorrectPassword {
+		return nil, data.ErrIncorrectPassword
 	}
 	if err != nil {
 		return nil, err
@@ -1044,7 +1071,7 @@ func (s *UserService) authenticateOrSpoof(ctx context.Context, email, password s
 	}
 
 	if !user.Valid {
-		return nil, data.UnverifiedUserError
+		return nil, data.ErrUnverifiedUser
 	}
 
 	return user, nil
@@ -1160,10 +1187,11 @@ func (as *AuthServer) UpdateAuthentication(ctx context.Context, user *data.User,
 	first, last := splitName(user.Name)
 
 	attrs := map[string][]string{
-		KeycloakPortalIDAttribute: []string{fmt.Sprintf("%d", user.ID)},
+		KeycloakPortalIDAttribute: {fmt.Sprintf("%d", user.ID)},
 	}
 
-	for _, ku := range users {
+	if len(users) >= 1 {
+		ku := users[0]
 		ku.FirstName = gocloak.StringP(first)
 		ku.LastName = gocloak.StringP(last)
 		ku.Email = gocloak.StringP(user.Email)
@@ -1179,7 +1207,6 @@ func (as *AuthServer) UpdateAuthentication(ctx context.Context, user *data.User,
 		}
 		updated = true
 		log.Infow("updated", "keycloak_user_id", ku.ID)
-		break
 	}
 
 	if !updated {

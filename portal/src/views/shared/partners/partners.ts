@@ -130,6 +130,8 @@ export interface PartnerCustomization {
         project: Component | null;
     };
     latestPrimaryNoDataColor: string;
+    googleTagManagerIds?: {staging: string, prod: string} | null;
+    queryRecentlyQueryString: (station: number[]) => URLSearchParams;
 }
 
 function getAttribute(station: DisplayStation, name: string): string | null {
@@ -201,6 +203,16 @@ export function getPartnerCustomization(): PartnerCustomization | null {
                 project: FloodNetProjectDescription,
             },
             latestPrimaryNoDataColor: "#cccccc",
+            googleTagManagerIds: {
+                staging: "G-F1QGZ545F8",
+                prod: "G-TTJPFSVRX6",
+            },
+            queryRecentlyQueryString: (stations: number[]): URLSearchParams => {
+                const qp = new URLSearchParams();
+                qp.append("stations", stations.join(","));
+                qp.append("windows", [1].join(","));
+                return qp;
+            },
         };
     }
     return null;
@@ -257,6 +269,12 @@ export function getPartnerCustomizationWithDefault(): PartnerCustomization {
             project: FieldKitProjectDescription,
         },
         latestPrimaryNoDataColor: "#777a80",
+        queryRecentlyQueryString: (stations: number[]): URLSearchParams => {
+            const qp = new URLSearchParams();
+            qp.append("stations", stations.join(","));
+            qp.append("windows", [24, 48, 72].join(","));
+            return qp;
+        },
     };
 }
 

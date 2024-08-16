@@ -3,13 +3,13 @@
 // data HTTP server types
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package server
 
 import (
-	data "github.com/fieldkit/cloud/server/api/gen/data"
-	dataviews "github.com/fieldkit/cloud/server/api/gen/data/views"
+	data "gitlab.com/fieldkit/cloud/server/api/gen/data"
+	dataviews "gitlab.com/fieldkit/cloud/server/api/gen/data/views"
 	goa "goa.design/goa/v3/pkg"
 )
 

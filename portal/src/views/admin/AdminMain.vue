@@ -10,7 +10,7 @@
                 <table>
                     <thead>
                         <tr>
-                            <th>Server Logs</th>
+                            <th>{{ $t("admin.serverLogs.heading") }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -20,14 +20,14 @@
                                     href="https://code.conservify.org/logs-viewer/?range=3600&query=tag:fkprd%20OR%20tag:fkdev"
                                     target="_blank"
                                 >
-                                    fkprd and fkdev: all
+                                    {{ $t("admin.serverLogs.all") }}
                                 </a>
                             </td>
                         </tr>
                         <tr>
                             <td>
                                 <a href="https://code.conservify.org/logs-viewer/?range=86400&query=zaplevel:error" target="_blank">
-                                    fkprd and fkdev: errors
+                                    {{ $t("admin.serverLogs.errors") }}
                                 </a>
                             </td>
                         </tr>
@@ -37,7 +37,7 @@
                                     href="https://code.conservify.org/logs-viewer/?range=86400&query=_exists_:data_processed&include=device_id,user_id,meta_errors,data_errors,meta_processed,data_processed,blocks,station_name"
                                     target="_blank"
                                 >
-                                    fkprd and fkdev: ingestions
+                                    {{ $t("admin.serverLogs.ingestions") }}
                                 </a>
                             </td>
                         </tr>
@@ -47,7 +47,7 @@
                                     href="https://code.conservify.org/logs-viewer/?range=86400&query=message:%22station%20conflict%22"
                                     target="_blank"
                                 >
-                                    fkprd and fkdev: conflicts
+                                    {{ $t("admin.serverLogs.conflicts") }}
                                 </a>
                             </td>
                         </tr>
@@ -59,19 +59,19 @@
                 <table>
                     <tbody>
                         <tr>
-                            <th>Server</th>
+                            <th>{{ $t("admin.status.server") }}</th>
                             <td>{{ status.serverName }}</td>
                         </tr>
                         <tr>
-                            <th>Tag</th>
+                            <th>{{ $t("admin.status.tag") }}</th>
                             <td>{{ status.tag }}</td>
                         </tr>
                         <tr>
-                            <th>Name</th>
+                            <th>{{ $t("admin.status.name") }}</th>
                             <td>{{ status.name }}</td>
                         </tr>
                         <tr>
-                            <th>GIT</th>
+                            <th>{{ $t("admin.status.git") }}</th>
                             <td>{{ status.git.hash }}</td>
                         </tr>
                     </tbody>

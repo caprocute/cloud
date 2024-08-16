@@ -16,7 +16,7 @@ import (
 	"github.com/muesli/smartcrop"
 	"github.com/muesli/smartcrop/nfnt"
 
-	"github.com/fieldkit/cloud/server/backend/repositories"
+	"gitlab.com/fieldkit/cloud/server/backend/repositories"
 )
 
 type ResizedImage struct {
@@ -26,7 +26,7 @@ type ResizedImage struct {
 	Data        []byte
 }
 
-func resizeLoadedMedia(ctx context.Context, lm *repositories.LoadedMedia, newWidth, newHeight uint) (resized *ResizedImage, err error) {
+func resizeLoadedMedia(_ context.Context, lm *repositories.LoadedMedia, newWidth, newHeight uint) (resized *ResizedImage, err error) {
 	original, _, err := imageorient.Decode(lm.Reader)
 	if err != nil {
 		return nil, err
@@ -63,6 +63,7 @@ func smartCrop(original image.Image, cropX, cropY uint) (i image.Image, err erro
 	return thumb, nil
 }
 
+/*
 func makeSimpleAssetURL(url string) string {
 	return fmt.Sprintf("%s", url)
 }
@@ -75,6 +76,7 @@ func makeAssetURL(url string, actual *string) *string {
 	final := fmt.Sprintf("%s?%s", url, hash)
 	return &final
 }
+*/
 
 func quickHash(value string) string {
 	h := sha1.New()

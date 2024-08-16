@@ -4,15 +4,15 @@ import (
 	"context"
 	"time"
 
-	"github.com/fieldkit/cloud/server/common/sqlxcache"
+	"gitlab.com/fieldkit/cloud/server/common/sqlxcache"
 
-	pb "github.com/fieldkit/data-protocol"
+	pb "gitlab.com/fieldkit/libraries/data-protocol"
 
-	"github.com/fieldkit/cloud/server/common/logging"
+	"gitlab.com/fieldkit/cloud/server/common/logging"
 
-	"github.com/fieldkit/cloud/server/backend/repositories"
-	"github.com/fieldkit/cloud/server/data"
-	"github.com/fieldkit/cloud/server/files"
+	"gitlab.com/fieldkit/cloud/server/backend/repositories"
+	"gitlab.com/fieldkit/cloud/server/data"
+	"gitlab.com/fieldkit/cloud/server/files"
 )
 
 type RecordAdder struct {
@@ -39,7 +39,7 @@ func NewRecordAdder(db *sqlxcache.DB, files files.FileArchive, metrics *logging.
 		handler:             handler,
 		stationRepository:   repositories.NewStationRepository(db),
 		provisionRepository: repositories.NewProvisionRepository(db),
-		recordRepository:    repositories.NewRecordRepository(db, saveData),
+		recordRepository:    repositories.NewRecordRepository(db),
 		statistics:          &newRecordStatistics{},
 		provision:           nil,
 		ingestion:           nil,

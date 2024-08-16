@@ -28,13 +28,16 @@ import { promiseAfter } from "@/utilities";
 import { createSensorColorScale } from "./d3-helpers";
 import { DisplayStation } from "@/store";
 import { getPartnerCustomizationWithDefault } from "../shared/partners";
+import { Locales } from "@/views/shared/LanguageSelector.vue";
 
 export * from "./common";
 
 type SensorReadAtType = string;
 
+const localeKey = (localStorage.getItem("locale") as Locales)?.replace("-", "");
+
 function getString(d) {
-    return d["enUS"] || d["enUs"] || d["en-US"]; // HACK
+    return d[localeKey] || d["enUS"] || d["enUs"] || d["en-US"]; // HACK
 }
 
 function getBackend(): string | null {
@@ -333,6 +336,10 @@ export class Graph extends Viz {
             }
         }
         return [];
+    }
+
+    public isDataSetEmpty(): boolean {
+        return this.loadedDataSets.some(ds => ds.all?.empty);
     }
 
     public allSeries(vizInfoFactory: VizInfoFactory): SeriesData[] {
@@ -866,17 +873,32 @@ export class Workspace implements VizInfoFactory {
     }
 
     private mapModulesToStations() {
+        // Right now we sort this list by sensor reading time so the most recent
+        // station that had a module gets returned. This is primarily for
+        // remapping modules from associated stations back to the original
+        // station, and could definitely be improved. See
+        // `dereferenceAssociatedVizQuery`
         return _(Object.values(this.stations))
-            .map((stationMeta) => stationMeta.sensors.map((sensorMeta) => [sensorMeta.moduleId, stationMeta.id]))
+            .map((stationMeta) =>
+                _(stationMeta.sensors)
+                    .map((sensorMeta) => {
+                        return { order: new Date(sensorMeta.sensorReadAt), row: [sensorMeta.moduleId, stationMeta.id] };
+                    })
+                    .value()
+            )
             .flatten()
+            .orderBy((ordered) => ordered.order)
+            .map((ordered) => ordered.row)
             .fromPairs()
             .value();
     }
 
     private dereferenceAssociatedVizQuery(vq: VizQuery): VizQuery {
+        // We can probably get away with leaving queries alone in many situations.
         const modulesToStations = this.mapModulesToStations();
-        // console.log("viz: dereference", vq.params.sensors, modulesToStations);
-        return vq.remapStationsFromModules(modulesToStations);
+        const after = vq.remapStationsFromModules(modulesToStations);
+        console.log("viz: dereference", vq.params.sensors, modulesToStations, vq.params.stations, "->", after.params.stations);
+        return after;
     }
 
     public availableChartTypes(viz: Graph, ds: DataSetSeries | undefined = undefined): ChartType[] {

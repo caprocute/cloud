@@ -4,13 +4,13 @@ import (
 	"context"
 	"errors"
 
-	"github.com/fieldkit/cloud/server/common/sqlxcache"
+	"gitlab.com/fieldkit/cloud/server/common/sqlxcache"
 
 	"goa.design/goa/v3/security"
 
-	csvService "github.com/fieldkit/cloud/server/api/gen/csv"
+	csvService "gitlab.com/fieldkit/cloud/server/api/gen/csv"
 
-	"github.com/fieldkit/cloud/server/common"
+	"gitlab.com/fieldkit/cloud/server/common"
 )
 
 type CsvService struct {

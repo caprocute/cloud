@@ -3,6 +3,7 @@ import Router from "vue-router";
 import VueBodyClass from "vue-body-class";
 
 import LoginView from "./views/auth/LoginView.vue";
+import DeleteAccountView from "./views/auth/DeleteAccountView.vue";
 import DiscourseView from "./views/auth/DiscourseView.vue";
 import ResumeView from "./views/auth/ResumeView.vue";
 import CreateAccountView from "./views/auth/CreateAccountView.vue";
@@ -130,6 +131,15 @@ const routes = [
         path: "/register",
         name: "register",
         component: CreateAccountView,
+        meta: {
+            bodyClass: "blue-background",
+            secured: false,
+        },
+    },
+    {
+        path: "/delete-account",
+        name: "deleteAccount",
+        component: DeleteAccountView,
         meta: {
             bodyClass: "blue-background",
             secured: false,

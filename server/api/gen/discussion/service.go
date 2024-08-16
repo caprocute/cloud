@@ -3,14 +3,14 @@
 // discussion service
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package discussion
 
 import (
 	"context"
 
-	discussionviews "github.com/fieldkit/cloud/server/api/gen/discussion/views"
+	discussionviews "gitlab.com/fieldkit/cloud/server/api/gen/discussion/views"
 	goa "goa.design/goa/v3/pkg"
 	"goa.design/goa/v3/security"
 )
