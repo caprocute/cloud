@@ -56,14 +56,12 @@ export default Vue.extend({
         mapbox: { token: string; style: string };
         ready: boolean;
         sensorMeta: Map<string, any> | null;
-        hasGeocoder: boolean;
         isMobileView: boolean;
     } {
         return {
             mapbox: Config.mapbox,
             ready: false,
             sensorMeta: null,
-            hasGeocoder: false,
             isMobileView: window.screen.availWidth <= 768,
         };
     },
@@ -179,19 +177,6 @@ export default Vue.extend({
             }
 
             const map = this.protectedData.map;
-
-            if (!this.hasGeocoder) {
-                map.addControl(
-                    new MapboxGeocoder({
-                        accessToken: this.mapbox.token,
-                        mapboxgl: mapboxgl,
-                        collapsed: true,
-                        marker: false,
-                    }),
-                    "top-left"
-                );
-                this.hasGeocoder = true;
-            }
 
             if (!map.getLayer("station-markers") && this.showStations) {
                 const stationsSource = map.getSource("stations");
