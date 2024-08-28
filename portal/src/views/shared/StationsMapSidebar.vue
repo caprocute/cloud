@@ -1,28 +1,28 @@
 <template>
     <div :class="['sidebar', { open: isOpen }]" @click.stop>
-        <div class="toggle-button" @click="toggleSidebar">
-            <slot name="toggle-button">Toggle</slot>
-        </div>
+        <button class="sidebar-toggle" @click="toggleSidebar"><i class="icon icon-filter"></i></button>
         <div class="sidebar-content">
             <div class="heading">{{ $t("map.sidebar.viewing.heading", { stationsLength: 10 }) }}</div>
-            <div>
-                <input id="updateMapResults" type="checkbox" />
-                <label for="updateMapResults">{{ $t("map.sidebar.viewing.updateMapCheckbox") }}</label>
+            <div class="update-map-results-checkbox">
+                <input id="updateResultsBasedOnMap" type="checkbox" @change="onUpdateResultsBasedOnMap" />
+                <label for="updateResultsBasedOnMap">{{ $t("map.sidebar.viewing.updateMapCheckbox") }}</label>
             </div>
-<!--
+            <!--
             <button class="button">{{ $t("map.sidebar.viewing.exploreBtn") }}</button>
 -->
-            <div class="station-list-item" v-for="station in mapped.stations" v-bind:key="station.id">
-                <StationSummaryContent ref="summaryContent" :station="station">
-                    <template #top-right-actions>
-                        <img
-                            :alt="$tc('station.navigateToStation')"
-                            class="navigate-button"
-                            :src="'tooltip-fieldkit.svg'"
-                            @click="openStationPageTab"
-                        />
-                    </template>
-                </StationSummaryContent>
+            <div class="station-list">
+                <div class="station-list-item" v-for="station in mapped.stations" v-bind:key="station.id">
+                    <StationSummaryContent ref="summaryContent" :station="station">
+                        <template #top-right-actions>
+                            <img
+                                :alt="$tc('station.navigateToStation')"
+                                class="navigate-button"
+                                src="@/assets/tooltip-fieldkit.svg"
+                                @click="openStationPageTab"
+                            />
+                        </template>
+                    </StationSummaryContent>
+                </div>
             </div>
         </div>
     </div>
@@ -54,6 +54,10 @@ export default Vue.extend({
             const routeData = this.$router.resolve({ name: "viewStationFromMap", params: { stationId: this.station.id } });
             window.open(routeData.href, "_blank");
         },
+        onUpdateResultsBasedOnMap(event) {
+            console.log("Radoi emit");
+            this.$emit("update-results-based-on-map", event.target.checked);
+        },
     },
 });
 </script>
@@ -66,15 +70,31 @@ export default Vue.extend({
     top: 89px;
     left: 0;
     height: 100%;
-    width: 0;
-    max-width: 480px;
-    overflow-x: hidden;
-    transition: width 0.3s ease, transform 0.3s ease;
+    width: 480px;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease, transform 0.3s ease;
     border: solid 1px #f4f5f7;
     background-color: #fff;
     z-index: 1000;
     padding: 20px;
     text-align: left;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-toggle {
+    position: absolute;
+    left: 520px;
+    top: 120px;
+    z-index: $z-index-top;
+    padding: 9px 8px;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.13);
+    border: solid 1px #f4f5f7;
+    background-color: #fff;
+
+    .icon {
+        font-size: 20px;
+    }
 }
 
 .heading {
@@ -84,29 +104,15 @@ export default Vue.extend({
 }
 
 .sidebar.open {
-    width: 480px;
+    transform: translateX(0);
 }
 
 .sidebar-content {
     padding: 20px;
     height: 100%;
     box-sizing: border-box;
-}
-
-.toggle-button {
-    position: absolute;
-    top: 10px;
-    right: -50px;
-    background-color: #444;
-    color: white;
-    padding: 10px 20px;
-    cursor: pointer;
-    z-index: 1001;
-    transition: transform 0.3s ease;
-}
-
-.sidebar.open .toggle-button {
-    transform: translateX(480px);
+    display: flex;
+    flex-direction: column;
 }
 
 .button {
@@ -116,7 +122,7 @@ export default Vue.extend({
 }
 
 .station-list-item {
-    padding: 17px 18px 24px 24px;
+    padding: 27px 18px 25px 25px;
     border-radius: 3px;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.07);
     border: solid 1px #d8dce0;
@@ -132,6 +138,43 @@ export default Vue.extend({
             flex: 0 0 93px;
             height: 93px;
         }
+
+        .navigate-button {
+            position: absolute;
+            right: 0;
+            top: 0;
+            cursor: pointer;
+        }
+
+        .image-container img {
+            border-radius: 5px;
+        }
     }
+}
+
+.update-map-results-checkbox {
+    font-size: 14px;
+    color: #000;
+    display: flex;
+    align-items: end;
+    margin-bottom: 23px;
+
+    input {
+        margin-right: 8px;
+    }
+
+    label {
+        user-select: none;
+    }
+}
+
+.station-list {
+    flex-grow: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding-right: 28px;
+    padding-bottom: 120px;
 }
 </style>

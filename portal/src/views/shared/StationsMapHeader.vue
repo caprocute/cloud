@@ -6,9 +6,22 @@
         <div class="detail-container">
             <div>
                 <div class="flex flex-al-center">
-                    <h1 class="detail-title">{{ $t("map.header.title") }}</h1>
+                    <h1 class="detail-title">
+                        <template v-if="project">{{ project.name }}</template>
+                        <template v-else>{{ $t("map.header.title") }}</template>
+                    </h1>
                 </div>
-                <div class="detail-description">{{ $t("map.header.subtitle") }}</div>
+                <div class="detail-description">
+                    <template v-if="project">
+                        <router-link :to="{ name: 'viewProject', params: { id: project.id } }">
+                          {{project.id}}
+                            {{ $t("map.header.viewProjectDashboard") }} >
+                        </router-link>
+                    </template>
+                    <template v-else>
+                        {{ $t("map.header.subtitle") }}
+                    </template>
+                </div>
             </div>
         </div>
     </div>
@@ -16,11 +29,17 @@
 
 <script lang="ts">
 import Vue from "vue";
+import { DisplayProject } from "@/store";
 
 export default Vue.extend({
     name: "StationsMapHeader",
     components: {},
-    props: {},
+    props: {
+        project: {
+            type: Object as () => DisplayProject,
+            required: false,
+        },
+    },
     data() {
         return {};
     },
