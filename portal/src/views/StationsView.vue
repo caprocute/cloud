@@ -213,6 +213,7 @@ export default Vue.extend({
     width: 100%;
     height: calc(100% - 66px);
     margin-top: 0;
+    overflow: hidden;
     @include position(absolute, 66px null null 0);
 
     ::v-deep .station-hover-summary {

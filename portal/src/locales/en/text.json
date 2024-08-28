@@ -665,7 +665,8 @@
         },
         "header": {
             "title": "Stations",
-            "subtitle": "Explore station data"
+            "subtitle": "Explore station data",
+            "viewProjectDashboard": "View Project Dashboard"
         },
         "sidebar": {
             "viewing": {

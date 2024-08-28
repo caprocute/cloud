@@ -1,7 +1,7 @@
 <template v-if="mapped.valid && ready">
     <div class="map-wrap" :class="{ 'hide-markers': !showStations }">
-        <StationsMapHeader></StationsMapHeader>
-        <StationsMapSidebar :mapped="mapped"></StationsMapSidebar>
+        <StationsMapHeader :project="project"></StationsMapHeader>
+        <StationsMapSidebar :mapped="mapped" @update-results-based-on-map="getStationsForBounds"></StationsMapSidebar>
         <mapbox
             class="stations-map"
             :access-token="mapbox.token"
@@ -27,7 +27,7 @@
 
 import _ from "lodash";
 import Config from "@/secrets";
-import { MappedStations, LngLat, BoundingRectangle, VisibleReadings, DecoratedReading } from "@/store";
+import { MappedStations, LngLat, BoundingRectangle, VisibleReadings, DecoratedReading, DisplayProject } from "@/store";
 
 import mapboxgl from "mapbox-gl";
 import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
@@ -86,6 +86,10 @@ export default Vue.extend({
         visibleReadings: {
             type: Number as PropType<VisibleReadings>,
             default: VisibleReadings.Current,
+        },
+        project: {
+            type: Object as () => DisplayProject,
+            required: false,
         },
     },
     computed: {
@@ -281,6 +285,9 @@ export default Vue.extend({
                 }
             }
             this.protectedData.markers = markers;
+        },
+        getStationsForBounds(isChecked: boolean) {
+            console.log("Radoi is checked", isChecked);
         },
     },
 });
