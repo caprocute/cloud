@@ -54,9 +54,6 @@ export default Vue.extend({
 .map-header {
     display: flex;
     width: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
     box-sizing: border-box;
     background-color: #fcfcfc;
     box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.12);

@@ -2,16 +2,18 @@
     <div :class="['sidebar', { open: isOpen }]" @click.stop>
         <button class="sidebar-toggle" @click="toggleSidebar"><i class="icon icon-filter"></i></button>
         <div class="sidebar-content">
-            <div class="heading">{{ $t("map.sidebar.viewing.heading", { stationsLength: 10 }) }}</div>
-            <div class="update-map-results-checkbox">
+            <div class="heading">{{ $t("map.sidebar.viewing.heading", { stationsLength: stations.length }) }}</div>
+            <label class="update-map-results-checkbox checkbox">
                 <input id="updateResultsBasedOnMap" type="checkbox" @change="onUpdateResultsBasedOnMap" />
-                <label for="updateResultsBasedOnMap">{{ $t("map.sidebar.viewing.updateMapCheckbox") }}</label>
-            </div>
+                <span class="checkbox-btn"></span>
+                {{ $t("map.sidebar.viewing.updateMapCheckbox") }}
+            </label>
             <!--
             <button class="button">{{ $t("map.sidebar.viewing.exploreBtn") }}</button>
 -->
             <div class="station-list">
-                <div class="station-list-item" v-for="station in mapped.stations" v-bind:key="station.id">
+                <div v-if="stations.length === 0">{{ $t("map.sidebar.viewing.noStationsOnMap") }}</div>
+                <div class="station-list-item" v-for="station in stations" v-bind:key="station.id">
                     <StationSummaryContent ref="summaryContent" :station="station">
                         <template #top-right-actions>
                             <img
@@ -31,14 +33,13 @@
 <script>
 import Vue from "vue";
 import StationSummaryContent from "@/views/shared/StationSummaryContent.vue";
-import { MappedStations } from "@/store";
 
 export default Vue.extend({
     name: "StationsMapSidebar",
     components: { StationSummaryContent },
     props: {
-        mapped: {
-            type: MappedStations,
+        stations: {
+            required: true,
         },
     },
     data() {
@@ -49,13 +50,13 @@ export default Vue.extend({
     methods: {
         toggleSidebar() {
             this.isOpen = !this.isOpen;
+            this.$emit("toggle");
         },
         openStationPageTab() {
             const routeData = this.$router.resolve({ name: "viewStationFromMap", params: { stationId: this.station.id } });
             window.open(routeData.href, "_blank");
         },
         onUpdateResultsBasedOnMap(event) {
-            console.log("Radoi emit");
             this.$emit("update-results-based-on-map", event.target.checked);
         },
     },
@@ -66,26 +67,25 @@ export default Vue.extend({
 @import "src/scss/variables";
 
 .sidebar {
-    position: absolute;
-    top: 89px;
-    left: 0;
     height: 100%;
-    width: 480px;
+    width: 0;
     transform: translateX(-100%);
-    transition: transform 0.3s ease, transform 0.3s ease;
+    transition: transform 0.3s ease;
     border: solid 1px #f4f5f7;
     background-color: #fff;
     z-index: 1000;
-    padding: 20px;
     text-align: left;
     display: flex;
     flex-direction: column;
+    box-sizing: border-box;
+    margin-top: 1px;
+    margin-left: 1px;
 }
 
 .sidebar-toggle {
     position: absolute;
-    left: 520px;
-    top: 120px;
+    left: 0;
+    top: 140px;
     z-index: $z-index-top;
     padding: 9px 8px;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.13);
@@ -105,14 +105,20 @@ export default Vue.extend({
 
 .sidebar.open {
     transform: translateX(0);
+    width: 480px;
+    padding: 20px;
+
+    .sidebar-toggle {
+        left: 480px;
+    }
 }
 
 .sidebar-content {
-    padding: 20px;
     height: 100%;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
 }
 
 .button {
@@ -158,13 +164,11 @@ export default Vue.extend({
     display: flex;
     align-items: end;
     margin-bottom: 23px;
+    user-select: none;
 
     input {
         margin-right: 8px;
-    }
-
-    label {
-        user-select: none;
+        margin-left: 0;
     }
 }
 
