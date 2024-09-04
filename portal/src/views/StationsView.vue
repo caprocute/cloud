@@ -19,11 +19,13 @@
         <template v-if="viewType === 'map'">
             <div class="container-map">
                 <StationsMap
+                    v-if="mapped"
                     @show-summary="showSummary"
                     :mapped="mapped"
                     :layoutChanges="layoutChanges"
-                    v-if="mapped"
                     :showStations="true"
+                    :showSidebar="true"
+                    :showHeader="true"
                 />
 
                 <StationHoverSummary
@@ -212,6 +214,7 @@ export default Vue.extend({
 .container-map {
     width: 100%;
     height: calc(100% - 66px);
+    max-height: calc(100vh - 66px);
     margin-top: 0;
     overflow: hidden;
     @include position(absolute, 66px null null 0);
@@ -347,5 +350,13 @@ export default Vue.extend({
     @include bp-down($sm) {
         top: 68px;
     }
+}
+
+::v-deep .container-map {
+    box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.12);
+}
+
+::v-deep .stations-map {
+    height: calc(100% - 88px) !important;
 }
 </style>

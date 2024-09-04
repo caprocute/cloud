@@ -48,6 +48,7 @@
                         :showStations="project.showStations"
                         :visibleReadings="visibleReadings"
                         :mapBounds="mapBounds"
+                        :showSidebar="true"
                     />
 
                     <StationHoverSummary

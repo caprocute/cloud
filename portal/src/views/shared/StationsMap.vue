@@ -1,7 +1,13 @@
 <template v-if="mapped.valid && ready">
     <div class="map-wrap" :class="{ 'hide-markers': !showStations }">
-        <StationsMapHeader :project="project"></StationsMapHeader>
-        <StationsMapSidebar :mapped="mapped" @update-results-based-on-map="getStationsForBounds"></StationsMapSidebar>
+        <StationsMapHeader v-if="showHeader" :project="project"></StationsMapHeader>
+        <StationsMapSidebar
+            v-if="showSidebar"
+            :mapped="mapped"
+            :stations="filteredStations"
+            @update-results-based-on-map="getStationsForBounds"
+            @toggle="handleLayoutChanges()"
+        ></StationsMapSidebar>
         <mapbox
             class="stations-map"
             :access-token="mapbox.token"
@@ -27,7 +33,7 @@
 
 import _ from "lodash";
 import Config from "@/secrets";
-import { MappedStations, LngLat, BoundingRectangle, VisibleReadings, DecoratedReading, DisplayProject } from "@/store";
+import { MappedStations, LngLat, BoundingRectangle, VisibleReadings, DecoratedReading, DisplayProject, DisplayStation } from "@/store";
 
 import mapboxgl from "mapbox-gl";
 import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
@@ -57,12 +63,16 @@ export default Vue.extend({
         ready: boolean;
         sensorMeta: Map<string, any> | null;
         isMobileView: boolean;
+        filteredStations: DisplayStation[];
+        filterStationsBasedOnMap: boolean;
     } {
         return {
             mapbox: Config.mapbox,
             ready: false,
             sensorMeta: null,
             isMobileView: window.screen.availWidth <= 768,
+            filteredStations: this.mapped.stations,
+            filterStationsBasedOnMap: false,
         };
     },
     props: {
@@ -91,6 +101,14 @@ export default Vue.extend({
             type: Object as () => DisplayProject,
             required: false,
         },
+        showSidebar: {
+            type: Boolean,
+            default: false,
+        },
+        showHeader: {
+            type: Boolean,
+            default: false,
+        },
     },
     computed: {
         // Mapbox maps absolutely hate being mangled by Vue
@@ -107,13 +125,7 @@ export default Vue.extend({
     },
     watch: {
         layoutChanges(): void {
-            console.log("map: layout changed");
-            if (this.protectedData.map) {
-                // TODO Not a fan of this.
-                this.$nextTick(() => {
-                    this.protectedData.map.resize();
-                });
-            }
+            this.handleLayoutChanges();
         },
         mapped(): void {
             console.log("map: mapped changed", this.mapped);
@@ -166,7 +178,7 @@ export default Vue.extend({
         newBounds() {
             const map = this.protectedData.map;
             const bounds = map.getBounds();
-            console.log("RADOI UPDATE BOUNDS", bounds);
+            this.filterStationsForBounds();
             this.$emit("input", new BoundingRectangle([bounds._sw.lng, bounds._sw.lat], [bounds._ne.lng, bounds._ne.lat]));
         },
         updateMap(): void {
@@ -287,7 +299,44 @@ export default Vue.extend({
             this.protectedData.markers = markers;
         },
         getStationsForBounds(isChecked: boolean) {
-            console.log("Radoi is checked", isChecked);
+            this.filterStationsBasedOnMap = isChecked;
+
+            if (this.filterStationsBasedOnMap) {
+                this.filterStationsForBounds();
+                return;
+            }
+            this.filteredStations = this.mapped.stations;
+        },
+        filterStationsForBounds() {
+            if (!this.filterStationsBasedOnMap) {
+                return;
+            }
+
+            const bounds = this.protectedData.map.getBounds();
+            const sw = bounds._sw;
+            const ne = bounds._ne;
+
+            this.filteredStations = [];
+
+            this.mapped.stations.forEach((station) => {
+                if (!station.location) {
+                    return;
+                }
+                const lat = station.location.latitude;
+                const lng = station.location.longitude;
+                if (lat >= sw.lat && lat <= ne.lat && lng >= sw.lng && lng <= ne.lng) {
+                    this.filteredStations.push(station);
+                }
+            });
+        },
+        handleLayoutChanges(): void {
+            console.log("map: layout changed");
+            if (this.protectedData.map) {
+                // TODO Not a fan of this.
+                this.$nextTick(() => {
+                    this.protectedData.map.resize();
+                });
+            }
         },
     },
 });
@@ -354,6 +403,8 @@ export default Vue.extend({
 
 .map-wrap {
     height: 100%;
+    display: flex;
+    flex-wrap: wrap;
 
     &.hide-markers ::v-deep .mapboxgl-marker {
         display: none;
@@ -362,5 +413,6 @@ export default Vue.extend({
 
 .stations-map {
     height: 100%;
+    flex: 1 1 auto;
 }
 </style>

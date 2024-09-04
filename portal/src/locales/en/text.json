@@ -671,6 +671,7 @@
         "sidebar": {
             "viewing": {
                 "heading": "Viewing {stationsLength} Station(s)",
+                "noStationsOnMap": "No results based on map view",
                 "updateMapCheckbox": "Update results based on map view",
                 "exploreBtn": "Explore All Data"
             }
