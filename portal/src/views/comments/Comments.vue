@@ -6,8 +6,9 @@
             class="comment-toggle"
             :leftLabel="$tc('comments.sectionToggle.leftLabel')"
             :rightLabel="$tc('comments.sectionToggle.rightLabel')"
+            :default="permissions.canAddComment ? 'left' : 'right'"
+            :show="{ left: permissions.canAddComment, right: permissions.canAddEvent }"
             @toggle="onSectionToggle"
-            :default="logMode === 'comment' ? 'left' : 'right'"
             v-if="viewType === 'data'"
         >
             <template #left>
@@ -45,7 +46,7 @@
                     </template>
                 </div>
             </template>
-            <template #right>
+            <template #right  v-if="permissions.canAddEvent">
                 <div class="event-level-selector">
                     <label for="allProjectRadio" v-if="stationBelongsToAProject">
                         <div class="event-level-radio">
@@ -469,6 +470,9 @@ export default Vue.extend({
                 return this.parentData;
             }
             return null;
+        },
+        permissions(): { canAddComment: boolean; canAddEvent: boolean } {
+            return this.$state.discussion.permissions;
         },
     },
     watch: {

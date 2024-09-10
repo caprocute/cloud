@@ -5,14 +5,14 @@
             <div class="toggle-bg">
                 <div class="toggle-controls">
                     <a
-                        v-if="permissions.canAddComment"
+                        v-if="show.left"
                         @click="toggleClickHandler($event, 'left')"
                         :class="{ selected: matchSection('left') }"
                     >
                         {{ leftLabel }}
                     </a>
                     <a
-                        v-if="permissions.canAddEvent"
+                        v-if="show.right"
                         @click="toggleClickHandler($event, 'right')"
                         :class="{ selected: matchSection('right') }"
                     >
@@ -27,7 +27,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import Vue, {PropType} from "vue";
 
 export default Vue.extend({
     name: "SectionToggle",
@@ -44,6 +44,10 @@ export default Vue.extend({
             type: String,
             default: "left",
         },
+        show: {
+            type: Object as PropType<{ left: boolean; right: boolean }>,
+            default: () => ({ left: true, right: true }),
+        },
     },
     data(): {
         selectedSection: any;
@@ -59,11 +63,6 @@ export default Vue.extend({
         },
         matchSection(section) {
             return this.selectedSection === section;
-        },
-    },
-    computed: {
-        permissions(): { canAddComment: boolean; canAddEvent: boolean } {
-            return this.$state.discussion.permissions;
         },
     },
 });
