@@ -1,4 +1,4 @@
-<template>
+<template class="wrap">
     <img v-if="photo && !processing" :src="photo" class="authenticated-photo photo" :class="{ processing: processing }" alt="Image" />
     <Spinner v-else class="spinner" />
 </template>

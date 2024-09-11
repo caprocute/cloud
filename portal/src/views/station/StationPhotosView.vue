@@ -169,10 +169,10 @@ export default Vue.extend({
             reader.readAsDataURL(image);
         },
         initGallery(): void {
-            this.gallery = [];
-            this.photos.forEach((photo) => {
+            this.gallery = new Array(this.photos.length);
+            this.photos.forEach((photo, index) => {
                 this.$services.api.loadMedia(photo["url"]).then((src) => {
-                    this.gallery.push({
+                    this.$set(this.gallery, index, {
                         src: src,
                         photo: photo,
                     });
