@@ -1,6 +1,6 @@
 <template>
     <div class="field-notes-wrap" data-cy="fieldNotes">
-        <header class="header">
+        <header class="header" :class="{ 'no-border': !user }">
             <div class="name">{{ $t("fieldNotes.title") }}</div>
             <div class="buttons" v-if="isAuthenticated">
                 <button class="button" @click="generatePDF">
@@ -57,8 +57,8 @@
             >
                 <div class="month-row" @click="toggleFieldNoteGroup('field-note-group-' + index)">
                     <i class="icon icon-chevron-right"></i>
-                    <div class="month-name">{{ getMonthName(month) }} {{$tc('fieldNotes.monthRow.entries')}}</div>
-                    <div class="month-last-updated">{{$tc('fieldNotes.monthRow.lastUpdated')}} {{ getMonthLastUpdated(monthItems) }}</div>
+                    <div class="month-name">{{ getMonthName(month) }} {{ $tc("fieldNotes.monthRow.entries") }}</div>
+                    <div class="month-last-updated">{{ $tc("fieldNotes.monthRow.lastUpdated") }} {{ getMonthLastUpdated(monthItems) }}</div>
                 </div>
 
                 <transition-group name="fade">
@@ -598,5 +598,9 @@ button {
 .icon-export:before {
     color: var(--color-dark);
     margin-right: 8px;
+}
+
+.header.no-border {
+    border-bottom: 0;
 }
 </style>
