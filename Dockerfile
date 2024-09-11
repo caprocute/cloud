@@ -10,16 +10,19 @@ RUN npm run build
 
 RUN for e in css csv html js json map svg txt; do find . -iname '*.$e' -exec gzip -k9 {} \; ; done
 
-FROM golang:latest AS golang
+FROM golang:1.22-bookworm AS golang
 WORKDIR /app
 
-COPY ./server/ ./
+COPY ./migrations/ /app/migrations
+COPY ./server/ /app/server
+
+WORKDIR /app/server
 
 RUN mkdir -p build
 RUN ls -alh api
 RUN mkdir -p api
-RUN cd cmd/server && go build --ldflags '-linkmode external -extldflags "-static"' -o /app/build/server *.go
-RUN cd cmd/ingester && go build --ldflags '-linkmode external -extldflags "-static"' -o /app/build/ingester *.go
+RUN cd cmd/server && go build --ldflags '-linkmode external -extldflags "-static"' -o /app/server/build/server *.go
+RUN cd cmd/ingester && go build --ldflags '-linkmode external -extldflags "-static"' -o /app/server/build/ingester *.go
 
 FROM alpine:latest AS env
 ARG GIT_HASH=missing
@@ -31,12 +34,12 @@ RUN echo "export FIELDKIT_VERSION=$VERSION" >> static.env
 RUN cat static.env
 
 FROM scratch
-COPY --from=golang /app/build/server /
-COPY --from=golang /app/build/ingester /
+COPY --from=golang /app/server/build/server /
+COPY --from=golang /app/server/build/ingester /
 COPY --from=node /app/build /portal
 COPY --from=golang /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 COPY --from=env /app/static.env /etc/
-COPY --from=golang /app/api /api/
+COPY --from=golang /app/server/api /api/
 
 # Downstream Dockerfile's require this. I'd like to use the above paths, though.
 COPY --from=golang /etc/ssl/certs/ca-certificates.crt /

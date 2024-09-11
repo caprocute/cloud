@@ -44,6 +44,41 @@ test:js:
     - node_modules/.bin/vue-cli-service build
     - node_modules/.bin/vue-cli-service test:unit
 
+test:cypress:
+  stage: test
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_COMMIT_TAG
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_BRANCH == "main"
+  image: node:22.6-bookworm
+  variables:
+    POSTGRES_DB: fktest
+    POSTGRES_USER: fieldkit
+    POSTGRES_PASSWORD: password
+    FIELDKIT_POSTGRES_URL: postgres://fieldkit:password@db:5432/fktest?sslmode=disable
+    FIELDKIT_TIME_SCALE_URL: postgres://fieldkit:password@tsdb:5432/fktest?sslmode=disable
+    FIELDKIT_API_DOMAIN: 127.0.0.1:8080
+    FIELDKIT_API_HOST: http://127.0.0.1:8080
+  services:
+    - name: kartoza/postgis:14-3
+      alias: db
+    - name: timescale/timescaledb:2.4.2-pg13
+      alias: tsdb
+  script:
+    - apt update -qyy && apt install -qyy xvfb libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libgtk-3-0 libgdm1 libgbm1 libasound2 golang
+    - go version
+    - make server
+    - (cd portal && npm install && cp src/secrets.ts.template src/secrets.ts)
+    - (cd migrations/cli && go build -o migrate *.go)
+    - MIGRATE_PATH=migrations/primary MIGRATE_DATABASE_URL=${FIELDKIT_POSTGRES_URL} migrations/cli/migrate migrate
+    - MIGRATE_PATH=migrations/tsdb MIGRATE_DATABASE_URL=${FIELDKIT_TIME_SCALE_URL} migrations/cli/migrate migrate
+    - (cd server && go test -p 1 -coverprofile=coverage.data ./...)
+    - build/server &
+    - (cd portal && npm run serve) &
+    - sleep 30
+    - (cd portal && npm run cypress:run)
+
 build:tools-amd64:
   stage: build
   rules:
@@ -124,7 +159,7 @@ build:migrations:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
     - if: $CI_COMMIT_BRANCH == "main"
   script:
-    - cd migrations && go build -o migrate *.go
+    - cd migrations/cli && go build -o migrate *.go
   artifacts:
     name: "cloud-migrations-${CI_COMMIT_REF_NAME}"
     paths:

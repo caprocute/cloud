@@ -172,10 +172,10 @@ migrate-image:
 	cd migrations && make image
 
 migrate-up:
-	cd migrations && MIGRATE_PATH=`pwd`/primary MIGRATE_DATABASE_URL=$(FIELDKIT_POSTGRES_URL) go run main.go migrate
+	cd migrations/cli && MIGRATE_PATH=`pwd`/../primary MIGRATE_DATABASE_URL=$(FIELDKIT_POSTGRES_URL) go run main.go migrate
 
 migrate-up-tsdb:
-	cd migrations && MIGRATE_PATH=`pwd`/tsdb MIGRATE_DATABASE_URL=$(FIELDKIT_TIME_SCALE_URL) go run main.go migrate
+	cd migrations/cli && MIGRATE_PATH=`pwd`/../tsdb MIGRATE_DATABASE_URL=$(FIELDKIT_TIME_SCALE_URL) go run main.go migrate
 
 ci: setup binaries jstests charting-setup
 

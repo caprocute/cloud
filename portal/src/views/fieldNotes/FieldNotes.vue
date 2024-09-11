@@ -1,5 +1,5 @@
 <template>
-    <div class="field-notes-wrap">
+    <div class="field-notes-wrap" data-cy="fieldNotes">
         <header class="header" :class="{ 'no-border': !user }">
             <div class="name">{{ $t("fieldNotes.title") }}</div>
             <div class="buttons" v-if="isAuthenticated">
