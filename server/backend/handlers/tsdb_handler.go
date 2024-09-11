@@ -7,13 +7,13 @@ import (
 	"math"
 	"time"
 
-	"github.com/fieldkit/cloud/server/backend/repositories"
-	"github.com/fieldkit/cloud/server/common/jobs"
-	"github.com/fieldkit/cloud/server/common/sqlxcache"
-	"github.com/fieldkit/cloud/server/data"
-	"github.com/fieldkit/cloud/server/messages"
-	"github.com/fieldkit/cloud/server/storage"
-	pb "github.com/fieldkit/data-protocol"
+	"gitlab.com/fieldkit/cloud/server/backend/repositories"
+	"gitlab.com/fieldkit/cloud/server/common/jobs"
+	"gitlab.com/fieldkit/cloud/server/common/sqlxcache"
+	"gitlab.com/fieldkit/cloud/server/data"
+	"gitlab.com/fieldkit/cloud/server/messages"
+	"gitlab.com/fieldkit/cloud/server/storage"
+	pb "gitlab.com/fieldkit/libraries/data-protocol"
 )
 
 const (
@@ -91,7 +91,7 @@ func (v *TsDBHandler) OnMeta(ctx context.Context, provision *data.Provision, raw
 }
 
 func (v *TsDBHandler) OnData(ctx context.Context, provision *data.Provision, rawData *pb.DataRecord, rawMeta *pb.DataRecord, db *data.DataRecord, meta *data.MetaRecord) error {
-	log := Logger(ctx).Sugar().With("data_record_id", db.ID, "meta_record_id", meta.ID, "provision_id", provision.ID)
+	log := Logger(ctx).Sugar().With("meta_record_id", meta.ID, "provision_id", provision.ID)
 
 	if v.metaID != meta.ID {
 		modules, err := v.stationRepository.QueryStationModulesByMetaID(ctx, meta.ID)
@@ -166,7 +166,7 @@ func (v *TsDBHandler) OnDone(ctx context.Context) error {
 	return nil
 }
 
-func (v *TsDBHandler) saveStorage(ctx context.Context, sampled time.Time, location []float64, sensorKey *AggregateSensorKey, value float64) error {
+func (v *TsDBHandler) saveStorage(ctx context.Context, sampled time.Time, _ []float64, sensorKey *AggregateSensorKey, value float64) error {
 	stationID, ok := v.stationIDs[v.provisionID]
 	if !ok {
 		return fmt.Errorf("missing station id")

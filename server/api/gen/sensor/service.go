@@ -3,14 +3,14 @@
 // sensor service
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package sensor
 
 import (
 	"context"
 
-	sensorviews "github.com/fieldkit/cloud/server/api/gen/sensor/views"
+	sensorviews "gitlab.com/fieldkit/cloud/server/api/gen/sensor/views"
 	goa "goa.design/goa/v3/pkg"
 	"goa.design/goa/v3/security"
 )
@@ -108,6 +108,7 @@ type TailResult struct {
 type RecentlyPayload struct {
 	Auth     *string
 	Stations *string
+	Windows  *string
 }
 
 // RecentlyResult is the result type of the sensor service recently method.

@@ -128,7 +128,7 @@
                             <template v-if="stationProjects.length > 1 && index !== stationProjects.length - 1">,&nbsp;</template>
                         </router-link>
                     </div>
-                    <div v-if="photos" class="station-photos">
+                    <div class="station-photos" :class="{ 'single-photo': photos && photos.length == 1 }">
                         <div class="photo-container" v-for="(n, index) in 4" v-bind:key="index" @click="navigateToPhotos()">
                             <AuthenticatedPhoto v-if="photos[index]" :url="photos[index].url" />
                             <div v-else class="photo-placeholder">
@@ -467,8 +467,8 @@ export default Vue.extend({
                     });
                 })
                 .finally(() => {
-                  this.$store.dispatch(ActionTypes.UPDATE_STATION, payload);
-                  this.$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, "stationDescription");
+                    this.$store.dispatch(ActionTypes.UPDATE_STATION, payload);
+                    this.$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, "stationDescription");
                     this.editingDescription = false;
                 });
         },
@@ -866,6 +866,18 @@ export default Vue.extend({
                 width: 100%;
                 margin-top: 5px;
                 height: 35px;
+            }
+        }
+
+        &.single-photo {
+            .photo-container {
+                &:nth-of-type(1) {
+                    flex: 0 0 100%;
+                    height: 100%;
+                }
+                &:nth-of-type(n + 2) {
+                    display: none;
+                }
             }
         }
     }

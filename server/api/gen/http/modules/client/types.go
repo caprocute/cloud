@@ -3,12 +3,12 @@
 // modules HTTP client types
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package client
 
 import (
-	modules "github.com/fieldkit/cloud/server/api/gen/modules"
+	modules "gitlab.com/fieldkit/cloud/server/api/gen/modules"
 	goa "goa.design/goa/v3/pkg"
 )
 

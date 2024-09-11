@@ -65,7 +65,7 @@
                     </FollowControl>
                     <button class="button-social" v-if="false">
                         <img src="@/assets/icon-share.svg" width="12px" alt="Icon" />
-                        Share
+                        {{ $t("project.share") }}
                     </button>
                 </div>
             </div>
@@ -141,15 +141,15 @@
 </template>
 
 <script lang="ts">
-import Vue, {PropType} from "vue";
-import {mapGetters} from "vuex";
+import Vue, { PropType } from "vue";
+import { mapGetters } from "vuex";
 import * as utils from "../../utilities";
-import {DisplayProject, DisplayStation, Project, ProjectModule} from "@/store";
+import { DisplayProject, DisplayStation, Project, ProjectModule } from "@/store";
 import ProjectStations from "./ProjectStations.vue";
 import CommonComponents from "@/views/shared";
 import Comments from "../comments/Comments.vue";
 import FollowControl from "@/views/shared/FollowControl.vue";
-import {twitterCardMeta} from "@/social";
+import { twitterCardMeta } from "@/social";
 
 export default Vue.extend({
     name: "ProjectPublic",

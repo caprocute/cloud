@@ -1,24 +1,29 @@
 <template>
     <div :class="'project-activity ' + containerClass">
         <div class="heading">
-            <div class="title">Activity History</div>
+            <div class="title">{{ $tc("project.activity.title") }}</div>
             <div class="close-button" v-on:click="onClose">
-                <img alt="Close" src="@/assets/icon-close.svg" />
+                <img :alt="$t('iconAlts.close')" src="@/assets/icon-close.svg" />
             </div>
         </div>
         <div class="feed-container" v-if="visibleActivities.length > 0">
             <div v-for="activity in visibleActivities" v-bind:key="activity.id" class="activity">
-                <div class="icon" v-if="!isFloodnetCustomisationEnabled()">
+                <div class="icon" v-if="!isCustomisationEnabled()">
                     <img :src="activity.icon" />
                 </div>
                 <div class="panel" v-if="activity.type == 'ingestion'">
                     <div class="activity-heading">
-                        <div class="title">Uploaded Data</div>
+                        <div class="title">{{ $tc("project.activity.uploadedData") }}</div>
                         <div class="date">{{ activity.time.toLocaleDateString() }}</div>
                     </div>
                     <div class="activity-text">
-                        {{ activity.records.toLocaleString() }} readings uploaded from {{ activity.name }}, with
-                        {{ activity.errors ? " an error." : "no errors." }}
+                        {{
+                            $t("project.activity.readingsUploaded", {
+                                records: activity.records.toLocaleDateString(),
+                                name: activity.name,
+                                errorText: activity.errors ? $t("project.activity.withError") : $t("project.activity.noErrors"),
+                            })
+                        }}
                         <img src="@/assets/icon-warning-error.svg" v-if="activity.errors" class="activity-error" />
                     </div>
                 </div>
@@ -33,10 +38,10 @@
                 </div>
                 <div class="panel" v-if="activity.type == 'deploy'">
                     <div class="activity-heading">
-                        <div class="title">Deployed Station</div>
+                        <div class="title">{{ $t("project.activity.deployedStation") }}</div>
                         <div class="date">{{ activity.time.toLocaleDateString() }}</div>
                     </div>
-                    <div class="activity-text">{{ activity.name }} was deployed.</div>
+                    <div class="activity-text">{{ $t("project.activity.activityDeployed", {activityName: activity.name})}}</div>
                     <div class="activity-text">
                         <img src="@/assets/icon-location.svg" />
                         {{ activity.location[1] | prettyCoordinate }}, {{ activity.location[0] | prettyCoordinate }}
@@ -44,7 +49,7 @@
                 </div>
             </div>
         </div>
-        <div class="feed-container empty" v-else>No recent activity.</div>
+        <div class="feed-container empty" v-else>{{ $t("project.activity.empty") }}</div>
     </div>
 </template>
 

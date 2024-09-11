@@ -18,7 +18,7 @@ import (
 
 	"github.com/golang/protobuf/proto"
 
-	pb "github.com/fieldkit/data-protocol"
+	pb "gitlab.com/fieldkit/libraries/data-protocol"
 )
 
 const (
@@ -95,7 +95,7 @@ func (a *Int64Range) ToIntArray() []int {
 
 func (a *Int64Range) parseString(s string) error {
 	if s[0] != '[' || s[len(s)-1] != ')' {
-		return fmt.Errorf("Unexpected range boundaries. I was lazy.")
+		return fmt.Errorf("unexpected range boundaries, laziness")
 	}
 
 	values := s[1 : len(s)-1]
@@ -155,7 +155,6 @@ func ParseBlocks(s string) ([]int64, error) {
 }
 
 type DataRecord struct {
-	ID           int64          `db:"id" json:"id"`
 	ProvisionID  int64          `db:"provision_id" json:"provision_id"`
 	Time         time.Time      `db:"time" json:"time"`
 	Number       int64          `db:"number" json:"number"`
@@ -385,7 +384,6 @@ func SanitizeDataRecord(r *DataRecord) *DataRecord {
 	}
 
 	return &DataRecord{
-		ID:           r.ID,
 		ProvisionID:  r.ProvisionID,
 		Time:         r.Time,
 		Number:       r.Number,

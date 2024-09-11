@@ -6,7 +6,7 @@ import (
 	"github.com/jmoiron/sqlx/types"
 	"github.com/lib/pq"
 
-	pb "github.com/fieldkit/data-protocol"
+	pb "gitlab.com/fieldkit/libraries/data-protocol"
 )
 
 type SensorRanges struct {
@@ -58,6 +58,7 @@ type ModuleMeta struct {
 	Key      string        `json:"key"`
 	Internal bool          `json:"internal"`
 	Sensors  []*SensorMeta `json:"sensors"`
+	Order    int           `json:"order"`
 }
 
 func (mm *ModuleMeta) Sensor(key string) *SensorMeta {
@@ -205,6 +206,7 @@ type PersistedModuleMeta struct {
 	Manufacturer uint32        `db:"manufacturer" json:"manufacturer"`
 	Kinds        pq.Int32Array `db:"kinds" json:"kinds"`
 	Version      pq.Int32Array `db:"version" json:"version"`
+	Ordering     int           `db:"ordering" json:"ordering"`
 	Internal     bool          `db:"internal" json:"internal"`
 }
 

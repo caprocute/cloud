@@ -1,16 +1,15 @@
 <template>
     <div :class="'export-panel ' + containerClass">
         <div class="heading">
-            <div class="title">Export</div>
+            <div class="title">{{ $tc("exportPanel.title") }}</div>
             <div class="close-button icon icon-close" v-on:click="onClose"></div>
         </div>
         <div class="export-options">
             <div class="button" @click="onExportCSV">CSV</div>
-            <div class="button" @click="onExportJSONLines">JSON Lines</div>
         </div>
         <div class="user-exports" v-if="history">
-            <div class="previous-heading">Previous Exports</div>
-            <div v-if="history.length == 0">No previous exports.</div>
+            <div class="previous-heading">{{ $tc("exportPanel.previous.heading") }}</div>
+            <div v-if="history.length == 0">{{ $tc("exportPanel.previous.noItems") }}</div>
             <div v-for="de in history" class="export" v-bind:key="de.id">
                 <div class="kind">{{ prettyKind(de.format) }}</div>
                 <div class="created">{{ de.createdAt | prettyTime }}</div>
@@ -23,8 +22,8 @@
                     :href="$config.baseUrl + de.downloadUrl"
                     @click="(ev) => onDownload(de)"
                 >
-                    <template v-if="isDownloaded(de.id)">Downloaded</template>
-                    <template v-else>Download</template>
+                    <template v-if="isDownloaded(de.id)">{{ $tc("exportPanel.previous.downloaded") }}</template>
+                    <template v-else>{{ $tc("exportPanel.previous.download") }}</template>
                 </a>
             </div>
         </div>

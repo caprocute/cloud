@@ -3,7 +3,7 @@
 // export service
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package export
 
@@ -11,7 +11,7 @@ import (
 	"context"
 	"io"
 
-	exportviews "github.com/fieldkit/cloud/server/api/gen/export/views"
+	exportviews "gitlab.com/fieldkit/cloud/server/api/gen/export/views"
 	goa "goa.design/goa/v3/pkg"
 	"goa.design/goa/v3/security"
 )

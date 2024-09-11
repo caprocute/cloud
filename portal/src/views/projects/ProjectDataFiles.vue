@@ -1,9 +1,7 @@
 <template>
     <div class="datafiles-container">
-        <div class="heading">Data Files</div>
-        <div class="message">
-            No readings have been uploaded yet.
-        </div>
+        <div class="heading">{{ $t("project.dataFiles") }}</div>
+        <div class="message"> {{ $t("project.noDataFiles") }} </div>
     </div>
 </template>
 

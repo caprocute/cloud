@@ -11,11 +11,11 @@ import (
 
 	"goa.design/goa/v3/security"
 
-	notes "github.com/fieldkit/cloud/server/api/gen/notes"
+	notes "gitlab.com/fieldkit/cloud/server/api/gen/notes"
 
-	"github.com/fieldkit/cloud/server/backend/repositories"
-	"github.com/fieldkit/cloud/server/common"
-	"github.com/fieldkit/cloud/server/data"
+	"gitlab.com/fieldkit/cloud/server/backend/repositories"
+	"gitlab.com/fieldkit/cloud/server/common"
+	"gitlab.com/fieldkit/cloud/server/data"
 )
 
 type NotesService struct {
@@ -60,9 +60,7 @@ func (s *NotesService) Update(ctx context.Context, payload *notes.UpdatePayload)
 			media[note.ID] = make([]int64, 0)
 		}
 
-		for _, id := range webNote.MediaIds {
-			media[note.ID] = append(media[note.ID], id)
-		}
+		media[note.ID] = append(media[note.ID], webNote.MediaIds...)
 	}
 	for _, webNote := range payload.Notes.Notes {
 		if webNote.ID == 0 {
@@ -89,9 +87,7 @@ func (s *NotesService) Update(ctx context.Context, payload *notes.UpdatePayload)
 			return nil, err
 		}
 
-		for _, id := range webNote.MediaIds {
-			media[note.ID] = append(media[note.ID], id)
-		}
+		media[note.ID] = append(media[note.ID], webNote.MediaIds...)
 	}
 
 	for noteID, ids := range media {
@@ -313,6 +309,9 @@ func (s *NotesService) DeleteMedia(ctx context.Context, payload *notes.DeleteMed
 	sr := repositories.NewStationRepository(s.options.Database)
 
 	station, err := sr.QueryStationByPhotoID(ctx, payload.MediaID)
+	if err != nil {
+		return err
+	}
 
 	p, err := NewPermissions(ctx, s.options).ForStation(station)
 	if err != nil {

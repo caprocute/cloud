@@ -6,9 +6,9 @@ import (
 
 	"goa.design/goa/v3/security"
 
-	tasks "github.com/fieldkit/cloud/server/api/gen/tasks"
-	"github.com/fieldkit/cloud/server/common"
-	"github.com/fieldkit/cloud/server/messages"
+	tasks "gitlab.com/fieldkit/cloud/server/api/gen/tasks"
+	"gitlab.com/fieldkit/cloud/server/common"
+	"gitlab.com/fieldkit/cloud/server/messages"
 )
 
 type TasksService struct {

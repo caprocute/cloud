@@ -3,13 +3,13 @@
 // notes HTTP client types
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package client
 
 import (
-	notes "github.com/fieldkit/cloud/server/api/gen/notes"
-	notesviews "github.com/fieldkit/cloud/server/api/gen/notes/views"
+	notes "gitlab.com/fieldkit/cloud/server/api/gen/notes"
+	notesviews "gitlab.com/fieldkit/cloud/server/api/gen/notes/views"
 	goa "goa.design/goa/v3/pkg"
 )
 

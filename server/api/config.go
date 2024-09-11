@@ -6,7 +6,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ses"
 
-	"github.com/fieldkit/cloud/server/email"
+	"gitlab.com/fieldkit/cloud/server/email"
 )
 
 type BucketNames struct {

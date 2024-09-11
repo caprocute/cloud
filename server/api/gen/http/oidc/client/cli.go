@@ -3,7 +3,7 @@
 // oidc HTTP client CLI support package
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package client
 
@@ -11,7 +11,7 @@ import (
 	"fmt"
 	"strconv"
 
-	oidc "github.com/fieldkit/cloud/server/api/gen/oidc"
+	oidc "gitlab.com/fieldkit/cloud/server/api/gen/oidc"
 )
 
 // BuildRequiredPayload builds the payload for the oidc required endpoint from

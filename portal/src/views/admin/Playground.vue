@@ -1,6 +1,6 @@
 <template>
     <StandardLayout>
-        <button v-on:click="onToggle">Modal</button>
+        <button v-on:click="onToggle">{{ $t("admin.playground.modal") }}</button>
         <StationPickerModal :stations="stations" @close="onToggle" v-if="modalOpen" />
 
         <div>

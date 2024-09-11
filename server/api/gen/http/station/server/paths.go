@@ -3,7 +3,7 @@
 // HTTP request path constructors for the station service.
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package server
 

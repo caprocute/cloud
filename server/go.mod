@@ -1,6 +1,8 @@
-module github.com/fieldkit/cloud/server
+module gitlab.com/fieldkit/cloud/server
 
-go 1.18
+go 1.22
+
+// toolchain go1.22.0
 
 require (
 	github.com/DataDog/datadog-go/v5 v5.1.1
@@ -10,12 +12,10 @@ require (
 	github.com/bxcodec/faker/v3 v3.3.1
 	github.com/coreos/go-oidc v2.2.1+incompatible
 	github.com/crewjam/saml v0.4.2
+	github.com/davecgh/go-spew v1.1.1
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/disintegration/imageorient v0.0.0-20180920195336-8147d86e83ec
 	github.com/elgs/gojq v0.0.0-20201120033525-b5293fef2759
-	github.com/fieldkit/app-protocol v0.0.0-20200515173549-e0925480073d
-	github.com/fieldkit/data-protocol v0.0.0-20230718145913-fb96ddfb3f7e
-	github.com/go-pg/pg/v10 v10.9.1
 	github.com/goadesign/goa v1.4.0
 	github.com/golang/protobuf v1.5.2
 	github.com/google/uuid v1.3.0
@@ -24,7 +24,6 @@ require (
 	github.com/h2non/filetype v1.0.10
 	github.com/hashicorp/go-multierror v1.1.0
 	github.com/iancoleman/strcase v0.0.0-20190422225806-e506e3ef7365
-	github.com/influxdata/influxdb-client-go/v2 v2.8.1
 	github.com/itchyny/gojq v0.12.5
 	github.com/jackc/pgx/v5 v5.0.0
 	github.com/jmoiron/sqlx v1.2.0
@@ -39,13 +38,15 @@ require (
 	github.com/paulmach/go.geo v0.0.0-20170321183534-b160a6efed6c
 	github.com/paulmach/orb v0.1.6
 	github.com/pkg/profile v1.5.0
-	github.com/robinjoseph08/go-pg-migrations/v3 v3.0.0
 	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.8.0
 	github.com/tevjef/go-runtime-metrics v0.0.0-20170326170900-527a54029307
 	github.com/tidwall/gjson v1.6.0
 	github.com/vgarvardt/gue v1.0.2
 	github.com/vgarvardt/gue/v4 v4.0.0
+	gitlab.com/fieldkit/cloud/migrations/support v0.0.0
+	gitlab.com/fieldkit/libraries/app-protocol v0.0.0-20240205194803-e3e032ad0353
+	gitlab.com/fieldkit/libraries/data-protocol v0.0.0-20240205194926-13d5785bdcc5
 	go.uber.org/zap v1.23.0
 	goa.design/goa/v3 v3.2.4
 	goa.design/plugins/v3 v3.1.1
@@ -53,14 +54,14 @@ require (
 	golang.org/x/oauth2 v0.0.0-20210514164344-f6687ab2804c
 )
 
+replace gitlab.com/fieldkit/cloud/migrations/support => ../migrations/support
+
 require (
 	github.com/Microsoft/go-winio v0.5.0 // indirect
 	github.com/armon/go-metrics v0.0.0-20180917152333-f0300d1749da // indirect
 	github.com/beevik/etree v1.1.0 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.0-20190314233015-f79a8a8ca69d // indirect
 	github.com/crewjam/httperr v0.0.0-20190612203328-a946449404da // indirect
-	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/deepmap/oapi-codegen v1.8.2 // indirect
 	github.com/dgrijalva/jwt-go/v4 v4.0.0-preview1 // indirect
 	github.com/dimfeld/httppath v0.0.0-20170720192232-ee938bf73598 // indirect
 	github.com/dimfeld/httptreemux v5.0.1+incompatible // indirect
@@ -69,9 +70,11 @@ require (
 	github.com/elgs/gosplitargs v0.0.0-20161028071935-a491c5eeb3c8 // indirect
 	github.com/fatih/color v1.13.0 // indirect
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
+	github.com/getkin/kin-openapi v0.61.0 // indirect
 	github.com/git-chglog/git-chglog v0.0.0-20200414013904-db796966b373 // indirect
 	github.com/go-logr/logr v1.2.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
+	github.com/go-pg/pg/v10 v10.9.1 // indirect
 	github.com/go-pg/zerochecker v0.2.0 // indirect
 	github.com/go-resty/resty/v2 v2.3.0 // indirect
 	github.com/golang/freetype v0.0.0-20161208064710-d9be45aaf745 // indirect
@@ -80,8 +83,6 @@ require (
 	github.com/hashicorp/golang-lru v0.5.1 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/imdario/mergo v0.3.8 // indirect
-	github.com/influxdata/influxdb v1.11.0 // indirect
-	github.com/influxdata/line-protocol v0.0.0-20200327222509-2487e7298839 // indirect
 	github.com/itchyny/timefmt-go v0.1.3 // indirect
 	github.com/jackc/pgio v1.0.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
@@ -107,6 +108,7 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/pquerna/cachecontrol v0.0.0-20201205024021-ac21108117ac // indirect
+	github.com/robinjoseph08/go-pg-migrations/v3 v3.0.0 // indirect
 	github.com/russellhaering/goxmldsig v1.1.0 // indirect
 	github.com/russross/blackfriday/v2 v2.0.1 // indirect
 	github.com/satori/go.uuid v1.2.1-0.20181028125025-b2ce2384e17b // indirect
@@ -143,7 +145,7 @@ require (
 	golang.org/x/tools v0.1.10 // indirect
 	golang.org/x/xerrors v0.0.0-20220411194840-2f41105eb62f // indirect
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/protobuf v1.31.0 // indirect
+	google.golang.org/protobuf v1.32.0 // indirect
 	gopkg.in/AlecAivazis/survey.v1 v1.8.7 // indirect
 	gopkg.in/ini.v1 v1.51.0 // indirect
 	gopkg.in/kyokomi/emoji.v1 v1.5.1 // indirect

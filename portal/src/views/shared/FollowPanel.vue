@@ -5,8 +5,8 @@
                 <div class="flex flex-al-center">
                     <i v-if="following" v-on:click="unfollow" class="icon icon-heart"></i>
                     <i v-if="!following" v-on:click="follow" class="icon icon-heart gray"></i>
-                    <span v-if="followers > 1">{{ followers }} Follows</span>
-                    <span v-if="followers <= 1">{{ followers }} Follow</span>
+                    <span v-if="followers > 1">{{ followers }} {{ $tc('followPanel.follows') }}</span>
+                    <span v-if="followers <= 1">{{ followers }} {{ $tc('followPanel.follow') }}</span>
                 </div>
             </template>
         </FollowControl>

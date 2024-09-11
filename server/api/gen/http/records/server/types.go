@@ -3,12 +3,12 @@
 // records HTTP server types
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package server
 
 import (
-	records "github.com/fieldkit/cloud/server/api/gen/records"
+	records "gitlab.com/fieldkit/cloud/server/api/gen/records"
 	goa "goa.design/goa/v3/pkg"
 )
 

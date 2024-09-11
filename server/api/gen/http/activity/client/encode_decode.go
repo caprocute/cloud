@@ -3,7 +3,7 @@
 // activity HTTP client encoders and decoders
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package client
 
@@ -16,8 +16,8 @@ import (
 	"net/url"
 	"strings"
 
-	activity "github.com/fieldkit/cloud/server/api/gen/activity"
-	activityviews "github.com/fieldkit/cloud/server/api/gen/activity/views"
+	activity "gitlab.com/fieldkit/cloud/server/api/gen/activity"
+	activityviews "gitlab.com/fieldkit/cloud/server/api/gen/activity/views"
 	goahttp "goa.design/goa/v3/http"
 )
 

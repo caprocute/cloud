@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	_ "fmt"
 
-	"github.com/fieldkit/cloud/server/data"
+	"gitlab.com/fieldkit/cloud/server/data"
 )
 
 type Mention struct {

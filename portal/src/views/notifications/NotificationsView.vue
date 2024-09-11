@@ -14,7 +14,7 @@
                     </span>
                     <span :class="{ active: this.filter === 'mention' }" v-on:click="viewKind('mention')">
                         {{ $t("notifications.filters.mention") }}
-                    </span>
+                    </span><!---->
                 </div>
                 <NotificationsList
                     v-on:notification-click="notificationNavigate"

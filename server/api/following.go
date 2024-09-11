@@ -6,10 +6,10 @@ import (
 
 	"goa.design/goa/v3/security"
 
-	following "github.com/fieldkit/cloud/server/api/gen/following"
+	following "gitlab.com/fieldkit/cloud/server/api/gen/following"
 
-	"github.com/fieldkit/cloud/server/common"
-	"github.com/fieldkit/cloud/server/data"
+	"gitlab.com/fieldkit/cloud/server/common"
+	"gitlab.com/fieldkit/cloud/server/data"
 )
 
 type FollowingService struct {

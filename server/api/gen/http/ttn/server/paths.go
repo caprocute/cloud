@@ -3,7 +3,7 @@
 // HTTP request path constructors for the ttn service.
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package server
 

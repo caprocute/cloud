@@ -5,12 +5,12 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/fieldkit/cloud/server/common/sqlxcache"
+	"gitlab.com/fieldkit/cloud/server/common/sqlxcache"
 
-	"github.com/fieldkit/cloud/server/common/jobs"
-	"github.com/fieldkit/cloud/server/common/logging"
+	"gitlab.com/fieldkit/cloud/server/common/jobs"
+	"gitlab.com/fieldkit/cloud/server/common/logging"
 
-	"github.com/fieldkit/cloud/server/tests"
+	"gitlab.com/fieldkit/cloud/server/tests"
 )
 
 var (
@@ -35,7 +35,7 @@ func NewServiceOptions(e *tests.TestEnv) (*ControllerOptions, error) {
 		Emailer:    "default",
 	}
 
-	services, err := CreateServiceOptions(e.Ctx, apiConfig, database, jq, nil, nil, metrics, nil, nil, nil)
+	services, err := CreateServiceOptions(e.Ctx, apiConfig, database, jq, nil, nil, metrics, nil, nil)
 	if err != nil {
 		return nil, fmt.Errorf("error creating service options: %w", err)
 	}

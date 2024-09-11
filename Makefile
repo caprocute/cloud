@@ -1,6 +1,6 @@
 VERSION_MAJOR = 0
 VERSION_MINOR = 3
-VERSION_PATCH = 52
+VERSION_PATCH = 60
 VERSION_PREL ?= $(BUILD_NUMBER)
 GIT_LOCAL_BRANCH ?= unknown
 GIT_HASH ?= $(shell git log -1 --format=%h)
@@ -66,10 +66,10 @@ gotests:
 	cd server && go test -p 1 -coverprofile=coverage.data ./...
 
 gotest-specific:
-	cd server && go test -p 1 github.com/fieldkit/cloud/server/api
-	cd server && go test -p 1 github.com/fieldkit/cloud/server/data
-	cd server && go test -p 1 github.com/fieldkit/cloud/server/ingester
-	cd server && go test -p 1 github.com/fieldkit/cloud/server/backend
+	cd server && go test -p 1 gitlab.com/fieldkit/cloud/server/api
+	cd server && go test -p 1 gitlab.com/fieldkit/cloud/server/data
+	cd server && go test -p 1 gitlab.com/fieldkit/cloud/server/ingester
+	cd server && go test -p 1 gitlab.com/fieldkit/cloud/server/backend
 
 view-coverage:
 	cd server && go tool cover -html=coverage.data
@@ -120,7 +120,7 @@ $(BUILD)/scratch: server/cmd/scratch/*.go $(SERVER_SOURCES)
 	cd server/cmd/scratch && $(GO) build -o $@ *.go
 
 generate:
-	cd server/api && $(GOPATH)/bin/goa gen github.com/fieldkit/cloud/server/api/design
+	cd server/api && $(GOPATH)/bin/goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 clean:
 	rm -rf $(BUILD)
@@ -172,10 +172,10 @@ migrate-image:
 	cd migrations && make image
 
 migrate-up:
-	cd migrations && MIGRATE_PATH=`pwd`/primary MIGRATE_DATABASE_URL=$(FIELDKIT_POSTGRES_URL) go run main.go migrate
+	cd migrations/cli && MIGRATE_PATH=`pwd`/../primary MIGRATE_DATABASE_URL=$(FIELDKIT_POSTGRES_URL) go run main.go migrate
 
 migrate-up-tsdb:
-	cd migrations && MIGRATE_PATH=`pwd`/tsdb MIGRATE_DATABASE_URL=$(FIELDKIT_TIME_SCALE_URL) go run main.go migrate
+	cd migrations/cli && MIGRATE_PATH=`pwd`/../tsdb MIGRATE_DATABASE_URL=$(FIELDKIT_TIME_SCALE_URL) go run main.go migrate
 
 ci: setup binaries jstests charting-setup
 

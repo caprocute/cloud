@@ -8,11 +8,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/fieldkit/cloud/server/common/sqlxcache"
+	"gitlab.com/fieldkit/cloud/server/common/sqlxcache"
 	"go.uber.org/zap"
 
-	"github.com/fieldkit/cloud/server/backend/repositories"
-	"github.com/fieldkit/cloud/server/data"
+	"gitlab.com/fieldkit/cloud/server/backend/repositories"
+	"gitlab.com/fieldkit/cloud/server/data"
 )
 
 const (
@@ -46,12 +46,17 @@ type AssociatedAttribute struct {
 	Attribute *data.StationAttributeSlot
 }
 
+type WebHookSavedSensor struct {
+	parsed *ParsedReading
+	schema *MessageSchemaSensor
+	sensor *data.ModuleSensor
+}
+
 type WebHookStation struct {
 	Provision       *data.Provision
 	Configuration   *data.StationConfiguration
 	Station         *data.Station
-	Module          *data.StationModule
-	Sensors         []*data.ModuleSensor
+	Sensors         []*WebHookSavedSensor
 	SensorPrefix    string
 	Attributes      map[string]*data.StationAttributeSlot
 	Associated      map[string]*AssociatedAttribute
@@ -65,126 +70,10 @@ func (s *WebHookStation) FindAttribute(name string) *data.StationAttributeSlot {
 	return nil
 }
 
-func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookStation, error) {
+func (m *ModelAdapter) findStationModule(ctx context.Context, pm *ParsedMessage, configuration *data.StationConfiguration, moduleSchema *MessageSchemaModule) (*data.StationModule, error) {
 	log := Logger(ctx).Sugar()
 
-	deviceKey := hex.EncodeToString(pm.DeviceID)
-
-	cached, ok := m.cache[deviceKey]
-	if ok {
-		err := m.updateLinkedFields(ctx, log, cached.station, pm)
-		if err != nil {
-			return nil, err
-		}
-
-		return cached.station, nil
-	}
-
-	// Add or create station model, we use this during creation and updating.
-	model, err := m.sr.FindOrCreateStationModel(ctx, pm.SchemaID, pm.Schema.Model)
-	if err != nil {
-		return nil, err
-	}
-
-	updating, err := m.sr.QueryStationByArbitraryDeviceID(ctx, pm.DeviceID)
-	if err != nil {
-		if err != sql.ErrNoRows {
-			return nil, fmt.Errorf("querying station: %w", err)
-		}
-	}
-
-	if updating == nil {
-		log.Infow("station-missing", "device_id", pm.DeviceID)
-	}
-
-	// Add or create the station.
-	station := updating
-	if updating == nil {
-		deviceName := string(pm.DeviceID)
-
-		if pm.DeviceName != nil && *pm.DeviceName != "" {
-			deviceName = *pm.DeviceName
-		}
-
-		if pm.DeviceName == nil {
-			return nil, fmt.Errorf("no-device-name")
-		}
-
-		updating = &data.Station{
-			DeviceID:  pm.DeviceID,
-			Name:      deviceName,
-			OwnerID:   pm.OwnerID,
-			ModelID:   model.ID,
-			CreatedAt: time.Now(),
-			UpdatedAt: time.Now(),
-		}
-
-		added, err := m.sr.AddStation(ctx, updating)
-		if err != nil {
-			return nil, err
-		}
-
-		if pm.ProjectID != nil {
-			pr := repositories.NewProjectRepository(m.db)
-
-			if err := pr.AddStationToProjectByID(ctx, *pm.ProjectID, added.ID); err != nil {
-				return nil, err
-			}
-		}
-
-		station = added
-	} else {
-		station.ModelID = model.ID
-		if pm.DeviceName != nil && *pm.DeviceName != "" {
-			station.Name = *pm.DeviceName
-		}
-	}
-
-	attributesRepository := repositories.NewAttributesRepository(m.db)
-
-	attributeRows, err := attributesRepository.QueryStationProjectAttributes(ctx, station.ID)
-	if err != nil {
-		return nil, err
-	}
-
-	attributes := make(map[string]*data.StationAttributeSlot)
-	for _, attribute := range attributeRows {
-		if _, ok := attributes[attribute.Name]; ok {
-			return nil, fmt.Errorf("duplicate attribute: %v", attribute.Name)
-		}
-		attributes[attribute.Name] = attribute
-	}
-
-	// Add or create the provision.
-	defaultGenerationID := pm.DeviceID
-	provision, err := m.pr.QueryOrCreateProvision(ctx, pm.DeviceID, defaultGenerationID)
-	if err != nil {
-		return nil, err
-	}
-
-	// Add or create the station configuration..
-	sourceID := WebHookSourceID
-	configuration, err := m.sr.UpsertConfiguration(ctx,
-		&data.StationConfiguration{
-			ProvisionID: provision.ID,
-			SourceID:    &sourceID,
-			UpdatedAt:   time.Now(),
-		})
-	if err != nil {
-		return nil, err
-	}
-
-	if err := m.sr.UpsertVisibleConfiguration(ctx, station.ID, configuration.ID); err != nil {
-		return nil, err
-	}
-
-	if len(pm.Schema.Modules) != 1 {
-		return nil, fmt.Errorf("schemas are allowed 1 module and only 1 module")
-	}
-
-	sensors := make([]*data.ModuleSensor, 0)
-
-	for _, moduleSchema := range pm.Schema.Modules {
+	if moduleSchema.Bay == nil {
 		modulePrefix := moduleSchema.KeyPrefix()
 
 		// Add or create the station module..
@@ -204,68 +93,253 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 			return nil, err
 		}
 
-		for index, sensorSchema := range moduleSchema.Sensors {
-			// Transient sensors aren't saved.
-			if !sensorSchema.Transient {
-				// Add or create the sensor..
-				sensor := &data.ModuleSensor{
-					ConfigurationID: configuration.ID,
-					ModuleID:        module.ID,
-					Index:           uint32(index),
-					Name:            sensorSchema.Key,
-					ReadingValue:    nil,
-					ReadingTime:     nil,
-				}
+		return module, nil
+	} else {
+		modules, err := m.sr.QueryStationModulesByConfigurationID(ctx, configuration.ID)
+		if err != nil {
+			return nil, err
+		}
 
-				if pm.ReceivedAt != nil {
-					for _, pr := range pm.Data {
-						if pr.Key == sensorSchema.Key {
-							sensor.ReadingValue = &pr.Value
-							sensor.ReadingTime = pm.ReceivedAt
-							break
-						}
-					}
-				}
-
-				if sensorSchema.UnitOfMeasure != nil {
-					sensor.UnitOfMeasure = *sensorSchema.UnitOfMeasure
-				}
-
-				if _, err := m.sr.UpsertModuleSensor(ctx, sensor); err != nil {
-					return nil, err
-				}
-
-				sensors = append(sensors, sensor)
+		for _, module := range modules {
+			if module.Position == uint32(*moduleSchema.Bay) {
+				return module, nil
 			}
 		}
 
-		whStation := &WebHookStation{
-			SensorPrefix:  modulePrefix,
-			Provision:     provision,
-			Configuration: configuration,
-			Station:       station,
-			Module:        module,
-			Sensors:       sensors,
-			Attributes:    attributes,
-			Associated:    make(map[string]*AssociatedAttribute),
+		log.Infow("wh:no-module-with-position(bay)", "bay", *moduleSchema.Bay)
+	}
+
+	return nil, nil
+}
+
+func (m *ModelAdapter) findStation(ctx context.Context, pm *ParsedMessage) (*data.Station, *data.Provision, *data.StationConfiguration, error) {
+	log := Logger(ctx).Sugar()
+
+	// Add or create station model, we use this during creation and updating.
+	model, err := m.sr.FindOrCreateStationModel(ctx, pm.SchemaID, pm.Schema.Model)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+
+	updating, err := m.sr.QueryStationByArbitraryDeviceID(ctx, pm.DeviceID)
+	if err != nil {
+		if err != sql.ErrNoRows {
+			return nil, nil, nil, fmt.Errorf("querying station: %w", err)
+		}
+	}
+
+	if updating == nil {
+		log.Infow("wh:station-missing", "device_id", pm.DeviceID)
+	} else {
+		log.Infow("wh:station", "message_device_id", pm.DeviceID, "device_id", updating.DeviceID)
+	}
+
+	// Add or create the station.
+	station := updating
+
+	// Add or create the station configuration..
+	if pm.AllModulesHaveBays() {
+		if station == nil {
+			return nil, nil, nil, fmt.Errorf("wh:module-bay-station-missing")
 		}
 
-		m.cache[deviceKey] = &cacheEntry{
-			station: whStation,
+		configuration, provision, err := m.sr.QueryVisibleConfiguration(ctx, station.ID)
+		if err != nil {
+			return nil, nil, nil, err
 		}
 
-		log.Infow("wh:loaded-station", "station_id", station.ID)
+		log.Infow("wh:station", "configuration_id", configuration.ID, "provision_id", provision.ID)
 
-		err = m.updateLinkedFields(ctx, log, whStation, pm)
+		return station, provision, configuration, nil
+	} else {
+		if updating == nil {
+			deviceName := string(pm.DeviceID)
+
+			if pm.DeviceName != nil && *pm.DeviceName != "" {
+				deviceName = *pm.DeviceName
+			}
+
+			if pm.DeviceName == nil {
+				return nil, nil, nil, fmt.Errorf("no-device-name")
+			}
+
+			updating = &data.Station{
+				DeviceID:  pm.DeviceID,
+				Name:      deviceName,
+				OwnerID:   pm.OwnerID,
+				ModelID:   model.ID,
+				CreatedAt: time.Now(),
+				UpdatedAt: time.Now(),
+			}
+
+			added, err := m.sr.AddStation(ctx, updating)
+			if err != nil {
+				return nil, nil, nil, err
+			}
+
+			if pm.ProjectID != nil {
+				pr := repositories.NewProjectRepository(m.db)
+
+				if err := pr.AddStationToProjectByID(ctx, *pm.ProjectID, added.ID); err != nil {
+					return nil, nil, nil, err
+				}
+			}
+
+			station = added
+		} else {
+			station.ModelID = model.ID
+			if pm.DeviceName != nil && *pm.DeviceName != "" {
+				station.Name = *pm.DeviceName
+			}
+		}
+
+		// Add or create the provision.
+		defaultGenerationID := pm.DeviceID
+		provision, err := m.pr.QueryOrCreateProvision(ctx, pm.DeviceID, defaultGenerationID)
+		if err != nil {
+			return nil, nil, nil, err
+		}
+
+		sourceID := WebHookSourceID
+		configuration, err := m.sr.UpsertConfiguration(ctx,
+			&data.StationConfiguration{
+				ProvisionID: provision.ID,
+				SourceID:    &sourceID,
+				UpdatedAt:   time.Now(),
+			})
+		if err != nil {
+			return nil, nil, nil, err
+		}
+
+		if err := m.sr.UpsertVisibleConfiguration(ctx, station.ID, configuration.ID); err != nil {
+			return nil, nil, nil, err
+		}
+
+		return station, provision, configuration, nil
+	}
+}
+
+func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookStation, error) {
+	log := Logger(ctx).Sugar()
+
+	deviceKey := hex.EncodeToString(pm.DeviceID)
+
+	cached, ok := m.cache[deviceKey]
+	if ok {
+		err := m.updateLinkedFields(ctx, log, cached.station, pm)
 		if err != nil {
 			return nil, err
+		}
+
+		return cached.station, nil
+	}
+
+	station, provision, configuration, err := m.findStation(ctx, pm)
+	if err != nil {
+		return nil, err
+	}
+
+	attributesRepository := repositories.NewAttributesRepository(m.db)
+
+	attributeRows, err := attributesRepository.QueryStationProjectAttributes(ctx, station.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	attributes := make(map[string]*data.StationAttributeSlot)
+	for _, attribute := range attributeRows {
+		if _, ok := attributes[attribute.Name]; ok {
+			return nil, fmt.Errorf("duplicate attribute: %v", attribute.Name)
+		}
+		attributes[attribute.Name] = attribute
+	}
+
+	sensors := make([]*WebHookSavedSensor, 0)
+
+	for _, moduleSchema := range pm.Schema.Modules {
+		module, err := m.findStationModule(ctx, pm, configuration, moduleSchema)
+		if err != nil {
+			return nil, fmt.Errorf("error creating or finding module")
+		}
+
+		if module != nil {
+			for index, sensorSchema := range moduleSchema.Sensors {
+				// Transient sensors aren't saved.
+				if !sensorSchema.Transient {
+					// Add or create the sensor..
+					sensor := &data.ModuleSensor{
+						ConfigurationID: configuration.ID,
+						ModuleID:        module.ID,
+						Index:           uint32(index),
+						Name:            sensorSchema.Key,
+						ReadingValue:    nil,
+						ReadingTime:     nil,
+					}
+
+					var parsedReading *ParsedReading
+
+					if pm.ReceivedAt != nil {
+						for _, pr := range pm.Data {
+							if pr.Key == sensorSchema.Key && (pr.ModuleBay == nil || uint32(*pr.ModuleBay) == module.Position) {
+								sensor.ReadingValue = &pr.Value
+								sensor.ReadingTime = pm.ReceivedAt
+								parsedReading = pr
+								break
+							}
+						}
+					}
+
+					if parsedReading == nil {
+						log.Errorf("wh:no-parsed-reading-for-saved")
+						return nil, fmt.Errorf("wh:no-parsed-reading-for-saved")
+					}
+
+					if sensorSchema.UnitOfMeasure != nil {
+						sensor.UnitOfMeasure = *sensorSchema.UnitOfMeasure
+					}
+
+					if _, err := m.sr.UpsertModuleSensor(ctx, sensor); err != nil {
+						return nil, err
+					}
+
+					sensors = append(sensors, &WebHookSavedSensor{
+						parsed: parsedReading,
+						schema: sensorSchema,
+						sensor: sensor,
+					})
+				}
+			}
+
+			whStation := &WebHookStation{
+				SensorPrefix:  moduleSchema.KeyPrefix(),
+				Provision:     provision,
+				Configuration: configuration,
+				Station:       station,
+				Sensors:       sensors,
+				Attributes:    attributes,
+				Associated:    make(map[string]*AssociatedAttribute),
+			}
+
+			m.cache[deviceKey] = &cacheEntry{
+				station: whStation,
+			}
+
+			log.Infow("wh:loaded-station", "station_id", station.ID)
+
+			err = m.updateLinkedFields(ctx, log, whStation, pm)
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			log.Infow("wh:no-module", "station_id", station.ID)
+			return nil, fmt.Errorf("no:wh-module")
 		}
 	}
 
 	return m.cache[deviceKey].station, nil
 }
 
-func (m *ModelAdapter) updateLinkedFields(ctx context.Context, log *zap.SugaredLogger, station *WebHookStation, pm *ParsedMessage) error {
+func (m *ModelAdapter) updateLinkedFields(_ context.Context, log *zap.SugaredLogger, station *WebHookStation, pm *ParsedMessage) error {
 	for _, parsedReading := range pm.Data {
 		if parsedReading.Battery {
 			battery := float32(parsedReading.Value)
@@ -289,9 +363,9 @@ func (m *ModelAdapter) updateLinkedFields(ctx context.Context, log *zap.SugaredL
 			}
 
 			for _, moduleSensor := range station.Sensors {
-				if pr.Key == moduleSensor.Name {
-					moduleSensor.ReadingValue = &pr.Value
-					moduleSensor.ReadingTime = pm.ReceivedAt
+				if pr.Key == moduleSensor.sensor.Name {
+					moduleSensor.sensor.ReadingValue = &pr.Value
+					moduleSensor.sensor.ReadingTime = pm.ReceivedAt
 					break
 				}
 			}
@@ -379,9 +453,9 @@ func (m *ModelAdapter) Close(ctx context.Context) error {
 		}
 
 		for _, moduleSensor := range cacheEntry.station.Sensors {
-			log.Infow("saving:sensor", "station_id", station.ID, "sensor_id", moduleSensor.ID, "value", moduleSensor.ReadingValue, "time", moduleSensor.ReadingTime)
+			log.Infow("saving:sensor", "station_id", station.ID, "sensor_id", moduleSensor.sensor.ID, "value", moduleSensor.sensor.ReadingValue, "time", moduleSensor.sensor.ReadingTime)
 
-			if _, err := m.sr.UpsertModuleSensor(ctx, moduleSensor); err != nil {
+			if _, err := m.sr.UpsertModuleSensor(ctx, moduleSensor.sensor); err != nil {
 				return err
 			}
 		}

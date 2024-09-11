@@ -47,14 +47,17 @@ export const VizGraph = Vue.extend({
         },
     },
     mounted() {
-        this.viz.log("mounted", this.viz);
+        // this.viz.log("mounted", this.viz);
     },
     updated() {
-        this.viz.log("updated", this.viz);
+        // this.viz.log("updated", this.viz);
     },
     computed: {
         debug(): boolean {
             return false;
+        },
+        isDataSetEmpty(): boolean {
+            return this.viz.isDataSetEmpty();
         },
     },
     methods: {
@@ -105,7 +108,7 @@ export const VizGraph = Vue.extend({
         },
     },
     template: `
-		<div class="viz graph">
+		<div class="viz graph" v-bind:class="{'group-no-data': isDataSetEmpty }">
 			<ViewingControls :viz="viz" :workspace="workspace" v-bind:key="workspace.version"
 				@viz-remove="raiseRemove"
 				@viz-compare="raiseCompare"
@@ -115,7 +118,9 @@ export const VizGraph = Vue.extend({
 				@viz-change-sensors="raiseChangeSensors"
 				@viz-change-chart="raiseChangeChart" />
 
-			<component v-bind:is="uiNameOf(viz)" :viz="viz" :workspace="workspace"
+          <div v-if="isDataSetEmpty" class="group-no-data-msg"> {{$tc('dataView.noData')}} </div>
+          
+          <component v-bind:is="uiNameOf(viz)" :viz="viz" :workspace="workspace"
 				@viz-geo-zoomed="raiseGeoZoomed"
 				@viz-time-zoomed="raiseTimeZoomed"
                 @viz-time-dragged="raiseTimeDragged" />

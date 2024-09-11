@@ -40,7 +40,7 @@
                         <div v-if="station.placeNameNative">
                             <i class="icon icon-location" />
                             <span>
-                                Native Lands:
+                                {{ $t("station.nativeLands") }}
                                 <span class="bold">{{ station.placeNameNative }}</span>
                             </span>
                         </div>
@@ -50,7 +50,7 @@
 
             <div v-if="!isMobileView && !isCustomisationEnabled()" class="station-modules">
                 <div v-for="(module, index) in station.modules" v-bind:key="index" class="module-icon-container">
-                    <img alt="Module Icon" class="small-space" :src="getModuleIcon(module)" />
+                    <img :alt="$t('station.photo.module.alt')" class="small-space" :src="getModuleIcon(module)" />
                 </div>
             </div>
 
@@ -59,7 +59,7 @@
 
         <div v-if="isMobileView && !isCustomisationEnabled()" class="station-modules">
             <div v-for="(module, index) in station.modules" v-bind:key="index" class="module-icon-container">
-                <img alt="Module Icon" class="small-space" :src="getModuleIcon(module)" />
+                <img :alt="$t('station.photo.module.alt')" class="small-space" :src="getModuleIcon(module)" />
             </div>
         </div>
     </div>

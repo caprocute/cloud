@@ -3,7 +3,7 @@
 // records HTTP client encoders and decoders
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package client
 
@@ -15,7 +15,7 @@ import (
 	"net/url"
 	"strings"
 
-	records "github.com/fieldkit/cloud/server/api/gen/records"
+	records "gitlab.com/fieldkit/cloud/server/api/gen/records"
 	goahttp "goa.design/goa/v3/http"
 )
 

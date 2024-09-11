@@ -3,12 +3,12 @@
 // ingestion HTTP server types
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package server
 
 import (
-	ingestion "github.com/fieldkit/cloud/server/api/gen/ingestion"
+	ingestion "gitlab.com/fieldkit/cloud/server/api/gen/ingestion"
 	goa "goa.design/goa/v3/pkg"
 )
 

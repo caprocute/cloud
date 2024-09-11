@@ -16,7 +16,7 @@ const (
 	queueKey        correlationIdType = iota
 	deviceIDKey     correlationIdType = iota
 
-	packagePrefix = "github.com/fieldkit/cloud/server/"
+	packagePrefix = "gitlab.com/fieldkit/cloud/server/"
 
 	reqIDTagName        = "req_id"
 	facilityTagName     = "facility"

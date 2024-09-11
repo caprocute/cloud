@@ -3,7 +3,7 @@
 // station_note endpoints
 //
 // Command:
-// $ goa gen github.com/fieldkit/cloud/server/api/design
+// $ goa gen gitlab.com/fieldkit/cloud/server/api/design
 
 package stationnote
 
@@ -51,7 +51,7 @@ func NewStationEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint 
 		sc := security.JWTScheme{
 			Name:           "jwt",
 			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
-			RequiredScopes: []string{"api:access"},
+			RequiredScopes: []string{},
 		}
 		var token string
 		if p.Auth != nil {

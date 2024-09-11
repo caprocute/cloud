@@ -1,6 +1,6 @@
 <template>
-    <div class="field-notes-wrap">
-        <header class="header">
+    <div class="field-notes-wrap" data-cy="fieldNotes">
+        <header class="header" :class="{ 'no-border': !user }">
             <div class="name">{{ $t("fieldNotes.title") }}</div>
             <div class="buttons" v-if="isAuthenticated">
                 <button class="button" @click="generatePDF">
@@ -16,8 +16,8 @@
                 <div class="new-field-note-wrap">
                     <Tiptap
                         v-model="newNoteText"
-                        placeholder="Join the discussion!"
-                        saveLabel="Save"
+                        :placeholder="$tc('fieldNotes.form.placeholder')"
+                        :saveLabel="$tc('fieldNotes.form.saveLabel')"
                         :disable-mentions="true"
                         @editor-focus="checkEditingFieldNote()"
                         @input="$store.dispatch(ActionTypes.NEW_DIRTY_FIELD, 'newFieldNote')"
@@ -57,8 +57,8 @@
             >
                 <div class="month-row" @click="toggleFieldNoteGroup('field-note-group-' + index)">
                     <i class="icon icon-chevron-right"></i>
-                    <div class="month-name">{{ getMonthName(month) }} Entries</div>
-                    <div class="month-last-updated">Last updated: {{ getMonthLastUpdated(monthItems) }}</div>
+                    <div class="month-name">{{ getMonthName(month) }} {{ $tc("fieldNotes.monthRow.entries") }}</div>
+                    <div class="month-last-updated">{{ $tc("fieldNotes.monthRow.lastUpdated") }} {{ getMonthLastUpdated(monthItems) }}</div>
                 </div>
 
                 <transition-group name="fade">
@@ -82,12 +82,11 @@
                                 :disable-mentions="true"
                                 @input="onEditFieldNoteInput(fieldNote, $event)"
                                 @save="saveEdit(fieldNote)"
-                                @empty="onNewFieldNoteText($event, 'edit')"
                             />
                         </template>
                         <div v-if="!editingFieldNote || (editingFieldNote && editingFieldNote.id !== fieldNote.id)" class="actions">
-                            <button v-if="user" @click="editFieldNote(fieldNote)">
-                                <i class="icon icon-edit" v-if="canEdit(fieldNote)"></i>
+                            <button v-if="user && canEdit(fieldNote)" @click="editFieldNote(fieldNote)">
+                                <i class="icon icon-edit"></i>
                                 {{ $t("fieldNotes.edit") }}
                             </button>
                             <button @click="deleteFieldNote(fieldNote.id)" v-if="canDelete(fieldNote)">
@@ -514,7 +513,10 @@ button {
 
 .actions {
     padding-left: 52px;
-    margin-top: 15px;
+
+    button {
+        margin-top: 15px;
+    }
 
     &.hidden {
         display: none;
@@ -596,5 +598,9 @@ button {
 .icon-export:before {
     color: var(--color-dark);
     margin-right: 8px;
+}
+
+.header.no-border {
+    border-bottom: 0;
 }
 </style>

@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/fieldkit/cloud/server/backend"
-	"github.com/fieldkit/cloud/server/data"
+	"gitlab.com/fieldkit/cloud/server/backend"
+	"gitlab.com/fieldkit/cloud/server/data"
 )
 
 type StationTailInfo struct {
@@ -40,6 +40,13 @@ type StationLastTime struct {
 type RecentlyAggregated struct {
 	Windows  map[time.Duration][]*backend.DataRow `json:"windows"`
 	Stations map[int32]*StationLastTime           `json:"stations"`
+}
+
+func NewRecentlyAggregated() *RecentlyAggregated {
+	return &RecentlyAggregated{
+		Windows:  make(map[time.Duration][]*backend.DataRow),
+		Stations: make(map[int32]*StationLastTime),
+	}
 }
 
 type DataBackend interface {

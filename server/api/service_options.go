@@ -8,16 +8,15 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws/session"
 
-	"github.com/fieldkit/cloud/server/api/querying"
-	"github.com/fieldkit/cloud/server/common/sqlxcache"
+	"gitlab.com/fieldkit/cloud/server/common/sqlxcache"
 
-	"github.com/fieldkit/cloud/server/common/jobs"
-	"github.com/fieldkit/cloud/server/common/logging"
+	"gitlab.com/fieldkit/cloud/server/common/jobs"
+	"gitlab.com/fieldkit/cloud/server/common/logging"
 
-	"github.com/fieldkit/cloud/server/data"
-	"github.com/fieldkit/cloud/server/email"
-	"github.com/fieldkit/cloud/server/files"
-	"github.com/fieldkit/cloud/server/storage"
+	"gitlab.com/fieldkit/cloud/server/data"
+	"gitlab.com/fieldkit/cloud/server/email"
+	"gitlab.com/fieldkit/cloud/server/files"
+	"gitlab.com/fieldkit/cloud/server/storage"
 )
 
 type ControllerOptions struct {
@@ -45,14 +44,13 @@ type ControllerOptions struct {
 	// Subscribed listeners
 	subscriptions *Subscriptions
 
-	influxConfig    *querying.InfluxDBConfig
 	timeScaleConfig *storage.TimeScaleDBConfig
 
 	photoCache *PhotoCache
 }
 
 func CreateServiceOptions(ctx context.Context, config *ApiConfiguration, database *sqlxcache.DB, publisher jobs.MessagePublisher, mediaFiles files.FileArchive,
-	awsSession *session.Session, metrics *logging.Metrics, que *gue.Client, influxConfig *querying.InfluxDBConfig, timeScaleConfig *storage.TimeScaleDBConfig) (controllerOptions *ControllerOptions, err error) {
+	awsSession *session.Session, metrics *logging.Metrics, que *gue.Client, timeScaleConfig *storage.TimeScaleDBConfig) (controllerOptions *ControllerOptions, err error) {
 
 	emailer, err := createEmailer(awsSession, config)
 	if err != nil {
@@ -82,7 +80,6 @@ func CreateServiceOptions(ctx context.Context, config *ApiConfiguration, databas
 		locations:       locations,
 		que:             que,
 		subscriptions:   NewSubscriptions(),
-		influxConfig:    influxConfig,
 		timeScaleConfig: timeScaleConfig,
 		photoCache:      NewPhotoCache(mediaFiles, metrics),
 	}
