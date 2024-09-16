@@ -9,7 +9,7 @@
             :default="permissions.canAddComment ? 'left' : 'right'"
             :show="{ left: permissions.canAddComment, right: permissions.canAddEvent }"
             @toggle="onSectionToggle"
-            v-if="viewType === 'data'"
+            v-if="viewType === 'data' && permissions"
         >
             <template #left>
                 <div class="new-comment" :class="{ 'align-center': !user }">
