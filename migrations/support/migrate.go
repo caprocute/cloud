@@ -89,23 +89,36 @@ func (m *Migrator) Run(args []string) error {
 	o.OnConnect = func(ctx context.Context, conn *pg.Conn) error {
 		log.Printf("Creating schema...")
 
-		if _, err := conn.Exec("CREATE SCHEMA IF NOT EXISTS fieldkit"); err != nil {
+		if _, err := conn.ExecContext(ctx, "CREATE SCHEMA IF NOT EXISTS fieldkit"); err != nil {
 			return fmt.Errorf("error creating: %w", err)
 		}
 
-		if _, err := conn.Exec("GRANT USAGE ON SCHEMA fieldkit TO fieldkit"); err != nil {
+		var n int
+		_, err := conn.QueryContext(ctx, pg.Scan(&n), "SELECT COUNT(rolname) FROM pg_roles WHERE rolname = 'fieldkit'")
+		if err != nil {
+			return fmt.Errorf("error granting: %w", err)
+		}
+		if n > 0 {
+			log.Printf("Granting permissions...")
+
+			if _, err := conn.ExecContext(ctx, "GRANT USAGE ON SCHEMA fieldkit TO fieldkit"); err != nil {
+				return fmt.Errorf("error granting: %w", err)
+			}
+
+			if _, err := conn.ExecContext(ctx, "GRANT CREATE ON SCHEMA fieldkit TO fieldkit"); err != nil {
+				return fmt.Errorf("error granting: %w", err)
+			}
+		} else {
+			log.Printf("Role missing, skipping GRANT...")
+		}
+
+		log.Printf("Configure search_path...")
+
+		if _, err := conn.ExecContext(ctx, "SET search_path TO fieldkit, public;"); err != nil {
 			return fmt.Errorf("error granting: %w", err)
 		}
 
-		if _, err := conn.Exec("GRANT CREATE ON SCHEMA fieldkit TO fieldkit"); err != nil {
-			return fmt.Errorf("error granting: %w", err)
-		}
-
-		if _, err := conn.Exec("SET search_path TO fieldkit, public;"); err != nil {
-			return fmt.Errorf("error granting: %w", err)
-		}
-
-		log.Printf("Done creating schema...")
+		log.Printf("Preparation done!")
 
 		return nil
 	}
