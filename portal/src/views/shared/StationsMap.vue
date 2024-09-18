@@ -1,13 +1,15 @@
 <template v-if="mapped.valid && ready">
     <div class="map-wrap" :class="{ 'hide-markers': !showStations }">
-        <StationsMapHeader v-if="showHeader" :project="project"></StationsMapHeader>
-        <StationsMapSidebar
-            v-if="showSidebar"
-            :mapped="mapped"
-            :stations="filteredStations"
-            @update-results-based-on-map="getStationsForBounds"
-            @toggle="handleLayoutChanges()"
-        ></StationsMapSidebar>
+        <template v-if="!isCustomisationEnabled()">
+            <StationsMapHeader v-if="showHeader" :project="project"></StationsMapHeader>
+            <StationsMapSidebar
+                v-if="showSidebar"
+                :mapped="mapped"
+                :stations="filteredStations"
+                @update-results-based-on-map="getStationsForBounds"
+                @toggle="handleLayoutChanges()"
+            ></StationsMapSidebar>
+        </template>
         <mapbox
             class="stations-map"
             :access-token="mapbox.token"
@@ -44,6 +46,7 @@ import ValueMarker from "./ValueMarker.vue";
 import Mapbox from "mapbox-gl-vue";
 import StationsMapHeader from "@/views/shared/StationsMapHeader.vue";
 import StationsMapSidebar from "@/views/shared/StationsMapSidebar.vue";
+import { isCustomisationEnabled } from "@/views/shared/partners";
 
 export interface ProtectedData {
     map: any;
@@ -62,6 +65,7 @@ export default Vue.extend({
         mapbox: { token: string; style: string };
         ready: boolean;
         sensorMeta: Map<string, any> | null;
+        hasGeocoder: boolean;
         isMobileView: boolean;
         filteredStations: DisplayStation[];
         filterStationsBasedOnMap: boolean;
@@ -70,6 +74,7 @@ export default Vue.extend({
             mapbox: Config.mapbox,
             ready: false,
             sensorMeta: null,
+            hasGeocoder: isCustomisationEnabled() ? false : true, // skips adding it if already true
             isMobileView: window.screen.availWidth <= 768,
             filteredStations: this.mapped.stations,
             filterStationsBasedOnMap: false,
@@ -147,6 +152,7 @@ export default Vue.extend({
         },
     },
     methods: {
+        isCustomisationEnabled,
         onMapInitialized(map: any): void {
             console.log("map: initialized");
             this.protectedData.map = map;
@@ -193,6 +199,19 @@ export default Vue.extend({
             }
 
             const map = this.protectedData.map;
+
+            if (!this.hasGeocoder) {
+                map.addControl(
+                    new MapboxGeocoder({
+                        accessToken: this.mapbox.token,
+                        mapboxgl: mapboxgl,
+                        collapsed: true,
+                        marker: false,
+                    }),
+                    "top-left"
+                );
+                this.hasGeocoder = true;
+            }
 
             if (!map.getLayer("station-markers") && this.showStations) {
                 const stationsSource = map.getSource("stations");

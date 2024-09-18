@@ -42,6 +42,17 @@
                 </div>
                 <div class="container-map">
                     <StationsMap
+                        v-if="isPartnerCustomisationEnabled"
+                        @show-summary="showSummary"
+                        :mapped="mappedProject"
+                        :layoutChanges="layoutChanges"
+                        :showStations="project.showStations"
+                        :visibleReadings="visibleReadings"
+                        :mapBounds="mapBounds"
+                    />
+
+                    <StationsMap
+                        v-else
                         @show-summary="showSummary"
                         :mapped="mappedProject"
                         :layoutChanges="layoutChanges"
