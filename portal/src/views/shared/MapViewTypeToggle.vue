@@ -79,6 +79,10 @@ export default Vue.extend({
         @include flex(center, center);
         @include position(absolute, 90px 62px null null);
 
+        body.floodnet & {
+            @include position(absolute, 90px 25px null null);
+        }
+
         @include bp-down($sm) {
             @include position(absolute, 115px 10px null null);
         }
