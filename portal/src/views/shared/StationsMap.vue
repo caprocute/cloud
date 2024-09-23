@@ -9,6 +9,7 @@
                 @update-results-based-on-map="getStationsForBounds"
                 @toggle="handleLayoutChanges()"
             ></StationsMapSidebar>
+            <slot></slot>
         </template>
         <mapbox
             class="stations-map"

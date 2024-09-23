@@ -18,34 +18,48 @@
 
         <template v-if="viewType === 'map'">
             <div class="container-map">
-                <StationsMap
-                    v-if="mapped && !isCustomisationEnabled()"
-                    :mapped="mapped"
-                    :layoutChanges="layoutChanges"
-                    :showStations="true"
-                    :showSidebar="true"
-                    :showHeader="true"
-                    @show-summary="showSummary"
-                />
-                <StationsMap
-                    v-else-if="mapped"
-                    :mapped="mapped"
-                    :layoutChanges="layoutChanges"
-                    :showStations="true"
-                    @show-summary="showSummary"
-                />
+                <template v-if="!isCustomisationEnabled()">
+                    <StationsMap
+                        v-if="mapped"
+                        :mapped="mapped"
+                        :layoutChanges="layoutChanges"
+                        :showStations="true"
+                        :showSidebar="true"
+                        :showHeader="true"
+                        @show-summary="showSummary"
+                    >
+                        <StationsMapSummary
+                            v-if="activeStation"
+                            v-slot="{ sensorDataQuerier }"
+                            :station="activeStation"
+                            :sensorDataQuerier="sensorDataQuerier"
+                            @close="closeSummary"
+                        >
+                            <TinyChart :station-id="activeStation.id" :station="activeStation" :querier="sensorDataQuerier" />
+                        </StationsMapSummary>
+                    </StationsMap>
+                </template>
 
-                <StationHoverSummary
-                    v-if="activeStation"
-                    class="summary-container"
-                    @close="closeSummary"
-                    :station="activeStation"
-                    :sensorDataQuerier="sensorDataQuerier"
-                    :hasCupertinoPane="true"
-                    v-slot="{ sensorDataQuerier }"
-                >
-                    <TinyChart :station-id="activeStation.id" :station="activeStation" :querier="sensorDataQuerier" />
-                </StationHoverSummary>
+                <template v-else>
+                    <StationsMap
+                        v-if="mapped"
+                        :mapped="mapped"
+                        :layoutChanges="layoutChanges"
+                        :showStations="true"
+                        @show-summary="showSummary"
+                    />
+                    <StationHoverSummary
+                        v-if="activeStation"
+                        class="summary-container"
+                        @close="closeSummary"
+                        :station="activeStation"
+                        :sensorDataQuerier="sensorDataQuerier"
+                        :hasCupertinoPane="true"
+                        v-slot="{ sensorDataQuerier }"
+                    >
+                        <TinyChart :station-id="activeStation.id" :station="activeStation" :querier="sensorDataQuerier" />
+                    </StationHoverSummary>
+                </template>
             </div>
         </template>
         <div class="no-stations" v-if="isAuthenticated && showNoStationsMessage && hasNoStations">
@@ -71,7 +85,7 @@
 </template>
 
 <script lang="ts">
-import { mapState, mapGetters } from "vuex";
+import { mapGetters, mapState } from "vuex";
 import * as ActionTypes from "@/store/actions";
 import { GlobalState } from "@/store/modules/global";
 import { DisplayStation, MappedStations } from "@/store";
@@ -82,11 +96,10 @@ import StandardLayout from "./StandardLayout.vue";
 import StationHoverSummary from "./shared/StationHoverSummary.vue";
 import StationsMap from "./shared/StationsMap.vue";
 import TinyChart from "@/views/viz/TinyChart.vue";
-import SnackBar from "@/views/shared/SnackBar.vue";
 import MapViewTypeToggle from "@/views/shared/MapViewTypeToggle.vue";
 import { MapViewType } from "@/api/api";
-import StationsMapHeader from "@/views/shared/StationsMapHeader.vue";
-import {isCustomisationEnabled} from '@/views/shared/partners';
+import { isCustomisationEnabled } from "@/views/shared/partners";
+import StationsMapSummary from "@/views/shared/StationsMapSummary.vue";
 
 export default Vue.extend({
     name: "StationsView",
@@ -96,6 +109,7 @@ export default Vue.extend({
         StationHoverSummary,
         TinyChart,
         MapViewTypeToggle,
+        StationsMapSummary,
     },
     props: {
         id: {
@@ -171,7 +185,7 @@ export default Vue.extend({
         },
     },
     methods: {
-      isCustomisationEnabled,
+        isCustomisationEnabled,
         goBack(): void {
             if (window.history.length) {
                 this.$router.go(-1);
