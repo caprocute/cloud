@@ -146,6 +146,10 @@ export default Vue.extend({
             type: Number,
             default: 0,
         },
+        station: {
+            type: Number,
+            default: null,
+        },
     },
     data(): {
         stations: EssentialStation[];
@@ -163,20 +167,30 @@ export default Vue.extend({
         };
     },
     mounted(this: any) {
-        return this.refresh();
+        this.refresh();
+        this.loadStation();
     },
     watch: {
         async page() {
             await this.refresh();
         },
+        async station() {
+            await this.loadStation();
+        },
     },
     methods: {
         async selected(station: EssentialStation): Promise<void> {
-            if (this.focused && this.focused.id == station.id) {
+            this.$router.push({
+                name: "adminStations",
+                query: { page: `${this.page}`, station: `${station.id}` },
+            });
+        },
+        async loadStation(): Promise<void> {
+            if (!this.station || (this.focused && this.focused.id == this.station)) {
                 return;
             }
             this.focused = null;
-            this.focused = await this.$services.api.getStation(station.id);
+            this.focused = await this.$services.api.getStation(this.station);
         },
         async refresh(): Promise<void> {
             this.busy = true;
