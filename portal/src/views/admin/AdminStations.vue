@@ -3,7 +3,13 @@
         <div class="container">
             <router-link :to="{ name: 'adminMain' }" class="link">Back to Admin</router-link>
 
-            <table class="stations">
+            <div class="busy" v-if="busy">Loading...</div>
+
+            <div v-if="!busy">
+                <PaginationControls :page="page" :totalPages="totalPages" @new-page="onNewPage" />
+            </div>
+
+            <table class="stations" v-if="!busy">
                 <thead>
                     <tr class="header">
                         <th>ID</th>
@@ -110,7 +116,7 @@
                 </tbody>
             </table>
 
-            <div>
+            <div v-if="!busy">
                 <PaginationControls :page="page" :totalPages="totalPages" @new-page="onNewPage" />
             </div>
         </div>
@@ -135,24 +141,34 @@ export default Vue.extend({
         PaginationControls,
         TransferStation,
     },
-    props: {},
+    props: {
+        page: {
+            type: Number,
+            default: 0,
+        },
+    },
     data(): {
         stations: EssentialStation[];
-        page: number;
         pageSize: number;
         totalPages: number;
         focused: Station | null;
+        busy: boolean;
     } {
         return {
             stations: [],
-            page: 0,
             pageSize: 50,
             totalPages: 0,
             focused: null,
+            busy: false,
         };
     },
     mounted(this: any) {
         return this.refresh();
+    },
+    watch: {
+        async page() {
+            await this.refresh();
+        },
     },
     methods: {
         async selected(station: EssentialStation): Promise<void> {
@@ -163,14 +179,20 @@ export default Vue.extend({
             this.focused = await this.$services.api.getStation(station.id);
         },
         async refresh(): Promise<void> {
+            this.busy = true;
+            this.stations = [];
             await this.$services.api.getAllStations(this.page, this.pageSize).then((page) => {
                 this.totalPages = Math.ceil(page.total / this.pageSize);
                 this.stations = page.stations;
+                this.busy = false;
             });
         },
-        onNewPage(page: number): Promise<void> {
-            this.page = page;
-            return this.refresh();
+        onNewPage(page: number) {
+            window.scrollTo(0, 0);
+            this.$router.push({
+                name: "adminStations",
+                query: { page: `${page}` },
+            });
         },
         async deleteStation(station: EssentialStation): Promise<void> {
             await this.$confirm({
@@ -308,7 +330,5 @@ td.focused {
 
 .row .tools {
     width: 400px;
-}
-.row .uploads {
 }
 </style>

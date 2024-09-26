@@ -623,7 +623,11 @@ const routes = [
         name: "adminStations",
         component: AdminStations,
         props: (route) => {
-            return {};
+            if (route.query.page) {
+                return {
+                    page: parseInt(route.query.page),
+                };
+            }
         },
         meta: {
             admin: true,
