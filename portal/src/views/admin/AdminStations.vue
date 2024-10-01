@@ -312,7 +312,7 @@ export default Vue.extend({
     padding: 5px;
 }
 .stations td {
-    padding: 5px;
+    padding: 2px;
 }
 .stations .device-id {
     font-family: monospace;
