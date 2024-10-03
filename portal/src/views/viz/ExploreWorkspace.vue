@@ -4,8 +4,16 @@
 
         <SharePanel v-if="shareVisible" containerClass="share-floating" :token="token" :bookmark="bookmark" @close="closePanel" />
 
+        <div class="export-chart-content">
+            <div class="project-detail-wrap">
+                <ProjectDetailCard :project="project"></ProjectDetailCard>
+                <i v-if="!isCustomisationEnabled()" id="header-logo" class="icon icon-logo-fieldkit"></i>
+            </div>
+        </div>
+
         <div class="explore-view">
             <div class="explore-header">
+                ∏
                 <div class="explore-links">
                     <a v-for="link in partnerCustomization().links" v-bind:key="link.url" :href="link.url" target="_blank" class="link">
                         {{ $t(link.text) }} >
@@ -14,32 +22,32 @@
                 <DoubleHeader :backTitle="$tc(backLabelKey)" @back="onBack">
                     <template v-slot:title>
                         <div class="one">
-                            {{$tc('dataView.title')}}
+                            {{ $tc("dataView.title") }}
 
                             <InfoTooltip :message="$tc('dataView.computerTip')"></InfoTooltip>
 
                             <div class="button compare" alt="Add Chart" @click="addChart">
                                 <img :src="addIcon" />
-                                <div>  {{$tc('dataView.buttons.addChart')}}</div>
+                                <div>{{ $tc("dataView.buttons.addChart") }}</div>
                             </div>
                         </div>
                     </template>
                     <template v-slot:default>
                         <div class="button-submit" @click="openShare">
                             <i class="icon icon-share"></i>
-                            <span class="button-submit-text"> {{$tc('dataView.buttons.share')}}</span>
+                            <span class="button-submit-text">{{ $tc("dataView.buttons.share") }}</span>
                         </div>
                         <div class="button-submit" @click="openExports" v-if="exportSupported()">
                             <i class="icon icon-export"></i>
-                            <span class="button-submit-text"> {{$tc('dataView.buttons.export')}}</span>
+                            <span class="button-submit-text">{{ $tc("dataView.buttons.export") }}</span>
                         </div>
                     </template>
                 </DoubleHeader>
             </div>
 
-            <div v-if="showNoSensors" class="notification">{{$tc('dataView.noSensors')}}</div>
+            <div v-if="showNoSensors" class="notification">{{ $tc("dataView.noSensors") }}</div>
 
-            <div v-if="!workspace && !bookmark">{{$tc('dataView.nothingSelected')}}</div>
+            <div v-if="!workspace && !bookmark">{{ $tc("dataView.nothingSelected") }}</div>
 
             <div class="workspace-container" v-if="!workspace && currentStation">
                 <div class="station-summary">
@@ -58,7 +66,6 @@
 
             <div v-bind:class="{ 'workspace-container': true, busy: busy }">
                 <div class="busy-panel" v-if="busy">
-                    &nbsp;
                     <Spinner></Spinner>
                 </div>
 
@@ -118,7 +125,13 @@ import ExportPanel from "./ExportPanel.vue";
 import SharePanel from "./SharePanel.vue";
 import StationSummaryContent from "../shared/StationSummaryContent.vue";
 import PaginationControls from "@/views/shared/PaginationControls.vue";
-import { getPartnerCustomization, getPartnerCustomizationWithDefault, interpolatePartner, PartnerCustomization } from "../shared/partners";
+import {
+  getPartnerCustomization,
+  getPartnerCustomizationWithDefault,
+  interpolatePartner,
+  isCustomisationEnabled,
+  PartnerCustomization
+} from "../shared/partners";
 import { mapState, mapGetters } from "vuex";
 import { DisplayStation } from "@/store";
 import { GlobalState } from "@/store/modules/global";
@@ -131,10 +144,12 @@ import StationBattery from "@/views/station/StationBattery.vue";
 import InfoTooltip from "@/views/shared/InfoTooltip.vue";
 import Spinner from "@/views/shared/Spinner.vue";
 import { confirmLeaveWithDirtyCheck } from "@/store/modules/dirty";
+import ProjectDetailCard from "@/views/projects/ProjectDetailCard.vue";
 
 export default Vue.extend({
     name: "ExploreWorkspace",
     components: {
+        ProjectDetailCard,
         ...CommonComponents,
         StandardLayout,
         VizWorkspace,
@@ -234,6 +249,7 @@ export default Vue.extend({
     },
     async beforeMount(): Promise<void> {
         if (this.bookmark) {
+            console.log("Radoi this.bookmark", this.bookmark);
             await this.$services.api
                 .getAllSensorsMemoized()() // TODO No need to make this call.
                 .then(async () => {
@@ -254,6 +270,7 @@ export default Vue.extend({
         }
     },
     methods: {
+      isCustomisationEnabled,
         async onBack() {
             if (this.bookmark.c) {
                 if (this.bookmark.c.map) {
@@ -618,8 +635,12 @@ export default Vue.extend({
         margin-right: 0.5em;
     }
 }
-.graph .vega-embed {
+.graph .vega-embed:not(.vega-embed--dummy) {
     height: 340px;
+}
+.graph .vega-embed--dummy {
+    overflow: visible;
+    z-index: $z-index-top;
 }
 .scrubber .vega-embed {
     height: 40px;
@@ -1123,5 +1144,25 @@ export default Vue.extend({
     background: #ffff;
     padding: 10px;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.07);
+}
+
+.export-chart-content {
+    // display: none;
+}
+
+.project-detail-wrap {
+    position: relative;
+
+    .icon-logo-fieldkit {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        right: 30px;
+        font-size: 26px;
+    }
+
+    .project-detail-card {
+        position: unset;
+    }
 }
 </style>
