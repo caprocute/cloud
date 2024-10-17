@@ -68,6 +68,13 @@ if [ "${DATABASE}" = "primary" ]; then
         -T fieldkit.bookmarks \
         -T fieldkit.ingestion_queue \
         -T fieldkit.data_record >> ${FILE}
+
+    if [ "${TABLES}" = "all" ]; then
+        df -h
+        echo "copying ALL (ttn_messages)"
+        echo "COPY fieldkit.ttn_messages FROM stdin;" >> ${FILE}
+        psql "${DATABASE_URL}" -c "COPY (SELECT * FROM fieldkit.ttn_messages ORDER BY created_at DESC LIMIT 1000) TO STDOUT" >> ${FILE}
+    fi
 fi
 
 if [ "${DATABASE}" = "ts" ]; then

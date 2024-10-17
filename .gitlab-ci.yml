@@ -182,7 +182,24 @@ db:primary:prod:clone:
   script:
     - cd tools
     - docker build -t conservify/fk-cloud-tools:latest .
-    - docker run -e DEPLOY_HOST=${DEPLOY_HOST} -e SYNC_COPY_TARGET_DBS=${SYNC_COPY_TARGET_DBS} -e SYNC_COPY_TARGET_DBS_PATH=${SYNC_COPY_TARGET_DBS_PATH} -e CI_JOB_TOKEN=${CI_JOB_TOKEN} -e CI_PROJECT_ID=${CI_PROJECT_ID} -e DATABASE=${DATABASE} conservify/fk-cloud-tools /work/db-clone.sh
+    - docker run -e DEPLOY_HOST=${DEPLOY_HOST} -e SYNC_COPY_TARGET_DBS=${SYNC_COPY_TARGET_DBS} -e SYNC_COPY_TARGET_DBS_PATH=${SYNC_COPY_TARGET_DBS_PATH} -e CI_JOB_TOKEN=${CI_JOB_TOKEN} -e CI_PROJECT_ID=${CI_PROJECT_ID} -e DATABASE=${DATABASE} -e TABLES=required conservify/fk-cloud-tools /work/db-clone.sh
+
+db:primary:prod:clone-all:
+  stage: db
+  image: docker:24.0.5
+  when: manual
+  timeout: 3h
+  services:
+    - name: docker:24.0.5-dind
+      alias: docker
+  variables:
+    DOCKER_HOST: tcp://docker:2375/
+    DOCKER_TLS_CERTDIR: ""
+    DATABASE: primary
+  script:
+    - cd tools
+    - docker build -t conservify/fk-cloud-tools:latest .
+    - docker run -e DEPLOY_HOST=${DEPLOY_HOST} -e SYNC_COPY_TARGET_DBS=${SYNC_COPY_TARGET_DBS} -e SYNC_COPY_TARGET_DBS_PATH=${SYNC_COPY_TARGET_DBS_PATH} -e CI_JOB_TOKEN=${CI_JOB_TOKEN} -e CI_PROJECT_ID=${CI_PROJECT_ID} -e DATABASE=${DATABASE} -e TABLES=all conservify/fk-cloud-tools /work/db-clone.sh
 
 db:ts:prod:clone:
   stage: db
@@ -199,7 +216,7 @@ db:ts:prod:clone:
   script:
     - cd tools
     - docker build -t conservify/fk-cloud-tools:latest .
-    - docker run -e DEPLOY_HOST=${DEPLOY_HOST} -e SYNC_COPY_TARGET_DBS=${SYNC_COPY_TARGET_DBS} -e SYNC_COPY_TARGET_DBS_PATH=${SYNC_COPY_TARGET_DBS_PATH} -e CI_JOB_TOKEN=${CI_JOB_TOKEN} -e CI_PROJECT_ID=${CI_PROJECT_ID} -e DATABASE=${DATABASE} conservify/fk-cloud-tools /work/db-clone.sh
+    - docker run -e DEPLOY_HOST=${DEPLOY_HOST} -e SYNC_COPY_TARGET_DBS=${SYNC_COPY_TARGET_DBS} -e SYNC_COPY_TARGET_DBS_PATH=${SYNC_COPY_TARGET_DBS_PATH} -e CI_JOB_TOKEN=${CI_JOB_TOKEN} -e CI_PROJECT_ID=${CI_PROJECT_ID} -e DATABASE=${DATABASE} -e TABLES=all conservify/fk-cloud-tools /work/db-clone.sh
 
 db:primary:dev:restore:
   stage: db
