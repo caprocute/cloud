@@ -18,7 +18,7 @@
 
         <div class="viz-stations">
             <div class="viz-station-row" v-for="(item, index) in stationSensorPairs" :key="index">
-                <div class="tree-key" :style="{ color: getKeyColor(parseInt(index)) }">&#9632;</div>
+                <div class="tree-key" :style="{ color: getKeyColor(index) }">&#9632;</div>
                 <span>{{ item.stationName }}:</span>
                 <span>{{ item.sensorName }}</span>
             </div>
