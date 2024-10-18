@@ -55,6 +55,9 @@ export default Vue.extend({
     },
     mounted() {
         document.addEventListener("click", this.handleClick);
+        setTimeout(() => {
+            console.log("Radoi", this.vega);
+        }, 1000);
     },
     beforeDestroy() {
         document.removeEventListener("click", this.handleClick);
@@ -110,7 +113,11 @@ export default Vue.extend({
 
                 exportCanvas.toBlob((blob) => {
                     if (blob) {
-                        this.downloadFile(blob, "combined-chart.png", "image/png");
+                        this.downloadFile(
+                            blob,
+                            (this.vega as { embedOptions: { downloadFileName: string } }).embedOptions.downloadFileName,
+                            "image/png"
+                        );
                     }
                 });
             } catch (error) {
@@ -158,7 +165,7 @@ export default Vue.extend({
 
             const link = document.createElement("a");
             link.href = url;
-            link.download = "combined-exported-content.svg";
+            link.download = (this.vega as { embedOptions: { downloadFileName: string } }).embedOptions.downloadFileName + ".svg";
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);

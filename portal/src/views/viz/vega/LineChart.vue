@@ -93,6 +93,7 @@ export default Vue.extend({
                                         <p class="time">${sanitize(tooltip.time)}</p>`;
                     },
                 },
+                downloadFileName: this.getFileName(this.series[0]),
                 actions: false,
                 scaleFactor: 2,
                 padding: { left: 10, right: 50 },
@@ -173,6 +174,12 @@ export default Vue.extend({
             } else {
                 return "#ccc";
             }
+        },
+        getFileName(series): string {
+            const stationName = series.vizInfo.station.name;
+            const sensorName = series.vizInfo.name;
+
+            return `${stationName}_${sensorName}`.replace("[^a-zA-Z0-9\\.\\-]", "_");
         },
     },
 });
