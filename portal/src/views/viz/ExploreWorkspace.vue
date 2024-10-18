@@ -4,16 +4,10 @@
 
         <SharePanel v-if="shareVisible" containerClass="share-floating" :token="token" :bookmark="bookmark" @close="closePanel" />
 
-        <div class="export-chart-content">
-            <div class="project-detail-wrap">
-                <ProjectDetailCard :project="project"></ProjectDetailCard>
-                <i v-if="!isCustomisationEnabled()" id="header-logo" class="icon icon-logo-fieldkit"></i>
-            </div>
-        </div>
+        <ExportChartContent></ExportChartContent>
 
         <div class="explore-view">
             <div class="explore-header">
-                ∏
                 <div class="explore-links">
                     <a v-for="link in partnerCustomization().links" v-bind:key="link.url" :href="link.url" target="_blank" class="link">
                         {{ $t(link.text) }} >
@@ -126,30 +120,31 @@ import SharePanel from "./SharePanel.vue";
 import StationSummaryContent from "../shared/StationSummaryContent.vue";
 import PaginationControls from "@/views/shared/PaginationControls.vue";
 import {
-  getPartnerCustomization,
-  getPartnerCustomizationWithDefault,
-  interpolatePartner,
-  isCustomisationEnabled,
-  PartnerCustomization
+    getPartnerCustomization,
+    getPartnerCustomizationWithDefault,
+    interpolatePartner,
+    isCustomisationEnabled,
+    PartnerCustomization,
 } from "../shared/partners";
-import { mapState, mapGetters } from "vuex";
+import { mapGetters, mapState } from "vuex";
 import { DisplayStation } from "@/store";
 import { GlobalState } from "@/store/modules/global";
 import { SensorsResponse } from "./api";
-import { Workspace, Bookmark, Time, VizSensor, ChartType, FastTime, VizSettings } from "./viz";
+import { Bookmark, ChartType, FastTime, Time, VizSensor, VizSettings, Workspace } from "./viz";
 import { VizWorkspace } from "./VizWorkspace";
-import { isMobile, getBatteryIcon } from "@/utilities";
+import { getBatteryIcon, isMobile } from "@/utilities";
 import Comments from "../comments/Comments.vue";
 import StationBattery from "@/views/station/StationBattery.vue";
 import InfoTooltip from "@/views/shared/InfoTooltip.vue";
 import Spinner from "@/views/shared/Spinner.vue";
 import { confirmLeaveWithDirtyCheck } from "@/store/modules/dirty";
-import ProjectDetailCard from "@/views/projects/ProjectDetailCard.vue";
+import ExportChartContent from "@/views/viz/vega/ExportChartContent.vue";
+import project from "vega-lite/build/src/compile/selection/project";
 
 export default Vue.extend({
     name: "ExploreWorkspace",
     components: {
-        ProjectDetailCard,
+        ExportChartContent,
         ...CommonComponents,
         StandardLayout,
         VizWorkspace,
@@ -194,6 +189,9 @@ export default Vue.extend({
         };
     },
     computed: {
+        project() {
+            return project;
+        },
         ...mapGetters({ isAuthenticated: "isAuthenticated" }),
         ...mapState({
             user: (s: GlobalState) => s.user.user,
@@ -249,7 +247,6 @@ export default Vue.extend({
     },
     async beforeMount(): Promise<void> {
         if (this.bookmark) {
-            console.log("Radoi this.bookmark", this.bookmark);
             await this.$services.api
                 .getAllSensorsMemoized()() // TODO No need to make this call.
                 .then(async () => {
@@ -270,7 +267,7 @@ export default Vue.extend({
         }
     },
     methods: {
-      isCustomisationEnabled,
+        isCustomisationEnabled,
         async onBack() {
             if (this.bookmark.c) {
                 if (this.bookmark.c.map) {
@@ -1144,25 +1141,5 @@ export default Vue.extend({
     background: #ffff;
     padding: 10px;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.07);
-}
-
-.export-chart-content {
-    // display: none;
-}
-
-.project-detail-wrap {
-    position: relative;
-
-    .icon-logo-fieldkit {
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        right: 30px;
-        font-size: 26px;
-    }
-
-    .project-detail-card {
-        position: unset;
-    }
 }
 </style>
