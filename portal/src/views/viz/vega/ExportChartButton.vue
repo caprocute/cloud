@@ -174,6 +174,13 @@ export default Vue.extend({
                 img.onerror = (error) => reject(error);
             });
         },
+
+        getFileName(series): string {
+            const stationName = series.vizInfo.station.name;
+            const sensorName = series.vizInfo.name;
+
+            return `${stationName}_${sensorName}`.replace("[^a-zA-Z0-9\\.\\-]", "_");
+        },
     },
 });
 </script>
