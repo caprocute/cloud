@@ -74,6 +74,7 @@ export default Vue.extend({
             link.click();
             URL.revokeObjectURL(url);
         },
+
         async exportAsPNG() {
             if (!this.vega) return;
 
@@ -117,15 +118,6 @@ export default Vue.extend({
             }
         },
 
-        loadImage(src: string): Promise<HTMLImageElement> {
-            return new Promise((resolve, reject) => {
-                const img = new Image();
-                img.src = src;
-                img.onload = () => resolve(img);
-                img.onerror = (error) => reject(error);
-            });
-        },
-
         async exportAsSVG() {
             const htmlElement = document.getElementById("export-chart-content") as HTMLHtmlElement;
             const canvas = await html2canvas(htmlElement);
@@ -144,22 +136,22 @@ export default Vue.extend({
             const scaledWidth = canvas.width * zoomFactor;
             const scaledHeight = canvas.height * zoomFactor;
             const marginTop = 30;
-            const marginLeft = 30;
+            const marginLeft = 50;
 
             const combinedSVG = `
-        <svg xmlns="http://www.w3.org/2000/svg" width="${scaledWidth + marginLeft}" height="${scaledHeight + marginTop + 300}">
-            <foreignObject width="100%" height="${scaledHeight}">
-                <div xmlns="http://www.w3.org/1999/xhtml" style="transform: scale(${zoomFactor}); transform-origin: 0 0; width: ${
-                canvas.width
+              <svg xmlns="http://www.w3.org/2000/svg" width="${scaledWidth}" height="${scaledHeight + marginTop + 300}">
+                  <foreignObject width="100%" height="${scaledHeight}">
+                      <div xmlns="http://www.w3.org/1999/xhtml" style="transform: scale(${zoomFactor}); transform-origin: 0 0; width: ${
+                canvas.width - 60
             }px; height: ${canvas.height}px;">
-                    <img src="${htmlImage}" style="width: 100%; height: auto;" />
-                </div>
-            </foreignObject>
-            <g transform="translate(${marginLeft}, ${marginTop + scaledHeight})">
-                ${svg}
-            </g>
-        </svg>
-    `;
+                                <img src="${htmlImage}" style="width: 100%; height: auto;" />
+                            </div>
+                        </foreignObject>
+                        <g transform="translate(${marginLeft}, ${marginTop + scaledHeight})">
+                            ${svg}s
+                        </g>
+                    </svg>
+            `;
 
             const blob = new Blob([combinedSVG], { type: "image/svg+xml;charset=utf-8" });
             const url = URL.createObjectURL(blob);
@@ -172,6 +164,15 @@ export default Vue.extend({
             document.body.removeChild(link);
 
             URL.revokeObjectURL(url);
+        },
+
+        loadImage(src: string): Promise<HTMLImageElement> {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.src = src;
+                img.onload = () => resolve(img);
+                img.onerror = (error) => reject(error);
+            });
         },
     },
 });
