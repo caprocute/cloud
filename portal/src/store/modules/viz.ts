@@ -22,15 +22,6 @@ const actions = () => {
         [ActionTypes.UPDATE_VIZ_SENSOR]: async ({ commit }: { commit: any }, payload: { index: number; sensorName: string }) => {
             commit(MutationTypes.UPDATE_VIZ_SENSOR, payload);
         },
-
-        /* [ActionTypes.EXPORT_SELECTION]: async ({ state }: { state: VizState }) => {
-            // Export the current selections for a PDF or other use
-            const formattedData = state.stationsAndSensors.map((row) => ({
-                stationName: row.stationName,
-                sensorName: row.sensorName,
-            }));
-            return formattedData; // This can be used in a PDF generation
-        },*/
     };
 };
 
