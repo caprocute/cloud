@@ -55,9 +55,6 @@ export default Vue.extend({
     },
     mounted() {
         document.addEventListener("click", this.handleClick);
-        setTimeout(() => {
-            console.log("Radoi", this.vega);
-        }, 1000);
     },
     beforeDestroy() {
         document.removeEventListener("click", this.handleClick);
