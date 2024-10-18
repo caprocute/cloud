@@ -7,15 +7,15 @@
 
 <script lang="ts">
 import _ from "lodash";
-import {isMobile} from "@/utilities";
-import Vue, {PropType} from "vue";
-import {default as vegaEmbed, VisualizationSpec} from "vega-embed";
+import { isMobile } from "@/utilities";
+import Vue, { PropType } from "vue";
+import { default as vegaEmbed, VisualizationSpec } from "vega-embed";
 
-import {TimeRange} from "../common";
-import {SeriesData, TimeZoom} from "../viz";
-import {ChartSettings} from "./SpecFactory";
+import { TimeRange } from "../common";
+import { SeriesData, TimeZoom } from "../viz";
+import { ChartSettings } from "./SpecFactory";
 import chartStyles from "./chartStyles";
-import {TimeSeriesSpecFactory} from "./TimeSeriesSpecFactory";
+import { TimeSeriesSpecFactory } from "./TimeSeriesSpecFactory";
 import ExportChartButton from "@/views/viz/vega/ExportChartButton.vue";
 
 type DragTimeSignal = [number, number] | null;
@@ -95,33 +95,10 @@ export default Vue.extend({
                 },
                 actions: false,
                 scaleFactor: 2,
+                padding: { left: 10, right: 50 },
             });
 
             this.vega = vegaInfo;
-
-            // Replace vega-embed save as icon with custom button
-            if (!this.settings.tiny) {
-                /* const saveButtons = document.querySelectorAll("summary");
-
-                saveButtons.forEach((button) => {
-                    if (button.querySelectorAll("span").length === 0) {
-                        const svg = button.querySelector("svg");
-                        if (svg) {
-                            svg.setAttribute("viewBox", "0 0 20 20");
-                            svg.innerHTML =
-                                '<g id="icon_SaveAs" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linecap="round">' +
-                                '<line x1="7.96030045" y1="1" x2="7.96030045" y2="11" id="Path-2" stroke="#2C3E50" stroke-width="1.5" stroke-linejoin="round"></line>' +
-                                '<polyline id="Path-9" stroke="#2C3E50" stroke-width="1.5" stroke-linejoin="bevel" points="12.8961983 6.50366211 8.05585126 11 2.92245537 6.50366211"></polyline>' +
-                                '<polyline id="Path-10" stroke="#2C3E50" stroke-width="1.5" stroke-linejoin="round" points="1 12.5363846 1 16.5 15.1181831 16.5 15.1181831 12.5363846"></polyline>' +
-                                "</g>";
-                            const saveLabel = document.createElement("span");
-                            saveLabel.setAttribute("class", "save-label");
-                            saveLabel.innerHTML = this.$tc("dataView.saveAs");
-                            button.appendChild(saveLabel);
-                        }
-                    }
-                });*/
-            }
 
             if (!this.settings.tiny) {
                 if (brushable) {
@@ -203,54 +180,6 @@ export default Vue.extend({
                 return "#ccc";
             }
         },
-
-        /*createCustomExportButtons() {
-            const chartContainer = document.querySelector(".vega-embed");
-            const exportButtonsContainer = document.createElement("div");
-            const details = document.createElement("details");
-            exportButtonsContainer.classList.add("vega-actions");
-
-            if (!chartContainer) return;
-
-            const summary = document.createElement("summary");
-            details.appendChild(summary);
-
-            const svgString = `
-<svg viewBox="0 0 20 20" fill="currentColor" stroke="none" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
-    <g id="icon_SaveAs" fill="none" fill-rule="evenodd" stroke-linecap="round">
-        <line x1="7.96030045" y1="1" x2="7.96030045" y2="11" id="Path-2" stroke="#2C3E50" stroke-width="1.5" stroke-linejoin="round"></line>
-        <polyline id="Path-9" stroke="#2C3E50" stroke-width="1.5" stroke-linejoin="bevel" points="12.8961983 6.50366211 8.05585126 11 2.92245537 6.50366211"></polyline>
-        <polyline id="Path-10" stroke="#2C3E50" stroke-width="1.5" stroke-linejoin="round" points="1 12.5363846 1 16.5 15.1181831 16.5 15.1181831 12.5363846"></polyline>
-    </g>
-</svg>
-`;
-
-            // Convert the string to an SVG element
-            const parser = new DOMParser();
-            const svgDoc = parser.parseFromString(svgString, "image/svg+xml");
-            const svg = svgDoc.documentElement; // Get the <svg> element
-
-            const saveLabel = document.createElement("span");
-            saveLabel.setAttribute("class", "save-label");
-            saveLabel.innerHTML = this.$tc("dataView.saveAs");
-            summary.appendChild(svg);
-            summary.appendChild(saveLabel);
-
-            const customPngButton = document.createElement("a");
-            customPngButton.innerHTML = this.$tc("dataView.saveAsPng");
-            customPngButton.addEventListener("click", this.exportAsPNG.bind(this));
-
-            /!*   // Create the custom "Save as SVG" button
-            const customSvgButton = document.createElement("a");
-            customSvgButton.innerHTML = this.getButtonHTML("SVG"); // Customize the inner HTML as needed
-            customSvgButton.addEventListener("click", this.exportAsSVG); // Attach your custom export function*!/
-
-            // Append buttons to the container
-            exportButtonsContainer.appendChild(customPngButton);
-            // chartContainer.appendChild(customSvgButton);
-            details.appendChild(exportButtonsContainer);
-            chartContainer.appendChild(details);
-        },*/
     },
 });
 </script>
@@ -268,13 +197,13 @@ export default Vue.extend({
     display: flex;
     align-items: center;
     margin-right: 3.2em !important;
+    opacity: 1 !important;
 
     @include bp-down($sm) {
         bottom: -195px;
         top: unset !important;
         left: 50%;
         transform: translateX(-50%);
-        opacity: 1 !important;
         width: 80px;
 
         span {

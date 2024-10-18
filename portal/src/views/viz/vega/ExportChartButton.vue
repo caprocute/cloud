@@ -1,6 +1,6 @@
 <template>
     <div class="vega-embed vega-embed--dummy">
-        <details>
+        <details ref="vegaExportOptions">
             <summary>
                 <svg viewBox="0 0 20 20" fill="currentColor" stroke="none" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
                     <g id="icon_SaveAs" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linecap="round">
@@ -43,6 +43,8 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { View } from "vega";
+import html2canvas from "html2canvas";
+import { HTMLElement } from "@tiptap/vue-2";
 
 export default Vue.extend({
     name: "ExportChartButton",
@@ -51,8 +53,17 @@ export default Vue.extend({
             required: true,
         },
     },
+    mounted() {
+        document.addEventListener("click", this.handleClick);
+    },
+    beforeDestroy() {
+        document.removeEventListener("click", this.handleClick);
+    },
     methods: {
-        // Reusable download helper
+        handleClick() {
+            const detailsElement = this.$refs.vegaExportOptions as HTMLHtmlElement;
+            detailsElement.removeAttribute("open");
+        },
         downloadFile(content: string | Blob, fileName: string, mimeType: string) {
             const blob = typeof content === "string" ? new Blob([content], { type: mimeType }) : content;
 
@@ -63,26 +74,42 @@ export default Vue.extend({
             link.click();
             URL.revokeObjectURL(url);
         },
-
         async exportAsPNG() {
             if (!this.vega) return;
 
             const view = (this.vega as { view: View }).view;
-            const exportWidth = 2400;
-            const exportHeight = 800;
+            const htmlElement = document.getElementById("export-chart-content") as HTMLHtmlElement;
 
             try {
-                const canvas = await view.toCanvas(4);
+                const htmlCanvas = await html2canvas(htmlElement, { scale: 2 });
+                const htmlImage = htmlCanvas.toDataURL("image/png");
+
+                const canvas = await view.toCanvas(2);
+                const exportWidth = Math.max(canvas.width, htmlCanvas.width);
+                const exportHeight = canvas.height + htmlCanvas.height + 30;
+
                 const exportCanvas = document.createElement("canvas");
                 exportCanvas.width = exportWidth;
                 exportCanvas.height = exportHeight;
 
                 const context = exportCanvas.getContext("2d");
-                context?.drawImage(canvas, 0, 0, exportWidth, exportHeight);
+                const htmlImg = await this.loadImage(htmlImage);
+
+                if (!context) return;
+
+                context.fillStyle = "white";
+                context.fillRect(0, 0, exportWidth, exportHeight);
+
+                context.drawImage(htmlImg, 0, 0, exportWidth, htmlCanvas.height);
+
+                const marginLeft = 90;
+                const yOffset = htmlCanvas.height + 30;
+
+                context.drawImage(canvas, marginLeft, yOffset, canvas.width + 70, canvas.height);
 
                 exportCanvas.toBlob((blob) => {
                     if (blob) {
-                        this.downloadFile(blob, "chart.png", "image/png");
+                        this.downloadFile(blob, "combined-chart.png", "image/png");
                     }
                 });
             } catch (error) {
@@ -90,17 +117,61 @@ export default Vue.extend({
             }
         },
 
+        loadImage(src: string): Promise<HTMLImageElement> {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.src = src;
+                img.onload = () => resolve(img);
+                img.onerror = (error) => reject(error);
+            });
+        },
+
         async exportAsSVG() {
-            if (!this.vega) return;
+            const htmlElement = document.getElementById("export-chart-content") as HTMLHtmlElement;
+            const canvas = await html2canvas(htmlElement);
+            const htmlImage = canvas.toDataURL("image/png");
 
             const view = (this.vega as { view: View }).view;
-
+            let svg;
             try {
-                const svg = await view.toSVG();
-                this.downloadFile(svg, "chart.svg", "image/svg+xml;charset=utf-8");
+                svg = await view.toSVG();
             } catch (error) {
                 console.error("Error exporting the chart as SVG:", error);
+                return;
             }
+
+            const zoomFactor = 0.5;
+            const scaledWidth = canvas.width * zoomFactor;
+            const scaledHeight = canvas.height * zoomFactor;
+            const marginTop = 30;
+            const marginLeft = 30;
+
+            const combinedSVG = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="${scaledWidth + marginLeft}" height="${scaledHeight + marginTop + 300}">
+            <foreignObject width="100%" height="${scaledHeight}">
+                <div xmlns="http://www.w3.org/1999/xhtml" style="transform: scale(${zoomFactor}); transform-origin: 0 0; width: ${
+                canvas.width
+            }px; height: ${canvas.height}px;">
+                    <img src="${htmlImage}" style="width: 100%; height: auto;" />
+                </div>
+            </foreignObject>
+            <g transform="translate(${marginLeft}, ${marginTop + scaledHeight})">
+                ${svg}
+            </g>
+        </svg>
+    `;
+
+            const blob = new Blob([combinedSVG], { type: "image/svg+xml;charset=utf-8" });
+            const url = URL.createObjectURL(blob);
+
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = "combined-exported-content.svg";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            URL.revokeObjectURL(url);
         },
     },
 });
