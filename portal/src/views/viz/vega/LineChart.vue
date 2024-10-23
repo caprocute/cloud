@@ -96,7 +96,7 @@ export default Vue.extend({
                 downloadFileName: this.getFileName(this.series[0]),
                 actions: false,
                 scaleFactor: 2,
-                padding: { left: 10, right: 50 },
+                padding: this.settings.mobile ? {left: 0, right: 10 } : { left: 10, right: 50 },
             });
 
             this.vega = vegaInfo;
