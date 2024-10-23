@@ -631,6 +631,14 @@ export default Vue.extend({
         margin-left: 0.25em;
         margin-right: 0.5em;
     }
+
+    details {
+        @include bp-down($sm) {
+            bottom: -360px;
+            position: absolute;
+            left: 50%;
+        }
+    }
 }
 .graph .vega-embed:not(.vega-embed--dummy) {
     height: 340px;
