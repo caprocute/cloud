@@ -2,8 +2,12 @@
     <div class="export-chart-content" id="export-chart-content">
         <div class="project-detail-wrap" v-if="project">
             <div class="project-detail-card">
-                <div id="exported-project-photo" class="photo-container">
-                    <ProjectPhoto :project="project" :image-size="132" />
+                <div
+                    id="exported-project-photo"
+                    class="photo-container"
+                    :style="{ backgroundImage: `url(${projectPhoto})`, backgroundSize: 'cover', backgroundPosition: 'center' }"
+                >
+                    <ProjectPhoto :project="project" :image-size="132" @project-photo-loaded="onProjectPhotoLoaded($event)" />
                 </div>
                 <div class="detail-container">
                     <div>
@@ -39,9 +43,11 @@ export default Vue.extend({
     components: { ProjectPhoto },
     data(): {
         project: Project | null;
+        projectPhoto: string | null;
     } {
         return {
             project: null,
+            projectPhoto: null,
         };
     },
     methods: {
@@ -49,6 +55,9 @@ export default Vue.extend({
         getKeyColor(idx: string | number) {
             const color = idx === 0 ? chartStyles.primaryLine.stroke : chartStyles.secondaryLine.stroke;
             return color;
+        },
+        onProjectPhotoLoaded(photo: string) {
+            this.projectPhoto = photo;
         },
     },
     computed: {
@@ -78,6 +87,10 @@ export default Vue.extend({
     text-align: left;
     background: #fff;
 
+    .project-photo {
+        visibility: hidden;
+    }
+
     .project-detail-card {
         background: #fff !important;
         align-items: center;
@@ -90,9 +103,8 @@ export default Vue.extend({
     }
 
     .photo-container {
-        width: 132px;
         height: 66px;
-        flex: 0 0 132px;
+        flex: 0 0 66px;
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
