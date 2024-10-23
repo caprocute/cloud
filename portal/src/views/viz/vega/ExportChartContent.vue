@@ -82,7 +82,7 @@ export default Vue.extend({
 .export-chart-content {
     position: absolute;
     left: -10000px;
-    width: 100%;
+    width: 1080px;
     overflow: hidden;
     text-align: left;
     background: #fff;
