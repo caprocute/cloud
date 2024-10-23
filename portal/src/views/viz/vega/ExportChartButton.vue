@@ -82,12 +82,13 @@ export default Vue.extend({
             const htmlElement = document.getElementById("export-chart-content") as HTMLHtmlElement;
 
             try {
-                const htmlCanvas = await html2canvas(htmlElement, { scale: 2 });
+                const exportWidth = 1080;
+                const exportHeight = 640;
+
+                const htmlCanvas = await html2canvas(htmlElement, { scale: 1 });
                 const htmlImage = htmlCanvas.toDataURL("image/png");
 
-                const canvas = await view.toCanvas(2);
-                const exportWidth = Math.max(canvas.width, htmlCanvas.width);
-                const exportHeight = canvas.height + htmlCanvas.height + 30;
+                const canvas = await view.toCanvas(1.5);
 
                 const exportCanvas = document.createElement("canvas");
                 exportCanvas.width = exportWidth;
@@ -101,12 +102,17 @@ export default Vue.extend({
                 context.fillStyle = "white";
                 context.fillRect(0, 0, exportWidth, exportHeight);
 
-                context.drawImage(htmlImg, 0, 0, exportWidth, htmlCanvas.height);
+                const htmlScale = Math.min(exportWidth / htmlCanvas.width, (exportHeight - canvas.height - 30) / htmlCanvas.height);
 
-                const marginLeft = 90;
-                const yOffset = htmlCanvas.height + 30;
+                const htmlYOffset = 30; // Center HTML vertically
+                const vegaChartWidth = htmlCanvas.width * htmlScale; // Use the scaled width for Vega chart
 
-                context.drawImage(canvas, marginLeft, yOffset, canvas.width + 70, canvas.height);
+                const vegaAspectRatio = canvas.height / canvas.width;
+                const vegaChartHeight = vegaChartWidth * vegaAspectRatio; // Scale height based on width
+
+                context.drawImage(htmlImg, 0, 0, htmlCanvas.width * htmlScale, htmlCanvas.height * htmlScale);
+
+                context.drawImage(canvas, 0, htmlYOffset + htmlCanvas.height * htmlScale, vegaChartWidth, vegaChartHeight);
 
                 exportCanvas.toBlob((blob) => {
                     if (blob) {
