@@ -694,11 +694,11 @@
             "map": "Mapa"
         },
         "viewBy": {
-            "btn": "View by:",
-            "day": "Day",
-            "week": "Week",
-            "month": "Month",
-            "year": "Year",
+            "btn": "Ver por:",
+            "day": "Día",
+            "week": "Semana",
+            "month": "Mes",
+            "year": "Año",
             "all": "Todas"
         }
     },
@@ -792,12 +792,12 @@
             "location": "Ubicación",
             "delete": "Borrar",
             "uploads": {
-                "heading": "Uploads",
+                "heading": "Subidas",
                 "id": "ID",
-                "date": "Date",
-                "type": "Type",
-                "size": "Size",
-                "blocks": "Blocks",
+                "date": "Fecha",
+                "type": "Tipo",
+                "size": "Tamaño",
+                "blocks": "Bloques",
                 "url": "URL"
             },
             "information": "Information",
@@ -813,14 +813,14 @@
         }
     },
     "pagination": {
-        "of": "of"
+        "of": "de"
     },
     "deleteAccount": {
-        "heading": "Delete My Account",
-        "button": "Delete Account",
-        "welcome": "Welcome, this form can be used to request that all of your FieldKit account information and data be deleted from our servers. This includes stations, photos, notes or personal projects and any associated location or diagnostic information. This deletion will take effect immediately, so please be careful before proceeding.",
-        "warning": "Warning, continuing will delete your account and all associated data. To confirm, please enter your email address.",
-        "done": "Your account has been deleted.",
-        "sameEmail": "Does not match your email."
+        "heading": "Eliminar Mi Cuenta",
+        "button": "Eliminar Cuenta",
+        "welcome": "Bienvenido, este formulario se puede utilizar para solicitar que toda la información y datos de tu cuenta de FieldKit sean eliminados de nuestros servidores. Esto incluye estaciones, fotos, notas o proyectos personales y cualquier información de ubicación o diagnósticos asociada. Esta eliminación tendrá efecto inmediato, así que ten cuidado antes de continuar.",
+        "warning": "Advertencia, al continuar se eliminará tu cuenta y todos los datos asociados. Para confirmar, por favor ingresa tu dirección de correo electrónico.",
+        "done": "Tu cuenta ha sido eliminada.",
+        "sameEmail": "El correo electrónico no coincide."
     }
 }
