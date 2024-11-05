@@ -840,5 +840,12 @@
         "warning": "Warning, continuing will delete your account and all associated data. To confirm, please enter your email address.",
         "done": "Your account has been deleted.",
         "sameEmail": "Does not match your email."
+    },
+    "stationsMapSummary": {
+        "tabs": {
+            "explore": "Explore Data",
+            "notes": "Field Notes",
+            "details": "Station Details"
+        }
     }
 }
