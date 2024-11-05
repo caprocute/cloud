@@ -1,65 +1,146 @@
 <template>
-    <div v-if="viewingSummary && station" class="station-map-summary radoi" :class="{ open: isOpen }">
-        <StationSummaryContent ref="summaryContent" :station="station">
-            <template #top-right-actions>
-                <img :alt="$t('iconAlts.close')" src="@/assets/icon-close.svg" class="close-button" v-on:click="wantCloseSummary" />
-                <img
-                    :alt="$tc('station.navigateToStation')"
-                    class="navigate-button"
-                    :src="$loadAsset(interpolatePartner('tooltip-') + '.svg')"
-                    @click="openStationPageTab"
-                />
-            </template>
-        </StationSummaryContent>
-
-        <template v-if="isPartnerCustomisationEnabled()">
-            <div class="latest-primary" :style="{ color: latestPrimaryColor }">
-                <template v-if="station.status === StationStatus.up">
-                    <template v-if="latestPrimaryLevel !== null">{{ latestPrimaryLevel }}</template>
-                    <span v-else-if="hasData" class="no-data">{{ $t("noRecentData") }}</span>
-                    <span v-else class="no-data">{{ $t("noData") }}</span>
-                </template>
-                <template v-if="station.status === StationStatus.down">{{ $t("station.inactive") }}</template>
-                <i v-if="latestPrimaryLevel !== null" :style="{ 'background-color': latestPrimaryColor }">
-                    <template v-if="station.status === StationStatus.down">-</template>
-                    <template v-else>{{ visibleReadingValue | prettyReadingNarrowSpace }}</template>
-                </i>
-                <i v-else :style="{ 'background-color': latestPrimaryColor }">–</i>
+    <div v-if="viewingSummary && station" class="station-map-summary" :class="{ open: isOpen }">
+        <div class="station-header">
+            <div class="station-heading">
+                <div class="station-name">{{ station.name }}</div>
+                <a class="btn-close" @click="wantCloseSummary"><i class="icon icon-close"></i></a>
+                <a>
+                    <img
+                        :alt="$tc('station.navigateToStation')"
+                        class="navigate-button"
+                        :src="$loadAsset(interpolatePartner('tooltip-') + '.svg')"
+                        @click="openStationPageTab"
+                    />
+                </a>
             </div>
-        </template>
 
-        <slot :station="station" :sensorDataQuerier="sensorDataQuerier"></slot>
+            <template v-if="isCustomisationEnabled()">
+                <div class="row where-row">
+                    <div v-if="neighborhood || borough" class="flex flex-al-center">
+                        <i class="icon icon-location" />
+                        <template v-if="neighborhood">{{ neighborhood }}</template>
+                        <template v-if="neighborhood && borough">{{ ", " }}</template>
+                        <template v-if="borough">{{ borough }}</template>
+                    </div>
+                    <div v-if="deploymentDate || deployedBy" class="flex flex-al-center">
+                        <i class="icon icon-calendar" />
+                        <template v-if="deploymentDate">{{ $t("station.deployedOn") }} {{ deploymentDate }}</template>
+                        <template v-if="deployedBy">{{ " " }}{{ $t("station.by") }} {{ deployedBy }}</template>
+                    </div>
+                </div>
+            </template>
 
-        <div class="explore-button" v-if="explore" v-on:click="onClickExplore">{{ $t("station.exploreData") }}</div>
+            <template v-else>
+                <div
+                    v-if="stationLocationName || station.placeNameNative || station.placeNameOther || station.placeNameNative"
+                    class="row where-row"
+                >
+                    <div class="flex flex-al-center">
+                        <template v-if="stationLocationName || station.placeNameOther">
+                            <i class="icon icon-location" />
+                            <template>
+                                {{ stationLocationName ? stationLocationName : station.placeNameOther }}
+                            </template>
+                        </template>
+                        <template v-if="station.placeNameNative">
+                            <i class="icon icon-location" />
+                            <span class="location-name">
+                                {{ $t("station.nativeLands") }}
+                                <span class="bold">{{ station.placeNameNative }}</span>
+                            </span>
+                        </template>
+                    </div>
+                </div>
+            </template>
+        </div>
 
-        <StationBattery :station="station" />
+        <StationPhoto :station="station" />
+
+        <StationBattery :station="station"></StationBattery>
+
+        <div class="tabs-container">
+            <div class="tabs-nav">
+                <a v-for="tab in tabs" :key="tab.id" :class="{ active: selectedTab === tab.id }" @click="selectedTab = tab.id">
+                    {{ tab.label }}
+                </a>
+            </div>
+
+            <!-- Tabs Content -->
+            <div class="tabs-content">
+                <div v-if="selectedTab == SummaryTabsEnum.explore">
+                    <StationModules v-if="station.modules.length > 0" :station="station"></StationModules>
+                    <template v-else>
+                        {{ $tc("dataView.noData") }}
+                    </template>
+                </div>
+                <div v-if="selectedTab == SummaryTabsEnum.fieldNotes">
+                  <FieldNotes :stationName="station.name"></FieldNotes>
+
+                </div>
+                <div v-if="selectedTab == SummaryTabsEnum.details">
+                    <StationProjects :stationId="station.id"></StationProjects>
+                    <div v-if="station.modules.length > 0" class="details-row">
+                        <span class="bold">{{ $tc("station.modules") }}</span>
+                        <div class="station-modules ml-10">
+                            <img
+                                v-for="(module, moduleIndex) in station.modules"
+                                v-bind:key="moduleIndex"
+                                alt="Module icon"
+                                :src="getModuleImg(module)"
+                            />
+                        </div>
+                    </div>
+
+                    <div v-if="station.firmwareNumber" class="details-row">
+                        <span class="bold">{{ $tc("station.firmwareVersion") }}</span>
+                        <span class="ml-10 small-light">{{ station.firmwareNumber }}</span>
+                    </div>
+
+                    <section v-if="!isCustomisationEnabled()" class="section-notes container-box">
+                        <NotesForm v-bind:key="station.id" :station="station" :readonly="true" />
+                    </section>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
 <script lang="ts">
-import _ from "lodash";
-
 import Vue, { PropType } from "vue";
 import { mapGetters } from "vuex";
 
 import CommonComponents from "@/views/shared";
 import StationBattery from "@/views/station/StationBattery.vue";
-import StationSummaryContent from "./StationSummaryContent.vue";
 
 import { ModuleSensorMeta, SensorDataQuerier, SensorMeta } from "@/views/shared/sensor_data_querier";
-import { VisibleReadings, DecoratedReading } from "@/store";
+import { DecoratedReading, DisplayModule, VisibleReadings } from "@/store";
 
 import { getBatteryIcon } from "@/utilities";
 import { BookmarkFactory, ExploreContext, serializeBookmark } from "@/views/viz/viz";
-import { getPartnerCustomizationWithDefault, interpolatePartner, isCustomisationEnabled } from "./partners";
+import { getPartnerCustomizationWithDefault, interpolatePartner, isCustomisationEnabled, PartnerCustomization } from "./partners";
 import { StationStatus } from "@/api";
 import { CupertinoPane } from "cupertino-pane";
+import TinyChart from "@/views/viz/TinyChart.vue";
+import * as utils from "@/utilities";
+import StationModules from "@/views/station/StationModules.vue";
+import StationProjects from "@/views/station/StationProjects.vue";
+import NotesForm from "@/views/notes/NotesForm.vue";
+import FieldNotes from '@/views/fieldNotes/FieldNotes.vue';
+
+enum SummaryTabsEnum {
+    explore = "explore",
+    fieldNotes = "fieldNotes",
+    details = "details",
+}
 
 export default Vue.extend({
     name: "StationsMapSummary",
     components: {
+      FieldNotes,
+        NotesForm,
+        StationProjects,
+        StationModules,
         ...CommonComponents,
-        StationSummaryContent,
         StationBattery,
     },
     props: {
@@ -110,6 +191,8 @@ export default Vue.extend({
         isMobileView: boolean;
         cupertinoPane: CupertinoPane | null;
         isOpen: boolean;
+        tabs: any[];
+        selectedTab: SummaryTabsEnum;
     } {
         return {
             viewingSummary: true,
@@ -118,6 +201,12 @@ export default Vue.extend({
             isMobileView: window.screen.availWidth < 500,
             cupertinoPane: null,
             isOpen: true,
+            tabs: [
+                { id: SummaryTabsEnum.explore, label: this.$tc("stationsMapSummary.tabs.explore") },
+                { id: SummaryTabsEnum.fieldNotes, label: "Field Notes" },
+                { id: SummaryTabsEnum.details, label: "Station Details" },
+            ],
+            selectedTab: SummaryTabsEnum.details,
         };
     },
     async mounted() {
@@ -172,8 +261,28 @@ export default Vue.extend({
             }
             return "#00CCFF";
         },
+        stationLocationName(): string {
+            return this.partnerCustomization().stationLocationName(this.station);
+        },
+        // TODO: refactor using functions from partner.ts
+        neighborhood(): string {
+            return this.getAttributeValue("Neighborhood");
+        },
+        borough(): string {
+            return this.getAttributeValue("Borough");
+        },
+        deploymentDate(): string {
+            return this.getAttributeValue("Deployment Date");
+        },
+        deployedBy(): string {
+            return this.getAttributeValue("Deployed By");
+        },
+        SummaryTabsEnum() {
+            return SummaryTabsEnum;
+        },
     },
     methods: {
+        isCustomisationEnabled,
         viewSummary() {
             this.viewingSummary = true;
         },
@@ -221,6 +330,24 @@ export default Vue.extend({
                 this.cupertinoPane.destroy();
             }
         },
+        partnerCustomization(): PartnerCustomization {
+            return getPartnerCustomizationWithDefault();
+        },
+        getAttributeValue(attrName: string): any {
+            if (this.station) {
+                const value = this.station.attributes.find((attr) => attr.name === attrName)?.stringValue;
+                return value ? value : null;
+            }
+        },
+        getModuleName(module: DisplayModule): string {
+            return module.label || this.$tc(module.name.replace("modules.", "fk."));
+        },
+        getModuleKey(module: DisplayModule): string {
+            return module.name.replace("modules.", "fk.");
+        },
+        getModuleImg(module: DisplayModule): string {
+            return this.$loadAsset(utils.getModuleImg(module));
+        },
     },
 });
 </script>
@@ -247,12 +374,53 @@ export default Vue.extend({
 
 .station-map-summary.open {
     transform: translateX(0);
-    width: 480px;
-    padding: 20px;
+    width: 430px;
 
     .sidebar-toggle {
         left: 480px;
     }
+}
+
+.station-heading {
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+}
+
+.location-name {
+    font-size: 14px;
+}
+
+.station-header {
+    padding: 40px 25px 30px;
+}
+
+.station-name {
+    font-size: 20px;
+    font-weight: 900;
+    color: #2c3e50;
+}
+
+.station-photo {
+    height: 200px;
+    width: 100%;
+    object-fit: cover;
+}
+
+.icon-location {
+    margin-right: 7px;
+    margin-top: -2px;
+}
+
+.station-battery-container {
+    padding: 20px 16px 30px 25px;
+}
+
+::v-deep .battery {
+    width: 25px;
+    height: 14px;
+    padding-right: 7px;
+    margin-bottom: -2px;
 }
 
 .station-hover-summary {
@@ -337,8 +505,7 @@ export default Vue.extend({
 }
 
 .navigate-button {
-    cursor: pointer;
-    @include position(absolute, -10px 20px null null);
+    margin: 0 8px;
 }
 
 .readings-container {
@@ -370,10 +537,6 @@ export default Vue.extend({
     border: 1px solid rgb(215, 220, 225);
     border-radius: 4px;
     cursor: pointer;
-}
-
-.icon {
-    padding-right: 7px;
 }
 
 ::v-deep .reading {
@@ -413,5 +576,68 @@ export default Vue.extend({
             color: #cccccc;
         }
     }
+}
+
+.btn-close {
+    position: absolute;
+    top: 40px;
+    right: 20px;
+}
+
+.tabs-container {
+    border-top: solid 1px var(--color-border);
+}
+
+.tabs-nav {
+    display: flex;
+    justify-content: space-between;
+    padding: 30px 20px 25px;
+
+    > a {
+        padding: 4px 4px;
+
+        &.active {
+            border-bottom: 1.5px solid var(--color-dark);
+        }
+    }
+}
+
+.tabs-content {
+    padding: 25px;
+    border-top: solid 1px #d8dce0;
+}
+
+::v-deep .module-data-item {
+    flex: 0 0 100%;
+}
+
+.station-modules {
+    margin-left: 10px;
+    flex-wrap: wrap;
+    @include flex;
+
+    img {
+        margin-right: 8px;
+        margin-bottom: 5px;
+        width: 25px;
+        height: 25px;
+    }
+}
+
+.details-row {
+    display: flex;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px solid var(--color-border);
+    font-size: 14px;
+
+    &:nth-of-type(1) {
+        padding-top: 0;
+    }
+}
+
+.station-projects {
+    margin: 10px 0;
+    color: var(--color-dark);
 }
 </style>

@@ -115,20 +115,8 @@
                     </div>
                 </div>
                 <div>
-                    <div class="station-projects" v-if="stationProjects.length > 0">
-                        <template v-if="stationProjects.length === 1">{{ $tc("station.singleProjectTitle") }}&nbsp;</template>
-                        <template v-else>{{ $tc("station.multipleProjectsTitle") }} &nbsp;</template>
-                        <router-link
-                            v-for="(project, index) in stationProjects"
-                            v-bind:key="project.id"
-                            :to="{ name: 'viewProject', params: { id: project.id } }"
-                            target="_blank"
-                        >
-                            {{ project.name }}
-                            <template v-if="stationProjects.length > 1 && index !== stationProjects.length - 1">,&nbsp;</template>
-                        </router-link>
-                    </div>
-                    <div class="station-photos" :class="{ 'single-photo': photos && photos.length == 1 }">
+                    <StationProjects :stationId="station.id"></StationProjects>
+                    <div v-if="photos" class="station-photos">
                         <div class="photo-container" v-for="(n, index) in 4" v-bind:key="index" @click="navigateToPhotos()">
                             <AuthenticatedPhoto v-if="photos[index]" :url="photos[index].url" />
                             <div v-else class="photo-placeholder">
@@ -146,26 +134,8 @@
             <section class="container-box" v-if="station.modules.length > 0">
                 <h2>{{ $t("station.data") }}</h2>
 
-                <ul class="flex flex-wrap flex-space-between module-data-container">
-                    <li
-                        class="module-data-item"
-                        v-for="module in station.modules"
-                        v-bind:key="module.name"
-                        @click="onModuleClick(module.id)"
-                    >
-                        <h3 class="module-data-title flex flex-al-center">
-                            <img alt="Module icon" :src="getModuleImg(module)" />
-                            {{ getModuleName(module) }}
-                        </h3>
-                        <TinyChart
-                            :ref="'tinyChart-' + module.id"
-                            :moduleKey="getModuleKey(module)"
-                            :station-id="station.id"
-                            :station="station"
-                            :querier="sensorDataQuerier"
-                        />
-                    </li>
-                </ul>
+                <StationModules :station="station"></StationModules>
+
                 <button class="btn module-data-btn" @click="onClickExplore">{{ $t("station.exploreData") }}</button>
             </section>
 
@@ -277,10 +247,13 @@ import { ExploreContext } from "@/views/viz/common";
 import FieldNotes from "@/views/fieldNotes/FieldNotes.vue";
 import { confirmLeaveWithDirtyCheck } from "@/store/modules/dirty";
 import { SnackbarStyle } from "@/store/modules/snackbar";
+import StationModules from "@/views/station/StationModules.vue";
+import StationProjects from "@/views/station/StationProjects.vue";
 
 export default Vue.extend({
     name: "StationView",
     components: {
+        StationProjects,
         StationBattery,
         StandardLayout,
         DoubleHeader,
@@ -290,15 +263,14 @@ export default Vue.extend({
         NotesForm,
         AuthenticatedPhoto,
         ProjectAttributes,
-        TinyChart,
         UserPhoto,
         FieldNotes,
+        StationModules,
     },
     data(): {
         selectedModule: DisplayModule | null;
         isMobileView: boolean;
         loading: boolean;
-        sensorDataQuerier: SensorDataQuerier;
         editModuleIndex: number | null;
         editingDescription: boolean;
         form: {
@@ -316,7 +288,6 @@ export default Vue.extend({
             form: {
                 description: "",
             },
-            sensorDataQuerier: new SensorDataQuerier(this.$services.api),
         };
     },
     watch: {
@@ -386,9 +357,6 @@ export default Vue.extend({
 
             return false;
         },
-        stationProjects(): Project[] {
-            return this.$store.getters.stationProjects;
-        },
         isPartnerCustomisationEnabled(): boolean {
             return isCustomisationEnabled();
         },
@@ -405,7 +373,6 @@ export default Vue.extend({
         const stationId = this.$route.params.stationId;
 
         this.$store.dispatch(ActionTypes.NEED_NOTES, { id: stationId });
-        this.$store.dispatch(ActionTypes.NEED_PROJECTS_FOR_STATION, { id: this.$route.params.stationId });
 
         return this.$store.dispatch(ActionTypes.NEED_STATION, { id: stationId }).catch((e) => {
             if (AuthenticationRequiredError.isInstance(e)) {
@@ -511,21 +478,6 @@ export default Vue.extend({
                 name: this.projectId ? "viewProjectStationPhotos" : "viewStationPhotos",
                 params: { projectId: this.projectId, stationId: String(this.station.id) },
             });
-        },
-
-        onModuleClick(moduleId: number) {
-            const tinyChartComp = this.$refs["tinyChart-" + moduleId];
-            if (tinyChartComp && tinyChartComp[0]) {
-                const vizData = tinyChartComp[0].vizData;
-                if (vizData) {
-                    const bm = BookmarkFactory.forSensor(this.station.id, vizData.vizSensor, vizData.timeRange);
-                    const url = this.$router.resolve({
-                        name: "exploreBookmark",
-                        query: { bookmark: serializeBookmark(bm) },
-                    }).href;
-                    window.open(url, "_blank");
-                }
-            }
         },
         onStationDescriptionInput() {
             const el = this.$refs["stationDescription"] as HTMLElement;
@@ -990,16 +942,6 @@ export default Vue.extend({
             margin-left: 3px;
         }
     }
-
-    &-projects {
-        font-size: 16px;
-        color: #6a6d71;
-        margin: 30px 0;
-
-        @include bp-down($xs) {
-            margin: 20px 0;
-        }
-    }
 }
 
 .small-light {
@@ -1054,39 +996,12 @@ section {
     }
 }
 
-.module-data-container {
-    gap: 20px;
-
-    @include bp-down($sm) {
-        gap: 10px;
-    }
+::v-deep .back {
+    margin-bottom: 15px;
 }
 
-.module-data-item {
-    flex: 1 1 calc(50% - 10px);
-    min-width: 0;
-
-    @include bp-down($sm) {
-        flex: 0 0 100%;
-    }
-}
-
-.module-data-title {
-    color: $color-primary;
-    font-size: 12px;
-    margin-bottom: 10px;
-    cursor: pointer;
-
-    img {
-        margin-right: 7px;
-        width: 19px;
-        height: 19px;
-    }
-}
-
-.module-data-btn {
-    margin: 30px auto 8px auto;
-    display: block;
+::v-deep .back {
+    margin-bottom: 15px;
 }
 
 .module-edit-name {
@@ -1096,18 +1011,8 @@ section {
     margin-bottom: -1px;
 }
 
-::v-deep .back {
-    margin-bottom: 15px;
-}
-
-::v-deep .back {
-    margin-bottom: 15px;
-}
-
-.module-edit-name {
-    opacity: 0.4;
-    font-size: 12px;
-    margin-bottom: -1px;
-    cursor: pointer;
+.module-data-btn {
+    margin: 30px auto 8px auto;
+    display: block;
 }
 </style>
