@@ -14,7 +14,7 @@
                 <div class="detail-description">
                     <template v-if="project">
                         <router-link :to="{ name: 'viewProject', params: { id: project.id } }">
-                          {{project.id}}
+                            {{ project.id }}
                             {{ $t("map.header.viewProjectDashboard") }} >
                         </router-link>
                     </template>
@@ -52,7 +52,7 @@ export default Vue.extend({
 @import "../../scss/global";
 
 .map-header {
-    display: flex;
+    display: none;
     width: 100%;
     box-sizing: border-box;
     background-color: #fcfcfc;
@@ -60,6 +60,10 @@ export default Vue.extend({
     text-align: left;
     padding: 24px 20px;
     z-index: $z-index-top;
+
+    @include bp-up($md) {
+        display: flex;
+    }
 
     body.floodnet & {
         background-color: #f6f9f8;

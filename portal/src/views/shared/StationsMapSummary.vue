@@ -14,68 +14,64 @@
                 </a>
             </div>
 
-            <template v-if="isCustomisationEnabled()">
-                <div class="row where-row">
-                    <div v-if="neighborhood || borough" class="flex flex-al-center">
-                        <i class="icon icon-location" />
-                        <template v-if="neighborhood">{{ neighborhood }}</template>
-                        <template v-if="neighborhood && borough">{{ ", " }}</template>
-                        <template v-if="borough">{{ borough }}</template>
-                    </div>
-                    <div v-if="deploymentDate || deployedBy" class="flex flex-al-center">
-                        <i class="icon icon-calendar" />
-                        <template v-if="deploymentDate">{{ $t("station.deployedOn") }} {{ deploymentDate }}</template>
-                        <template v-if="deployedBy">{{ " " }}{{ $t("station.by") }} {{ deployedBy }}</template>
-                    </div>
+            <div v-if="isCustomisationEnabled()" class="location-rows">
+                <div v-if="neighborhood || borough" class="flex al-center">
+                    <i class="icon icon-location" />
+                    <template v-if="neighborhood">{{ neighborhood }}</template>
+                    <template v-if="neighborhood && borough">{{ ", " }}</template>
+                    <template v-if="borough">{{ borough }}</template>
                 </div>
-            </template>
+                <div v-if="deploymentDate || deployedBy" class="flex al-center">
+                    <i class="icon icon-calendar" />
+                    <template v-if="deploymentDate">{{ $t("station.deployedOn") }} {{ deploymentDate }}</template>
+                    <template v-if="deployedBy">{{ " " }}{{ $t("station.by") }} {{ deployedBy }}</template>
+                </div>
+            </div>
 
-            <template v-else>
-                <div
-                    v-if="stationLocationName || station.placeNameNative || station.placeNameOther || station.placeNameNative"
-                    class="row where-row"
-                >
-                    <div class="flex flex-al-center">
-                        <template v-if="stationLocationName || station.placeNameOther">
-                            <i class="icon icon-location" />
-                            <template>
-                                {{ stationLocationName ? stationLocationName : station.placeNameOther }}
-                            </template>
-                        </template>
-                        <template v-if="station.placeNameNative">
-                            <i class="icon icon-location" />
-                            <span class="location-name">
-                                {{ $t("station.nativeLands") }}
-                                <span class="bold">{{ station.placeNameNative }}</span>
-                            </span>
-                        </template>
-                    </div>
+            <div
+                v-else-if="stationLocationName || station.placeNameNative || station.placeNameOther || station.placeNameNative"
+                class="location-rows"
+            >
+                <div class="flex al-center" v-if="stationLocationName || station.placeNameOther">
+                    <i class="icon icon-location" />
+                    <template>
+                        {{ stationLocationName ? stationLocationName : station.placeNameOther }}
+                    </template>
                 </div>
-            </template>
+                <div class="flex al-center" v-if="station.placeNameNative">
+                    <i class="icon icon-location" />
+                    <span class="location-name">
+                        {{ $t("station.nativeLands") }}
+                        <span class="bold">{{ station.placeNameNative }}</span>
+                    </span>
+                </div>
+            </div>
         </div>
 
-        <StationPhoto :station="station" />
+        <StationPhoto :station="station" :size="400" />
 
         <StationBattery :station="station"></StationBattery>
 
         <div class="tabs-container">
             <div class="tabs-nav">
                 <a v-for="tab in tabs" :key="tab.id" :class="{ active: selectedTab === tab.id }" @click="selectedTab = tab.id">
-                    {{ tab.label }}
+                    <span>{{ tab.label }}</span>
                 </a>
             </div>
 
             <!-- Tabs Content -->
             <div class="tabs-content">
                 <div v-if="selectedTab == SummaryTabsEnum.explore">
-                    <StationModules v-if="station.modules.length > 0" :station="station"></StationModules>
+                    <template v-if="station.modules.length > 0">
+                        <StationModules :station="station"></StationModules>
+                        <StationReadings :station="station"></StationReadings>
+                    </template>
                     <template v-else>
                         {{ $tc("dataView.noData") }}
                     </template>
                 </div>
                 <div v-if="selectedTab == SummaryTabsEnum.fieldNotes">
-                  <FieldNotes :stationName="station.name"></FieldNotes>
-
+                    <FieldNotes :stationName="station.name"></FieldNotes>
                 </div>
                 <div v-if="selectedTab == SummaryTabsEnum.details">
                     <StationProjects :stationId="station.id"></StationProjects>
@@ -96,9 +92,9 @@
                         <span class="ml-10 small-light">{{ station.firmwareNumber }}</span>
                     </div>
 
-                    <section v-if="!isCustomisationEnabled()" class="section-notes container-box">
+                    <!--                    <section v-if="!isCustomisationEnabled()" class="section-notes container-box">
                         <NotesForm v-bind:key="station.id" :station="station" :readonly="true" />
-                    </section>
+                    </section>-->
                 </div>
             </div>
         </div>
@@ -125,7 +121,9 @@ import * as utils from "@/utilities";
 import StationModules from "@/views/station/StationModules.vue";
 import StationProjects from "@/views/station/StationProjects.vue";
 import NotesForm from "@/views/notes/NotesForm.vue";
-import FieldNotes from '@/views/fieldNotes/FieldNotes.vue';
+import FieldNotes from "@/views/fieldNotes/FieldNotes.vue";
+import StationReadings from "@/views/station/StationReadings.vue";
+import StationPhoto from "@/views/shared/StationPhoto.vue";
 
 enum SummaryTabsEnum {
     explore = "explore",
@@ -136,12 +134,13 @@ enum SummaryTabsEnum {
 export default Vue.extend({
     name: "StationsMapSummary",
     components: {
-      FieldNotes,
-        NotesForm,
+        FieldNotes,
+        //  NotesForm,
         StationProjects,
         StationModules,
-        ...CommonComponents,
         StationBattery,
+        StationReadings,
+        StationPhoto,
     },
     props: {
         station: {
@@ -206,7 +205,7 @@ export default Vue.extend({
                 { id: SummaryTabsEnum.fieldNotes, label: "Field Notes" },
                 { id: SummaryTabsEnum.details, label: "Station Details" },
             ],
-            selectedTab: SummaryTabsEnum.details,
+            selectedTab: SummaryTabsEnum.explore,
         };
     },
     async mounted() {
@@ -384,7 +383,6 @@ export default Vue.extend({
 .station-heading {
     margin-bottom: 8px;
     display: flex;
-    align-items: center;
 }
 
 .location-name {
@@ -393,18 +391,30 @@ export default Vue.extend({
 
 .station-header {
     padding: 40px 25px 30px;
+
+    @include bp-down($xs) {
+        padding: 35px 25px 35px;
+    }
 }
 
 .station-name {
     font-size: 20px;
     font-weight: 900;
     color: #2c3e50;
+
+    @include bp-down($xs) {
+        font-size: 16px;
+    }
 }
 
 .station-photo {
     height: 200px;
     width: 100%;
     object-fit: cover;
+
+    @include bp-down($xs) {
+        height: 155px;
+    }
 }
 
 .icon-location {
@@ -414,6 +424,10 @@ export default Vue.extend({
 
 .station-battery-container {
     padding: 20px 16px 30px 25px;
+
+    @include bp-down($xs) {
+      padding: 18px;
+    }
 }
 
 ::v-deep .battery {
@@ -506,6 +520,10 @@ export default Vue.extend({
 
 .navigate-button {
     margin: 0 8px;
+
+    @include bp-down($xs) {
+        height: 16px;
+    }
 }
 
 .readings-container {
@@ -582,6 +600,10 @@ export default Vue.extend({
     position: absolute;
     top: 40px;
     right: 20px;
+
+    @include bp-down($xs) {
+        top: 20px;
+    }
 }
 
 .tabs-container {
@@ -593,18 +615,41 @@ export default Vue.extend({
     justify-content: space-between;
     padding: 30px 20px 25px;
 
+    @include bp-down($xs) {
+        padding: 15px 0 0;
+    }
+
     > a {
         padding: 4px 4px;
 
-        &.active {
+        @include bp-down($xs) {
+            flex: 1 1 auto;
+            text-align: center;
+            padding: 0;
+        }
+
+        &.active span {
             border-bottom: 1.5px solid var(--color-dark);
+            padding-bottom: 3px;
+
+            @include bp-down($xs) {
+                display: block;
+                padding-bottom: 15px;
+            }
         }
     }
 }
 
 .tabs-content {
-    padding: 25px;
+    margin: 0 23px;
+    padding: 25px 0;
     border-top: solid 1px #d8dce0;
+    overflow-y: scroll;
+
+    @include bp-down($xs) {
+        margin: 0;
+        padding: 15px;
+    }
 }
 
 ::v-deep .module-data-item {
@@ -639,5 +684,9 @@ export default Vue.extend({
 .station-projects {
     margin: 10px 0;
     color: var(--color-dark);
+}
+
+.location-rows > div:not(:last-of-type) {
+    margin-bottom: 5px;
 }
 </style>

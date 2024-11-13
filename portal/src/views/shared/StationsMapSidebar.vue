@@ -1,7 +1,7 @@
 <template>
-    <div :class="['sidebar', { open: isOpen }]" @click.stop>
+    <div :class="['sidebar', { open: isOpen }]" @click.stop class="js-cupertinoPane" ref="paneContent">
         <button class="sidebar-toggle" @click="toggleSidebar"><i class="icon icon-filter"></i></button>
-        <div class="sidebar-content">
+        <div class="sidebar-content" ref="summaryContent">
             <div class="heading">{{ $t("map.sidebar.viewing.heading", { stationsLength: stations.length }) }}</div>
             <label class="update-map-results-checkbox checkbox">
                 <input id="updateResultsBasedOnMap" type="checkbox" @change="onUpdateResultsBasedOnMap" />
@@ -30,9 +30,10 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import Vue from "vue";
 import StationSummaryContent from "@/views/shared/StationSummaryContent.vue";
+import { CupertinoPane } from "cupertino-pane";
 
 export default Vue.extend({
     name: "StationsMapSidebar",
@@ -42,10 +43,20 @@ export default Vue.extend({
             required: true,
         },
     },
-    data() {
+    data(): {
+        isOpen: boolean;
+        cupertinoPane: CupertinoPane | null;
+    } {
         return {
             isOpen: true,
+            cupertinoPane: null,
         };
+    },
+    mounted() {
+        this.initCupertinoPane();
+    },
+    destroyed() {
+        this.destroyCupertinoPane();
     },
     methods: {
         toggleSidebar() {
@@ -59,12 +70,37 @@ export default Vue.extend({
         onUpdateResultsBasedOnMap(event) {
             this.$emit("update-results-based-on-map", event.target.checked);
         },
+        async initCupertinoPane(): Promise<void> {
+            if (window.screen.availWidth > 500) {
+                return;
+            }
+            const paneContentEl = this.$refs["paneContent"] as HTMLDivElement;
+            // const generalRowEl = (this.$refs["summaryContent"] as Vue).$refs["summaryGeneralRow"] as HTMLDivElement;
+            this.cupertinoPane = new CupertinoPane(".js-cupertinoPane", {
+                parentElement: "body",
+                breaks: {
+                    top: { enabled: true, height: window.screen.availHeight / 1.3, bounce: true },
+                    // add padding top of container and margin of general row
+                    middle: { enabled: true, height: window.screen.availHeight / 2, bounce: true },
+                    bottom: { enabled: true, height: 60 },
+                },
+                bottomClose: false,
+                buttonDestroy: false,
+            });
+            this.cupertinoPane.present({ animate: true });
+        },
+        destroyCupertinoPane(): void {
+            if (this.cupertinoPane) {
+                this.cupertinoPane.destroy();
+            }
+        },
     },
 });
 </script>
 
 <style scoped lang="scss">
 @import "src/scss/variables";
+@import "src/scss/mixins";
 
 .sidebar {
     height: 100%;
@@ -73,13 +109,14 @@ export default Vue.extend({
     transition: transform 0.3s ease;
     border: solid 1px #f4f5f7;
     background-color: #fff;
-    z-index: 1000;
+    z-index: $z-index-top;
     text-align: left;
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
     margin-top: 1px;
     margin-left: 1px;
+    border: 0;
 }
 
 .sidebar-toggle {
@@ -101,12 +138,23 @@ export default Vue.extend({
     font-size: 25px;
     font-weight: 900;
     margin-bottom: 7px;
+    color: var(--color-dark);
+
+    @include bp-down($xs) {
+        font-size: 16px;
+        text-align: center;
+    }
 }
 
 .sidebar.open {
     transform: translateX(0);
     width: 480px;
-    padding: 20px;
+    max-width: 100%;
+    padding: 20px 10px 20px 20px;
+
+    @include bp-down($xs) {
+        padding-top: 10px;
+    }
 
     .sidebar-toggle {
         left: 480px;
@@ -134,6 +182,10 @@ export default Vue.extend({
     border: solid 1px #d8dce0;
     background-color: #fff;
     margin-bottom: 16px;
+
+    @include bp-down($xs) {
+        padding: 17px 15px 10px 15px;
+    }
 
     ::v-deep {
         .station-name {
@@ -177,8 +229,7 @@ export default Vue.extend({
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    width: 100%;
-    padding-right: 28px;
-    padding-bottom: 120px;
+    padding-right: 16px;
+    padding-bottom: 80px;
 }
 </style>
