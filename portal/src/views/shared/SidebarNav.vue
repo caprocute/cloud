@@ -146,7 +146,6 @@ export default Vue.extend({
             }
         },
         isScrollable() {
-            console.log("Radoi");
             return true;
         },
     },

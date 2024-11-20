@@ -1,7 +1,7 @@
 <template>
     <div :class="['sidebar', { open: isOpen }]" @click.stop class="js-cupertinoPane" ref="paneContent">
         <button class="sidebar-toggle" @click="toggleSidebar"><i class="icon icon-filter"></i></button>
-        <div class="sidebar-content" ref="summaryContent">
+        <div class="sidebar-content" ref="summaryContent" @click="$event.stopPropagation()">
             <div class="heading">{{ $t("map.sidebar.viewing.heading", { stationsLength: stations.length }) }}</div>
             <label class="update-map-results-checkbox checkbox">
                 <input id="updateResultsBasedOnMap" type="checkbox" @change="onUpdateResultsBasedOnMap" />
@@ -9,18 +9,24 @@
                 {{ $t("map.sidebar.viewing.updateMapCheckbox") }}
             </label>
             <!--
-            <button class="button">{{ $t("map.sidebar.viewing.exploreBtn") }}</button>
--->
+                <button class="button">{{ $t("map.sidebar.viewing.exploreBtn") }}</button>
+            -->
             <div class="station-list">
-                <div v-if="stations.length === 0">{{ $t("map.sidebar.viewing.noStationsOnMap") }}</div>
-                <div class="station-list-item" v-for="station in stations" v-bind:key="station.id">
+                <div v-if="stations.length == 0">{{ $t("map.sidebar.viewing.noStationsOnMap") }}</div>
+                <div
+                    class="station-list-item"
+                    v-for="station in stations"
+                    v-bind:key="station.id"
+                    @click="selectStation(station.id)"
+                    :class="{ selected: $route.params.id == station.id }"
+                >
                     <StationSummaryContent ref="summaryContent" :station="station">
                         <template #top-right-actions>
                             <img
                                 :alt="$tc('station.navigateToStation')"
                                 class="navigate-button"
                                 src="@/assets/tooltip-fieldkit.svg"
-                                @click="openStationPageTab"
+                                @click="openStationPageTab(station.id)"
                             />
                         </template>
                     </StationSummaryContent>
@@ -34,6 +40,7 @@
 import Vue from "vue";
 import StationSummaryContent from "@/views/shared/StationSummaryContent.vue";
 import { CupertinoPane } from "cupertino-pane";
+import debounce from "lodash/debounce";
 
 export default Vue.extend({
     name: "StationsMapSidebar",
@@ -46,41 +53,46 @@ export default Vue.extend({
     data(): {
         isOpen: boolean;
         cupertinoPane: CupertinoPane | null;
+        onResize: any;
     } {
         return {
             isOpen: true,
             cupertinoPane: null,
+            onResize: null,
         };
     },
     mounted() {
         this.initCupertinoPane();
+        this.onResize = debounce(() => {
+            this.destroyCupertinoPane();
+            this.initCupertinoPane();
+        }, 300);
+        window.addEventListener("resize", this.onResize);
     },
     destroyed() {
         this.destroyCupertinoPane();
+        window.removeEventListener("resize", this.onResize);
     },
     methods: {
         toggleSidebar() {
             this.isOpen = !this.isOpen;
             this.$emit("toggle");
         },
-        openStationPageTab() {
-            const routeData = this.$router.resolve({ name: "viewStationFromMap", params: { stationId: this.station.id } });
+        openStationPageTab(stationId: number) {
+            const routeData = this.$router.resolve({ name: "viewStationFromMap", params: { stationId: stationId.toString() } });
             window.open(routeData.href, "_blank");
         },
         onUpdateResultsBasedOnMap(event) {
             this.$emit("update-results-based-on-map", event.target.checked);
         },
         async initCupertinoPane(): Promise<void> {
-            if (window.screen.availWidth > 500) {
+            if (window.screen.availWidth > 1040) {
                 return;
             }
-            const paneContentEl = this.$refs["paneContent"] as HTMLDivElement;
-            // const generalRowEl = (this.$refs["summaryContent"] as Vue).$refs["summaryGeneralRow"] as HTMLDivElement;
             this.cupertinoPane = new CupertinoPane(".js-cupertinoPane", {
                 parentElement: "body",
                 breaks: {
                     top: { enabled: true, height: window.screen.availHeight / 1.3, bounce: true },
-                    // add padding top of container and margin of general row
                     middle: { enabled: true, height: window.screen.availHeight / 2, bounce: true },
                     bottom: { enabled: true, height: 60 },
                 },
@@ -90,9 +102,13 @@ export default Vue.extend({
             this.cupertinoPane.present({ animate: true });
         },
         destroyCupertinoPane(): void {
-            if (this.cupertinoPane) {
+            if (this.cupertinoPane && window.screen.availWidth > 1040) {
                 this.cupertinoPane.destroy();
+                this.cupertinoPane = null;
             }
+        },
+        selectStation(id: number) {
+            this.$emit("select-station", id);
         },
     },
 });
@@ -103,10 +119,9 @@ export default Vue.extend({
 @import "src/scss/mixins";
 
 .sidebar {
-    height: 100%;
+    height: calc(100% - 88px);
     width: 0;
     transform: translateX(-100%);
-    transition: transform 0.3s ease;
     border: solid 1px #f4f5f7;
     background-color: #fff;
     z-index: $z-index-top;
@@ -116,7 +131,10 @@ export default Vue.extend({
     box-sizing: border-box;
     margin-top: 1px;
     margin-left: 1px;
-    border: 0;
+
+    @include bp-down($lg) {
+        border: 0;
+    }
 }
 
 .sidebar-toggle {
@@ -210,6 +228,10 @@ export default Vue.extend({
     }
 }
 
+.station-list-item.selected {
+    background-color: #f4f5f7;
+}
+
 .update-map-results-checkbox {
     font-size: 14px;
     color: #000;
@@ -230,6 +252,5 @@ export default Vue.extend({
     display: flex;
     flex-direction: column;
     padding-right: 16px;
-    padding-bottom: 80px;
 }
 </style>

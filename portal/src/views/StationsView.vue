@@ -254,8 +254,12 @@ export default Vue.extend({
 
 body:not(.floodnet) .container-map {
     box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.12);
-    max-height: calc(100vh - 66px); // radoi
+    max-height: calc(100vh - 66px);
     overflow: hidden;
+
+    @include bp-down($xs) {
+        max-height: calc(100vh - 54px);
+    }
 }
 
 .no-stations {
