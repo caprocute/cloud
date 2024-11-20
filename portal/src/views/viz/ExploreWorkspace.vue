@@ -438,17 +438,17 @@ export default Vue.extend({
 <style lang="scss">
 @import "../../scss/layout";
 .vue-treeselect__control {
-  @include bp-down($sm) {
-    height: 29px;
-    font-size: 12px;
-  }
+    @include bp-down($sm) {
+        height: 29px;
+        font-size: 12px;
+    }
 }
 
 .vue-treeselect__placeholder,
 .vue-treeselect__single-value {
-  @include bp-down($sm) {
-    line-height: 29px;
-  }
+    @include bp-down($sm) {
+        line-height: 29px;
+    }
 }
 
 #vg-tooltip-element {
@@ -781,6 +781,11 @@ export default Vue.extend({
     body.floodnet & {
         margin-top: -10px;
     }
+}
+
+.group-no-data .controls-container .right {
+    opacity: 0.4;
+    pointer-events: none;
 }
 
 .controls-container .right {
@@ -1147,8 +1152,6 @@ export default Vue.extend({
 }
 
 ::v-deep .group-no-data {
-    position: relative;
-
     .viz,
     .scrubber {
         opacity: 0.4;
@@ -1166,5 +1169,6 @@ export default Vue.extend({
     background: #ffff;
     padding: 10px;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.07);
+    white-space: nowrap;
 }
 </style>
