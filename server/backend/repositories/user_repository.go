@@ -89,8 +89,8 @@ func (r *UserRepository) NewRecoveryToken(ctx context.Context, user *data.User, 
 
 func (r *UserRepository) Add(ctx context.Context, user *data.User) error {
 	if err := r.db.NamedGetContext(ctx, user, `
-		INSERT INTO fieldkit.user (name, username, email, password, bio, created_at, updated_at, tnc_date)
-		VALUES (:name, :email, :email, :password, :bio, NOW(), NOW(), :tnc_date) RETURNING *
+		INSERT INTO fieldkit.user (name, username, email, password, bio, created_at, updated_at, tnc_date, valid)
+		VALUES (:name, :email, :email, :password, :bio, NOW(), NOW(), :tnc_date, :valid) RETURNING *
 		`, user); err != nil {
 		return err
 	}
@@ -158,7 +158,7 @@ func (r *UserRepository) Delete(outerCtx context.Context, id int32) (err error) 
 		if _, err := r.db.ExecContext(ctx, `DELETE FROM fieldkit.notes_media WHERE user_id = $1`, id); err != nil {
 			return err
 		}
-		if _, err := r.db.ExecContext(ctx, `DELETE FROM fieldkit.notes WHERE user_id = $1`, id); err != nil {
+		if _, err := r.db.ExecContext(ctx, `DELETE FROM fieldkit.notes WHERE author_id = $1`, id); err != nil {
 			return err
 		}
 		if _, err := r.db.ExecContext(ctx, `DELETE FROM fieldkit.station_ingestion WHERE uploader_id = $1`, id); err != nil {

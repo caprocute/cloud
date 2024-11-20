@@ -1,6 +1,6 @@
 <template>
-    <div class="field-notes-wrap">
-        <header class="header">
+    <div class="field-notes-wrap" data-cy="fieldNotes">
+        <header class="header" :class="{ 'no-border': !user }">
             <div class="name">{{ $t("fieldNotes.title") }}</div>
             <div class="buttons" v-if="isAuthenticated">
                 <button class="button" @click="generatePDF">
@@ -601,5 +601,9 @@ button {
 .icon-export:before {
     color: var(--color-dark);
     margin-right: 8px;
+}
+
+.header.no-border {
+    border-bottom: 0;
 }
 </style>

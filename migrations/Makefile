@@ -1,7 +1,7 @@
 default: image
 
 image:
-	docker build -t conservify/fk-cloud-migrate .
+	docker build -t conservify/fk-cloud-migrate --progress plain .
 
 dump:
 	docker create --name temp conservify/fk-cloud-migrate

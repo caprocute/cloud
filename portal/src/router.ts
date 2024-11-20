@@ -623,7 +623,12 @@ const routes = [
         name: "adminStations",
         component: AdminStations,
         props: (route) => {
-            return {};
+            const page = route.query.page ? parseInt(route.query.page) : 0;
+            const station = route.query.station ? parseInt(route.query.station) : null;
+            return {
+                page: page,
+                station: station,
+            };
         },
         meta: {
             admin: true,
