@@ -1,5 +1,5 @@
 <template>
-    <div v-if="viewingSummary && station" class="station-map-summary" :class="{ open: isOpen }">
+    <div v-if="viewingSummary && station" class="station-map-summary js-cupertinoPaneSummary" :class="{ open: isOpen }">
         <div class="station-header">
             <div class="station-heading">
                 <div class="station-name">{{ station.name }}</div>
@@ -61,19 +61,17 @@
 
             <!-- Tabs Content -->
             <div class="tabs-content">
-                <div v-if="selectedTab == SummaryTabsEnum.explore">
+                <template v-if="selectedTab == SummaryTabsEnum.explore">
                     <template v-if="station.modules.length > 0">
                         <StationModules :station="station"></StationModules>
                         <StationReadings :station="station"></StationReadings>
                     </template>
-                    <template v-else>
-                        {{ $tc("dataView.noData") }}
-                    </template>
-                </div>
-                <div v-if="selectedTab == SummaryTabsEnum.fieldNotes">
+                    <template v-else>{{ $tc("dataView.noData") }}</template>
+                </template>
+                <template v-if="selectedTab == SummaryTabsEnum.fieldNotes">
                     <FieldNotes :stationName="station.name"></FieldNotes>
-                </div>
-                <div v-if="selectedTab == SummaryTabsEnum.details">
+                </template>
+                <template v-if="selectedTab == SummaryTabsEnum.details">
                     <StationProjects :stationId="station.id"></StationProjects>
                     <div v-if="station.modules.length > 0" class="details-row">
                         <span class="bold">{{ $tc("station.modules") }}</span>
@@ -86,16 +84,12 @@
                             />
                         </div>
                     </div>
-
                     <div v-if="station.firmwareNumber" class="details-row">
                         <span class="bold">{{ $tc("station.firmwareVersion") }}</span>
                         <span class="ml-10 small-light">{{ station.firmwareNumber }}</span>
                     </div>
-
-                    <!--                    <section v-if="!isCustomisationEnabled()" class="section-notes container-box">
-                        <NotesForm v-bind:key="station.id" :station="station" :readonly="true" />
-                    </section>-->
-                </div>
+                    <NotesForm v-bind:key="station.id" :station="station" :readonly="true" />
+                </template>
             </div>
         </div>
     </div>
@@ -104,26 +98,24 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import { mapGetters } from "vuex";
-
-import CommonComponents from "@/views/shared";
 import StationBattery from "@/views/station/StationBattery.vue";
 
 import { ModuleSensorMeta, SensorDataQuerier, SensorMeta } from "@/views/shared/sensor_data_querier";
-import { DecoratedReading, DisplayModule, VisibleReadings } from "@/store";
+import { ActionTypes, DecoratedReading, DisplayModule, VisibleReadings } from "@/store";
 
+import * as utils from "@/utilities";
 import { getBatteryIcon } from "@/utilities";
 import { BookmarkFactory, ExploreContext, serializeBookmark } from "@/views/viz/viz";
 import { getPartnerCustomizationWithDefault, interpolatePartner, isCustomisationEnabled, PartnerCustomization } from "./partners";
 import { StationStatus } from "@/api";
 import { CupertinoPane } from "cupertino-pane";
-import TinyChart from "@/views/viz/TinyChart.vue";
-import * as utils from "@/utilities";
 import StationModules from "@/views/station/StationModules.vue";
 import StationProjects from "@/views/station/StationProjects.vue";
 import NotesForm from "@/views/notes/NotesForm.vue";
 import FieldNotes from "@/views/fieldNotes/FieldNotes.vue";
 import StationReadings from "@/views/station/StationReadings.vue";
 import StationPhoto from "@/views/shared/StationPhoto.vue";
+import debounce from "lodash/debounce";
 
 enum SummaryTabsEnum {
     explore = "explore",
@@ -135,12 +127,12 @@ export default Vue.extend({
     name: "StationsMapSummary",
     components: {
         FieldNotes,
-        //  NotesForm,
         StationProjects,
         StationModules,
         StationBattery,
         StationReadings,
         StationPhoto,
+        NotesForm,
     },
     props: {
         station: {
@@ -178,9 +170,7 @@ export default Vue.extend({
     },
     watch: {
         station(this: any) {
-            if (this.cupertinoPane) {
-                this.cupertinoPane.present({ animate: true });
-            }
+            this.$store.dispatch(ActionTypes.NEED_NOTES, { id: this.$route.params.id });
         },
     },
     data(): {
@@ -192,6 +182,7 @@ export default Vue.extend({
         isOpen: boolean;
         tabs: any[];
         selectedTab: SummaryTabsEnum;
+        onResize: any;
     } {
         return {
             viewingSummary: true,
@@ -206,16 +197,22 @@ export default Vue.extend({
                 { id: SummaryTabsEnum.details, label: "Station Details" },
             ],
             selectedTab: SummaryTabsEnum.explore,
+            onResize: null,
         };
     },
     async mounted() {
-        if (this.hasCupertinoPane && this.isMobileView) {
+        this.initCupertinoPane();
+        this.onResize = debounce(() => {
+            this.destroyCupertinoPane();
             this.initCupertinoPane();
-        }
+        }, 300);
+        window.addEventListener("resize", this.onResize);
         this.sensorMeta = await this.sensorDataQuerier.querySensorMeta();
+        this.$store.dispatch(ActionTypes.NEED_NOTES, { id: this.$route.params.id });
     },
     destroyed() {
         this.destroyCupertinoPane();
+        window.removeEventListener("resize", this.onResize);
     },
     computed: {
         ...mapGetters({ projectsById: "projectsById" }),
@@ -296,6 +293,7 @@ export default Vue.extend({
             return this.$loadAsset(getBatteryIcon(this.station.battery));
         },
         wantCloseSummary() {
+            this.destroyCupertinoPane();
             this.$emit("close");
         },
         openStationPageTab() {
@@ -309,17 +307,18 @@ export default Vue.extend({
             return isCustomisationEnabled();
         },
         async initCupertinoPane(): Promise<void> {
+            if (window.screen.availWidth > 1040) {
+                return;
+            }
             const paneContentEl = this.$refs["paneContent"] as HTMLDivElement;
-            const generalRowEl = (this.$refs["summaryContent"] as Vue).$refs["summaryGeneralRow"] as HTMLDivElement;
-            this.cupertinoPane = new CupertinoPane(".js-cupertinoPane", {
+            this.cupertinoPane = new CupertinoPane(".js-cupertinoPaneSummary", {
                 parentElement: "body",
                 breaks: {
-                    top: { enabled: true, height: paneContentEl.scrollHeight, bounce: true },
-                    // add padding top of container and margin of general row
-                    middle: { enabled: true, height: generalRowEl.scrollHeight + 25 + 10, bounce: true },
-                    bottom: { enabled: true, height: 0 },
+                    top: { enabled: true, height: window.screen.availHeight / 1.3, bounce: true },
+                    middle: { enabled: true, height: window.screen.availHeight / 2, bounce: true },
+                    bottom: { enabled: false, height: 60 },
                 },
-                bottomClose: true,
+                bottomClose: false,
                 buttonDestroy: false,
             });
             this.cupertinoPane.present({ animate: true });
@@ -327,6 +326,7 @@ export default Vue.extend({
         destroyCupertinoPane(): void {
             if (this.cupertinoPane) {
                 this.cupertinoPane.destroy();
+                this.cupertinoPane = null;
             }
         },
         partnerCustomization(): PartnerCustomization {
@@ -355,25 +355,33 @@ export default Vue.extend({
 @import "../../scss/mixins";
 
 .station-map-summary {
-    height: 100%;
+    height: calc(100% - 88px);
     width: 0;
     transform: translateX(-100%);
     transition: transform 0.3s ease;
-    border: solid 1px #f4f5f7;
     background-color: #fff;
+    border: solid 1px #f4f5f7;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.07);
     z-index: 1000;
     text-align: left;
-    display: flex;
     flex-direction: column;
     box-sizing: border-box;
     margin-top: 1px;
     margin-left: 1px;
+    overflow-y: scroll;
+
+    @include bp-down($lg) {
+        border: 0;
+    }
 }
 
 .station-map-summary.open {
     transform: translateX(0);
     width: 430px;
+
+    @include bp-down($sm) {
+        width: 100%;
+    }
 
     .sidebar-toggle {
         left: 480px;
@@ -426,7 +434,7 @@ export default Vue.extend({
     padding: 20px 16px 30px 25px;
 
     @include bp-down($xs) {
-      padding: 18px;
+        padding: 18px;
     }
 }
 
@@ -644,7 +652,6 @@ export default Vue.extend({
     margin: 0 23px;
     padding: 25px 0;
     border-top: solid 1px #d8dce0;
-    overflow-y: scroll;
 
     @include bp-down($xs) {
         margin: 0;
@@ -652,8 +659,32 @@ export default Vue.extend({
     }
 }
 
+::v-deep .field-notes-wrap .buttons {
+    display: none;
+}
+
+::v-deep .field-note-group .actions {
+    display: none;
+}
+
+::v-deep .field-note-group:first-of-type .month-row {
+    border-top: 0;
+}
+
+.tabs-content::v-deep .new-field-note {
+    display: none;
+}
+
+::v-deep .no-field-notes-msg {
+    margin-top: 30px;
+}
+
 ::v-deep .module-data-item {
     flex: 0 0 100%;
+}
+
+::v-deep .notes-form .header {
+    display: none;
 }
 
 .station-modules {

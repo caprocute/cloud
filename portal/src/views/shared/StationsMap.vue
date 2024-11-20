@@ -7,6 +7,7 @@
                 :mapped="mapped"
                 :stations="filteredStations"
                 @update-results-based-on-map="getStationsForBounds"
+                @select-station="$emit('show-summary', { id: $event })"
                 @toggle="handleLayoutChanges()"
             ></StationsMapSidebar>
             <slot></slot>
@@ -366,9 +367,12 @@ export default Vue.extend({
 @import "../../scss/global";
 
 .map-view #map {
-    height: 100%;
+    height: calc(100% - 88px);
     position: relative;
-    width: inherit;
+
+    @include bp-down($lg) {
+        height: 100%;
+    }
 }
 .project-container #map {
     height: inherit;

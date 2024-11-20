@@ -45,7 +45,7 @@
 
         <div v-if="errorMessage" class="error">{{ errorMessage }}</div>
 
-        <div v-if="!isLoading && !groupedFieldNotes">{{ $tc("fieldNotes.noData") }}</div>
+        <div v-if="!isLoading && !groupedFieldNotes" class="no-field-notes-msg">{{ $tc("fieldNotes.noData") }}</div>
         <div v-if="isLoading">{{ $tc("fieldNotes.loading") }}</div>
 
         <div class="field-note-list" v-if="groupedFieldNotes" ref="pdfContent">
@@ -57,8 +57,8 @@
             >
                 <div class="month-row" @click="toggleFieldNoteGroup('field-note-group-' + index)">
                     <i class="icon icon-chevron-right"></i>
-                    <div class="month-name">{{ getMonthName(month) }} {{$tc('fieldNotes.monthRow.entries')}}</div>
-                    <div class="month-last-updated">{{$tc('fieldNotes.monthRow.lastUpdated')}} {{ getMonthLastUpdated(monthItems) }}</div>
+                    <div class="month-name">{{ getMonthName(month) }} {{ $tc("fieldNotes.monthRow.entries") }}</div>
+                    <div class="month-last-updated">{{ $tc("fieldNotes.monthRow.lastUpdated") }} {{ getMonthLastUpdated(monthItems) }}</div>
                 </div>
 
                 <transition-group name="fade">
@@ -151,7 +151,7 @@ export default Vue.extend({
             return this.$state.fieldNotes.fieldNotes;
         },
         stationId(): number {
-            return parseInt(this.$route.params.stationId, 10);
+            return parseInt(this.$route.params.stationId ?? this.$route.params.id, 10);
         },
     },
     data(): {
@@ -179,6 +179,9 @@ export default Vue.extend({
     watch: {
         fieldNotes() {
             this.groupByMonth();
+        },
+        stationName(newStationName) {
+            this.$store.dispatch(ActionTypes.NEED_FIELD_NOTES, { id: this.stationId });
         },
     },
     methods: {

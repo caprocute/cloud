@@ -65,9 +65,9 @@ export default Vue.extend({
 }
 
 .reading-item {
-    border-top: solid 1px #d8dce0;
     margin-top: 25px;
     padding-top: 23px;
+    border-top: solid 1px #d8dce0;
 
     header {
         font-size: 20px;
