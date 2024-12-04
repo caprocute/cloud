@@ -82,10 +82,10 @@ export default Vue.extend({
             const htmlElement = document.getElementById("export-chart-content") as HTMLHtmlElement;
 
             try {
-                const exportWidth = 1080;
-                const exportHeight = 640;
+                const exportWidth = 4096;
+                const exportHeight = 2304;
 
-                const htmlCanvas = await html2canvas(htmlElement, { scale: 1 });
+                const htmlCanvas = await html2canvas(htmlElement, { scale: 2 });
                 const htmlImage = htmlCanvas.toDataURL("image/png");
 
                 const canvas = await view.toCanvas(1.5);
@@ -183,13 +183,6 @@ export default Vue.extend({
                 img.onload = () => resolve(img);
                 img.onerror = (error) => reject(error);
             });
-        },
-
-        getFileName(series): string {
-            const stationName = series.vizInfo.station.name;
-            const sensorName = series.vizInfo.name;
-
-            return `${stationName}_${sensorName}`.replace("[^a-zA-Z0-9\\.\\-]", "_");
         },
     },
 });
