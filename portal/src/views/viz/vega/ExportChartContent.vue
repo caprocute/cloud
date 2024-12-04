@@ -148,4 +148,8 @@ export default Vue.extend({
         margin-right: 5px;
     }
 }
+
+.icon-logo-fieldkit {
+    margin-top: -15px;
+}
 </style>

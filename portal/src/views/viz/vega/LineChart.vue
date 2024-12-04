@@ -93,10 +93,10 @@ export default Vue.extend({
                                         <p class="time">${sanitize(tooltip.time)}</p>`;
                     },
                 },
-                downloadFileName: this.getFileName(this.series[0]),
+                downloadFileName: this.getFileName(this.series),
                 actions: false,
                 scaleFactor: 2,
-                padding: this.settings.mobile ? {left: 0, right: 10 } : { left: 10, right: 50 },
+                padding: this.settings.mobile ? { left: 0, right: 10 } : { left: 10, right: 50 },
             });
 
             this.vega = vegaInfo;
@@ -175,11 +175,41 @@ export default Vue.extend({
                 return "#ccc";
             }
         },
-        getFileName(series): string {
-            const stationName = series.vizInfo.station.name;
-            const sensorName = series.vizInfo.name;
+        getFileName(series: { vizInfo: { station: { name: string }; name: string } }[]): string {
+            const stationGroups: Record<string, string[]> = series.reduce((acc, item) => {
+                const stationName = item.vizInfo.station.name;
+                const sensorName = item.vizInfo.name;
 
-            return `${stationName}_${sensorName}`.replace("[^a-zA-Z0-9\\.\\-]", "_");
+                if (!acc[stationName]) {
+                    acc[stationName] = [];
+                }
+                acc[stationName].push(sensorName);
+                return acc;
+            }, {} as Record<string, string[]>);
+
+            const entries = Object.entries(stationGroups);
+
+            if (entries.length === 1) {
+                const [stationName, sensorNames] = entries[0];
+                if (sensorNames.length === 1) {
+                    return `${stationName}-${sensorNames[0]}`;
+                } else {
+                    return `${stationName} ${sensorNames.join(" - ")}`;
+                }
+            } else if (entries.length === 2) {
+                const [[station1Name, sensor1Names], [station2Name, sensor2Names]] = entries;
+                if (sensor1Names.length === 1 && sensor2Names.length === 1) {
+                    return `${station1Name}-${sensor1Names[0]}_${station2Name}-${sensor2Names[0]}`;
+                }
+            }
+
+            const fileName: string = entries
+                .map(([stationName, sensorNames]) => {
+                    return `${stationName}-${sensorNames.join("-")}`;
+                })
+                .join(" ");
+
+            return fileName;
         },
     },
 });
