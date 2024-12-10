@@ -160,7 +160,7 @@ func (m *ModelAdapter) findStation(ctx context.Context, pm *ParsedMessage) (*dat
 			}
 
 			if pm.DeviceName == nil {
-				return nil, nil, nil, fmt.Errorf("no-device-name")
+				return nil, nil, nil, ErrNoDeviceName
 			}
 
 			updating = &data.Station{
@@ -524,4 +524,15 @@ func (m *ModelAdapter) Close(ctx context.Context) error {
 	}
 
 	return nil
+}
+
+var (
+	ErrNoDeviceName = &errNoDeviceName{}
+)
+
+type errNoDeviceName struct {
+}
+
+func (m *errNoDeviceName) Error() string {
+	return "no-device-name"
 }
