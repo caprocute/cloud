@@ -290,7 +290,6 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 					}
 
 					if parsedReading == nil {
-						log.Errorf("wh:no-parsed-reading-for-saved")
 						return nil, fmt.Errorf("wh:no-parsed-reading-for-saved")
 					}
 
