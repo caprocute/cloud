@@ -52,25 +52,21 @@
                     <div class="details-team">
                         <div class="title">{{ $t("project.team") }}</div>
                         <div
-                            class="team-member"
+                            class="hoverable-item"
                             v-for="(projectUser, index) in displayProject.users"
                             v-bind:key="projectUser.user.email"
                             @mouseover="showTooltip('member-tooltip-' + index)"
                         >
-                            <span :ref="'member-tooltip-' + index" class="member-name">{{ projectUser.user.name }}</span>
+                            <span :ref="'member-tooltip-' + index" class="tooltip-text">{{ projectUser.user.name }}</span>
                             <UserPhoto :user="projectUser.user" v-if="!projectUser.invited" />
                         </div>
                     </div>
                     <div class="details-modules">
                         <div class="title">{{ $t("project.modules") }}</div>
-
-                        <img
-                            v-for="module in projectModules"
-                            v-bind:key="module.name"
-                            alt="Module icon"
-                            class="module-icon"
-                            :src="module.url"
-                        />
+                        <div class="hoverable-item" v-for="(module, index) in projectModules" :key="module.name">
+                            <img alt="Module icon" class="module-icon" :src="module.url" />
+                            <span :ref="'module-tooltip-' + index" class="tooltip-text">{{ $t(module.name) }}</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -189,6 +185,7 @@ export default Vue.extend({
         showTooltip(ref: string): void {
             const refs = this.$refs[ref];
             const el = refs ? refs[0] : null;
+            console.log(el);
 
             if (!utils.isMobile() || !el) {
                 return;
@@ -357,57 +354,21 @@ export default Vue.extend({
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
+    align-items: baseline;
 
     @include bp-down($xs) {
         padding-top: 15px;
     }
 }
+
 .details-bottom .details-team {
-    display: flex;
-    flex-wrap: wrap;
-    flex: 1;
     padding-right: 15px;
 
     @include bp-down($xs) {
-        flex-basis: 100%;
         margin-bottom: 15px;
     }
-
-    .member-name {
-        visibility: hidden;
-        opacity: 0;
-        transition: opacity 0.25s;
-        padding: 8px 16px;
-        border-radius: 2px;
-        box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.24);
-        border: solid 1px #f4f5f7;
-        background-color: #fff;
-        font-size: 14px;
-        white-space: nowrap;
-        transform: translateX(-50%);
-        z-index: $z-index-top;
-        @include position(absolute, null null calc(-100% + 10px) 50%);
-
-        @include bp-down($sm) {
-            bottom: calc(-100% + 15px);
-        }
-    }
 }
 
-.team-member {
-    position: relative;
-
-    @include attention() {
-        .member-name {
-            visibility: visible;
-            opacity: 1;
-        }
-    }
-}
-
-.details-bottom .details-modules {
-    flex: 1;
-}
 .details-bottom .title {
     font-weight: 500;
     font-size: 14px;

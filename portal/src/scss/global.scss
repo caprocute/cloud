@@ -209,3 +209,14 @@ a {
 .cursor-pointer {
     cursor: pointer;
 }
+
+.hoverable-item {
+    position: relative;
+
+    @include attention() {
+        .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+    }
+}
