@@ -185,7 +185,6 @@ export default Vue.extend({
         showTooltip(ref: string): void {
             const refs = this.$refs[ref];
             const el = refs ? refs[0] : null;
-            console.log(el);
 
             if (!utils.isMobile() || !el) {
                 return;
