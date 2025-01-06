@@ -1,5 +1,5 @@
 import Vue from "vue";
-import Router from "vue-router";
+import Router, {Route} from "vue-router";
 import VueBodyClass from "vue-body-class";
 
 import LoginView from "./views/auth/LoginView.vue";
@@ -75,6 +75,10 @@ function getRoot() {
         };
     }
     return makeDefaultRouteForProject(partnerCustomization.projectId);
+}
+
+function isAdminRoute(route: Route): boolean {
+    return route.matched.some((record) => record.meta.admin);
 }
 
 const routes = [
@@ -660,7 +664,6 @@ export default function routerFactory(store) {
     router.beforeEach(async (to, from, next) => {
         console.log("nav", from.name, "->", to.name);
         if (from.name === null && (to.name === null || to.name == "login")) {
-            console.log("nav", "authenticated", store.getters.isAuthenticated);
             if (store.getters.isAuthenticated) {
                 if (!store.getters.isTncValid && to.name != "login") {
                     await store.dispatch(ActionTypes.REFRESH_CURRENT_USER);
@@ -688,6 +691,10 @@ export default function routerFactory(store) {
                 if (!store.getters.isTncValid && to.name != "login") {
                     await store.dispatch(ActionTypes.REFRESH_CURRENT_USER);
 
+                    if (isAdminRoute(to) && !store.getters.isAdmin) {
+                        next("/dashboard");
+                    }
+
                     if (!store.getters.isTncValid) {
                         next("/terms");
                     } else {
@@ -700,6 +707,10 @@ export default function routerFactory(store) {
                 // const queryParams = new URLSearchParams();
                 // queryParams.append("after", to.fullPath);
                 // next("/login?" + queryParams.toString());
+
+                if (isAdminRoute(to)) {
+                    next('/login');
+                }
                 next();
             }
         } else {
