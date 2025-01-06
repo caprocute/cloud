@@ -664,6 +664,7 @@ export default function routerFactory(store) {
     router.beforeEach(async (to, from, next) => {
         console.log("nav", from.name, "->", to.name);
         if (from.name === null && (to.name === null || to.name == "login")) {
+            console.log("nav", "authenticated", store.getters.isAuthenticated);
             if (store.getters.isAuthenticated) {
                 if (!store.getters.isTncValid && to.name != "login") {
                     await store.dispatch(ActionTypes.REFRESH_CURRENT_USER);
