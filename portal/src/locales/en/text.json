@@ -56,6 +56,7 @@
     "random.random_7": "Random 7",
     "random.random_8": "Random 8",
     "random.random_9": "Random 9",
+    "fk.modules.unknown": "Unknown",
     "layout": {
         "logo": {
             "fieldkit": {
