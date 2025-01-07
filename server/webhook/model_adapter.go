@@ -160,7 +160,7 @@ func (m *ModelAdapter) findStation(ctx context.Context, pm *ParsedMessage) (*dat
 			}
 
 			if pm.DeviceName == nil {
-				return nil, nil, nil, fmt.Errorf("no-device-name")
+				return nil, nil, nil, ErrNoDeviceName
 			}
 
 			updating = &data.Station{
@@ -290,7 +290,6 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 					}
 
 					if parsedReading == nil {
-						log.Errorf("wh:no-parsed-reading-for-saved")
 						return nil, fmt.Errorf("wh:no-parsed-reading-for-saved")
 					}
 
@@ -524,4 +523,15 @@ func (m *ModelAdapter) Close(ctx context.Context) error {
 	}
 
 	return nil
+}
+
+var (
+	ErrNoDeviceName = &errNoDeviceName{}
+)
+
+type errNoDeviceName struct {
+}
+
+func (m *errNoDeviceName) Error() string {
+	return "no-device-name"
 }

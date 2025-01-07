@@ -225,7 +225,7 @@ export default Vue.extend({
         height: 100%;
 
         &:after {
-            transform: translate(-1px, 13px);
+            transform: translate(-1px, 4px);
             font-weight: bold;
         }
     }

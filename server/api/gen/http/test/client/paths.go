@@ -7,21 +7,7 @@
 
 package client
 
-import (
-	"fmt"
-)
-
-// GetTestPath returns the URL path to the test service get HTTP endpoint.
-func GetTestPath(id int64) string {
-	return fmt.Sprintf("/test/%v", id)
-}
-
-// ErrorTestPath returns the URL path to the test service error HTTP endpoint.
-func ErrorTestPath() string {
-	return "/test/error"
-}
-
-// EmailTestPath returns the URL path to the test service email HTTP endpoint.
-func EmailTestPath() string {
-	return "/test/email"
+// NoopTestPath returns the URL path to the test service noop HTTP endpoint.
+func NoopTestPath() string {
+	return "/test/noop"
 }

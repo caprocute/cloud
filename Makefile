@@ -1,6 +1,6 @@
 VERSION_MAJOR = 0
 VERSION_MINOR = 3
-VERSION_PATCH = 60
+VERSION_PATCH = 65
 VERSION_PREL ?= $(BUILD_NUMBER)
 GIT_LOCAL_BRANCH ?= unknown
 GIT_HASH ?= $(shell git log -1 --format=%h)
@@ -172,10 +172,10 @@ migrate-image:
 	cd migrations && make image
 
 migrate-up:
-	cd migrations && MIGRATE_PATH=`pwd`/primary MIGRATE_DATABASE_URL=$(FIELDKIT_POSTGRES_URL) go run main.go migrate
+	cd migrations/cli && MIGRATE_PATH=`pwd`/../primary MIGRATE_DATABASE_URL=$(FIELDKIT_POSTGRES_URL) go run main.go migrate
 
 migrate-up-tsdb:
-	cd migrations && MIGRATE_PATH=`pwd`/tsdb MIGRATE_DATABASE_URL=$(FIELDKIT_TIME_SCALE_URL) go run main.go migrate
+	cd migrations/cli && MIGRATE_PATH=`pwd`/../tsdb MIGRATE_DATABASE_URL=$(FIELDKIT_TIME_SCALE_URL) go run main.go migrate
 
 ci: setup binaries jstests charting-setup
 

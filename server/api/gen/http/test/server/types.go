@@ -12,9 +12,9 @@ import (
 	goa "goa.design/goa/v3/pkg"
 )
 
-// GetForbiddenResponseBody is the type of the "test" service "get" endpoint
+// NoopForbiddenResponseBody is the type of the "test" service "noop" endpoint
 // HTTP response body for the "forbidden" error.
-type GetForbiddenResponseBody struct {
+type NoopForbiddenResponseBody struct {
 	// Name is the name of this class of errors.
 	Name string `form:"name" json:"name" xml:"name"`
 	// ID is a unique identifier for this particular occurrence of the problem.
@@ -30,9 +30,9 @@ type GetForbiddenResponseBody struct {
 	Fault bool `form:"fault" json:"fault" xml:"fault"`
 }
 
-// GetNotFoundResponseBody is the type of the "test" service "get" endpoint
+// NoopNotFoundResponseBody is the type of the "test" service "noop" endpoint
 // HTTP response body for the "not-found" error.
-type GetNotFoundResponseBody struct {
+type NoopNotFoundResponseBody struct {
 	// Name is the name of this class of errors.
 	Name string `form:"name" json:"name" xml:"name"`
 	// ID is a unique identifier for this particular occurrence of the problem.
@@ -48,9 +48,9 @@ type GetNotFoundResponseBody struct {
 	Fault bool `form:"fault" json:"fault" xml:"fault"`
 }
 
-// GetBadRequestResponseBody is the type of the "test" service "get" endpoint
+// NoopBadRequestResponseBody is the type of the "test" service "noop" endpoint
 // HTTP response body for the "bad-request" error.
-type GetBadRequestResponseBody struct {
+type NoopBadRequestResponseBody struct {
 	// Name is the name of this class of errors.
 	Name string `form:"name" json:"name" xml:"name"`
 	// ID is a unique identifier for this particular occurrence of the problem.
@@ -66,130 +66,14 @@ type GetBadRequestResponseBody struct {
 	Fault bool `form:"fault" json:"fault" xml:"fault"`
 }
 
-// GetUnauthorizedResponseBody is the type of the "test" service "get" endpoint
-// HTTP response body for the "unauthorized" error.
-type GetUnauthorizedResponseBody string
-
-// ErrorForbiddenResponseBody is the type of the "test" service "error"
-// endpoint HTTP response body for the "forbidden" error.
-type ErrorForbiddenResponseBody struct {
-	// Name is the name of this class of errors.
-	Name string `form:"name" json:"name" xml:"name"`
-	// ID is a unique identifier for this particular occurrence of the problem.
-	ID string `form:"id" json:"id" xml:"id"`
-	// Message is a human-readable explanation specific to this occurrence of the
-	// problem.
-	Message string `form:"message" json:"message" xml:"message"`
-	// Is the error temporary?
-	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
-	// Is the error a timeout?
-	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
-	// Is the error a server-side fault?
-	Fault bool `form:"fault" json:"fault" xml:"fault"`
-}
-
-// ErrorNotFoundResponseBody is the type of the "test" service "error" endpoint
-// HTTP response body for the "not-found" error.
-type ErrorNotFoundResponseBody struct {
-	// Name is the name of this class of errors.
-	Name string `form:"name" json:"name" xml:"name"`
-	// ID is a unique identifier for this particular occurrence of the problem.
-	ID string `form:"id" json:"id" xml:"id"`
-	// Message is a human-readable explanation specific to this occurrence of the
-	// problem.
-	Message string `form:"message" json:"message" xml:"message"`
-	// Is the error temporary?
-	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
-	// Is the error a timeout?
-	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
-	// Is the error a server-side fault?
-	Fault bool `form:"fault" json:"fault" xml:"fault"`
-}
-
-// ErrorBadRequestResponseBody is the type of the "test" service "error"
-// endpoint HTTP response body for the "bad-request" error.
-type ErrorBadRequestResponseBody struct {
-	// Name is the name of this class of errors.
-	Name string `form:"name" json:"name" xml:"name"`
-	// ID is a unique identifier for this particular occurrence of the problem.
-	ID string `form:"id" json:"id" xml:"id"`
-	// Message is a human-readable explanation specific to this occurrence of the
-	// problem.
-	Message string `form:"message" json:"message" xml:"message"`
-	// Is the error temporary?
-	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
-	// Is the error a timeout?
-	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
-	// Is the error a server-side fault?
-	Fault bool `form:"fault" json:"fault" xml:"fault"`
-}
-
-// ErrorUnauthorizedResponseBody is the type of the "test" service "error"
+// NoopUnauthorizedResponseBody is the type of the "test" service "noop"
 // endpoint HTTP response body for the "unauthorized" error.
-type ErrorUnauthorizedResponseBody string
+type NoopUnauthorizedResponseBody string
 
-// EmailForbiddenResponseBody is the type of the "test" service "email"
-// endpoint HTTP response body for the "forbidden" error.
-type EmailForbiddenResponseBody struct {
-	// Name is the name of this class of errors.
-	Name string `form:"name" json:"name" xml:"name"`
-	// ID is a unique identifier for this particular occurrence of the problem.
-	ID string `form:"id" json:"id" xml:"id"`
-	// Message is a human-readable explanation specific to this occurrence of the
-	// problem.
-	Message string `form:"message" json:"message" xml:"message"`
-	// Is the error temporary?
-	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
-	// Is the error a timeout?
-	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
-	// Is the error a server-side fault?
-	Fault bool `form:"fault" json:"fault" xml:"fault"`
-}
-
-// EmailNotFoundResponseBody is the type of the "test" service "email" endpoint
-// HTTP response body for the "not-found" error.
-type EmailNotFoundResponseBody struct {
-	// Name is the name of this class of errors.
-	Name string `form:"name" json:"name" xml:"name"`
-	// ID is a unique identifier for this particular occurrence of the problem.
-	ID string `form:"id" json:"id" xml:"id"`
-	// Message is a human-readable explanation specific to this occurrence of the
-	// problem.
-	Message string `form:"message" json:"message" xml:"message"`
-	// Is the error temporary?
-	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
-	// Is the error a timeout?
-	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
-	// Is the error a server-side fault?
-	Fault bool `form:"fault" json:"fault" xml:"fault"`
-}
-
-// EmailBadRequestResponseBody is the type of the "test" service "email"
-// endpoint HTTP response body for the "bad-request" error.
-type EmailBadRequestResponseBody struct {
-	// Name is the name of this class of errors.
-	Name string `form:"name" json:"name" xml:"name"`
-	// ID is a unique identifier for this particular occurrence of the problem.
-	ID string `form:"id" json:"id" xml:"id"`
-	// Message is a human-readable explanation specific to this occurrence of the
-	// problem.
-	Message string `form:"message" json:"message" xml:"message"`
-	// Is the error temporary?
-	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
-	// Is the error a timeout?
-	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
-	// Is the error a server-side fault?
-	Fault bool `form:"fault" json:"fault" xml:"fault"`
-}
-
-// EmailUnauthorizedResponseBody is the type of the "test" service "email"
-// endpoint HTTP response body for the "unauthorized" error.
-type EmailUnauthorizedResponseBody string
-
-// NewGetForbiddenResponseBody builds the HTTP response body from the result of
-// the "get" endpoint of the "test" service.
-func NewGetForbiddenResponseBody(res *goa.ServiceError) *GetForbiddenResponseBody {
-	body := &GetForbiddenResponseBody{
+// NewNoopForbiddenResponseBody builds the HTTP response body from the result
+// of the "noop" endpoint of the "test" service.
+func NewNoopForbiddenResponseBody(res *goa.ServiceError) *NoopForbiddenResponseBody {
+	body := &NoopForbiddenResponseBody{
 		Name:      res.Name,
 		ID:        res.ID,
 		Message:   res.Message,
@@ -200,10 +84,10 @@ func NewGetForbiddenResponseBody(res *goa.ServiceError) *GetForbiddenResponseBod
 	return body
 }
 
-// NewGetNotFoundResponseBody builds the HTTP response body from the result of
-// the "get" endpoint of the "test" service.
-func NewGetNotFoundResponseBody(res *goa.ServiceError) *GetNotFoundResponseBody {
-	body := &GetNotFoundResponseBody{
+// NewNoopNotFoundResponseBody builds the HTTP response body from the result of
+// the "noop" endpoint of the "test" service.
+func NewNoopNotFoundResponseBody(res *goa.ServiceError) *NoopNotFoundResponseBody {
+	body := &NoopNotFoundResponseBody{
 		Name:      res.Name,
 		ID:        res.ID,
 		Message:   res.Message,
@@ -214,10 +98,10 @@ func NewGetNotFoundResponseBody(res *goa.ServiceError) *GetNotFoundResponseBody 
 	return body
 }
 
-// NewGetBadRequestResponseBody builds the HTTP response body from the result
-// of the "get" endpoint of the "test" service.
-func NewGetBadRequestResponseBody(res *goa.ServiceError) *GetBadRequestResponseBody {
-	body := &GetBadRequestResponseBody{
+// NewNoopBadRequestResponseBody builds the HTTP response body from the result
+// of the "noop" endpoint of the "test" service.
+func NewNoopBadRequestResponseBody(res *goa.ServiceError) *NoopBadRequestResponseBody {
+	body := &NoopBadRequestResponseBody{
 		Name:      res.Name,
 		ID:        res.ID,
 		Message:   res.Message,
@@ -228,124 +112,9 @@ func NewGetBadRequestResponseBody(res *goa.ServiceError) *GetBadRequestResponseB
 	return body
 }
 
-// NewGetUnauthorizedResponseBody builds the HTTP response body from the result
-// of the "get" endpoint of the "test" service.
-func NewGetUnauthorizedResponseBody(res test.Unauthorized) GetUnauthorizedResponseBody {
-	body := GetUnauthorizedResponseBody(res)
+// NewNoopUnauthorizedResponseBody builds the HTTP response body from the
+// result of the "noop" endpoint of the "test" service.
+func NewNoopUnauthorizedResponseBody(res test.Unauthorized) NoopUnauthorizedResponseBody {
+	body := NoopUnauthorizedResponseBody(res)
 	return body
-}
-
-// NewErrorForbiddenResponseBody builds the HTTP response body from the result
-// of the "error" endpoint of the "test" service.
-func NewErrorForbiddenResponseBody(res *goa.ServiceError) *ErrorForbiddenResponseBody {
-	body := &ErrorForbiddenResponseBody{
-		Name:      res.Name,
-		ID:        res.ID,
-		Message:   res.Message,
-		Temporary: res.Temporary,
-		Timeout:   res.Timeout,
-		Fault:     res.Fault,
-	}
-	return body
-}
-
-// NewErrorNotFoundResponseBody builds the HTTP response body from the result
-// of the "error" endpoint of the "test" service.
-func NewErrorNotFoundResponseBody(res *goa.ServiceError) *ErrorNotFoundResponseBody {
-	body := &ErrorNotFoundResponseBody{
-		Name:      res.Name,
-		ID:        res.ID,
-		Message:   res.Message,
-		Temporary: res.Temporary,
-		Timeout:   res.Timeout,
-		Fault:     res.Fault,
-	}
-	return body
-}
-
-// NewErrorBadRequestResponseBody builds the HTTP response body from the result
-// of the "error" endpoint of the "test" service.
-func NewErrorBadRequestResponseBody(res *goa.ServiceError) *ErrorBadRequestResponseBody {
-	body := &ErrorBadRequestResponseBody{
-		Name:      res.Name,
-		ID:        res.ID,
-		Message:   res.Message,
-		Temporary: res.Temporary,
-		Timeout:   res.Timeout,
-		Fault:     res.Fault,
-	}
-	return body
-}
-
-// NewErrorUnauthorizedResponseBody builds the HTTP response body from the
-// result of the "error" endpoint of the "test" service.
-func NewErrorUnauthorizedResponseBody(res test.Unauthorized) ErrorUnauthorizedResponseBody {
-	body := ErrorUnauthorizedResponseBody(res)
-	return body
-}
-
-// NewEmailForbiddenResponseBody builds the HTTP response body from the result
-// of the "email" endpoint of the "test" service.
-func NewEmailForbiddenResponseBody(res *goa.ServiceError) *EmailForbiddenResponseBody {
-	body := &EmailForbiddenResponseBody{
-		Name:      res.Name,
-		ID:        res.ID,
-		Message:   res.Message,
-		Temporary: res.Temporary,
-		Timeout:   res.Timeout,
-		Fault:     res.Fault,
-	}
-	return body
-}
-
-// NewEmailNotFoundResponseBody builds the HTTP response body from the result
-// of the "email" endpoint of the "test" service.
-func NewEmailNotFoundResponseBody(res *goa.ServiceError) *EmailNotFoundResponseBody {
-	body := &EmailNotFoundResponseBody{
-		Name:      res.Name,
-		ID:        res.ID,
-		Message:   res.Message,
-		Temporary: res.Temporary,
-		Timeout:   res.Timeout,
-		Fault:     res.Fault,
-	}
-	return body
-}
-
-// NewEmailBadRequestResponseBody builds the HTTP response body from the result
-// of the "email" endpoint of the "test" service.
-func NewEmailBadRequestResponseBody(res *goa.ServiceError) *EmailBadRequestResponseBody {
-	body := &EmailBadRequestResponseBody{
-		Name:      res.Name,
-		ID:        res.ID,
-		Message:   res.Message,
-		Temporary: res.Temporary,
-		Timeout:   res.Timeout,
-		Fault:     res.Fault,
-	}
-	return body
-}
-
-// NewEmailUnauthorizedResponseBody builds the HTTP response body from the
-// result of the "email" endpoint of the "test" service.
-func NewEmailUnauthorizedResponseBody(res test.Unauthorized) EmailUnauthorizedResponseBody {
-	body := EmailUnauthorizedResponseBody(res)
-	return body
-}
-
-// NewGetPayload builds a test service get endpoint payload.
-func NewGetPayload(id int64) *test.GetPayload {
-	v := &test.GetPayload{}
-	v.ID = &id
-
-	return v
-}
-
-// NewEmailPayload builds a test service email endpoint payload.
-func NewEmailPayload(address string, auth string) *test.EmailPayload {
-	v := &test.EmailPayload{}
-	v.Address = address
-	v.Auth = auth
-
-	return v
 }

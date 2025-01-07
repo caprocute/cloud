@@ -30,3 +30,5 @@ influxdb
 .db
 *.swp
 migrations/migrate
+portal/cypress/screenshots/*
+portal/cypress/videos/*
