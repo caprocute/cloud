@@ -221,3 +221,14 @@ a {
         display: none !important;
     }
 }
+
+.hoverable-item {
+    position: relative;
+
+    @include attention() {
+        .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+    }
+}
