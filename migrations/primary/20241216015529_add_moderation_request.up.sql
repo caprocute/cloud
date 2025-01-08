@@ -2,8 +2,8 @@
 
 CREATE TABLE moderation_request (
     id SERIAL PRIMARY KEY,
-    target_id INT NOT NULL,
-    target_type VARCHAR(50) NOT NULL, -- "discussion_post" or "data_event"
+    post_id INT NOT NULL,
+    post_type VARCHAR(50) NOT NULL, -- "discussion_post" or "data_event"
     reported_by INT NOT NULL,
     acknowledged_by INT NULL,
     is_acknowledged BOOLEAN DEFAULT FALSE,
@@ -11,7 +11,7 @@ CREATE TABLE moderation_request (
     acknowledged_at TIMESTAMP NULL
 );
 
-CREATE INDEX idx_moderation_request_target ON moderation_request(target_id, target_type);
+CREATE INDEX idx_moderation_request_post ON moderation_request(post_id, post_type);
 
 ALTER TABLE moderation_request
 ADD CONSTRAINT fk_moderation_request_reported_by FOREIGN KEY (reported_by) REFERENCES "user"(id) ON DELETE CASCADE;
