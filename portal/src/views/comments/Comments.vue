@@ -420,13 +420,16 @@ export default Vue.extend({
             }
             return null;
         },
+        // we need it in order to see if the user is an admin and can delete posts
         isAdmin(): boolean {
             if (this.user.id && this.projectId) {
                 return this.$store.getters.isAdminForProject(this.user.id, this.projectId);
             }
             return false;
         },
-        // we need it in order to see if the user is an admin and can delete posts
+        isModerator(): boolean {
+            return true;
+        },
         isProjectLoaded(): boolean {
             if (this.projectId) {
                 const project = this.$getters.projectsById[this.projectId];
@@ -802,29 +805,17 @@ export default Vue.extend({
                 return [];
             }
 
+            const options: { label: string; event: string }[] = [];
+
             if (this.user.id === post.author.id) {
-                return [
-                    {
-                        label: "Edit post",
-                        event: "edit-comment",
-                    },
-                    {
-                        label: "Delete post",
-                        event: "delete-comment",
-                    },
-                ];
+                options.push({ label: "Edit post", event: "edit-comment" }, { label: "Delete post", event: "delete-comment" });
             }
 
-            if (this.isAdmin) {
-                return [
-                    {
-                        label: "Delete post",
-                        event: "delete-comment",
-                    },
-                ];
+            if (this.isModerator && this.user.id !== post.author.id) {
+                options.push({ label: "Report post", event: "report-comment" });
             }
 
-            return [];
+            return options;
         },
         highlightComment(): void {
             this.$nextTick(() => {

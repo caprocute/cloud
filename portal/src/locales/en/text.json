@@ -816,7 +816,8 @@
             "processRecsTsdb": "Process Recs (TsDB only)",
             "exploreData": "Explore Data",
             "transfer": "Transfer"
-        }
+        },
+        "moderation": "Moderation"
     },
     "pagination": {
         "of": "of"
@@ -828,5 +829,6 @@
         "warning": "Warning, continuing will delete your account and all associated data. To confirm, please enter your email address.",
         "done": "Your account has been deleted.",
         "sameEmail": "Does not match your email."
-    }
+    },
+    "loading": "Loading..."
 }

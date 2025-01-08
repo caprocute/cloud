@@ -4,6 +4,7 @@
             <div class="menu">
                 <router-link :to="{ name: 'adminUsers' }" class="link">Users</router-link>
                 <router-link :to="{ name: 'adminStations' }" class="link">Stations</router-link>
+                <router-link :to="{ name: 'adminModeration' }" class="link">{{$t('admin.moderation')}}</router-link>
             </div>
 
             <div class="status" v-if="status">
