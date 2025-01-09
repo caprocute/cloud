@@ -1,12 +1,13 @@
 -- moderation_request
 
+CREATE TYPE post_type_enum AS ENUM ('discussion_post', 'data_event');
+
 CREATE TABLE moderation_request (
     id SERIAL PRIMARY KEY,
     post_id INT NOT NULL,
-    post_type VARCHAR(50) NOT NULL, -- "discussion_post" or "data_event"
+    post_type post_type_enum NOT NULL,
     reported_by INT NOT NULL,
     acknowledged_by INT NULL,
-    is_acknowledged BOOLEAN DEFAULT FALSE,
     reported_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     acknowledged_at TIMESTAMP NULL
 );
