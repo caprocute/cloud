@@ -1,56 +1,130 @@
 package api
 
-// import (
-//     "database/sql"
-//     "time"
-//     moderation_request
-// )
+import (
+	"context"
+	"errors"
+	"time"
 
-// type ModerationRequestService struct {
-//     DB *sqlxcache.DB
-// }
+	"gitlab.com/fieldkit/cloud/server/backend/repositories"
+	"gitlab.com/fieldkit/cloud/server/common"
+	"gitlab.com/fieldkit/cloud/server/data"
+	"gitlab.com/fieldkit/cloud/server/messages"
+)
 
-// func (s *ModerationRequestService) CreateModerationRequest(targetID int, targetType string, reportedBy int) error {
-//     query := `
-//         INSERT INTO moderation_request (target_id, target_type, reported_by, is_acknowledged, reported_at)
-//         VALUES ($1, $2, $3, FALSE, NOW())
-//     `
-//     _, err := s.DB.Exec(query, targetID, targetType, reportedBy)
-//     return err
-// }
+type ModerationService struct {
+	options *ControllerOptions
+}
 
-// func (s *ModerationRequestService) AcknowledgeModerationRequest(id int, acknowledgedBy int) error {
-//     query := `
-//         UPDATE moderation_request
-//         SET is_acknowledged = TRUE, acknowledged_by = $1, acknowledged_at = NOW()
-//         WHERE id = $2
-//     `
-//     _, err := s.DB.Exec(query, acknowledgedBy, id)
-//     return err
-// }
+func NewModerationService(ctx context.Context, options *ControllerOptions) *ModerationService {
+	return &ModerationService{
+		options: options,
+	}
+}
 
-// func (s *ModerationRequestService) ListPendingModerationRequests() ([]models.ModerationRequest, error) {
-//     query := `
-//         SELECT id, target_id, target_type, reported_by, acknowledged_by, is_acknowledged, reported_at, acknowledged_at
-//         FROM moderation_request
-//         WHERE is_acknowledged = FALSE
-//         ORDER BY reported_at ASC
-//     `
-//     rows, err := s.DB.Query(query)
-//     if err != nil {
-//         return nil, err
-//     }
-//     defer rows.Close()
+func (s *ModerationService) Add(ctx context.Context, payload *ModerationAddPayload) (response *ModerationRequestResponse, err error) {
+	tx, err := s.options.Database.Begin(ctx)
+	if err != nil {
+		return nil, err
+	}
 
-//     var requests []models.ModerationRequest
-//     for rows.Next() {
-//         var request models.ModerationRequest
-//         err := rows.Scan(&request.ID, &request.TargetID, &request.TargetType, &request.ReportedBy,
-//             &request.AcknowledgedBy, &request.IsAcknowledged, &request.ReportedAt, &request.AcknowledgedAt)
-//         if err != nil {
-//             return nil, err
-//         }
-//         requests = append(requests, request)
-//     }
-//     return requests, nil
-// }
+	txCtx := context.WithValue(ctx, common.TxContextKey, tx)
+	response, err = s.add(txCtx, payload)
+	if err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	err = tx.Commit()
+	return response, err
+}
+
+func (s *ModerationService) add(ctx context.Context, payload *ModerationAddPayload) (response *ModerationRequestResponse, err error) {
+	log := Logger(ctx).Sugar()
+
+	p, err := NewPermissions(ctx, s.options).Unwrap()
+	if err != nil {
+		return nil, err
+	}
+
+	if payload.PostType != data.ModerationDiscussionPost && payload.PostType != data.ModerationDataEvent {
+		return nil, errors.New("invalid post_type")
+	}
+
+	log.Infow("adding moderation request", "post_id", payload.PostID, "post_type", payload.PostType)
+
+	mr := repositories.NewModerationRepository(s.options.Database)
+
+	newRequest := &data.ModerationRequest{
+		PostID:     payload.PostID,
+		PostType:   payload.PostType,
+		ReportedBy: p.UserID(),
+		ReportedAt: time.Now().UTC(),
+	}
+
+	created, err := mr.AddModerationRequest(ctx, newRequest)
+	if err != nil {
+		return nil, err
+	}
+
+	modRepo := repositories.NewModeratorsRepository(s.options.Database)
+	moderators, err := modRepo.GetAllModerators(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, moderator := range moderators {
+		if err := s.options.Publisher.Publish(ctx, &messages.ModerationRequestCreated{
+			ModeratorID: moderator.UserID,
+			PostID:      payload.PostID,
+			PostType:    payload.PostType,
+		}); err != nil {
+			log.Errorw("error sending moderation notification", "moderator_id", moderator.UserID, "error", err)
+		}
+	}
+
+	response = &ModerationRequestResponse{
+		ID:             created.ID,
+		PostID:         created.PostID,
+		PostType:       created.PostType,
+		ReportedBy:     created.ReportedBy,
+		ReportedAt:     created.ReportedAt,
+		AcknowledgedBy: nil,
+		AcknowledgedAt: nil,
+	}
+
+	return response, nil
+}
+
+func (s *ModerationService) Acknowledge(ctx context.Context, id int, acknowledgedBy int) (response *ModerationRequestResponse, err error) {
+	mrRepo := repositories.NewModerationRepository(s.options.Database)
+
+	// Retrieve the moderation request
+	moderationRequest, err := mrRepo.GetModerationRequest(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+
+	// Mark as acknowledged
+	now := time.Now().UTC()
+	moderationRequest.AcknowledgedBy = &acknowledgedBy
+	moderationRequest.AcknowledgedAt = &now
+
+	// Save the updated request
+	err = mrRepo.UpdateModerationRequest(ctx, moderationRequest)
+	if err != nil {
+		return nil, err
+	}
+
+	// Return the updated response
+	response = &ModerationRequestResponse{
+		ID:             moderationRequest.ID,
+		PostID:         moderationRequest.PostID,
+		PostType:       moderationRequest.PostType,
+		ReportedBy:     moderationRequest.ReportedBy,
+		ReportedAt:     moderationRequest.ReportedAt,
+		AcknowledgedBy: moderationRequest.AcknowledgedBy,
+		AcknowledgedAt: moderationRequest.AcknowledgedAt,
+	}
+
+	return response, nil
+}
