@@ -3,12 +3,12 @@ package api
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
+	"github.com/jmoiron/sqlx"
 	"gitlab.com/fieldkit/cloud/server/backend/repositories"
-	"gitlab.com/fieldkit/cloud/server/common"
 	"gitlab.com/fieldkit/cloud/server/data"
-	"gitlab.com/fieldkit/cloud/server/messages"
 )
 
 type ModerationService struct {
@@ -21,14 +21,13 @@ func NewModerationService(ctx context.Context, options *ControllerOptions) *Mode
 	}
 }
 
-func (s *ModerationService) Add(ctx context.Context, payload *ModerationAddPayload) (response *ModerationRequestResponse, err error) {
+func (s *ModerationService) Add(ctx context.Context, payload *data.ModerationAddPayload) (response *data.ModerationRequestResponse, err error) {
 	tx, err := s.options.Database.Begin(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	txCtx := context.WithValue(ctx, common.TxContextKey, tx)
-	response, err = s.add(txCtx, payload)
+	response, err = s.add(tx, payload)
 	if err != nil {
 		tx.Rollback()
 		return nil, err
@@ -38,10 +37,10 @@ func (s *ModerationService) Add(ctx context.Context, payload *ModerationAddPaylo
 	return response, err
 }
 
-func (s *ModerationService) add(ctx context.Context, payload *ModerationAddPayload) (response *ModerationRequestResponse, err error) {
-	log := Logger(ctx).Sugar()
+func (s *ModerationService) add(tx *sqlx.Tx, payload *data.ModerationAddPayload) (response *data.ModerationRequestResponse, err error) {
+	log := Logger(context.Background()).Sugar()
 
-	p, err := NewPermissions(ctx, s.options).Unwrap()
+	p, err := NewPermissions(context.Background(), s.options).Unwrap()
 	if err != nil {
 		return nil, err
 	}
@@ -56,29 +55,39 @@ func (s *ModerationService) add(ctx context.Context, payload *ModerationAddPaylo
 
 	newRequest := &data.ModerationRequest{
 		PostID:     payload.PostID,
-		PostType:   payload.PostType,
+		PostType:   string(payload.PostType),
 		ReportedBy: p.UserID(),
 		ReportedAt: time.Now().UTC(),
 	}
 
-	created, err := mr.AddModerationRequest(ctx, newRequest)
+	created, err := mr.AddModerationRequest(context.Background(), newRequest)
 	if err != nil {
 		return nil, err
 	}
 
-	modRepo := repositories.NewModeratorsRepository(s.options.Database)
-	moderators, err := modRepo.GetAllModerators(ctx)
+	modRepo := repositories.NewModerationRepository(s.options.Database)
+	moderators, err := modRepo.GetAllModerators(context.Background())
 	if err != nil {
 		return nil, err
 	}
+
+	// Assuming you have a method or repo to get user info by user_id
+	userRepo := repositories.NewUserRepository(s.options.Database)
 
 	for _, moderator := range moderators {
-		if err := s.options.Publisher.Publish(ctx, &messages.ModerationRequestCreated{
-			ModeratorID: moderator.UserID,
-			PostID:      payload.PostID,
-			PostType:    payload.PostType,
-		}); err != nil {
-			log.Errorw("error sending moderation notification", "moderator_id", moderator.UserID, "error", err)
+		// Fetch user details to get the email
+		user, err := userRepo.QueryByID(context.Background(), moderator.UserID)
+		if err != nil {
+			log.Errorw("error retrieving user details", "moderator_id", moderator.UserID, "error", err)
+			continue
+		}
+
+		// Simulate email sending (replace with real implementation later)
+		err = sendMockEmail(user.Email, "New Moderation Request", createEmailBody(payload))
+		if err != nil {
+			log.Errorw("error sending email notification", "moderator_id", moderator.UserID, "error", err)
+		} else {
+			log.Infow("email notification sent", "moderator_id", moderator.UserID)
 		}
 	}
 
@@ -95,28 +104,33 @@ func (s *ModerationService) add(ctx context.Context, payload *ModerationAddPaylo
 	return response, nil
 }
 
-func (s *ModerationService) Acknowledge(ctx context.Context, id int, acknowledgedBy int) (response *ModerationRequestResponse, err error) {
+func createEmailBody(payload *data.ModerationAddPayload) string {
+	return fmt.Sprintf("A new moderation request has been created for post ID %d and post type %s.", payload.PostID, payload.PostType)
+}
+
+func sendMockEmail(to string, subject string, body string) error {
+	fmt.Printf("Mock sending email to: %s\nSubject: %s\nBody: %s\n", to, subject, body)
+	return nil
+}
+
+func (s *ModerationService) Acknowledge(ctx context.Context, id int, acknowledgedBy int) (response *data.ModerationRequestResponse, err error) {
 	mrRepo := repositories.NewModerationRepository(s.options.Database)
 
-	// Retrieve the moderation request
 	moderationRequest, err := mrRepo.GetModerationRequest(ctx, id)
 	if err != nil {
 		return nil, err
 	}
 
-	// Mark as acknowledged
 	now := time.Now().UTC()
 	moderationRequest.AcknowledgedBy = &acknowledgedBy
 	moderationRequest.AcknowledgedAt = &now
 
-	// Save the updated request
 	err = mrRepo.UpdateModerationRequest(ctx, moderationRequest)
 	if err != nil {
 		return nil, err
 	}
 
-	// Return the updated response
-	response = &ModerationRequestResponse{
+	response = &data.ModerationRequestResponse{
 		ID:             moderationRequest.ID,
 		PostID:         moderationRequest.PostID,
 		PostType:       moderationRequest.PostType,
