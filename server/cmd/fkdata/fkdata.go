@@ -1,293 +1,179 @@
 package main
 
 import (
+	"bytes"
 	"context"
+	"encoding/hex"
+	"encoding/json"
 	"flag"
 	"fmt"
-	"math"
-	"time"
+	"io"
+	"log"
+	"os"
 
-	"github.com/kelseyhightower/envconfig"
+	"github.com/golang/protobuf/proto"
+	stream "gitlab.com/fieldkit/cloud/server/backend"
 
-	_ "github.com/lib/pq"
-
-	"github.com/hashicorp/go-multierror"
-
-	"gitlab.com/fieldkit/cloud/server/common/sqlxcache"
-
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials"
-	"github.com/aws/aws-sdk-go/aws/session"
-
-	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/vgarvardt/gue/v4"
-	"github.com/vgarvardt/gue/v4/adapter/pgxv5"
-
-	"gitlab.com/fieldkit/cloud/server/backend"
-	"gitlab.com/fieldkit/cloud/server/common/errors"
-	"gitlab.com/fieldkit/cloud/server/common/jobs"
-	"gitlab.com/fieldkit/cloud/server/common/logging"
-	"gitlab.com/fieldkit/cloud/server/files"
-	"gitlab.com/fieldkit/cloud/server/messages"
-	"gitlab.com/fieldkit/cloud/server/storage"
+	pbdata "gitlab.com/fieldkit/libraries/data-protocol"
 )
 
-const SecondsPerWeek = int64(60 * 60 * 24 * 7)
-
 type Options struct {
-	StationID int
-	Ingestion bool
-	Aggregate bool
-	All       bool
-	Recently  bool
-	Fake      bool
-}
-
-type Config struct {
-	PostgresURL  string `split_words:"true" default:"postgres://localhost/fieldkit?sslmode=disable" required:"true"`
-	TimeScaleURL string `split_words:"true"`
-
-	AwsProfile string `envconfig:"aws_profile" default:"fieldkit" required:"true"`
-	AwsId      string `split_words:"true" default:""`
-	AwsSecret  string `split_words:"true" default:""`
-
-	MediaBuckets   []string `split_words:"true" default:""`
-	StreamsBuckets []string `split_words:"true" default:""`
-}
-
-func (c *Config) timeScaleConfig() *storage.TimeScaleDBConfig {
-	if c.TimeScaleURL != "" {
-		return &storage.TimeScaleDBConfig{
-			Url: c.TimeScaleURL,
-		}
-	}
-	return nil
-}
-
-func fail(ctx context.Context, err error) {
-	log := logging.Logger(ctx).Sugar()
-	if se, ok := err.(errors.StructuredError); ok {
-		fmt.Printf("%v\n", se)
-	}
-	log.Errorw("error", "error", err)
-	panic(err)
-}
-
-func getAwsSessionOptions(ctx context.Context, config *Config) session.Options {
-	log := logging.Logger(ctx).Sugar()
-
-	if config.AwsId == "" || config.AwsSecret == "" {
-		log.Infow("using aws profile")
-		return session.Options{
-			Profile: config.AwsProfile,
-			Config: aws.Config{
-				Region:                        aws.String("us-east-1"),
-				CredentialsChainVerboseErrors: aws.Bool(true),
-			},
-		}
-	}
-	log.Infow("using aws credentials")
-	return session.Options{
-		Profile: config.AwsProfile,
-		Config: aws.Config{
-			Region:                        aws.String("us-east-1"),
-			Credentials:                   credentials.NewStaticCredentials(config.AwsId, config.AwsSecret, ""),
-			CredentialsChainVerboseErrors: aws.Bool(true),
-		},
-	}
+	File string
 }
 
 func main() {
 	ctx := context.Background()
 
-	options := &Options{}
-
-	flag.IntVar(&options.StationID, "station-id", 0, "station id")
-	flag.BoolVar(&options.Ingestion, "ingestion", false, "ingestion")
-	flag.BoolVar(&options.Aggregate, "aggregate", false, "aggregate")
-	flag.BoolVar(&options.All, "all", false, "all stations")
-	flag.BoolVar(&options.Fake, "fake", false, "create a fake data")
-	flag.BoolVar(&options.Recently, "recently", false, "recently inserted data")
-
+	options := Options{}
+	flag.StringVar(&options.File, "file", "fkpb file", "")
 	flag.Parse()
 
-	config := &Config{}
-	if err := envconfig.Process("FIELDKIT", config); err != nil {
-		fail(ctx, err)
-	}
-
-	db, err := sqlxcache.Open(ctx, "postgres", config.PostgresURL)
+	file, err := os.Open(options.File)
 	if err != nil {
-		fail(ctx, err)
+		log.Fatalln("Opening file: %w", err)
 	}
 
-	logging.Configure(false, "fkdata")
+	ms := NewMetaScanner()
 
-	log := logging.Logger(ctx).Sugar()
-
-	tsConfig := config.timeScaleConfig()
-
-	var errors *multierror.Error
-
-	if options.Ingestion {
-		awsSessionOptions := getAwsSessionOptions(ctx, config)
-
-		awsSession, err := session.NewSessionWithOptions(awsSessionOptions)
-		if err != nil {
-			fail(ctx, err)
-		}
-
-		metrics := logging.NewMetrics(ctx, &logging.MetricsSettings{
-			Prefix:  "fk.service",
-			Address: "",
-		})
-
-		reading := make([]files.FileArchive, 0)
-		writing := make([]files.FileArchive, 0)
-
-		fs := files.NewLocalFilesArchive()
-		reading = append(reading, fs)
-		writing = append(writing, fs)
-
-		for _, bucketName := range config.StreamsBuckets {
-			s3, err := files.NewS3FileArchive(awsSession, metrics, bucketName, files.NoPrefix)
-			if err != nil {
-				fail(ctx, err)
-			}
-
-			reading = append(reading, s3)
-		}
-
-		pgxcfg, err := pgxpool.ParseConfig(config.PostgresURL)
-		if err != nil {
-			fail(ctx, err)
-		}
-
-		pgxpool, err := pgxpool.NewWithConfig(ctx, pgxcfg)
-		if err != nil {
-			fail(ctx, err)
-		}
-
-		fa := files.NewPrioritizedFilesArchive(reading, writing)
-
-		qc, err := gue.NewClient(pgxv5.NewConnPool(pgxpool))
-		if err != nil {
-			fail(ctx, err)
-		}
-		publisher := jobs.NewQueMessagePublisher(metrics, pgxpool, qc)
-		mc := jobs.NewMessageContext(publisher, nil)
-		isHandler := backend.NewIngestStationHandler(db, pgxpool, fa, metrics, publisher, tsConfig)
-
-		process := func(ctx context.Context, id int32) error {
-			return isHandler.Start(ctx, &messages.IngestStation{
-				StationID: id,
-				UserID:    2, // Jacob
-				Verbose:   true,
-			}, mc)
-		}
-
-		if options.All {
-			ids := []*IDRow{}
-			if err := db.SelectContext(ctx, &ids, `SELECT id FROM fieldkit.station`); err != nil {
-				fail(ctx, err)
-			}
-
-			for _, id := range ids {
-				log.Infow("station", "station_id", id.ID)
-				err := process(ctx, int32(id.ID))
-				if err != nil {
-					errors = multierror.Append(errors, err)
-				}
-			}
-		} else {
-			err := process(ctx, int32(options.StationID))
-			if err != nil {
-				errors = multierror.Append(errors, err)
-			}
-		}
-
-		if errors.ErrorOrNil() != nil {
-			fail(ctx, errors.ErrorOrNil())
-		}
-
-		return
+	if err := Decode(ctx, file, ms); err != nil {
+		log.Fatalf("error: %v", err)
 	}
 
-	if options.Aggregate {
-		if options.All {
-			ids := []*IDRow{}
-			if err := db.SelectContext(ctx, &ids, `SELECT id FROM fieldkit.station`); err != nil {
-				fail(ctx, err)
-			} else {
-				for _, id := range ids {
-					log.Infow("station", "station_id", id.ID)
-					if err := processStation(ctx, db, tsConfig, int32(id.ID), options.Recently); err != nil {
-						errors = multierror.Append(errors, err)
-					}
-				}
-			}
-		} else {
-			if options.StationID > 0 {
-				if err := processStation(ctx, db, tsConfig, int32(options.StationID), options.Recently); err != nil {
-					errors = multierror.Append(errors, err)
-				}
-			}
-		}
+	if ms.DeviceId != nil {
+		log.Printf("DeviceId: %s", hex.EncodeToString(*ms.DeviceId))
 	}
-
-	if errors.ErrorOrNil() != nil {
-		fail(ctx, errors.ErrorOrNil())
+	if ms.GenerationId != nil {
+		log.Printf("GenerationId: %s", hex.EncodeToString(*ms.GenerationId))
 	}
+	if ms.DeviceName != nil {
+		log.Printf("DeviceName: %s", *ms.DeviceName)
+	}
+	if ms.FirstRecord != nil {
+		log.Printf("FirstRecord: %d", *ms.FirstRecord)
+	}
+	if ms.LastRecord != nil {
+		log.Printf("LastRecord: %d", *ms.LastRecord)
+	}
+	log.Printf("Visited: %d", ms.Visited)
 }
 
-func processStation(ctx context.Context, db *sqlxcache.DB, tsConfig *storage.TimeScaleDBConfig, stationID int32, recently bool) error {
-	sr, err := backend.NewStationRefresher(db, tsConfig, "")
+type MetaScanner struct {
+	DeviceId     *[]byte
+	DeviceName   *string
+	GenerationId *[]byte
+	Visited      uint64
+	FirstRecord  *uint64
+	LastRecord   *uint64
+}
+
+func NewMetaScanner() *MetaScanner {
+	return &MetaScanner{}
+}
+
+func (ms *MetaScanner) OnRecord(ctx context.Context, record *pbdata.DataRecord) error {
+	if record.Metadata != nil {
+		if record.Metadata.DeviceId != nil {
+			if ms.DeviceId == nil {
+				ms.DeviceId = &record.Metadata.DeviceId
+			} else {
+				if !bytes.Equal(*ms.DeviceId, record.Metadata.DeviceId) {
+					return fmt.Errorf("multiple device ids in file")
+				}
+			}
+		}
+		if record.Metadata.Generation != nil {
+			if ms.GenerationId == nil {
+				ms.GenerationId = &record.Metadata.Generation
+			} else {
+				if !bytes.Equal(*ms.GenerationId, record.Metadata.Generation) {
+					return fmt.Errorf("multiple generations in file")
+				}
+			}
+		}
+	}
+
+	if record.Identity != nil {
+		if record.Identity.Name != "" {
+			if ms.DeviceName == nil {
+				ms.DeviceName = &record.Identity.Name
+			} else {
+				if *ms.DeviceName != record.Identity.Name {
+					return fmt.Errorf("multiple names in file (%s vs %s)", *ms.DeviceName, record.Identity.Name)
+				}
+			}
+		}
+	}
+
+	number, err := getRecordNumber(record)
 	if err != nil {
 		return err
 	}
 
-	if recently {
-		if err := sr.Refresh(ctx, stationID, time.Hour*48, false, false); err != nil {
-			return fmt.Errorf("recently refresh failed: %w", err)
+	if number != nil {
+		if ms.FirstRecord == nil {
+			ms.FirstRecord = number
 		}
-	} else {
-		if err := sr.Refresh(ctx, stationID, 0, true, false); err != nil {
-			return fmt.Errorf("complete refresh failed: %w", err)
+		if ms.LastRecord == nil || *ms.LastRecord < *number {
+			ms.LastRecord = number
+		} else {
+			return fmt.Errorf("non-monotonic record")
 		}
 	}
+
+	ms.Visited += 1
 
 	return nil
 }
 
-type SampleFunc func(t time.Time) float64
-
-type IDRow struct {
-	ID int64 `db:"id"`
-}
-
-type RandomLocation struct {
-	Coords []float64
-}
-
-func NewRandomLocation() (rl *RandomLocation) {
-	return &RandomLocation{
-		Coords: []float64{},
+func getRecordNumber(record *pbdata.DataRecord) (*uint64, error) {
+	if record.Readings != nil {
+		if record.Readings.Reading == 0 {
+			// Sanity check. This should never happen, as we'll need a meta
+			// record first, so we can't have a zero reading record.
+			return nil, fmt.Errorf("zero readings record")
+		}
+		return &record.Readings.Reading, nil
 	}
+	if record.Metadata != nil {
+		return &record.Metadata.Record, nil
+	}
+	// All records from modern firmware should have a number. There are hacks we
+	// can fallback in if we ever see an old file in here.
+	return nil, fmt.Errorf("no record number")
 }
 
-func (rl *RandomLocation) Move(t time.Time) {
-	period := SecondsPerWeek * 4
-	scaled := float64(t.Unix()%period) / float64(period)
-	radians := scaled * math.Pi * 2
-	x := math.Sin(radians)
-	y := math.Cos(radians)
+type RecordVisitor interface {
+	OnRecord(ctx context.Context, record *pbdata.DataRecord) error
+}
 
-	center := []float64{-115.4093893, 35.0691767}
-	radius := float64(1 / 100.0)
-	coords := []float64{
-		center[0] + y*radius,
-		center[1] + x*radius,
-		0,
+func Decode(ctx context.Context, reader io.Reader, visitor RecordVisitor) error {
+	unmarshalFunc := stream.UnmarshalFunc(func(b []byte) (proto.Message, error) {
+		var record pbdata.DataRecord
+		err := proto.Unmarshal(b, &record)
+		if err != nil {
+			return nil, err
+		}
+
+		if err := visitor.OnRecord(ctx, &record); err != nil {
+			log.Printf("error: %s", err)
+
+			replyJson, err := json.MarshalIndent(&record, "", "  ")
+			if err != nil {
+				return nil, err
+			}
+
+			fmt.Println(string(replyJson))
+
+			return nil, err
+		}
+
+		return nil, nil
+	})
+
+	_, _, err := stream.ReadLengthPrefixedCollection(ctx, stream.MaximumDataRecordLength, reader, unmarshalFunc)
+	if err != nil {
+		return err
 	}
-	rl.Coords = coords
+
+	return nil
 }
