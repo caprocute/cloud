@@ -64,7 +64,9 @@ export default Vue.extend({
             busy: false,
         };
     },
-    mounted(this: any) {},
+    mounted(this: any) {
+      console.log("mounted admin moderation");
+    },
     watch: {},
     methods: {
         onNewPage(page: number) {

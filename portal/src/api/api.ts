@@ -228,6 +228,7 @@ export class CurrentUser {
     mediaUrl: string;
     tncDate: number;
     admin: boolean;
+    moderator: boolean;
 }
 
 export enum UserRolesEnum {
@@ -924,8 +925,7 @@ class FKApi {
         });
     }
 
-    addStation(data: {name: string, deviceId: string, locationName?: string, statusPb: string, description: string}) {
-
+    addStation(data: { name: string; deviceId: string; locationName?: string; statusPb: string; description: string }) {
         return this.invoke({
             auth: Auth.Required,
             method: "POST",
@@ -1724,6 +1724,25 @@ class FKApi {
             method: "GET",
             url: this.baseUrl + "/projects/station/" + id,
         });
+    }
+
+    public async reportPost(post: Comment | DataEvent): Promise<{ post: Comment }> {
+
+        const returned = await this.invoke({
+            auth: Auth.Required,
+            method: "POST",
+            url: this.baseUrl + "/moderation",
+            data: {
+                post_id: post.id,
+                post_type: 'discussion_post'
+            },
+        });
+
+         console.log("comments", returned);
+
+        return {
+            post: returned
+        };
     }
 }
 

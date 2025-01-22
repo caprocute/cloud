@@ -202,7 +202,7 @@
                                 <span v-if="item.body" class="icon icon-comment"></span>
                                 <span v-else class="icon icon-flag"></span>
                                 <ListItemOptions
-                                    v-if="user && (user.id === item.author.id || user.admin)"
+                                    v-if="user"
                                     @listItemOptionClick="onListItemOptionClick($event, item)"
                                     :options="getCommentOptions(item)"
                                 />
@@ -258,7 +258,7 @@
                                                 {{ reply.author.name }}
                                             </span>
                                             <ListItemOptions
-                                                v-if="user && (user.id === reply.author.id || user.admin)"
+                                                v-if="user"
                                                 @listItemOptionClick="onListItemOptionClick($event, reply)"
                                                 :options="getCommentOptions(reply)"
                                             />
@@ -426,9 +426,6 @@ export default Vue.extend({
                 return this.$store.getters.isAdminForProject(this.user.id, this.projectId);
             }
             return false;
-        },
-        isModerator(): boolean {
-            return true;
         },
         isProjectLoaded(): boolean {
             if (this.projectId) {
@@ -799,6 +796,10 @@ export default Vue.extend({
                     this.deleteDataEvent(item.id);
                 }
             }
+            if (event === "report") {
+                console.log("report", item);
+                this.$services.api.reportPost(item);
+            }
         },
         getCommentOptions(post: Comment): { label: string; event: string }[] {
             if (!this.user) {
@@ -811,8 +812,8 @@ export default Vue.extend({
                 options.push({ label: "Edit post", event: "edit-comment" }, { label: "Delete post", event: "delete-comment" });
             }
 
-            if (this.isModerator && this.user.id !== post.author.id) {
-                options.push({ label: "Report post", event: "report-comment" });
+            if (this.user.id !== post.author.id) {
+                options.push({ label: "Report", event: "report" });
             }
 
             return options;

@@ -21,7 +21,7 @@ func NewModerationService(ctx context.Context, options *ControllerOptions) *Mode
 	}
 }
 
-func (s *ModerationService) Add(ctx context.Context, payload *data.ModerationAddPayload) (response *data.ModerationRequestResponse, err error) {
+func (s *ModerationService) Add(ctx context.Context, payload *data.ModerationAddPayload) (response *data.ModerationRequest, err error) {
 	tx, err := s.options.Database.Begin(ctx)
 	if err != nil {
 		return nil, err
@@ -37,7 +37,7 @@ func (s *ModerationService) Add(ctx context.Context, payload *data.ModerationAdd
 	return response, err
 }
 
-func (s *ModerationService) add(tx *sqlx.Tx, payload *data.ModerationAddPayload) (response *data.ModerationRequestResponse, err error) {
+func (s *ModerationService) add(tx *sqlx.Tx, payload *data.ModerationAddPayload) (response *data.ModerationRequest, err error) {
 	log := Logger(context.Background()).Sugar()
 
 	p, err := NewPermissions(context.Background(), s.options).Unwrap()
@@ -55,7 +55,7 @@ func (s *ModerationService) add(tx *sqlx.Tx, payload *data.ModerationAddPayload)
 
 	newRequest := &data.ModerationRequest{
 		PostID:     payload.PostID,
-		PostType:   string(payload.PostType),
+		PostType:   payload.PostType,
 		ReportedBy: p.UserID(),
 		ReportedAt: time.Now().UTC(),
 	}
@@ -91,7 +91,7 @@ func (s *ModerationService) add(tx *sqlx.Tx, payload *data.ModerationAddPayload)
 		}
 	}
 
-	response = &ModerationRequestResponse{
+	response = &data.ModerationRequest{
 		ID:             created.ID,
 		PostID:         created.PostID,
 		PostType:       created.PostType,
@@ -113,7 +113,7 @@ func sendMockEmail(to string, subject string, body string) error {
 	return nil
 }
 
-func (s *ModerationService) Acknowledge(ctx context.Context, id int, acknowledgedBy int) (response *data.ModerationRequestResponse, err error) {
+func (s *ModerationService) Acknowledge(ctx context.Context, id int, acknowledgedBy int32) (response *data.ModerationRequest, err error) {
 	mrRepo := repositories.NewModerationRepository(s.options.Database)
 
 	moderationRequest, err := mrRepo.GetModerationRequest(ctx, id)
@@ -130,7 +130,7 @@ func (s *ModerationService) Acknowledge(ctx context.Context, id int, acknowledge
 		return nil, err
 	}
 
-	response = &data.ModerationRequestResponse{
+	response = &data.ModerationRequest{
 		ID:             moderationRequest.ID,
 		PostID:         moderationRequest.PostID,
 		PostType:       moderationRequest.PostType,
