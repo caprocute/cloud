@@ -3,7 +3,7 @@
         <header class="header" :class="{ 'no-border': !user }">
             <div class="name">{{ $t("fieldNotes.title") }}</div>
             <div class="buttons" v-if="isAuthenticated">
-                <button v-if="!isLoading && groupedFieldNotes" class="button" @click="generatePDF">
+                <button :class="{ disabled: isLoading || !groupedFieldNotes }" class="button" @click="generatePDF">
                     <i class="icon icon-export"></i>
                     {{ $t("fieldNotes.btnExport") }}
                 </button>
