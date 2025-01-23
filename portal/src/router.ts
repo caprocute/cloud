@@ -56,7 +56,7 @@ function makeDefaultRouteForProject(projectId: number) {
             };
         },
         meta: {
-            secured: true,
+            secured: false,
             viewType: MapViewType.map,
         },
     };
@@ -70,7 +70,7 @@ function getRoot() {
             name: "root",
             component: ProjectsView,
             meta: {
-                secured: true,
+                secured: false,
             },
         };
     }
@@ -188,7 +188,7 @@ const routes = [
         name: "viewInvites",
         component: ProjectsView,
         meta: {
-            secured: true,
+            secured: false,
         },
     },
     {
@@ -212,7 +212,7 @@ const routes = [
         name: "projects",
         component: ProjectsView,
         meta: {
-            secured: true,
+            secured: false,
         },
     },
     {
@@ -226,7 +226,7 @@ const routes = [
             };
         },
         meta: {
-            secured: true,
+            secured: false,
         },
     },
     {
@@ -242,7 +242,7 @@ const routes = [
         },
         meta: {
             bodyClass: "disable-scrolling",
-            secured: true,
+            secured: false,
         },
     },
     {
@@ -256,7 +256,7 @@ const routes = [
             };
         },
         meta: {
-            secured: true,
+            secured: false,
         },
     },
     {
@@ -271,7 +271,7 @@ const routes = [
             };
         },
         meta: {
-            secured: true,
+            secured: false,
             viewType: MapViewType.map,
         },
     },
@@ -287,7 +287,7 @@ const routes = [
             };
         },
         meta: {
-            secured: true,
+            secured: false,
             viewType: MapViewType.list,
         },
     },
@@ -296,7 +296,7 @@ const routes = [
         name: "addProject",
         component: ProjectEditView,
         meta: {
-            secured: true,
+            secured: false,
         },
     },
     {
@@ -309,7 +309,7 @@ const routes = [
             };
         },
         meta: {
-            secured: true,
+            secured: false,
         },
     },
     {
@@ -318,7 +318,7 @@ const routes = [
         component: ProjectUpdateEditView,
         props: true,
         meta: {
-            secured: true,
+            secured: false,
         },
     },
     {
@@ -331,7 +331,7 @@ const routes = [
             };
         },
         meta: {
-            secured: true,
+            secured: false,
         },
     },
     {
@@ -341,7 +341,7 @@ const routes = [
         props: true,
         meta: {
             bodyClass: "map-view",
-            secured: true,
+            secured: false,
             viewType: MapViewType.map,
         },
     },
@@ -352,7 +352,7 @@ const routes = [
         props: true,
         meta: {
             bodyClass: "map-view",
-            secured: true,
+            secured: false,
             viewType: MapViewType.list,
         },
     },
@@ -367,7 +367,7 @@ const routes = [
         },
         meta: {
             bodyClass: "map-view",
-            secured: true,
+            secured: false,
         },
     },
     {
@@ -381,7 +381,7 @@ const routes = [
         },
         meta: {
             bodyClass: "map-view",
-            secured: true,
+            secured: false,
         },
     },
     {
@@ -396,7 +396,7 @@ const routes = [
         },
         meta: {
             bodyClass: "map-view",
-            secured: true,
+            secured: false,
         },
     },
     {
@@ -410,7 +410,7 @@ const routes = [
             };
         },
         meta: {
-            secured: true,
+            secured: false,
         },
     },
     {
@@ -425,7 +425,7 @@ const routes = [
             };
         },
         meta: {
-            secured: true,
+            secured: false,
         },
     },
     {
@@ -439,7 +439,7 @@ const routes = [
             };
         },
         meta: {
-            secured: true,
+            secured: false,
             bodyClass: "disable-scrolling",
         },
     },
@@ -455,7 +455,7 @@ const routes = [
             };
         },
         meta: {
-            secured: true,
+            secured: false,
         },
     },
     {
@@ -509,7 +509,7 @@ const routes = [
         },
         meta: {
             bodyClass: "disable-scrolling",
-            secured: true,
+            secured: false,
         },
     },
     {
@@ -524,7 +524,7 @@ const routes = [
         },
         meta: {
             bodyClass: "disable-scrolling",
-            secured: true,
+            secured: false,
         },
     },
     {
@@ -537,7 +537,7 @@ const routes = [
             };
         },
         meta: {
-            secured: true,
+            secured: false,
         },
     },
     {
@@ -551,7 +551,7 @@ const routes = [
             };
         },
         meta: {
-            secured: true,
+            secured: false,
         },
     },
     {
@@ -575,7 +575,7 @@ const routes = [
             };
         },
         meta: {
-            secured: true,
+            secured: false,
         },
     },
     {
@@ -663,6 +663,7 @@ export default function routerFactory(store) {
 
     router.beforeEach(async (to, from, next) => {
         console.log("nav", from.name, "->", to.name);
+        console.log("ss", store);
         if (from.name === null && (to.name === null || to.name == "login")) {
             console.log("nav", "authenticated", store.getters.isAuthenticated);
             if (store.getters.isAuthenticated) {
@@ -705,14 +706,9 @@ export default function routerFactory(store) {
                     next();
                 }
             } else {
-                // const queryParams = new URLSearchParams();
-                // queryParams.append("after", to.fullPath);
-                // next("/login?" + queryParams.toString());
-
-                if (isAdminRoute(to)) {
-                    next('/login');
-                }
-                next();
+                const queryParams = new URLSearchParams();
+                queryParams.append("after", to.fullPath);
+                next("/login?" + queryParams.toString());
             }
         } else {
             if (to.name === null) {
