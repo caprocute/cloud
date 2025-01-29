@@ -16,7 +16,6 @@ import (
 	"strings"
 
 	moderation "gitlab.com/fieldkit/cloud/server/api/gen/moderation"
-	moderationviews "gitlab.com/fieldkit/cloud/server/api/gen/moderation/views"
 	goahttp "goa.design/goa/v3/http"
 )
 
@@ -39,12 +38,12 @@ func (c *Client) BuildAddRequest(ctx context.Context, v interface{}) (*http.Requ
 // server.
 func EncodeAddRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
 	return func(req *http.Request, v interface{}) error {
-		p, ok := v.(*moderation.AddPayload)
+		p, ok := v.(*moderation.ModerationAddPayload)
 		if !ok {
-			return goahttp.ErrInvalidType("moderation", "add", "*moderation.AddPayload", v)
+			return goahttp.ErrInvalidType("moderation", "add", "*moderation.ModerationAddPayload", v)
 		}
-		{
-			head := p.Auth
+		if p.Auth != nil {
+			head := *p.Auth
 			if !strings.Contains(head, " ") {
 				req.Header.Set("Authorization", "Bearer "+head)
 			} else {
@@ -77,7 +76,7 @@ func DecodeAddResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody
 			defer resp.Body.Close()
 		}
 		switch resp.StatusCode {
-		case http.StatusCreated:
+		case http.StatusOK:
 			var (
 				body AddResponseBody
 				err  error
@@ -86,17 +85,94 @@ func DecodeAddResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody
 			if err != nil {
 				return nil, goahttp.ErrDecodingError("moderation", "add", err)
 			}
-			p := NewAddModeratedPostCreated(&body)
-			view := "default"
-			vres := &moderationviews.ModeratedPost{Projected: p, View: view}
-			if err = moderationviews.ValidateModeratedPost(vres); err != nil {
+			err = ValidateAddResponseBody(&body)
+			if err != nil {
 				return nil, goahttp.ErrValidationError("moderation", "add", err)
 			}
-			res := moderation.NewModeratedPost(vres)
+			res := NewAddModerationRequestOK(&body)
 			return res, nil
 		default:
 			body, _ := ioutil.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("moderation", "add", resp.StatusCode, string(body))
+		}
+	}
+}
+
+// BuildAcknowledgeRequest instantiates a HTTP request object with method and
+// path set to call the "moderation" service "acknowledge" endpoint
+func (c *Client) BuildAcknowledgeRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: AcknowledgeModerationPath()}
+	req, err := http.NewRequest("POST", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("moderation", "acknowledge", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeAcknowledgeRequest returns an encoder for requests sent to the
+// moderation acknowledge server.
+func EncodeAcknowledgeRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*moderation.AcknowledgePayload)
+		if !ok {
+			return goahttp.ErrInvalidType("moderation", "acknowledge", "*moderation.AcknowledgePayload", v)
+		}
+		if p.Auth != nil {
+			head := *p.Auth
+			if !strings.Contains(head, " ") {
+				req.Header.Set("Authorization", "Bearer "+head)
+			} else {
+				req.Header.Set("Authorization", head)
+			}
+		}
+		body := NewAcknowledgeRequestBody(p)
+		if err := encoder(req).Encode(&body); err != nil {
+			return goahttp.ErrEncodingError("moderation", "acknowledge", err)
+		}
+		return nil
+	}
+}
+
+// DecodeAcknowledgeResponse returns a decoder for responses returned by the
+// moderation acknowledge endpoint. restoreBody controls whether the response
+// body should be restored after having been read.
+func DecodeAcknowledgeResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			var (
+				body AcknowledgeResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("moderation", "acknowledge", err)
+			}
+			err = ValidateAcknowledgeResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("moderation", "acknowledge", err)
+			}
+			res := NewAcknowledgeModerationRequestOK(&body)
+			return res, nil
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("moderation", "acknowledge", resp.StatusCode, string(body))
 		}
 	}
 }

@@ -4,54 +4,57 @@ import (
 	. "goa.design/goa/v3/dsl"
 )
 
-var ModeratedPost = ResultType("application/vnd.app.moderation.media", func() {
-	TypeName("ModeratedPost")
-	Attributes(func() {
-		Attribute("id", Int64)
-		Attribute("post_id", Int64)
-		Attribute("post_type", String)
-		Attribute("reported_by", Int64)
-		Attribute("reported_at", String, func() {
-			Format(FormatDateTime)
-		})
-		Attribute("acknowledged_by", Int64)
-		Attribute("acknowledged_at", String, func() {
-			Format(FormatDateTime)
-		})
-		Required("id", "post_id", "post_type", "reported_by", "reported_at")
-	})
-	View("default", func() {
-		Attribute("id")
-		Attribute("post_id")
-		Attribute("post_type")
-		Attribute("reported_by")
-		Attribute("reported_at")
-		Attribute("acknowledged_by")
-		Attribute("acknowledged_at")
-	})
+var ModerationRequest = Type("ModerationRequest", func() {
+	Attribute("id", Int32)
+	Attribute("postId", Int32)
+	Attribute("postType", String)
+	Attribute("reportedBy", Int32)
+	Attribute("reportedAt", String)
+	Attribute("acknowledgedBy", Int32)
+	Attribute("acknowledgedAt", String)
+	Required("id", "postId", "postType", "reportedBy", "reportedAt")
+})
+
+var ModerationAddPayload = Type("ModerationAddPayload", func() {
+	Token("auth")
+	Attribute("postId", Int32)
+	Attribute("postType", String)
+	Required("postId", "postType")
 })
 
 var _ = Service("moderation", func() {
 	Method("add", func() {
+		Security(JWTAuth, func() {
+			Scope("api:access")
+		})
 
+		Payload(ModerationAddPayload)
+
+		Result(ModerationRequest)
+
+		HTTP(func() {
+			POST("moderation")
+			httpAuthentication()
+		})
+	})
+
+	Method("acknowledge", func() {
 		Security(JWTAuth, func() {
 			Scope("api:access")
 		})
 
 		Payload(func() {
 			Token("auth")
-			Required("auth")
-			Attribute("post_id", Int64)
-			Attribute("post_type", String)
-			Required("post_id", "post_type")
+			Attribute("id", Int32)
+			Attribute("acknowledgedBy", Int32)
+			Required("id", "acknowledgedBy")
 		})
 
-		Result(ModeratedPost)
+		Result(ModerationRequest)
 
 		HTTP(func() {
-			POST("/moderation")
-
-			Response(StatusCreated)
+			POST("moderation/acknowledge")
+			httpAuthentication()
 		})
 	})
 })

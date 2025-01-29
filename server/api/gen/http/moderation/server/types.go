@@ -9,49 +9,94 @@ package server
 
 import (
 	moderation "gitlab.com/fieldkit/cloud/server/api/gen/moderation"
-	moderationviews "gitlab.com/fieldkit/cloud/server/api/gen/moderation/views"
 	goa "goa.design/goa/v3/pkg"
 )
 
 // AddRequestBody is the type of the "moderation" service "add" endpoint HTTP
 // request body.
 type AddRequestBody struct {
-	PostID   *int64  `form:"post_id,omitempty" json:"post_id,omitempty" xml:"post_id,omitempty"`
-	PostType *string `form:"post_type,omitempty" json:"post_type,omitempty" xml:"post_type,omitempty"`
+	PostID   *int32  `form:"postId,omitempty" json:"postId,omitempty" xml:"postId,omitempty"`
+	PostType *string `form:"postType,omitempty" json:"postType,omitempty" xml:"postType,omitempty"`
+}
+
+// AcknowledgeRequestBody is the type of the "moderation" service "acknowledge"
+// endpoint HTTP request body.
+type AcknowledgeRequestBody struct {
+	ID             *int32 `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	AcknowledgedBy *int32 `form:"acknowledgedBy,omitempty" json:"acknowledgedBy,omitempty" xml:"acknowledgedBy,omitempty"`
 }
 
 // AddResponseBody is the type of the "moderation" service "add" endpoint HTTP
 // response body.
 type AddResponseBody struct {
-	ID             int64   `form:"id" json:"id" xml:"id"`
-	PostID         int64   `form:"post_id" json:"post_id" xml:"post_id"`
-	PostType       string  `form:"post_type" json:"post_type" xml:"post_type"`
-	ReportedBy     int64   `form:"reported_by" json:"reported_by" xml:"reported_by"`
-	ReportedAt     string  `form:"reported_at" json:"reported_at" xml:"reported_at"`
-	AcknowledgedBy *int64  `form:"acknowledged_by,omitempty" json:"acknowledged_by,omitempty" xml:"acknowledged_by,omitempty"`
-	AcknowledgedAt *string `form:"acknowledged_at,omitempty" json:"acknowledged_at,omitempty" xml:"acknowledged_at,omitempty"`
+	ID             int32   `form:"id" json:"id" xml:"id"`
+	PostID         int32   `form:"postId" json:"postId" xml:"postId"`
+	PostType       string  `form:"postType" json:"postType" xml:"postType"`
+	ReportedBy     int32   `form:"reportedBy" json:"reportedBy" xml:"reportedBy"`
+	ReportedAt     string  `form:"reportedAt" json:"reportedAt" xml:"reportedAt"`
+	AcknowledgedBy *int32  `form:"acknowledgedBy,omitempty" json:"acknowledgedBy,omitempty" xml:"acknowledgedBy,omitempty"`
+	AcknowledgedAt *string `form:"acknowledgedAt,omitempty" json:"acknowledgedAt,omitempty" xml:"acknowledgedAt,omitempty"`
+}
+
+// AcknowledgeResponseBody is the type of the "moderation" service
+// "acknowledge" endpoint HTTP response body.
+type AcknowledgeResponseBody struct {
+	ID             int32   `form:"id" json:"id" xml:"id"`
+	PostID         int32   `form:"postId" json:"postId" xml:"postId"`
+	PostType       string  `form:"postType" json:"postType" xml:"postType"`
+	ReportedBy     int32   `form:"reportedBy" json:"reportedBy" xml:"reportedBy"`
+	ReportedAt     string  `form:"reportedAt" json:"reportedAt" xml:"reportedAt"`
+	AcknowledgedBy *int32  `form:"acknowledgedBy,omitempty" json:"acknowledgedBy,omitempty" xml:"acknowledgedBy,omitempty"`
+	AcknowledgedAt *string `form:"acknowledgedAt,omitempty" json:"acknowledgedAt,omitempty" xml:"acknowledgedAt,omitempty"`
 }
 
 // NewAddResponseBody builds the HTTP response body from the result of the
 // "add" endpoint of the "moderation" service.
-func NewAddResponseBody(res *moderationviews.ModeratedPostView) *AddResponseBody {
+func NewAddResponseBody(res *moderation.ModerationRequest) *AddResponseBody {
 	body := &AddResponseBody{
-		ID:             *res.ID,
-		PostID:         *res.PostID,
-		PostType:       *res.PostType,
-		ReportedBy:     *res.ReportedBy,
-		ReportedAt:     *res.ReportedAt,
+		ID:             res.ID,
+		PostID:         res.PostID,
+		PostType:       res.PostType,
+		ReportedBy:     res.ReportedBy,
+		ReportedAt:     res.ReportedAt,
 		AcknowledgedBy: res.AcknowledgedBy,
 		AcknowledgedAt: res.AcknowledgedAt,
 	}
 	return body
 }
 
-// NewAddPayload builds a moderation service add endpoint payload.
-func NewAddPayload(body *AddRequestBody, auth string) *moderation.AddPayload {
-	v := &moderation.AddPayload{
+// NewAcknowledgeResponseBody builds the HTTP response body from the result of
+// the "acknowledge" endpoint of the "moderation" service.
+func NewAcknowledgeResponseBody(res *moderation.ModerationRequest) *AcknowledgeResponseBody {
+	body := &AcknowledgeResponseBody{
+		ID:             res.ID,
+		PostID:         res.PostID,
+		PostType:       res.PostType,
+		ReportedBy:     res.ReportedBy,
+		ReportedAt:     res.ReportedAt,
+		AcknowledgedBy: res.AcknowledgedBy,
+		AcknowledgedAt: res.AcknowledgedAt,
+	}
+	return body
+}
+
+// NewAddModerationAddPayload builds a moderation service add endpoint payload.
+func NewAddModerationAddPayload(body *AddRequestBody, auth *string) *moderation.ModerationAddPayload {
+	v := &moderation.ModerationAddPayload{
 		PostID:   *body.PostID,
 		PostType: *body.PostType,
+	}
+	v.Auth = auth
+
+	return v
+}
+
+// NewAcknowledgePayload builds a moderation service acknowledge endpoint
+// payload.
+func NewAcknowledgePayload(body *AcknowledgeRequestBody, auth *string) *moderation.AcknowledgePayload {
+	v := &moderation.AcknowledgePayload{
+		ID:             *body.ID,
+		AcknowledgedBy: *body.AcknowledgedBy,
 	}
 	v.Auth = auth
 
@@ -61,10 +106,22 @@ func NewAddPayload(body *AddRequestBody, auth string) *moderation.AddPayload {
 // ValidateAddRequestBody runs the validations defined on AddRequestBody
 func ValidateAddRequestBody(body *AddRequestBody) (err error) {
 	if body.PostID == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("post_id", "body"))
+		err = goa.MergeErrors(err, goa.MissingFieldError("postId", "body"))
 	}
 	if body.PostType == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("post_type", "body"))
+		err = goa.MergeErrors(err, goa.MissingFieldError("postType", "body"))
+	}
+	return
+}
+
+// ValidateAcknowledgeRequestBody runs the validations defined on
+// AcknowledgeRequestBody
+func ValidateAcknowledgeRequestBody(body *AcknowledgeRequestBody) (err error) {
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.AcknowledgedBy == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("acknowledgedBy", "body"))
 	}
 	return
 }

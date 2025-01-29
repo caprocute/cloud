@@ -13,7 +13,7 @@ import (
 	"net/http"
 	"strings"
 
-	moderationviews "gitlab.com/fieldkit/cloud/server/api/gen/moderation/views"
+	moderation "gitlab.com/fieldkit/cloud/server/api/gen/moderation"
 	goahttp "goa.design/goa/v3/http"
 	goa "goa.design/goa/v3/pkg"
 )
@@ -22,10 +22,10 @@ import (
 // moderation add endpoint.
 func EncodeAddResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
 	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
-		res := v.(*moderationviews.ModeratedPost)
+		res := v.(*moderation.ModerationRequest)
 		enc := encoder(ctx, w)
-		body := NewAddResponseBody(res.Projected)
-		w.WriteHeader(http.StatusCreated)
+		body := NewAddResponseBody(res)
+		w.WriteHeader(http.StatusOK)
 		return enc.Encode(body)
 	}
 }
@@ -51,20 +51,71 @@ func DecodeAddRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Dec
 		}
 
 		var (
-			auth string
+			auth *string
 		)
-		auth = r.Header.Get("Authorization")
-		if auth == "" {
-			err = goa.MergeErrors(err, goa.MissingFieldError("Authorization", "header"))
+		authRaw := r.Header.Get("Authorization")
+		if authRaw != "" {
+			auth = &authRaw
 		}
+		payload := NewAddModerationAddPayload(&body, auth)
+		if payload.Auth != nil {
+			if strings.Contains(*payload.Auth, " ") {
+				// Remove authorization scheme prefix (e.g. "Bearer")
+				cred := strings.SplitN(*payload.Auth, " ", 2)[1]
+				payload.Auth = &cred
+			}
+		}
+
+		return payload, nil
+	}
+}
+
+// EncodeAcknowledgeResponse returns an encoder for responses returned by the
+// moderation acknowledge endpoint.
+func EncodeAcknowledgeResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
+	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
+		res := v.(*moderation.ModerationRequest)
+		enc := encoder(ctx, w)
+		body := NewAcknowledgeResponseBody(res)
+		w.WriteHeader(http.StatusOK)
+		return enc.Encode(body)
+	}
+}
+
+// DecodeAcknowledgeRequest returns a decoder for requests sent to the
+// moderation acknowledge endpoint.
+func DecodeAcknowledgeRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
+	return func(r *http.Request) (interface{}, error) {
+		var (
+			body AcknowledgeRequestBody
+			err  error
+		)
+		err = decoder(r).Decode(&body)
+		if err != nil {
+			if err == io.EOF {
+				return nil, goa.MissingPayloadError()
+			}
+			return nil, goa.DecodePayloadError(err.Error())
+		}
+		err = ValidateAcknowledgeRequestBody(&body)
 		if err != nil {
 			return nil, err
 		}
-		payload := NewAddPayload(&body, auth)
-		if strings.Contains(payload.Auth, " ") {
-			// Remove authorization scheme prefix (e.g. "Bearer")
-			cred := strings.SplitN(payload.Auth, " ", 2)[1]
-			payload.Auth = cred
+
+		var (
+			auth *string
+		)
+		authRaw := r.Header.Get("Authorization")
+		if authRaw != "" {
+			auth = &authRaw
+		}
+		payload := NewAcknowledgePayload(&body, auth)
+		if payload.Auth != nil {
+			if strings.Contains(*payload.Auth, " ") {
+				// Remove authorization scheme prefix (e.g. "Bearer")
+				cred := strings.SplitN(*payload.Auth, " ", 2)[1]
+				payload.Auth = &cred
+			}
 		}
 
 		return payload, nil

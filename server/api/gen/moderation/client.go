@@ -15,22 +15,34 @@ import (
 
 // Client is the "moderation" service client.
 type Client struct {
-	AddEndpoint goa.Endpoint
+	AddEndpoint         goa.Endpoint
+	AcknowledgeEndpoint goa.Endpoint
 }
 
 // NewClient initializes a "moderation" service client given the endpoints.
-func NewClient(add goa.Endpoint) *Client {
+func NewClient(add, acknowledge goa.Endpoint) *Client {
 	return &Client{
-		AddEndpoint: add,
+		AddEndpoint:         add,
+		AcknowledgeEndpoint: acknowledge,
 	}
 }
 
 // Add calls the "add" endpoint of the "moderation" service.
-func (c *Client) Add(ctx context.Context, p *AddPayload) (res *ModeratedPost, err error) {
+func (c *Client) Add(ctx context.Context, p *ModerationAddPayload) (res *ModerationRequest, err error) {
 	var ires interface{}
 	ires, err = c.AddEndpoint(ctx, p)
 	if err != nil {
 		return
 	}
-	return ires.(*ModeratedPost), nil
+	return ires.(*ModerationRequest), nil
+}
+
+// Acknowledge calls the "acknowledge" endpoint of the "moderation" service.
+func (c *Client) Acknowledge(ctx context.Context, p *AcknowledgePayload) (res *ModerationRequest, err error) {
+	var ires interface{}
+	ires, err = c.AcknowledgeEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*ModerationRequest), nil
 }

@@ -20,6 +20,10 @@ type Client struct {
 	// Add Doer is the HTTP client used to make requests to the add endpoint.
 	AddDoer goahttp.Doer
 
+	// Acknowledge Doer is the HTTP client used to make requests to the acknowledge
+	// endpoint.
+	AcknowledgeDoer goahttp.Doer
+
 	// CORS Doer is the HTTP client used to make requests to the  endpoint.
 	CORSDoer goahttp.Doer
 
@@ -44,6 +48,7 @@ func NewClient(
 ) *Client {
 	return &Client{
 		AddDoer:             doer,
+		AcknowledgeDoer:     doer,
 		CORSDoer:            doer,
 		RestoreResponseBody: restoreBody,
 		scheme:              scheme,
@@ -72,6 +77,30 @@ func (c *Client) Add() goa.Endpoint {
 		resp, err := c.AddDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("moderation", "add", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// Acknowledge returns an endpoint that makes HTTP requests to the moderation
+// service acknowledge server.
+func (c *Client) Acknowledge() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeAcknowledgeRequest(c.encoder)
+		decodeResponse = DecodeAcknowledgeResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildAcknowledgeRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.AcknowledgeDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("moderation", "acknowledge", err)
 		}
 		return decodeResponse(resp)
 	}

@@ -10,14 +10,15 @@ package moderation
 import (
 	"context"
 
-	moderationviews "gitlab.com/fieldkit/cloud/server/api/gen/moderation/views"
 	"goa.design/goa/v3/security"
 )
 
 // Service is the moderation service interface.
 type Service interface {
 	// Add implements add.
-	Add(context.Context, *AddPayload) (res *ModeratedPost, err error)
+	Add(context.Context, *ModerationAddPayload) (res *ModerationRequest, err error)
+	// Acknowledge implements acknowledge.
+	Acknowledge(context.Context, *AcknowledgePayload) (res *ModerationRequest, err error)
 }
 
 // Auther defines the authorization functions to be implemented by the service.
@@ -34,75 +35,31 @@ const ServiceName = "moderation"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [1]string{"add"}
+var MethodNames = [2]string{"add", "acknowledge"}
 
-// AddPayload is the payload type of the moderation service add method.
-type AddPayload struct {
-	Auth     string
-	PostID   int64
+// ModerationAddPayload is the payload type of the moderation service add
+// method.
+type ModerationAddPayload struct {
+	Auth     *string
+	PostID   int32
 	PostType string
 }
 
-// ModeratedPost is the result type of the moderation service add method.
-type ModeratedPost struct {
-	ID             int64
-	PostID         int64
+// ModerationRequest is the result type of the moderation service add method.
+type ModerationRequest struct {
+	ID             int32
+	PostID         int32
 	PostType       string
-	ReportedBy     int64
+	ReportedBy     int32
 	ReportedAt     string
-	AcknowledgedBy *int64
+	AcknowledgedBy *int32
 	AcknowledgedAt *string
 }
 
-// NewModeratedPost initializes result type ModeratedPost from viewed result
-// type ModeratedPost.
-func NewModeratedPost(vres *moderationviews.ModeratedPost) *ModeratedPost {
-	return newModeratedPost(vres.Projected)
-}
-
-// NewViewedModeratedPost initializes viewed result type ModeratedPost from
-// result type ModeratedPost using the given view.
-func NewViewedModeratedPost(res *ModeratedPost, view string) *moderationviews.ModeratedPost {
-	p := newModeratedPostView(res)
-	return &moderationviews.ModeratedPost{Projected: p, View: "default"}
-}
-
-// newModeratedPost converts projected type ModeratedPost to service type
-// ModeratedPost.
-func newModeratedPost(vres *moderationviews.ModeratedPostView) *ModeratedPost {
-	res := &ModeratedPost{
-		AcknowledgedBy: vres.AcknowledgedBy,
-		AcknowledgedAt: vres.AcknowledgedAt,
-	}
-	if vres.ID != nil {
-		res.ID = *vres.ID
-	}
-	if vres.PostID != nil {
-		res.PostID = *vres.PostID
-	}
-	if vres.PostType != nil {
-		res.PostType = *vres.PostType
-	}
-	if vres.ReportedBy != nil {
-		res.ReportedBy = *vres.ReportedBy
-	}
-	if vres.ReportedAt != nil {
-		res.ReportedAt = *vres.ReportedAt
-	}
-	return res
-}
-
-// newModeratedPostView projects result type ModeratedPost to projected type
-// ModeratedPostView using the "default" view.
-func newModeratedPostView(res *ModeratedPost) *moderationviews.ModeratedPostView {
-	vres := &moderationviews.ModeratedPostView{
-		ID:             &res.ID,
-		PostID:         &res.PostID,
-		PostType:       &res.PostType,
-		ReportedBy:     &res.ReportedBy,
-		ReportedAt:     &res.ReportedAt,
-		AcknowledgedBy: res.AcknowledgedBy,
-		AcknowledgedAt: res.AcknowledgedAt,
-	}
-	return vres
+// AcknowledgePayload is the payload type of the moderation service acknowledge
+// method.
+type AcknowledgePayload struct {
+	Auth           *string
+	ID             int32
+	AcknowledgedBy int32
 }

@@ -16,7 +16,8 @@ import (
 
 // Endpoints wraps the "moderation" service endpoints.
 type Endpoints struct {
-	Add goa.Endpoint
+	Add         goa.Endpoint
+	Acknowledge goa.Endpoint
 }
 
 // NewEndpoints wraps the methods of the "moderation" service with endpoints.
@@ -24,35 +25,59 @@ func NewEndpoints(s Service) *Endpoints {
 	// Casting service to Auther interface
 	a := s.(Auther)
 	return &Endpoints{
-		Add: NewAddEndpoint(s, a.JWTAuth),
+		Add:         NewAddEndpoint(s, a.JWTAuth),
+		Acknowledge: NewAcknowledgeEndpoint(s, a.JWTAuth),
 	}
 }
 
 // Use applies the given middleware to all the "moderation" service endpoints.
 func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.Add = m(e.Add)
+	e.Acknowledge = m(e.Acknowledge)
 }
 
 // NewAddEndpoint returns an endpoint function that calls the method "add" of
 // service "moderation".
 func NewAddEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
 	return func(ctx context.Context, req interface{}) (interface{}, error) {
-		p := req.(*AddPayload)
+		p := req.(*ModerationAddPayload)
 		var err error
 		sc := security.JWTScheme{
 			Name:           "jwt",
 			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
 			RequiredScopes: []string{"api:access"},
 		}
-		ctx, err = authJWTFn(ctx, p.Auth, &sc)
+		var token string
+		if p.Auth != nil {
+			token = *p.Auth
+		}
+		ctx, err = authJWTFn(ctx, token, &sc)
 		if err != nil {
 			return nil, err
 		}
-		res, err := s.Add(ctx, p)
+		return s.Add(ctx, p)
+	}
+}
+
+// NewAcknowledgeEndpoint returns an endpoint function that calls the method
+// "acknowledge" of service "moderation".
+func NewAcknowledgeEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*AcknowledgePayload)
+		var err error
+		sc := security.JWTScheme{
+			Name:           "jwt",
+			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
+			RequiredScopes: []string{"api:access"},
+		}
+		var token string
+		if p.Auth != nil {
+			token = *p.Auth
+		}
+		ctx, err = authJWTFn(ctx, token, &sc)
 		if err != nil {
 			return nil, err
 		}
-		vres := NewViewedModeratedPost(res, "default")
-		return vres, nil
+		return s.Acknowledge(ctx, p)
 	}
 }

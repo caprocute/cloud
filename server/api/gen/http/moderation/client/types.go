@@ -9,31 +9,50 @@ package client
 
 import (
 	moderation "gitlab.com/fieldkit/cloud/server/api/gen/moderation"
-	moderationviews "gitlab.com/fieldkit/cloud/server/api/gen/moderation/views"
+	goa "goa.design/goa/v3/pkg"
 )
 
 // AddRequestBody is the type of the "moderation" service "add" endpoint HTTP
 // request body.
 type AddRequestBody struct {
-	PostID   int64  `form:"post_id" json:"post_id" xml:"post_id"`
-	PostType string `form:"post_type" json:"post_type" xml:"post_type"`
+	PostID   int32  `form:"postId" json:"postId" xml:"postId"`
+	PostType string `form:"postType" json:"postType" xml:"postType"`
+}
+
+// AcknowledgeRequestBody is the type of the "moderation" service "acknowledge"
+// endpoint HTTP request body.
+type AcknowledgeRequestBody struct {
+	ID             int32 `form:"id" json:"id" xml:"id"`
+	AcknowledgedBy int32 `form:"acknowledgedBy" json:"acknowledgedBy" xml:"acknowledgedBy"`
 }
 
 // AddResponseBody is the type of the "moderation" service "add" endpoint HTTP
 // response body.
 type AddResponseBody struct {
-	ID             *int64  `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
-	PostID         *int64  `form:"post_id,omitempty" json:"post_id,omitempty" xml:"post_id,omitempty"`
-	PostType       *string `form:"post_type,omitempty" json:"post_type,omitempty" xml:"post_type,omitempty"`
-	ReportedBy     *int64  `form:"reported_by,omitempty" json:"reported_by,omitempty" xml:"reported_by,omitempty"`
-	ReportedAt     *string `form:"reported_at,omitempty" json:"reported_at,omitempty" xml:"reported_at,omitempty"`
-	AcknowledgedBy *int64  `form:"acknowledged_by,omitempty" json:"acknowledged_by,omitempty" xml:"acknowledged_by,omitempty"`
-	AcknowledgedAt *string `form:"acknowledged_at,omitempty" json:"acknowledged_at,omitempty" xml:"acknowledged_at,omitempty"`
+	ID             *int32  `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	PostID         *int32  `form:"postId,omitempty" json:"postId,omitempty" xml:"postId,omitempty"`
+	PostType       *string `form:"postType,omitempty" json:"postType,omitempty" xml:"postType,omitempty"`
+	ReportedBy     *int32  `form:"reportedBy,omitempty" json:"reportedBy,omitempty" xml:"reportedBy,omitempty"`
+	ReportedAt     *string `form:"reportedAt,omitempty" json:"reportedAt,omitempty" xml:"reportedAt,omitempty"`
+	AcknowledgedBy *int32  `form:"acknowledgedBy,omitempty" json:"acknowledgedBy,omitempty" xml:"acknowledgedBy,omitempty"`
+	AcknowledgedAt *string `form:"acknowledgedAt,omitempty" json:"acknowledgedAt,omitempty" xml:"acknowledgedAt,omitempty"`
+}
+
+// AcknowledgeResponseBody is the type of the "moderation" service
+// "acknowledge" endpoint HTTP response body.
+type AcknowledgeResponseBody struct {
+	ID             *int32  `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	PostID         *int32  `form:"postId,omitempty" json:"postId,omitempty" xml:"postId,omitempty"`
+	PostType       *string `form:"postType,omitempty" json:"postType,omitempty" xml:"postType,omitempty"`
+	ReportedBy     *int32  `form:"reportedBy,omitempty" json:"reportedBy,omitempty" xml:"reportedBy,omitempty"`
+	ReportedAt     *string `form:"reportedAt,omitempty" json:"reportedAt,omitempty" xml:"reportedAt,omitempty"`
+	AcknowledgedBy *int32  `form:"acknowledgedBy,omitempty" json:"acknowledgedBy,omitempty" xml:"acknowledgedBy,omitempty"`
+	AcknowledgedAt *string `form:"acknowledgedAt,omitempty" json:"acknowledgedAt,omitempty" xml:"acknowledgedAt,omitempty"`
 }
 
 // NewAddRequestBody builds the HTTP request body from the payload of the "add"
 // endpoint of the "moderation" service.
-func NewAddRequestBody(p *moderation.AddPayload) *AddRequestBody {
+func NewAddRequestBody(p *moderation.ModerationAddPayload) *AddRequestBody {
 	body := &AddRequestBody{
 		PostID:   p.PostID,
 		PostType: p.PostType,
@@ -41,18 +60,85 @@ func NewAddRequestBody(p *moderation.AddPayload) *AddRequestBody {
 	return body
 }
 
-// NewAddModeratedPostCreated builds a "moderation" service "add" endpoint
-// result from a HTTP "Created" response.
-func NewAddModeratedPostCreated(body *AddResponseBody) *moderationviews.ModeratedPostView {
-	v := &moderationviews.ModeratedPostView{
-		ID:             body.ID,
-		PostID:         body.PostID,
-		PostType:       body.PostType,
-		ReportedBy:     body.ReportedBy,
-		ReportedAt:     body.ReportedAt,
+// NewAcknowledgeRequestBody builds the HTTP request body from the payload of
+// the "acknowledge" endpoint of the "moderation" service.
+func NewAcknowledgeRequestBody(p *moderation.AcknowledgePayload) *AcknowledgeRequestBody {
+	body := &AcknowledgeRequestBody{
+		ID:             p.ID,
+		AcknowledgedBy: p.AcknowledgedBy,
+	}
+	return body
+}
+
+// NewAddModerationRequestOK builds a "moderation" service "add" endpoint
+// result from a HTTP "OK" response.
+func NewAddModerationRequestOK(body *AddResponseBody) *moderation.ModerationRequest {
+	v := &moderation.ModerationRequest{
+		ID:             *body.ID,
+		PostID:         *body.PostID,
+		PostType:       *body.PostType,
+		ReportedBy:     *body.ReportedBy,
+		ReportedAt:     *body.ReportedAt,
 		AcknowledgedBy: body.AcknowledgedBy,
 		AcknowledgedAt: body.AcknowledgedAt,
 	}
 
 	return v
+}
+
+// NewAcknowledgeModerationRequestOK builds a "moderation" service
+// "acknowledge" endpoint result from a HTTP "OK" response.
+func NewAcknowledgeModerationRequestOK(body *AcknowledgeResponseBody) *moderation.ModerationRequest {
+	v := &moderation.ModerationRequest{
+		ID:             *body.ID,
+		PostID:         *body.PostID,
+		PostType:       *body.PostType,
+		ReportedBy:     *body.ReportedBy,
+		ReportedAt:     *body.ReportedAt,
+		AcknowledgedBy: body.AcknowledgedBy,
+		AcknowledgedAt: body.AcknowledgedAt,
+	}
+
+	return v
+}
+
+// ValidateAddResponseBody runs the validations defined on AddResponseBody
+func ValidateAddResponseBody(body *AddResponseBody) (err error) {
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.PostID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("postId", "body"))
+	}
+	if body.PostType == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("postType", "body"))
+	}
+	if body.ReportedBy == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("reportedBy", "body"))
+	}
+	if body.ReportedAt == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("reportedAt", "body"))
+	}
+	return
+}
+
+// ValidateAcknowledgeResponseBody runs the validations defined on
+// AcknowledgeResponseBody
+func ValidateAcknowledgeResponseBody(body *AcknowledgeResponseBody) (err error) {
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.PostID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("postId", "body"))
+	}
+	if body.PostType == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("postType", "body"))
+	}
+	if body.ReportedBy == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("reportedBy", "body"))
+	}
+	if body.ReportedAt == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("reportedAt", "body"))
+	}
+	return
 }

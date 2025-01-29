@@ -16,22 +16,50 @@ import (
 
 // BuildAddPayload builds the payload for the moderation add endpoint from CLI
 // flags.
-func BuildAddPayload(moderationAddBody string, moderationAddAuth string) (*moderation.AddPayload, error) {
+func BuildAddPayload(moderationAddBody string, moderationAddAuth string) (*moderation.ModerationAddPayload, error) {
 	var err error
 	var body AddRequestBody
 	{
 		err = json.Unmarshal([]byte(moderationAddBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"post_id\": 6322059755340554222,\n      \"post_type\": \"Amet cupiditate et quia quaerat magnam.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"postId\": 1471969242,\n      \"postType\": \"Amet cupiditate et quia quaerat magnam.\"\n   }'")
 		}
 	}
-	var auth string
+	var auth *string
 	{
-		auth = moderationAddAuth
+		if moderationAddAuth != "" {
+			auth = &moderationAddAuth
+		}
 	}
-	v := &moderation.AddPayload{
+	v := &moderation.ModerationAddPayload{
 		PostID:   body.PostID,
 		PostType: body.PostType,
+	}
+	v.Auth = auth
+
+	return v, nil
+}
+
+// BuildAcknowledgePayload builds the payload for the moderation acknowledge
+// endpoint from CLI flags.
+func BuildAcknowledgePayload(moderationAcknowledgeBody string, moderationAcknowledgeAuth string) (*moderation.AcknowledgePayload, error) {
+	var err error
+	var body AcknowledgeRequestBody
+	{
+		err = json.Unmarshal([]byte(moderationAcknowledgeBody), &body)
+		if err != nil {
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"acknowledgedBy\": 584479908,\n      \"id\": 1130606972\n   }'")
+		}
+	}
+	var auth *string
+	{
+		if moderationAcknowledgeAuth != "" {
+			auth = &moderationAcknowledgeAuth
+		}
+	}
+	v := &moderation.AcknowledgePayload{
+		ID:             body.ID,
+		AcknowledgedBy: body.AcknowledgedBy,
 	}
 	v.Auth = auth
 

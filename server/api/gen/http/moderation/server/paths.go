@@ -11,3 +11,8 @@ package server
 func AddModerationPath() string {
 	return "/moderation"
 }
+
+// AcknowledgeModerationPath returns the URL path to the moderation service acknowledge HTTP endpoint.
+func AcknowledgeModerationPath() string {
+	return "/moderation/acknowledge"
+}
