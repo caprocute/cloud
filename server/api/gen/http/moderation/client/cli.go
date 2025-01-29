@@ -48,7 +48,7 @@ func BuildAcknowledgePayload(moderationAcknowledgeBody string, moderationAcknowl
 	{
 		err = json.Unmarshal([]byte(moderationAcknowledgeBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"acknowledgedBy\": 584479908,\n      \"id\": 1130606972\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"acknowledgedBy\": 584479908,\n      \"id\": 4855919972605555645\n   }'")
 		}
 	}
 	var auth *string

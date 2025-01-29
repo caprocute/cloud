@@ -113,16 +113,15 @@ func sendMockEmail(to string, subject string, body string) error {
 	return nil
 }
 
-func (s *ModerationService) Acknowledge(ctx context.Context, id int, acknowledgedBy int32) (response *data.ModerationRequest, err error) {
+func (s *ModerationService) Acknowledge(ctx context.Context, payload *data.AcknowledgePayload) (response *data.ModerationRequest, err error) {
 	mrRepo := repositories.NewModerationRepository(s.options.Database)
 
-	moderationRequest, err := mrRepo.GetModerationRequest(ctx, id)
+	moderationRequest, err := mrRepo.GetModerationRequest(ctx, payload.ID)
 	if err != nil {
 		return nil, err
 	}
 
 	now := time.Now().UTC()
-	moderationRequest.AcknowledgedBy = &acknowledgedBy
 	moderationRequest.AcknowledgedAt = &now
 
 	err = mrRepo.UpdateModerationRequest(ctx, moderationRequest)
@@ -136,7 +135,7 @@ func (s *ModerationService) Acknowledge(ctx context.Context, id int, acknowledge
 		PostType:       moderationRequest.PostType,
 		ReportedBy:     moderationRequest.ReportedBy,
 		ReportedAt:     moderationRequest.ReportedAt,
-		AcknowledgedBy: moderationRequest.AcknowledgedBy,
+		AcknowledgedBy: payload.AcknowledgedBy,
 		AcknowledgedAt: moderationRequest.AcknowledgedAt,
 	}
 

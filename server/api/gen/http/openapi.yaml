@@ -17807,11 +17807,11 @@ definitions:
         format: int32
       id:
         type: integer
-        example: 2017523428
-        format: int32
+        example: 8665197146265611286
+        format: int64
     example:
       acknowledgedBy: 1601857640
-      id: 2137135581
+      id: 9178927429708533671
     required:
     - id
     - acknowledgedBy

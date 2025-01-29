@@ -4270,7 +4270,7 @@ Acknowledge implements acknowledge.
 Example:
     `+os.Args[0]+` moderation acknowledge --body '{
       "acknowledgedBy": 584479908,
-      "id": 1130606972
+      "id": 4855919972605555645
    }' --auth "Quae pariatur tenetur fugiat sed ut."
 `, os.Args[0])
 }

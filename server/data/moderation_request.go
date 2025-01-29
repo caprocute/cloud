@@ -29,3 +29,8 @@ type ModerationRequest struct {
 	AcknowledgedBy *int32       `json:"acknowledged_by,omitempty"`
 	AcknowledgedAt *time.Time   `json:"acknowledged_at,omitempty"`
 }
+
+type AcknowledgePayload struct {
+	ID             int        `json:"id"`
+	AcknowledgedBy int32      `json:"post_id"`
+}
