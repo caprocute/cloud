@@ -663,7 +663,6 @@ export default function routerFactory(store) {
 
     router.beforeEach(async (to, from, next) => {
         console.log("nav", from.name, "->", to.name);
-        console.log("ss", store);
         if (from.name === null && (to.name === null || to.name == "login")) {
             console.log("nav", "authenticated", store.getters.isAuthenticated);
             if (store.getters.isAuthenticated) {
