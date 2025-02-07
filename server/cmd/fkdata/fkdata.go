@@ -8,7 +8,9 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
+	"net/http"
 	"os"
 
 	"github.com/golang/protobuf/proto"
@@ -18,25 +20,45 @@ import (
 )
 
 type Options struct {
-	File string
+	File   string
+	Portal string
 }
 
 func main() {
 	ctx := context.Background()
 
 	options := Options{}
-	flag.StringVar(&options.File, "file", "fkpb file", "")
+	flag.StringVar(&options.File, "file", "", "fkpb file")
+	flag.StringVar(&options.Portal, "portal", "", "portal url")
 	flag.Parse()
 
-	file, err := os.Open(options.File)
-	if err != nil {
-		log.Fatalln("Opening file: %w", err)
+	if options.File == "" || options.Portal == "" {
+		flag.Usage()
+		return
 	}
+
+	credentials, err := CredentialsFromEnv()
+	if err != nil {
+		log.Fatalf("Error: %v", err)
+	}
+
+	if err := Upload(ctx, credentials, options.File, options.Portal); err != nil {
+		log.Fatalf("Error: %v", err)
+	}
+}
+
+func ExtractMeta(ctx context.Context, path string) (*MetaScanner, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, fmt.Errorf("opening file: %w", err)
+	}
+
+	defer file.Close()
 
 	ms := NewMetaScanner()
 
 	if err := Decode(ctx, file, ms); err != nil {
-		log.Fatalf("error: %v", err)
+		return nil, fmt.Errorf("decoding: %w", err)
 	}
 
 	if ms.DeviceId != nil {
@@ -54,7 +76,85 @@ func main() {
 	if ms.LastRecord != nil {
 		log.Printf("LastRecord: %d", *ms.LastRecord)
 	}
+
 	log.Printf("Visited: %d", ms.Visited)
+
+	return ms, nil
+}
+
+type Credentials struct {
+	Email    string
+	Password string
+}
+
+func CredentialsFromEnv() (*Credentials, error) {
+	email := os.Getenv("FIELDKIT_EMAIL")
+	if email == "" {
+		return nil, fmt.Errorf("FIELDKIT_EMAIL missing")
+	}
+
+	password := os.Getenv("FIELDKIT_PASSWORD")
+	if password == "" {
+		return nil, fmt.Errorf("FIELDKIT_PASSWORD missing")
+	}
+
+	return &Credentials{
+		Email:    email,
+		Password: password,
+	}, nil
+}
+
+func Upload(ctx context.Context, credentials *Credentials, path string, url string) error {
+	ms, err := ExtractMeta(ctx, path)
+	if err != nil {
+		return err
+	}
+
+	fkc := NewFkClient(url)
+
+	token, err := fkc.Login(ctx, credentials.Email, credentials.Password)
+	if err != nil {
+		return err
+	}
+
+	file, err := os.Open(path)
+	if err != nil {
+		return err
+	}
+
+	stat, err := file.Stat()
+	if err != nil {
+		return err
+	}
+
+	defer file.Close()
+
+	req, err := http.NewRequest("POST", fmt.Sprintf("%s/ingestion", url), file)
+	if err != nil {
+		return err
+	}
+
+	req.ContentLength = stat.Size()
+
+	req.Header.Set("Content-Type", "application/octet-stream")
+	req.Header.Set("Authorization", token)
+	req.Header.Set("Fk-Blocks", fmt.Sprintf("%d,%d", *ms.FirstRecord, *ms.LastRecord))
+	req.Header.Set("Fk-DeviceId", hex.EncodeToString(*ms.DeviceId))
+	req.Header.Set("Fk-DeviceName", *ms.DeviceName)
+	req.Header.Set("Fk-Generation", hex.EncodeToString(*ms.GenerationId))
+	req.Header.Set("Fk-Type", "data")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+
+	log.Printf("response: %v", resp.StatusCode)
+
+	defer resp.Body.Close()
+
+	return nil
 }
 
 type MetaScanner struct {
@@ -176,4 +276,62 @@ func Decode(ctx context.Context, reader io.Reader, visitor RecordVisitor) error 
 	}
 
 	return nil
+}
+
+type FkClient struct {
+	base string
+	http *http.Client
+	auth string
+}
+
+func NewFkClient(base string) (fkc *FkClient) {
+	return &FkClient{
+		base: base,
+		http: http.DefaultClient,
+	}
+}
+
+func (fkc *FkClient) Login(ctx context.Context, email, password string) (string, error) {
+	type LoginPayload struct {
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}
+
+	payload := &LoginPayload{
+		Email:    email,
+		Password: password,
+	}
+
+	requestBody, err := json.Marshal(payload)
+	if err != nil {
+		return "", err
+	}
+
+	url := fmt.Sprintf("%s/login", fkc.base)
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestBody))
+	if err != nil {
+		return "", err
+	}
+
+	response, err := fkc.http.Do(req)
+	if err != nil {
+		return "", err
+	}
+
+	defer response.Body.Close()
+
+	if response.StatusCode != http.StatusNoContent {
+		return "", fmt.Errorf("invalid username or password")
+	}
+
+	body, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return "", err
+	}
+
+	fkc.auth = response.Header.Get("Authorization")
+
+	_ = body
+
+	return fkc.auth, nil
 }
