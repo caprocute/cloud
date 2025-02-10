@@ -9,6 +9,7 @@ package admin
 
 import (
 	"context"
+	"io"
 
 	goa "goa.design/goa/v3/pkg"
 )
@@ -16,12 +17,14 @@ import (
 // Client is the "admin" service client.
 type Client struct {
 	HealthEndpointEndpoint goa.Endpoint
+	UploadBackupEndpoint   goa.Endpoint
 }
 
 // NewClient initializes a "admin" service client given the endpoints.
-func NewClient(healthEndpoint goa.Endpoint) *Client {
+func NewClient(healthEndpoint, uploadBackup goa.Endpoint) *Client {
 	return &Client{
 		HealthEndpointEndpoint: healthEndpoint,
+		UploadBackupEndpoint:   uploadBackup,
 	}
 }
 
@@ -33,4 +36,14 @@ func (c *Client) HealthEndpoint(ctx context.Context, p *HealthPayload) (res *Hea
 		return
 	}
 	return ires.(*Health), nil
+}
+
+// UploadBackup calls the "upload backup" endpoint of the "admin" service.
+func (c *Client) UploadBackup(ctx context.Context, p *UploadBackupPayload, req io.ReadCloser) (res *BackupCheck, err error) {
+	var ires interface{}
+	ires, err = c.UploadBackupEndpoint(ctx, &UploadBackupRequestData{Payload: p, Body: req})
+	if err != nil {
+		return
+	}
+	return ires.(*BackupCheck), nil
 }

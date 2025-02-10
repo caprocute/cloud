@@ -10,9 +10,12 @@ package client
 import (
 	"bytes"
 	"context"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"os"
+	"strconv"
 	"strings"
 
 	admin "gitlab.com/fieldkit/cloud/server/api/gen/admin"
@@ -157,6 +160,176 @@ func DecodeHealthEndpointResponse(decoder func(*http.Response) goahttp.Decoder, 
 			return nil, goahttp.ErrInvalidResponse("admin", "health", resp.StatusCode, string(body))
 		}
 	}
+}
+
+// BuildUploadBackupRequest instantiates a HTTP request object with method and
+// path set to call the "admin" service "upload backup" endpoint
+func (c *Client) BuildUploadBackupRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	var (
+		body io.Reader
+	)
+	rd, ok := v.(*admin.UploadBackupRequestData)
+	if !ok {
+		return nil, goahttp.ErrInvalidType("admin", "upload backup", "admin.UploadBackupRequestData", v)
+	}
+	body = rd.Body
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: UploadBackupAdminPath()}
+	req, err := http.NewRequest("POST", u.String(), body)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("admin", "upload backup", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeUploadBackupRequest returns an encoder for requests sent to the admin
+// upload backup server.
+func EncodeUploadBackupRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		data, ok := v.(*admin.UploadBackupRequestData)
+		if !ok {
+			return goahttp.ErrInvalidType("admin", "upload backup", "*admin.UploadBackupRequestData", v)
+		}
+		p := data.Payload
+		{
+			head := p.ContentType
+			req.Header.Set("Content-Type", head)
+		}
+		{
+			head := p.ContentLength
+			headStr := strconv.FormatInt(head, 10)
+			req.Header.Set("Content-Length", headStr)
+		}
+		{
+			head := p.Auth
+			if !strings.Contains(head, " ") {
+				req.Header.Set("Authorization", "Bearer "+head)
+			} else {
+				req.Header.Set("Authorization", head)
+			}
+		}
+		return nil
+	}
+}
+
+// DecodeUploadBackupResponse returns a decoder for responses returned by the
+// admin upload backup endpoint. restoreBody controls whether the response body
+// should be restored after having been read.
+// DecodeUploadBackupResponse may return the following errors:
+//   - "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//   - "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//   - "not-found" (type *goa.ServiceError): http.StatusNotFound
+//   - "bad-request" (type *goa.ServiceError): http.StatusBadRequest
+//   - error: internal error
+func DecodeUploadBackupResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			var (
+				body UploadBackupResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("admin", "upload backup", err)
+			}
+			p := NewUploadBackupBackupCheckOK(&body)
+			view := "default"
+			vres := &adminviews.BackupCheck{Projected: p, View: view}
+			if err = adminviews.ValidateBackupCheck(vres); err != nil {
+				return nil, goahttp.ErrValidationError("admin", "upload backup", err)
+			}
+			res := admin.NewBackupCheck(vres)
+			return res, nil
+		case http.StatusUnauthorized:
+			var (
+				body UploadBackupUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("admin", "upload backup", err)
+			}
+			err = ValidateUploadBackupUnauthorizedResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("admin", "upload backup", err)
+			}
+			return nil, NewUploadBackupUnauthorized(&body)
+		case http.StatusForbidden:
+			var (
+				body UploadBackupForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("admin", "upload backup", err)
+			}
+			err = ValidateUploadBackupForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("admin", "upload backup", err)
+			}
+			return nil, NewUploadBackupForbidden(&body)
+		case http.StatusNotFound:
+			var (
+				body UploadBackupNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("admin", "upload backup", err)
+			}
+			err = ValidateUploadBackupNotFoundResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("admin", "upload backup", err)
+			}
+			return nil, NewUploadBackupNotFound(&body)
+		case http.StatusBadRequest:
+			var (
+				body UploadBackupBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("admin", "upload backup", err)
+			}
+			err = ValidateUploadBackupBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("admin", "upload backup", err)
+			}
+			return nil, NewUploadBackupBadRequest(&body)
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("admin", "upload backup", resp.StatusCode, string(body))
+		}
+	}
+}
+
+// // BuildUploadBackupStreamPayload creates a streaming endpoint request payload
+// from the method payload and the path to the file to be streamed
+func BuildUploadBackupStreamPayload(payload interface{}, fpath string) (*admin.UploadBackupRequestData, error) {
+	f, err := os.Open(fpath)
+	if err != nil {
+		return nil, err
+	}
+	return &admin.UploadBackupRequestData{
+		Payload: payload.(*admin.UploadBackupPayload),
+		Body:    f,
+	}, nil
 }
 
 // unmarshalQueueHealthResponseBodyToAdminviewsQueueHealthView builds a value
