@@ -55,6 +55,13 @@
                 </table>
             </div>
 
+            <div>
+                <form @submit.prevent="saveForm">
+                    <input type="file" @change="upload" />
+                    <button class="button-solid" type="submit">Upload</button>
+                </form>
+            </div>
+
             <div class="status" v-if="status">
                 <table>
                     <tbody>
@@ -95,15 +102,30 @@ export default Vue.extend({
     },
     data(): {
         status: PortalDeployStatus | null;
+        form: { file: any };
     } {
         return {
             status: null,
+            form: { file: null },
         };
     },
     async mounted(): Promise<void> {
         await this.$services.api.getStatus().then((status) => {
             this.status = status;
         });
+    },
+    methods: {
+        upload(this: any, ev) {
+            console.log("upload", ev.target.files);
+            const file = ev.target.files[0];
+            this.form.file = file;
+        },
+        async saveForm() {
+            console.log("save-form", this.form);
+            await this.$services.api.adminUploadBackup(this.form).then(() => {
+                //
+            });
+        },
     },
 });
 </script>
