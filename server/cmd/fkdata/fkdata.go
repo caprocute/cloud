@@ -82,6 +82,26 @@ func ExtractMeta(ctx context.Context, path string) (*MetaScanner, error) {
 	return ms, nil
 }
 
+func (ms *MetaScanner) Valid() error {
+	if ms.DeviceId == nil {
+		return fmt.Errorf("missing: device id")
+	}
+	if ms.GenerationId == nil {
+		return fmt.Errorf("missing: generation id")
+	}
+	if ms.DeviceName == nil {
+		return fmt.Errorf("missing: device name")
+	}
+	if ms.FirstRecord == nil {
+		return fmt.Errorf("missing: first record")
+	}
+	if ms.LastRecord == nil {
+		return fmt.Errorf("missing: last record")
+	}
+
+	return nil
+}
+
 type Credentials struct {
 	Email    string
 	Password string
@@ -108,6 +128,10 @@ func Upload(ctx context.Context, credentials *Credentials, path string, url stri
 	ms, err := ExtractMeta(ctx, path)
 	if err != nil {
 		return err
+	}
+
+	if err := ms.Valid(); err != nil {
+		log.Fatalf("Error: %v", err)
 	}
 
 	fkc := NewFkClient(url)
