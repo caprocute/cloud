@@ -21,6 +21,10 @@ type Client struct {
 	// endpoint.
 	HealthEndpointDoer goahttp.Doer
 
+	// UploadBackup Doer is the HTTP client used to make requests to the upload
+	// backup endpoint.
+	UploadBackupDoer goahttp.Doer
+
 	// CORS Doer is the HTTP client used to make requests to the  endpoint.
 	CORSDoer goahttp.Doer
 
@@ -45,6 +49,7 @@ func NewClient(
 ) *Client {
 	return &Client{
 		HealthEndpointDoer:  doer,
+		UploadBackupDoer:    doer,
 		CORSDoer:            doer,
 		RestoreResponseBody: restoreBody,
 		scheme:              scheme,
@@ -73,6 +78,30 @@ func (c *Client) HealthEndpoint() goa.Endpoint {
 		resp, err := c.HealthEndpointDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("admin", "health", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// UploadBackup returns an endpoint that makes HTTP requests to the admin
+// service upload backup server.
+func (c *Client) UploadBackup() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeUploadBackupRequest(c.encoder)
+		decodeResponse = DecodeUploadBackupResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildUploadBackupRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.UploadBackupDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("admin", "upload backup", err)
 		}
 		return decodeResponse(resp)
 	}

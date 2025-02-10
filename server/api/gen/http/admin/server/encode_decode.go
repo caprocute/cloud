@@ -10,6 +10,7 @@ package server
 import (
 	"context"
 	"net/http"
+	"strconv"
 	"strings"
 
 	adminviews "gitlab.com/fieldkit/cloud/server/api/gen/admin/views"
@@ -109,6 +110,125 @@ func EncodeHealthEndpointError(encoder func(context.Context, http.ResponseWriter
 				body = formatter(res)
 			} else {
 				body = NewHealthBadRequestResponseBody(res)
+			}
+			w.Header().Set("goa-error", "bad-request")
+			w.WriteHeader(http.StatusBadRequest)
+			return enc.Encode(body)
+		default:
+			return encodeError(ctx, w, v)
+		}
+	}
+}
+
+// EncodeUploadBackupResponse returns an encoder for responses returned by the
+// admin upload backup endpoint.
+func EncodeUploadBackupResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
+	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
+		res := v.(*adminviews.BackupCheck)
+		enc := encoder(ctx, w)
+		body := NewUploadBackupResponseBody(res.Projected)
+		w.WriteHeader(http.StatusOK)
+		return enc.Encode(body)
+	}
+}
+
+// DecodeUploadBackupRequest returns a decoder for requests sent to the admin
+// upload backup endpoint.
+func DecodeUploadBackupRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
+	return func(r *http.Request) (interface{}, error) {
+		var (
+			contentType   string
+			contentLength int64
+			auth          string
+			err           error
+		)
+		contentType = r.Header.Get("Content-Type")
+		if contentType == "" {
+			err = goa.MergeErrors(err, goa.MissingFieldError("Content-Type", "header"))
+		}
+		{
+			contentLengthRaw := r.Header.Get("Content-Length")
+			if contentLengthRaw == "" {
+				err = goa.MergeErrors(err, goa.MissingFieldError("Content-Length", "header"))
+			}
+			v, err2 := strconv.ParseInt(contentLengthRaw, 10, 64)
+			if err2 != nil {
+				err = goa.MergeErrors(err, goa.InvalidFieldTypeError("contentLength", contentLengthRaw, "integer"))
+			}
+			contentLength = v
+		}
+		auth = r.Header.Get("Authorization")
+		if auth == "" {
+			err = goa.MergeErrors(err, goa.MissingFieldError("Authorization", "header"))
+		}
+		if err != nil {
+			return nil, err
+		}
+		payload := NewUploadBackupPayload(contentType, contentLength, auth)
+		if strings.Contains(payload.Auth, " ") {
+			// Remove authorization scheme prefix (e.g. "Bearer")
+			cred := strings.SplitN(payload.Auth, " ", 2)[1]
+			payload.Auth = cred
+		}
+
+		return payload, nil
+	}
+}
+
+// EncodeUploadBackupError returns an encoder for errors returned by the upload
+// backup admin endpoint.
+func EncodeUploadBackupError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+	encodeError := goahttp.ErrorEncoder(encoder, formatter)
+	return func(ctx context.Context, w http.ResponseWriter, v error) error {
+		en, ok := v.(ErrorNamer)
+		if !ok {
+			return encodeError(ctx, w, v)
+		}
+		switch en.ErrorName() {
+		case "unauthorized":
+			res := v.(*goa.ServiceError)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewUploadBackupUnauthorizedResponseBody(res)
+			}
+			w.Header().Set("goa-error", "unauthorized")
+			w.WriteHeader(http.StatusUnauthorized)
+			return enc.Encode(body)
+		case "forbidden":
+			res := v.(*goa.ServiceError)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewUploadBackupForbiddenResponseBody(res)
+			}
+			w.Header().Set("goa-error", "forbidden")
+			w.WriteHeader(http.StatusForbidden)
+			return enc.Encode(body)
+		case "not-found":
+			res := v.(*goa.ServiceError)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewUploadBackupNotFoundResponseBody(res)
+			}
+			w.Header().Set("goa-error", "not-found")
+			w.WriteHeader(http.StatusNotFound)
+			return enc.Encode(body)
+		case "bad-request":
+			res := v.(*goa.ServiceError)
+			enc := encoder(ctx, w)
+			var body interface{}
+			if formatter != nil {
+				body = formatter(res)
+			} else {
+				body = NewUploadBackupBadRequestResponseBody(res)
 			}
 			w.Header().Set("goa-error", "bad-request")
 			w.WriteHeader(http.StatusBadRequest)

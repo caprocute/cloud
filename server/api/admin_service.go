@@ -3,6 +3,8 @@ package api
 import (
 	"context"
 	"errors"
+	"io"
+	"os"
 
 	"gitlab.com/fieldkit/cloud/server/api/gen/admin"
 	"gitlab.com/fieldkit/cloud/server/common/sqlxcache"
@@ -41,6 +43,31 @@ func (s *AdminService) HealthEndpoint(ctx context.Context, payload *admin.Health
 			Errors:  errors[0],
 		},
 	}, nil
+}
+
+func (s *AdminService) UploadBackup(ctx context.Context, payload *admin.UploadBackupPayload, body io.ReadCloser) (*admin.BackupCheck, error) {
+	p, err := NewPermissions(ctx, s.options).Unwrap()
+	if err != nil {
+		return nil, err
+	}
+
+	log := Logger(ctx).Sugar()
+
+	log.Infow("backup", "content_type", payload.ContentType, "content_length", payload.ContentLength, "user_id", p.UserID())
+
+	f, err := os.CreateTemp("", "admin-backup-")
+	if err != nil {
+		return nil, err
+	}
+
+	copied, err := io.Copy(f, body)
+	if err != nil {
+		return nil, err
+	}
+
+	log.Infow("saved", "copied", copied, "file_name", f.Name())
+
+	return nil, nil
 }
 
 func (s *AdminService) JWTAuth(ctx context.Context, token string, scheme *security.JWTScheme) (context.Context, error) {
