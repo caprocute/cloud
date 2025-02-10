@@ -32,18 +32,29 @@ func main() {
 	flag.StringVar(&options.Portal, "portal", "", "portal url")
 	flag.Parse()
 
-	if options.File == "" || options.Portal == "" {
+	if options.File == "" {
 		flag.Usage()
 		return
 	}
 
-	credentials, err := CredentialsFromEnv()
-	if err != nil {
-		log.Fatalf("Error: %v", err)
-	}
+	if options.Portal == "" {
+		ms, err := ExtractMeta(ctx, options.File)
+		if err != nil {
+			log.Fatalf("Error: %v", err)
+		}
 
-	if err := Upload(ctx, credentials, options.File, options.Portal); err != nil {
-		log.Fatalf("Error: %v", err)
+		if err := ms.Valid(); err != nil {
+			log.Fatalf("Error: %v", err)
+		}
+	} else {
+		credentials, err := CredentialsFromEnv()
+		if err != nil {
+			log.Fatalf("Error: %v", err)
+		}
+
+		if err := Upload(ctx, credentials, options.File, options.Portal); err != nil {
+			log.Fatalf("Error: %v", err)
+		}
 	}
 }
 
