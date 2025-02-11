@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"context"
-	"encoding/hex"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -48,7 +47,7 @@ func main() {
 			log.Fatalf("Error: %v", err)
 		}
 
-		if err := Upload(ctx, credentials, options.File, options.Portal); err != nil {
+		if err := Upload(ctx, options.Portal, credentials, options.File); err != nil {
 			log.Fatalf("Error: %v", err)
 		}
 	}
@@ -76,16 +75,7 @@ func CredentialsFromEnv() (*Credentials, error) {
 	}, nil
 }
 
-func Upload(ctx context.Context, credentials *Credentials, path string, url string) error {
-	ms, err := backend.ExtractMeta(ctx, path)
-	if err != nil {
-		return err
-	}
-
-	if err := ms.Valid(); err != nil {
-		log.Fatalf("Error: %v", err)
-	}
-
+func Upload(ctx context.Context, url string, credentials *Credentials, path string) error {
 	fkc := NewFkClient(url)
 
 	token, err := fkc.Login(ctx, credentials.Email, credentials.Password)
@@ -93,42 +83,10 @@ func Upload(ctx context.Context, credentials *Credentials, path string, url stri
 		return err
 	}
 
-	file, err := os.Open(path)
+	_, err = backend.UploadWithToken(ctx, url, token, path)
 	if err != nil {
 		return err
 	}
-
-	stat, err := file.Stat()
-	if err != nil {
-		return err
-	}
-
-	defer file.Close()
-
-	req, err := http.NewRequest("POST", fmt.Sprintf("%s/ingestion", url), file)
-	if err != nil {
-		return err
-	}
-
-	req.ContentLength = stat.Size()
-
-	req.Header.Set("Content-Type", "application/octet-stream")
-	req.Header.Set("Authorization", token)
-	req.Header.Set("Fk-Blocks", fmt.Sprintf("%d,%d", *ms.FirstRecord, *ms.LastRecord))
-	req.Header.Set("Fk-DeviceId", hex.EncodeToString(*ms.DeviceId))
-	req.Header.Set("Fk-DeviceName", *ms.DeviceName)
-	req.Header.Set("Fk-Generation", hex.EncodeToString(*ms.GenerationId))
-	req.Header.Set("Fk-Type", "data")
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return err
-	}
-
-	log.Printf("response: %v", resp.StatusCode)
-
-	defer resp.Body.Close()
 
 	return nil
 }

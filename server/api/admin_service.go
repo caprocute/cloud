@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"io"
@@ -62,6 +63,8 @@ func (s *AdminService) UploadBackup(ctx context.Context, payload *admin.UploadBa
 		return nil, err
 	}
 
+	defer os.Remove(f.Name())
+
 	copied, err := io.Copy(f, body)
 	if err != nil {
 		return nil, err
@@ -71,14 +74,21 @@ func (s *AdminService) UploadBackup(ctx context.Context, payload *admin.UploadBa
 
 	check := &admin.BackupCheck{}
 
-	ms, err := backend.ExtractMeta(ctx, f.Name())
+	url := s.options.Config.ApiHost
+
+	ms, err := backend.UploadWithToken(ctx, url, payload.Auth, f.Name())
 	if err != nil {
 		check.Errors = []string{fmt.Sprintf("%v", err)}
 	} else {
 		if err := ms.Valid(); err != nil {
 			check.Errors = []string{fmt.Sprintf("%v", err)}
 		} else {
-
+			deviceId := hex.EncodeToString(*ms.DeviceId)
+			generationId := hex.EncodeToString(*ms.GenerationId)
+			check.DeviceID = &deviceId
+			check.DeviceName = ms.DeviceName
+			check.GenerationID = &generationId
+			check.Records = []int32{int32(*ms.FirstRecord), int32(*ms.LastRecord)}
 		}
 	}
 

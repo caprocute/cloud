@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"net/http"
 	"os"
 
 	"github.com/golang/protobuf/proto"
@@ -189,4 +190,52 @@ func Decode(ctx context.Context, reader io.Reader, visitor RecordVisitor) error 
 	}
 
 	return nil
+}
+
+func UploadWithToken(ctx context.Context, url string, token string, path string) (*MetaScanner, error) {
+	ms, err := ExtractMeta(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := ms.Valid(); err != nil {
+		return nil, err
+	}
+
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+
+	stat, err := file.Stat()
+	if err != nil {
+		return nil, err
+	}
+
+	defer file.Close()
+
+	req, err := http.NewRequest("POST", fmt.Sprintf("%s/ingestion", url), file)
+	if err != nil {
+		return nil, err
+	}
+
+	req.ContentLength = stat.Size()
+
+	req.Header.Set("Content-Type", "application/octet-stream")
+	req.Header.Set("Authorization", token)
+	req.Header.Set("Fk-Blocks", fmt.Sprintf("%d,%d", *ms.FirstRecord, *ms.LastRecord))
+	req.Header.Set("Fk-DeviceId", hex.EncodeToString(*ms.DeviceId))
+	req.Header.Set("Fk-DeviceName", *ms.DeviceName)
+	req.Header.Set("Fk-Generation", hex.EncodeToString(*ms.GenerationId))
+	req.Header.Set("Fk-Type", "data")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	defer resp.Body.Close()
+
+	return ms, nil
 }
