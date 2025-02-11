@@ -447,6 +447,10 @@ export default Vue.extend({
     margin-right: 0;
     padding-bottom: 1em;
 
+    @include bp-down($xs) {
+        margin-left: unset !important;
+    }
+
     ::v-deep .pages {
         margin-top: 4px;
     }
