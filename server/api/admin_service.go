@@ -3,10 +3,12 @@ package api
 import (
 	"context"
 	"errors"
+	"fmt"
 	"io"
 	"os"
 
 	"gitlab.com/fieldkit/cloud/server/api/gen/admin"
+	"gitlab.com/fieldkit/cloud/server/backend"
 	"gitlab.com/fieldkit/cloud/server/common/sqlxcache"
 
 	"goa.design/goa/v3/security"
@@ -67,7 +69,20 @@ func (s *AdminService) UploadBackup(ctx context.Context, payload *admin.UploadBa
 
 	log.Infow("saved", "copied", copied, "file_name", f.Name())
 
-	return nil, nil
+	check := &admin.BackupCheck{}
+
+	ms, err := backend.ExtractMeta(ctx, f.Name())
+	if err != nil {
+		check.Errors = []string{fmt.Sprintf("%v", err)}
+	} else {
+		if err := ms.Valid(); err != nil {
+			check.Errors = []string{fmt.Sprintf("%v", err)}
+		} else {
+
+		}
+	}
+
+	return check, nil
 }
 
 func (s *AdminService) JWTAuth(ctx context.Context, token string, scheme *security.JWTScheme) (context.Context, error) {
