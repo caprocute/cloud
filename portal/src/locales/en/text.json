@@ -663,6 +663,19 @@
         },
         "legend": {
             "noData": "No Data or Inactive"
+        },
+        "header": {
+            "title": "Stations",
+            "subtitle": "Explore station data",
+            "viewProjectDashboard": "View Project Dashboard"
+        },
+        "sidebar": {
+            "viewing": {
+                "heading": "Viewing {stationsLength} Station(s)",
+                "noStationsOnMap": "No results based on map view",
+                "updateMapCheckbox": "Update results based on map view",
+                "exploreBtn": "Explore All Data"
+            }
         }
     },
     "confirmDeletePhoto": "Are you sure you want to delete this photo?",
@@ -829,5 +842,12 @@
         "warning": "Warning, continuing will delete your account and all associated data. To confirm, please enter your email address.",
         "done": "Your account has been deleted.",
         "sameEmail": "Does not match your email."
+    },
+    "stationsMapSummary": {
+        "tabs": {
+            "explore": "Explore Data",
+            "notes": "Field Notes",
+            "details": "Station Details"
+        }
     }
 }
