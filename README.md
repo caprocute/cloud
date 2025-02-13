@@ -129,6 +129,8 @@ yarn install
 npm install tiptap
 ```
 
+2. Run `make`.
+
 ## Running the Project
 
 1. In one terminal, start Docker:
@@ -140,14 +142,14 @@ sudo docker-compose up
 2. In a separate terminal, serve the project:
 
 ```bash
-yarn serve
+cd portal
+npm run serve
 ```
 
 ## Known Issues
 
+```bash
 - Issue with `@secrets` that's not getting resolved.
 ```
 
-This should give you a nicely formatted README.md on GitHub with all the instructions and references intact. Adjustments might be needed depending on the specific layout you had in mind or the specifics of the project.
-
-*EOF*
+If you run into this, copy `/portal/src/secets.ts.template` to `portal/src/secrets.ts`.

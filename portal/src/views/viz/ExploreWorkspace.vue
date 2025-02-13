@@ -127,7 +127,7 @@ import {
     PartnerCustomization,
 } from "../shared/partners";
 import { mapGetters, mapState } from "vuex";
-import { DisplayStation } from "@/store";
+import { ActionTypes, DisplayStation } from "@/store";
 import { GlobalState } from "@/store/modules/global";
 import { SensorsResponse } from "./api";
 import { Bookmark, ChartType, FastTime, Time, VizSensor, VizSettings, Workspace } from "./viz";
@@ -265,9 +265,14 @@ export default Vue.extend({
                     }
                 });
         }
+        await this.$store.dispatch(ActionTypes.SET_REFRESH_WORKSPACE_FN, this.refreshWorkspace);
     },
     methods: {
         isCustomisationEnabled,
+        refreshWorkspace() {
+            this.workspace = null;
+            this.createWorkspaceIfNecessary();
+        },
         async onBack() {
             if (this.bookmark.c) {
                 if (this.bookmark.c.map) {

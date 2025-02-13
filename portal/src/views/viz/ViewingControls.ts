@@ -412,7 +412,7 @@ export const ViewingControls = Vue.extend({
 				<div class="right time">
                     <div class="fast-time-container">
                         <span class="view-by"> {{ $t('dataView.viewBy.btn') }}</span>
-                        <div class="fast-time" @click="ev => raiseFastTime(ev, 1)" v-bind:class="{ selected: viz.fastTime == 1 }"> {{ $t('dataView.viewBy.btn') }}</div>
+                        <div class="fast-time" @click="ev => raiseFastTime(ev, 1)" v-bind:class="{ selected: viz.fastTime == 1 }"> {{ $t('dataView.viewBy.day') }}</div>
                         <div class="fast-time" @click="ev => raiseFastTime(ev, 7)" v-bind:class="{ selected: viz.fastTime == 7 }"> {{ $t('dataView.viewBy.week') }}</div>
                         <div class="fast-time" @click="ev => raiseFastTime(ev, 14)" v-bind:class="{ selected: viz.fastTime == 14 }"> 2 {{ $t('dataView.viewBy.week') }}</div>
                         <div class="fast-time" @click="ev => raiseFastTime(ev, 30)" v-bind:class="{ selected: viz.fastTime == 30 }"> {{ $t('dataView.viewBy.month') }}</div>

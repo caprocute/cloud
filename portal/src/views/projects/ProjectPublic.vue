@@ -42,13 +42,10 @@
                 <div class="project-detail" v-if="project.goal">{{ $t("project.goal", { goal: project.goal }) }}</div>
                 <div class="project-detail">{{ project.description }}</div>
                 <div class="details-modules">
-                    <img
-                        v-for="module in projectModules"
-                        v-bind:key="module.name"
-                        alt="Module icon"
-                        class="module-icon"
-                        :src="module.url"
-                    />
+                    <div class="hoverable-item" v-for="(module, index) in projectModules" :key="module.name">
+                        <img alt="Module icon" class="module-icon" :src="module.url" />
+                        <span :ref="'module-tooltip-' + index" class="tooltip-text">{{ $t(module.name) }}</span>
+                    </div>
                 </div>
                 <div class="right-actions">
                     <FollowControl :project="project" v-if="isAuthenticated">

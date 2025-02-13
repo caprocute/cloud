@@ -10,53 +10,24 @@ package server
 import (
 	"context"
 	"net/http"
-	"strconv"
-	"strings"
 
 	test "gitlab.com/fieldkit/cloud/server/api/gen/test"
 	goahttp "goa.design/goa/v3/http"
 	goa "goa.design/goa/v3/pkg"
 )
 
-// EncodeGetResponse returns an encoder for responses returned by the test get
-// endpoint.
-func EncodeGetResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
+// EncodeNoopResponse returns an encoder for responses returned by the test
+// noop endpoint.
+func EncodeNoopResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
 	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
 		w.WriteHeader(http.StatusNoContent)
 		return nil
 	}
 }
 
-// DecodeGetRequest returns a decoder for requests sent to the test get
+// EncodeNoopError returns an encoder for errors returned by the noop test
 // endpoint.
-func DecodeGetRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
-	return func(r *http.Request) (interface{}, error) {
-		var (
-			id  int64
-			err error
-
-			params = mux.Vars(r)
-		)
-		{
-			idRaw := params["id"]
-			v, err2 := strconv.ParseInt(idRaw, 10, 64)
-			if err2 != nil {
-				err = goa.MergeErrors(err, goa.InvalidFieldTypeError("id", idRaw, "integer"))
-			}
-			id = v
-		}
-		if err != nil {
-			return nil, err
-		}
-		payload := NewGetPayload(id)
-
-		return payload, nil
-	}
-}
-
-// EncodeGetError returns an encoder for errors returned by the get test
-// endpoint.
-func EncodeGetError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
+func EncodeNoopError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
 	encodeError := goahttp.ErrorEncoder(encoder, formatter)
 	return func(ctx context.Context, w http.ResponseWriter, v error) error {
 		en, ok := v.(ErrorNamer)
@@ -71,7 +42,7 @@ func EncodeGetError(encoder func(context.Context, http.ResponseWriter) goahttp.E
 			if formatter != nil {
 				body = formatter(res)
 			} else {
-				body = NewGetForbiddenResponseBody(res)
+				body = NewNoopForbiddenResponseBody(res)
 			}
 			w.Header().Set("goa-error", "forbidden")
 			w.WriteHeader(http.StatusForbidden)
@@ -83,7 +54,7 @@ func EncodeGetError(encoder func(context.Context, http.ResponseWriter) goahttp.E
 			if formatter != nil {
 				body = formatter(res)
 			} else {
-				body = NewGetNotFoundResponseBody(res)
+				body = NewNoopNotFoundResponseBody(res)
 			}
 			w.Header().Set("goa-error", "not-found")
 			w.WriteHeader(http.StatusNotFound)
@@ -95,7 +66,7 @@ func EncodeGetError(encoder func(context.Context, http.ResponseWriter) goahttp.E
 			if formatter != nil {
 				body = formatter(res)
 			} else {
-				body = NewGetBadRequestResponseBody(res)
+				body = NewNoopBadRequestResponseBody(res)
 			}
 			w.Header().Set("goa-error", "bad-request")
 			w.WriteHeader(http.StatusBadRequest)
@@ -107,184 +78,7 @@ func EncodeGetError(encoder func(context.Context, http.ResponseWriter) goahttp.E
 			if formatter != nil {
 				body = formatter(res)
 			} else {
-				body = NewGetUnauthorizedResponseBody(res)
-			}
-			w.Header().Set("goa-error", "unauthorized")
-			w.WriteHeader(http.StatusUnauthorized)
-			return enc.Encode(body)
-		default:
-			return encodeError(ctx, w, v)
-		}
-	}
-}
-
-// EncodeErrorResponse returns an encoder for responses returned by the test
-// error endpoint.
-func EncodeErrorResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
-	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
-		w.WriteHeader(http.StatusNoContent)
-		return nil
-	}
-}
-
-// EncodeErrorError returns an encoder for errors returned by the error test
-// endpoint.
-func EncodeErrorError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
-	encodeError := goahttp.ErrorEncoder(encoder, formatter)
-	return func(ctx context.Context, w http.ResponseWriter, v error) error {
-		en, ok := v.(ErrorNamer)
-		if !ok {
-			return encodeError(ctx, w, v)
-		}
-		switch en.ErrorName() {
-		case "forbidden":
-			res := v.(*goa.ServiceError)
-			enc := encoder(ctx, w)
-			var body interface{}
-			if formatter != nil {
-				body = formatter(res)
-			} else {
-				body = NewErrorForbiddenResponseBody(res)
-			}
-			w.Header().Set("goa-error", "forbidden")
-			w.WriteHeader(http.StatusForbidden)
-			return enc.Encode(body)
-		case "not-found":
-			res := v.(*goa.ServiceError)
-			enc := encoder(ctx, w)
-			var body interface{}
-			if formatter != nil {
-				body = formatter(res)
-			} else {
-				body = NewErrorNotFoundResponseBody(res)
-			}
-			w.Header().Set("goa-error", "not-found")
-			w.WriteHeader(http.StatusNotFound)
-			return enc.Encode(body)
-		case "bad-request":
-			res := v.(*goa.ServiceError)
-			enc := encoder(ctx, w)
-			var body interface{}
-			if formatter != nil {
-				body = formatter(res)
-			} else {
-				body = NewErrorBadRequestResponseBody(res)
-			}
-			w.Header().Set("goa-error", "bad-request")
-			w.WriteHeader(http.StatusBadRequest)
-			return enc.Encode(body)
-		case "unauthorized":
-			res := v.(test.Unauthorized)
-			enc := encoder(ctx, w)
-			var body interface{}
-			if formatter != nil {
-				body = formatter(res)
-			} else {
-				body = NewErrorUnauthorizedResponseBody(res)
-			}
-			w.Header().Set("goa-error", "unauthorized")
-			w.WriteHeader(http.StatusUnauthorized)
-			return enc.Encode(body)
-		default:
-			return encodeError(ctx, w, v)
-		}
-	}
-}
-
-// EncodeEmailResponse returns an encoder for responses returned by the test
-// email endpoint.
-func EncodeEmailResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
-	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
-		w.WriteHeader(http.StatusNoContent)
-		return nil
-	}
-}
-
-// DecodeEmailRequest returns a decoder for requests sent to the test email
-// endpoint.
-func DecodeEmailRequest(mux goahttp.Muxer, decoder func(*http.Request) goahttp.Decoder) func(*http.Request) (interface{}, error) {
-	return func(r *http.Request) (interface{}, error) {
-		var (
-			address string
-			auth    string
-			err     error
-		)
-		address = r.URL.Query().Get("address")
-		if address == "" {
-			err = goa.MergeErrors(err, goa.MissingFieldError("address", "query string"))
-		}
-		auth = r.Header.Get("Authorization")
-		if auth == "" {
-			err = goa.MergeErrors(err, goa.MissingFieldError("Authorization", "header"))
-		}
-		if err != nil {
-			return nil, err
-		}
-		payload := NewEmailPayload(address, auth)
-		if strings.Contains(payload.Auth, " ") {
-			// Remove authorization scheme prefix (e.g. "Bearer")
-			cred := strings.SplitN(payload.Auth, " ", 2)[1]
-			payload.Auth = cred
-		}
-
-		return payload, nil
-	}
-}
-
-// EncodeEmailError returns an encoder for errors returned by the email test
-// endpoint.
-func EncodeEmailError(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder, formatter func(err error) goahttp.Statuser) func(context.Context, http.ResponseWriter, error) error {
-	encodeError := goahttp.ErrorEncoder(encoder, formatter)
-	return func(ctx context.Context, w http.ResponseWriter, v error) error {
-		en, ok := v.(ErrorNamer)
-		if !ok {
-			return encodeError(ctx, w, v)
-		}
-		switch en.ErrorName() {
-		case "forbidden":
-			res := v.(*goa.ServiceError)
-			enc := encoder(ctx, w)
-			var body interface{}
-			if formatter != nil {
-				body = formatter(res)
-			} else {
-				body = NewEmailForbiddenResponseBody(res)
-			}
-			w.Header().Set("goa-error", "forbidden")
-			w.WriteHeader(http.StatusForbidden)
-			return enc.Encode(body)
-		case "not-found":
-			res := v.(*goa.ServiceError)
-			enc := encoder(ctx, w)
-			var body interface{}
-			if formatter != nil {
-				body = formatter(res)
-			} else {
-				body = NewEmailNotFoundResponseBody(res)
-			}
-			w.Header().Set("goa-error", "not-found")
-			w.WriteHeader(http.StatusNotFound)
-			return enc.Encode(body)
-		case "bad-request":
-			res := v.(*goa.ServiceError)
-			enc := encoder(ctx, w)
-			var body interface{}
-			if formatter != nil {
-				body = formatter(res)
-			} else {
-				body = NewEmailBadRequestResponseBody(res)
-			}
-			w.Header().Set("goa-error", "bad-request")
-			w.WriteHeader(http.StatusBadRequest)
-			return enc.Encode(body)
-		case "unauthorized":
-			res := v.(test.Unauthorized)
-			enc := encoder(ctx, w)
-			var body interface{}
-			if formatter != nil {
-				body = formatter(res)
-			} else {
-				body = NewEmailUnauthorizedResponseBody(res)
+				body = NewNoopUnauthorizedResponseBody(res)
 			}
 			w.Header().Set("goa-error", "unauthorized")
 			w.WriteHeader(http.StatusUnauthorized)

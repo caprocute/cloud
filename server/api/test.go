@@ -2,16 +2,12 @@ package api
 
 import (
 	"context"
-	"fmt"
-	"time"
 
 	"goa.design/goa/v3/security"
 
 	test "gitlab.com/fieldkit/cloud/server/api/gen/test"
 
 	"gitlab.com/fieldkit/cloud/server/common"
-	"gitlab.com/fieldkit/cloud/server/data"
-	"gitlab.com/fieldkit/cloud/server/messages"
 )
 
 type TestService struct {
@@ -24,40 +20,7 @@ func NewTestSevice(ctx context.Context, options *ControllerOptions) *TestService
 	}
 }
 
-func (sc *TestService) Get(ctx context.Context, payload *test.GetPayload) error {
-	example := messages.Example{
-		Name: "Jacob",
-	}
-	if err := sc.options.Publisher.Publish(ctx, &example); err != nil {
-		return nil
-	}
-	return nil
-}
-
-func (sc *TestService) Error(ctx context.Context) error {
-	return fmt.Errorf("life is unpredictable")
-}
-
-func (sc *TestService) Email(ctx context.Context, payload *test.EmailPayload) error {
-	log := Logger(ctx).Sugar()
-
-	log.Infow("sending test email", "address", payload.Address)
-
-	user := &data.User{
-		ID:    0,
-		Name:  data.Name("Bernie Sanders"),
-		Email: payload.Address,
-	}
-
-	token, err := data.NewValidationToken(user.ID, 20, time.Now().Add(time.Duration(72)*time.Hour))
-	if err != nil {
-		return err
-	}
-
-	if err := sc.options.Emailer.SendValidationToken(user, token); err != nil {
-		return err
-	}
-
+func (sc *TestService) Noop(ctx context.Context) error {
 	return nil
 }
 

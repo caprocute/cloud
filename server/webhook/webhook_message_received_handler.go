@@ -2,6 +2,7 @@ package webhook
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -49,7 +50,12 @@ func (h *WebHookMessageReceivedHandler) Handle(ctx context.Context, m *WebHookMe
 
 	for _, row := range h.batch.Messages {
 		if incoming, err := h.parseMessage(ctx, row); err != nil {
-			return err
+			if errors.Is(err, ErrNoDeviceName) {
+				log.Warnw("wh:no-device-name")
+				return nil
+			} else {
+				return err
+			}
 		} else {
 			if len(incoming) == 0 {
 				log.Infow("wh:no-incoming")

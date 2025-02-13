@@ -1,5 +1,5 @@
 <template>
-    <div class="container-side" v-bind:class="{ active: !sidebar.narrow }">
+    <div class="container-side" v-bind:class="{ active: !sidebar.narrow, scrollable: isScrollable }">
         <div class="sidebar-header">
             <router-link :to="{ name: 'root' }">
                 <Logo />
@@ -142,6 +142,9 @@ export default Vue.extend({
                 return this.stations;
             }
         },
+        isScrollable() {
+            return true;
+        },
     },
     methods: {
         showStation(station: DisplayStation): void {
@@ -192,6 +195,10 @@ export default Vue.extend({
     &.active {
         width: 240px;
         flex: 0 0 240px;
+    }
+
+    &.scrollable {
+        max-height: 100vh;
     }
 
     @include bp-down($md) {

@@ -1,5 +1,5 @@
 import Vue from "vue";
-import Router from "vue-router";
+import Router, {Route} from "vue-router";
 import VueBodyClass from "vue-body-class";
 
 import LoginView from "./views/auth/LoginView.vue";
@@ -56,7 +56,7 @@ function makeDefaultRouteForProject(projectId: number) {
             };
         },
         meta: {
-            secured: true,
+            secured: false,
             viewType: MapViewType.map,
         },
     };
@@ -70,11 +70,15 @@ function getRoot() {
             name: "root",
             component: ProjectsView,
             meta: {
-                secured: true,
+                secured: false,
             },
         };
     }
     return makeDefaultRouteForProject(partnerCustomization.projectId);
+}
+
+function isAdminRoute(route: Route): boolean {
+    return route.matched.some((record) => record.meta.admin);
 }
 
 const routes = [
@@ -184,7 +188,7 @@ const routes = [
         name: "viewInvites",
         component: ProjectsView,
         meta: {
-            secured: true,
+            secured: false,
         },
     },
     {
@@ -208,7 +212,7 @@ const routes = [
         name: "projects",
         component: ProjectsView,
         meta: {
-            secured: true,
+            secured: false,
         },
     },
     {
@@ -222,7 +226,7 @@ const routes = [
             };
         },
         meta: {
-            secured: true,
+            secured: false,
         },
     },
     {
@@ -238,7 +242,7 @@ const routes = [
         },
         meta: {
             bodyClass: "disable-scrolling",
-            secured: true,
+            secured: false,
         },
     },
     {
@@ -252,7 +256,7 @@ const routes = [
             };
         },
         meta: {
-            secured: true,
+            secured: false,
         },
     },
     {
@@ -267,7 +271,7 @@ const routes = [
             };
         },
         meta: {
-            secured: true,
+            secured: false,
             viewType: MapViewType.map,
         },
     },
@@ -283,7 +287,7 @@ const routes = [
             };
         },
         meta: {
-            secured: true,
+            secured: false,
             viewType: MapViewType.list,
         },
     },
@@ -292,7 +296,7 @@ const routes = [
         name: "addProject",
         component: ProjectEditView,
         meta: {
-            secured: true,
+            secured: false,
         },
     },
     {
@@ -305,7 +309,7 @@ const routes = [
             };
         },
         meta: {
-            secured: true,
+            secured: false,
         },
     },
     {
@@ -314,7 +318,7 @@ const routes = [
         component: ProjectUpdateEditView,
         props: true,
         meta: {
-            secured: true,
+            secured: false,
         },
     },
     {
@@ -327,7 +331,7 @@ const routes = [
             };
         },
         meta: {
-            secured: true,
+            secured: false,
         },
     },
     {
@@ -337,7 +341,7 @@ const routes = [
         props: true,
         meta: {
             bodyClass: "map-view",
-            secured: true,
+            secured: false,
             viewType: MapViewType.map,
         },
     },
@@ -348,7 +352,7 @@ const routes = [
         props: true,
         meta: {
             bodyClass: "map-view",
-            secured: true,
+            secured: false,
             viewType: MapViewType.list,
         },
     },
@@ -363,7 +367,7 @@ const routes = [
         },
         meta: {
             bodyClass: "map-view",
-            secured: true,
+            secured: false,
         },
     },
     {
@@ -377,7 +381,7 @@ const routes = [
         },
         meta: {
             bodyClass: "map-view",
-            secured: true,
+            secured: false,
         },
     },
     {
@@ -392,7 +396,7 @@ const routes = [
         },
         meta: {
             bodyClass: "map-view",
-            secured: true,
+            secured: false,
         },
     },
     {
@@ -406,7 +410,7 @@ const routes = [
             };
         },
         meta: {
-            secured: true,
+            secured: false,
         },
     },
     {
@@ -421,7 +425,7 @@ const routes = [
             };
         },
         meta: {
-            secured: true,
+            secured: false,
         },
     },
     {
@@ -435,7 +439,7 @@ const routes = [
             };
         },
         meta: {
-            secured: true,
+            secured: false,
             bodyClass: "disable-scrolling",
         },
     },
@@ -451,7 +455,7 @@ const routes = [
             };
         },
         meta: {
-            secured: true,
+            secured: false,
         },
     },
     {
@@ -505,7 +509,7 @@ const routes = [
         },
         meta: {
             bodyClass: "disable-scrolling",
-            secured: true,
+            secured: false,
         },
     },
     {
@@ -520,7 +524,7 @@ const routes = [
         },
         meta: {
             bodyClass: "disable-scrolling",
-            secured: true,
+            secured: false,
         },
     },
     {
@@ -533,7 +537,7 @@ const routes = [
             };
         },
         meta: {
-            secured: true,
+            secured: false,
         },
     },
     {
@@ -547,7 +551,7 @@ const routes = [
             };
         },
         meta: {
-            secured: true,
+            secured: false,
         },
     },
     {
@@ -571,7 +575,7 @@ const routes = [
             };
         },
         meta: {
-            secured: true,
+            secured: false,
         },
     },
     {
@@ -623,7 +627,12 @@ const routes = [
         name: "adminStations",
         component: AdminStations,
         props: (route) => {
-            return {};
+            const page = route.query.page ? parseInt(route.query.page) : 0;
+            const station = route.query.station ? parseInt(route.query.station) : null;
+            return {
+                page: page,
+                station: station,
+            };
         },
         meta: {
             admin: true,
@@ -683,6 +692,10 @@ export default function routerFactory(store) {
                 if (!store.getters.isTncValid && to.name != "login") {
                     await store.dispatch(ActionTypes.REFRESH_CURRENT_USER);
 
+                    if (isAdminRoute(to) && !store.getters.isAdmin) {
+                        next("/dashboard");
+                    }
+
                     if (!store.getters.isTncValid) {
                         next("/terms");
                     } else {
@@ -692,10 +705,9 @@ export default function routerFactory(store) {
                     next();
                 }
             } else {
-                // const queryParams = new URLSearchParams();
-                // queryParams.append("after", to.fullPath);
-                // next("/login?" + queryParams.toString());
-                next();
+                const queryParams = new URLSearchParams();
+                queryParams.append("after", to.fullPath);
+                next("/login?" + queryParams.toString());
             }
         } else {
             if (to.name === null) {
