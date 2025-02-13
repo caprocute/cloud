@@ -1,9 +1,7 @@
 <template>
     <div class="h-100">
-        <div class="viz linechart"></div>
-        <div v-if="isLoading" class="loading-container">
-            <Spinner class="spinner" />
-        </div>
+        <ExportChartButton v-if="!settings.tiny" :vega="vega"></ExportChartButton>
+        <div ref="vegaContainer" class="viz linechart"></div>
     </div>
 </template>
 
@@ -14,11 +12,12 @@ import Vue, { PropType } from "vue";
 import { default as vegaEmbed, VisualizationSpec } from "vega-embed";
 
 import { TimeRange } from "../common";
-import { TimeZoom, SeriesData } from "../viz";
+import { SeriesData, TimeZoom } from "../viz";
 import { ChartSettings } from "./SpecFactory";
 import chartStyles from "./chartStyles";
 import { TimeSeriesSpecFactory } from "./TimeSeriesSpecFactory";
 import Spinner from "@/views/shared/Spinner.vue";
+import ExportChartButton from "@/views/viz/vega/ExportChartButton.vue";
 import { ActionTypes } from "@/store";
 
 type DragTimeSignal = [number, number] | null;
@@ -37,7 +36,7 @@ function roundForDisplay(value: number): number {
 export default Vue.extend({
     name: "LineChart",
     components: {
-        Spinner,
+        ExportChartButton,
     },
     props: {
         series: {
@@ -80,9 +79,9 @@ export default Vue.extend({
             const factory = new TimeSeriesSpecFactory(this.series, this.settings, brushable, draggable);
 
             const spec = factory.create();
-            const vegaInfo = await vegaEmbed(this.$el as HTMLElement, spec as VisualizationSpec, {
+            const vegaContainer = this.$refs.vegaContainer as HTMLElement;
+            const vegaInfo = await vegaEmbed(vegaContainer as HTMLElement, spec as VisualizationSpec, {
                 renderer: "svg",
-                downloadFileName: this.getFileName(this.series[0]),
                 tooltip: {
                     offsetX: -50,
                     offsetY: 50,
@@ -95,8 +94,10 @@ export default Vue.extend({
                                         <p class="time">${sanitize(tooltip.time)}</p>`;
                     },
                 },
-                actions: this.settings.tiny ? false : { source: false, editor: false, compiled: false },
+                downloadFileName: this.getFileName(this.series),
+                actions: false,
                 scaleFactor: 2,
+                padding: this.settings.mobile ? { left: 0, right: 10 } : { left: 10, right: 50 },
             });
 
             this.vega = vegaInfo;
@@ -189,12 +190,6 @@ export default Vue.extend({
 
             this.isLoading = false;
         },
-        getFileName(series): string {
-            const stationName = series.vizInfo.station.name;
-            const sensorName = series.vizInfo.name;
-
-            return `${stationName}_${sensorName}`.replace("[^a-zA-Z0-9\\.\\-]", "_");
-        },
         getTooltipColor(name: string): string {
             if (name === "LEFT") {
                 return chartStyles.primaryLine.stroke;
@@ -204,6 +199,42 @@ export default Vue.extend({
             } else {
                 return "#ccc";
             }
+        },
+        getFileName(series: { vizInfo: { station: { name: string }; name: string } }[]): string {
+            const stationGroups: Record<string, string[]> = series.reduce((acc, item) => {
+                const stationName = item.vizInfo.station.name;
+                const sensorName = item.vizInfo.name;
+
+                if (!acc[stationName]) {
+                    acc[stationName] = [];
+                }
+                acc[stationName].push(sensorName);
+                return acc;
+            }, {} as Record<string, string[]>);
+
+            const entries = Object.entries(stationGroups);
+
+            if (entries.length === 1) {
+                const [stationName, sensorNames] = entries[0];
+                if (sensorNames.length === 1) {
+                    return `${stationName}-${sensorNames[0]}`;
+                } else {
+                    return `${stationName} ${sensorNames.join(" - ")}`;
+                }
+            } else if (entries.length === 2) {
+                const [[station1Name, sensor1Names], [station2Name, sensor2Names]] = entries;
+                if (sensor1Names.length === 1 && sensor2Names.length === 1) {
+                    return `${station1Name}-${sensor1Names[0]}_${station2Name}-${sensor2Names[0]}`;
+                }
+            }
+
+            const fileName: string = entries
+                .map(([stationName, sensorNames]) => {
+                    return `${stationName}-${sensorNames.join("-")}`;
+                })
+                .join(" ");
+
+            return fileName;
         },
     },
 });
@@ -222,13 +253,13 @@ export default Vue.extend({
     display: flex;
     align-items: center;
     margin-right: 3.2em !important;
+    opacity: 1 !important;
 
     @include bp-down($sm) {
         bottom: -195px;
         top: unset !important;
         left: 50%;
         transform: translateX(-50%);
-        opacity: 1 !important;
         width: 80px;
 
         span {

@@ -701,6 +701,8 @@
         "noSensors": "Oh snap, this station doesn't appear to have any sensors to show you.",
         "nothingSelected": "Nothing selected to visualize, please choose a station or project from the left.",
         "saveAs": "Save As",
+        "saveAsPng": "Save as PNG",
+        "saveAsSvg": "Save as SVG",
         "chartTypes": {
             "timeSeries": "Time Series",
             "bar": "Bar",

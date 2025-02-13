@@ -4,6 +4,8 @@
 
         <SharePanel v-if="shareVisible" containerClass="share-floating" :token="token" :bookmark="bookmark" @close="closePanel" />
 
+        <ExportChartContent></ExportChartContent>
+
         <div class="explore-view">
             <div class="explore-header">
                 <div class="explore-links">
@@ -58,7 +60,6 @@
 
             <div v-bind:class="{ 'workspace-container': true, busy: busy }">
                 <div class="busy-panel" v-if="busy">
-                    &nbsp;
                     <Spinner></Spinner>
                 </div>
 
@@ -118,23 +119,32 @@ import ExportPanel from "./ExportPanel.vue";
 import SharePanel from "./SharePanel.vue";
 import StationSummaryContent from "../shared/StationSummaryContent.vue";
 import PaginationControls from "@/views/shared/PaginationControls.vue";
-import { getPartnerCustomization, getPartnerCustomizationWithDefault, interpolatePartner, PartnerCustomization } from "../shared/partners";
-import { mapState, mapGetters } from "vuex";
+import {
+    getPartnerCustomization,
+    getPartnerCustomizationWithDefault,
+    interpolatePartner,
+    isCustomisationEnabled,
+    PartnerCustomization,
+} from "../shared/partners";
+import { mapGetters, mapState } from "vuex";
 import { ActionTypes, DisplayStation } from "@/store";
 import { GlobalState } from "@/store/modules/global";
 import { SensorsResponse } from "./api";
-import { Workspace, Bookmark, Time, VizSensor, ChartType, FastTime, VizSettings } from "./viz";
+import { Bookmark, ChartType, FastTime, Time, VizSensor, VizSettings, Workspace } from "./viz";
 import { VizWorkspace } from "./VizWorkspace";
-import { isMobile, getBatteryIcon } from "@/utilities";
+import { getBatteryIcon, isMobile } from "@/utilities";
 import Comments from "../comments/Comments.vue";
 import StationBattery from "@/views/station/StationBattery.vue";
 import InfoTooltip from "@/views/shared/InfoTooltip.vue";
 import Spinner from "@/views/shared/Spinner.vue";
 import { confirmLeaveWithDirtyCheck } from "@/store/modules/dirty";
+import ExportChartContent from "@/views/viz/vega/ExportChartContent.vue";
+import project from "vega-lite/build/src/compile/selection/project";
 
 export default Vue.extend({
     name: "ExploreWorkspace",
     components: {
+        ExportChartContent,
         ...CommonComponents,
         StandardLayout,
         VizWorkspace,
@@ -179,6 +189,9 @@ export default Vue.extend({
         };
     },
     computed: {
+        project() {
+            return project;
+        },
         ...mapGetters({ isAuthenticated: "isAuthenticated" }),
         ...mapState({
             user: (s: GlobalState) => s.user.user,
@@ -255,6 +268,7 @@ export default Vue.extend({
         await this.$store.dispatch(ActionTypes.SET_REFRESH_WORKSPACE_FN, this.refreshWorkspace);
     },
     methods: {
+        isCustomisationEnabled,
         refreshWorkspace() {
             this.workspace = null;
             this.createWorkspaceIfNecessary();
@@ -622,9 +636,21 @@ export default Vue.extend({
         margin-left: 0.25em;
         margin-right: 0.5em;
     }
+
+    details {
+        @include bp-down($sm) {
+            bottom: -360px;
+            position: absolute;
+            left: 50%;
+        }
+    }
 }
-.graph .vega-embed {
+.graph .vega-embed:not(.vega-embed--dummy) {
     height: 340px;
+}
+.graph .vega-embed--dummy {
+    overflow: visible;
+    z-index: $z-index-top;
 }
 .scrubber .vega-embed {
     height: 40px;
