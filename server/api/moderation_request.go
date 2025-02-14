@@ -6,8 +6,12 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/jmoiron/sqlx"
+	"goa.design/goa/v3/security"
+
+	"gitlab.com/fieldkit/cloud/server/api/gen/moderation"
+	moderationService "gitlab.com/fieldkit/cloud/server/api/gen/moderation"
 	"gitlab.com/fieldkit/cloud/server/backend/repositories"
+	"gitlab.com/fieldkit/cloud/server/common"
 	"gitlab.com/fieldkit/cloud/server/data"
 )
 
@@ -21,13 +25,13 @@ func NewModerationService(ctx context.Context, options *ControllerOptions) *Mode
 	}
 }
 
-func (s *ModerationService) Add(ctx context.Context, payload *data.ModerationAddPayload) (response *data.ModerationRequest, err error) {
+func (s *ModerationService) Add(ctx context.Context, payload *moderation.ModerationAddPayload) (*moderation.ModerationRequest, error) {
 	tx, err := s.options.Database.Begin(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	response, err = s.add(tx, payload)
+	response, err := s.add(ctx, payload)
 	if err != nil {
 		tx.Rollback()
 		return nil, err
@@ -37,7 +41,7 @@ func (s *ModerationService) Add(ctx context.Context, payload *data.ModerationAdd
 	return response, err
 }
 
-func (s *ModerationService) add(tx *sqlx.Tx, payload *data.ModerationAddPayload) (response *data.ModerationRequest, err error) {
+func (s *ModerationService) add(ctx context.Context, payload *moderation.ModerationAddPayload) (*moderation.ModerationRequest, error) {
 	log := Logger(context.Background()).Sugar()
 
 	p, err := NewPermissions(context.Background(), s.options).Unwrap()
@@ -45,22 +49,21 @@ func (s *ModerationService) add(tx *sqlx.Tx, payload *data.ModerationAddPayload)
 		return nil, err
 	}
 
-	if payload.PostType != data.ModerationDiscussionPost && payload.PostType != data.ModerationDataEvent {
-		return nil, errors.New("invalid post_type")
+	if payload.PostType != string(data.ModerationDiscussionPost) && payload.PostType != string(data.ModerationDataEvent) {
+		return nil, fmt.Errorf("invalid post type")
 	}
 
 	log.Infow("adding moderation request", "post_id", payload.PostID, "post_type", payload.PostType)
 
-	mr := repositories.NewModerationRepository(s.options.Database)
-
-	newRequest := &data.ModerationRequest{
+	mrRepo := repositories.NewModerationRepository(s.options.Database)
+	mr := &data.ModerationRequest{
 		PostID:     payload.PostID,
-		PostType:   payload.PostType,
+		PostType:   data.PostTypeEnum(payload.PostType),
 		ReportedBy: p.UserID(),
 		ReportedAt: time.Now().UTC(),
 	}
 
-	created, err := mr.AddModerationRequest(context.Background(), newRequest)
+	created, err := mrRepo.AddModerationRequest(ctx, mr)
 	if err != nil {
 		return nil, err
 	}
@@ -91,20 +94,18 @@ func (s *ModerationService) add(tx *sqlx.Tx, payload *data.ModerationAddPayload)
 		}
 	}
 
-	response = &data.ModerationRequest{
-		ID:             created.ID,
-		PostID:         created.PostID,
-		PostType:       created.PostType,
-		ReportedBy:     created.ReportedBy,
-		ReportedAt:     created.ReportedAt,
-		AcknowledgedBy: nil,
-		AcknowledgedAt: nil,
+	response := &moderation.ModerationRequest{
+		ID:         created.ID,
+		PostID:     created.PostID,
+		PostType:   string(created.PostType),
+		ReportedBy: created.ReportedBy,
+		ReportedAt: created.ReportedAt.Format(time.RFC3339),
 	}
 
 	return response, nil
 }
 
-func createEmailBody(payload *data.ModerationAddPayload) string {
+func createEmailBody(payload *moderation.ModerationAddPayload) string {
 	return fmt.Sprintf("A new moderation request has been created for post ID %d and post type %s.", payload.PostID, payload.PostType)
 }
 
@@ -113,10 +114,10 @@ func sendMockEmail(to string, subject string, body string) error {
 	return nil
 }
 
-func (s *ModerationService) Acknowledge(ctx context.Context, payload *data.AcknowledgePayload) (response *data.ModerationRequest, err error) {
+func (s *ModerationService) Acknowledge(ctx context.Context, payload *moderation.AcknowledgePayload) (*moderation.ModerationRequest, error) {
 	mrRepo := repositories.NewModerationRepository(s.options.Database)
 
-	moderationRequest, err := mrRepo.GetModerationRequest(ctx, payload.ID)
+	moderationRequest, err := mrRepo.GetModerationRequest(ctx, int(payload.ID))
 	if err != nil {
 		return nil, err
 	}
@@ -129,15 +130,32 @@ func (s *ModerationService) Acknowledge(ctx context.Context, payload *data.Ackno
 		return nil, err
 	}
 
-	response = &data.ModerationRequest{
+	var acknowledgedAtStr *string
+	if moderationRequest.AcknowledgedAt != nil {
+		str := moderationRequest.AcknowledgedAt.Format(time.RFC3339)
+		acknowledgedAtStr = &str
+	}
+
+	response := &moderation.ModerationRequest{
 		ID:             moderationRequest.ID,
 		PostID:         moderationRequest.PostID,
-		PostType:       moderationRequest.PostType,
+		PostType:       string(moderationRequest.PostType),
 		ReportedBy:     moderationRequest.ReportedBy,
-		ReportedAt:     moderationRequest.ReportedAt,
-		AcknowledgedBy: payload.AcknowledgedBy,
-		AcknowledgedAt: moderationRequest.AcknowledgedAt,
+		ReportedAt:     moderationRequest.ReportedAt.Format(time.RFC3339),
+		AcknowledgedBy: &payload.AcknowledgedBy,
+		AcknowledgedAt: acknowledgedAtStr,
 	}
 
 	return response, nil
+}
+
+func (s *ModerationService) JWTAuth(ctx context.Context, token string, scheme *security.JWTScheme) (context.Context, error) {
+	return Authenticate(ctx, common.AuthAttempt{
+		Token:        token,
+		Scheme:       scheme,
+		Key:          s.options.JWTHMACKey,
+		NotFound:     func(m string) error { return moderationService.MakeNotFound(errors.New(m)) },
+		Unauthorized: func(m string) error { return moderationService.MakeUnauthorized(errors.New(m)) },
+		Forbidden:    func(m string) error { return moderationService.MakeForbidden(errors.New(m)) },
+	})
 }

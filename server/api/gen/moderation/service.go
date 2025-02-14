@@ -60,6 +60,6 @@ type ModerationRequest struct {
 // method.
 type AcknowledgePayload struct {
 	Auth           *string
-	ID             int
+	ID             int32
 	AcknowledgedBy int32
 }

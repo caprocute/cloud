@@ -22,13 +22,6 @@ var ModerationAddPayload = Type("ModerationAddPayload", func() {
 	Required("postId", "postType")
 })
 
-var AcknowledgePayload = Type("AcknowledgePayload", func() {
-	Token("auth")
-	Attribute("id", Int)
-	Attribute("acknowledgedBy", Int32)
-	Required("id", "acknowledgedBy")
-})
-
 var _ = Service("moderation", func() {
 	Method("add", func() {
 		Security(JWTAuth, func() {
@@ -50,7 +43,12 @@ var _ = Service("moderation", func() {
 			Scope("api:access")
 		})
 
-		Payload(AcknowledgePayload)
+		Payload(func() {
+			Token("auth")
+			Attribute("id", Int32)
+			Attribute("acknowledgedBy", Int32)
+			Required("id", "acknowledgedBy")
+		})
 
 		Result(ModerationRequest)
 

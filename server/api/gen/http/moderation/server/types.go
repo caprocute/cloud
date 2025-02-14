@@ -22,7 +22,7 @@ type AddRequestBody struct {
 // AcknowledgeRequestBody is the type of the "moderation" service "acknowledge"
 // endpoint HTTP request body.
 type AcknowledgeRequestBody struct {
-	ID             *int   `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	ID             *int32 `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
 	AcknowledgedBy *int32 `form:"acknowledgedBy,omitempty" json:"acknowledgedBy,omitempty" xml:"acknowledgedBy,omitempty"`
 }
 

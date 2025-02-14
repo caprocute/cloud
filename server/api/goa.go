@@ -264,6 +264,7 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	oidcServer := oidcServiceSvr.New(oidcEndpoints, mux, dec, enc, eh, nil)
 	ttnServer := ttnServiceSvr.New(ttnEndpoints, mux, dec, enc, eh, nil)
 	adminServer := adminServiceSvr.New(adminEndpoints, mux, dec, enc, eh, nil)
+	moderationServer := moderationServiceSvr.New(moderationEndpoints, mux, dec, enc, eh, nil)
 
 	upgrader := &websocket.Upgrader{}
 	upgrader.CheckOrigin = func(r *http.Request) bool {
