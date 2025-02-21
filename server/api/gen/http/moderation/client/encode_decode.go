@@ -61,6 +61,12 @@ func EncodeAddRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Re
 // DecodeAddResponse returns a decoder for responses returned by the moderation
 // add endpoint. restoreBody controls whether the response body should be
 // restored after having been read.
+// DecodeAddResponse may return the following errors:
+//   - "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//   - "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//   - "not-found" (type *goa.ServiceError): http.StatusNotFound
+//   - "bad-request" (type *goa.ServiceError): http.StatusBadRequest
+//   - error: internal error
 func DecodeAddResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
 		if restoreBody {
@@ -91,6 +97,62 @@ func DecodeAddResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody
 			}
 			res := NewAddModerationRequestOK(&body)
 			return res, nil
+		case http.StatusUnauthorized:
+			var (
+				body AddUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("moderation", "add", err)
+			}
+			err = ValidateAddUnauthorizedResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("moderation", "add", err)
+			}
+			return nil, NewAddUnauthorized(&body)
+		case http.StatusForbidden:
+			var (
+				body AddForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("moderation", "add", err)
+			}
+			err = ValidateAddForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("moderation", "add", err)
+			}
+			return nil, NewAddForbidden(&body)
+		case http.StatusNotFound:
+			var (
+				body AddNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("moderation", "add", err)
+			}
+			err = ValidateAddNotFoundResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("moderation", "add", err)
+			}
+			return nil, NewAddNotFound(&body)
+		case http.StatusBadRequest:
+			var (
+				body AddBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("moderation", "add", err)
+			}
+			err = ValidateAddBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("moderation", "add", err)
+			}
+			return nil, NewAddBadRequest(&body)
 		default:
 			body, _ := ioutil.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("moderation", "add", resp.StatusCode, string(body))
@@ -140,6 +202,12 @@ func EncodeAcknowledgeRequest(encoder func(*http.Request) goahttp.Encoder) func(
 // DecodeAcknowledgeResponse returns a decoder for responses returned by the
 // moderation acknowledge endpoint. restoreBody controls whether the response
 // body should be restored after having been read.
+// DecodeAcknowledgeResponse may return the following errors:
+//   - "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//   - "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//   - "not-found" (type *goa.ServiceError): http.StatusNotFound
+//   - "bad-request" (type *goa.ServiceError): http.StatusBadRequest
+//   - error: internal error
 func DecodeAcknowledgeResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
 	return func(resp *http.Response) (interface{}, error) {
 		if restoreBody {
@@ -170,6 +238,62 @@ func DecodeAcknowledgeResponse(decoder func(*http.Response) goahttp.Decoder, res
 			}
 			res := NewAcknowledgeModerationRequestOK(&body)
 			return res, nil
+		case http.StatusUnauthorized:
+			var (
+				body AcknowledgeUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("moderation", "acknowledge", err)
+			}
+			err = ValidateAcknowledgeUnauthorizedResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("moderation", "acknowledge", err)
+			}
+			return nil, NewAcknowledgeUnauthorized(&body)
+		case http.StatusForbidden:
+			var (
+				body AcknowledgeForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("moderation", "acknowledge", err)
+			}
+			err = ValidateAcknowledgeForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("moderation", "acknowledge", err)
+			}
+			return nil, NewAcknowledgeForbidden(&body)
+		case http.StatusNotFound:
+			var (
+				body AcknowledgeNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("moderation", "acknowledge", err)
+			}
+			err = ValidateAcknowledgeNotFoundResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("moderation", "acknowledge", err)
+			}
+			return nil, NewAcknowledgeNotFound(&body)
+		case http.StatusBadRequest:
+			var (
+				body AcknowledgeBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("moderation", "acknowledge", err)
+			}
+			err = ValidateAcknowledgeBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("moderation", "acknowledge", err)
+			}
+			return nil, NewAcknowledgeBadRequest(&body)
 		default:
 			body, _ := ioutil.ReadAll(resp.Body)
 			return nil, goahttp.ErrInvalidResponse("moderation", "acknowledge", resp.StatusCode, string(body))

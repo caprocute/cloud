@@ -22,7 +22,7 @@ func BuildAddPayload(moderationAddBody string, moderationAddAuth string) (*moder
 	{
 		err = json.Unmarshal([]byte(moderationAddBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"postId\": 1471969242,\n      \"postType\": \"Amet cupiditate et quia quaerat magnam.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"postId\": 633512197,\n      \"postType\": \"Praesentium libero.\"\n   }'")
 		}
 	}
 	var auth *string
@@ -48,7 +48,7 @@ func BuildAcknowledgePayload(moderationAcknowledgeBody string, moderationAcknowl
 	{
 		err = json.Unmarshal([]byte(moderationAcknowledgeBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"acknowledgedBy\": 584479908,\n      \"id\": 1130606972\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"acknowledgedBy\": 332309470,\n      \"id\": 1595984137\n   }'")
 		}
 	}
 	var auth *string

@@ -57,4 +57,6 @@ var _ = Service("moderation", func() {
 			httpAuthentication()
 		})
 	})
+
+	commonOptions()
 })
