@@ -32,6 +32,7 @@ fi
 psql -h $DB_HOST -p $DB_PORT -U $DB_USER postgres -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = 'fieldkit';"
 psql -h $DB_HOST -p $DB_PORT -U $DB_USER postgres -c "DROP DATABASE fieldkit;" || true
 psql -h $DB_HOST -p $DB_PORT -U $DB_USER postgres -c "CREATE DATABASE fieldkit;"
+psql -h $DB_HOST -p $DB_PORT -U $DB_USER postgres -c 'ALTER DATABASE "fieldkit" SET search_path TO "\$user", fieldkit, public;'
 
 if [ "${sql_file: -4}" == ".bz2" ]; then
 	bunzip2 -c $sql_file | psql -h $DB_HOST -p $DB_PORT -U $DB_USER fieldkit
