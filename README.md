@@ -161,6 +161,4 @@ yarn serve
   - This will occur if `portal/src/secrets.ts` does not exist. `@` is set up as an alias for `src` within the portal project.  
 ```
 
-This should give you a nicely formatted README.md on GitHub with all the instructions and references intact. Adjustments might be needed depending on the specific layout you had in mind or the specifics of the project.
-
-*EOF*
+If you run into this, copy `/portal/src/secets.ts.template` to `portal/src/secrets.ts`.

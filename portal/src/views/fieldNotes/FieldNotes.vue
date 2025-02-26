@@ -3,7 +3,7 @@
         <header class="header" :class="{ 'no-border': !user }">
             <div class="name">{{ $t("fieldNotes.title") }}</div>
             <div class="buttons" v-if="isAuthenticated">
-                <button class="button" @click="generatePDF">
+                <button :class="{ disabled: isLoading || !groupedFieldNotes }" class="button" @click="generatePDF">
                     <i class="icon icon-export"></i>
                     {{ $t("fieldNotes.btnExport") }}
                 </button>
@@ -45,7 +45,7 @@
 
         <div v-if="errorMessage" class="error">{{ errorMessage }}</div>
 
-        <div v-if="!isLoading && !groupedFieldNotes">{{ $tc("fieldNotes.noData") }}</div>
+        <div v-if="!isLoading && !groupedFieldNotes" class="no-field-notes-msg">{{ $tc("fieldNotes.noData") }}</div>
         <div v-if="isLoading">{{ $tc("fieldNotes.loading") }}</div>
 
         <div class="field-note-list" v-if="groupedFieldNotes" ref="pdfContent">
@@ -151,7 +151,7 @@ export default Vue.extend({
             return this.$state.fieldNotes.fieldNotes;
         },
         stationId(): number {
-            return parseInt(this.$route.params.stationId, 10);
+            return parseInt(this.$route.params.stationId ?? this.$route.params.id, 10);
         },
     },
     data(): {
@@ -179,6 +179,9 @@ export default Vue.extend({
     watch: {
         fieldNotes() {
             this.groupByMonth();
+        },
+        stationName(newStationName) {
+            this.$store.dispatch(ActionTypes.NEED_FIELD_NOTES, { id: this.stationId });
         },
     },
     methods: {

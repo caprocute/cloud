@@ -2,7 +2,9 @@ import _ from "lodash";
 import { ChartSettings, SeriesData } from "./SpecFactory";
 import { TimeRange } from "../common";
 import { VisualizationSpec } from "vega-embed";
-import { Spec, Mark } from "vega";
+import {Spec, Mark, Locale} from "vega";
+import {vegaEsLocale} from '@/locales/es/vega';
+import {Locales} from '@/views/shared/LanguageSelector.vue';
 
 export { ChartSettings };
 
@@ -13,6 +15,14 @@ export class ScrubberSpecFactory {
         // TODO Would love to pull this type in but we'd have to move to common or create a new type.
         private readonly dataEvents: any[] = []
     ) {}
+
+    private getLocaleConfig(): Locale | undefined {
+        const localeKey = localStorage.getItem('locale');
+        if (localeKey === Locales.esEs) {
+            return vegaEsLocale as Locale;
+        }
+        return undefined;
+    }
 
     create(): VisualizationSpec {
         const first = this.allSeries[0]; // TODO
@@ -135,6 +145,13 @@ export class ScrubberSpecFactory {
             ];
         };
 
+        const localeKey = localStorage.getItem('locale');
+        let localeConfig: Locale | undefined;
+
+        if (localeKey === Locales.esEs) {
+            localeConfig = vegaEsLocale as Locale;
+        }
+
         return {
             $schema: "https://vega.github.io/schema/vega/v5.json",
             description: "FK Scrubber Spec",
@@ -146,6 +163,7 @@ export class ScrubberSpecFactory {
             height: 50,
             style: "cell",
             config: {
+                locale: this.getLocaleConfig(),
                 axis: {
                     labelFont: "Avenir Light",
                     labelFontSize: 12,

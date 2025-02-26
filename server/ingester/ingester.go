@@ -71,6 +71,7 @@ func NewIngesterHandler(ctx context.Context, o *IngesterOptions) http.Handler {
 
 		headers, err := newIncomingHeaders(req)
 		if err != nil {
+			log.Errorw("invalid headers", "error", err)
 			if err := writeInvalidHeaders(ctx, w, req); err != nil {
 				return err
 			}

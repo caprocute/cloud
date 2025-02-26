@@ -2,6 +2,7 @@ import _ from "lodash";
 import { ChartSettings, DataRow, SeriesData, getSeriesThresholds, getAxisLabel } from "./SpecFactory";
 import chartStyles from "./chartStyles";
 import { makeRange, truncateTime, addDays, addSeconds } from "../common";
+import i18n from '../i18n-charts';
 
 export interface TimeSeriesDataRow extends DataRow {
     gap: number;
@@ -158,8 +159,7 @@ export class TimeSeriesSpecFactory {
         const sameSensorUnits = uniqueSensorUnits.length == 1 && this.allSeries.length > 1;
         const yDomainsAll = this.allSeries.map((series, i: number) => makeSeriesDomain(series, i));
         const dataRangeAll = [_.min(yDomainsAll.map((dr: number[]) => dr[0])), _.max(yDomainsAll.map((dr: number[]) => dr[1]))];
-
-        const timeLabel = "Time (" + Intl.DateTimeFormat().resolvedOptions().timeZone + ")";
+        const timeLabel = i18n.timeSeriesXAxisLabel();
 
         const makeDomainY = _.memoize((i: number, series) => {
             if (sameSensorUnits) {

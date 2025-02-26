@@ -2,7 +2,7 @@
     <div v-if="loading" class="station-photo loading-container">
         <Spinner class="spinner" />
     </div>
-    <img v-else-if="station.photos && photo" :src="photo" class="station-photo photo"  :alt="$t('station.photo.alt')" />
+    <img v-else-if="station.photos && photo" :src="photo" class="station-photo photo" :alt="$t('station.photo.alt')" />
     <img
         v-else
         :src="$loadAsset(interpolatePartner('station-image-placeholder-') + '.png')"
@@ -27,6 +27,10 @@ export default Vue.extend({
             type: Object as PropType<DisplayStation>,
             required: true,
         },
+        size: {
+            type: Number,
+            default: 125,
+        },
     },
     data(): {
         photo: unknown | null;
@@ -49,9 +53,11 @@ export default Vue.extend({
         async refresh(): Promise<void> {
             // console.log(`loading-photo:`, this.station);
             if (this.station.photos) {
+                const isRetinaDisplay = window.devicePixelRatio > 1;
+                const photoSize = isRetinaDisplay ? this.size * 2 : this.size;
                 this.loading = true;
                 try {
-                    const photo = await this.$services.api.loadMedia(this.station.photos.small);
+                    const photo = await this.$services.api.loadMedia(this.station.photos.small, { size: photoSize });
                     this.photo = photo;
                 } finally {
                     this.loading = false;

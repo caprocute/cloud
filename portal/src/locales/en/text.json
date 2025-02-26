@@ -56,6 +56,7 @@
     "random.random_7": "Random 7",
     "random.random_8": "Random 8",
     "random.random_9": "Random 9",
+    "fk.modules.unknown": "Unknown",
     "layout": {
         "logo": {
             "fieldkit": {
@@ -662,6 +663,19 @@
         },
         "legend": {
             "noData": "No Data or Inactive"
+        },
+        "header": {
+            "title": "Stations",
+            "subtitle": "Explore station data",
+            "viewProjectDashboard": "View Project Dashboard"
+        },
+        "sidebar": {
+            "viewing": {
+                "heading": "Viewing {stationsLength} Station(s)",
+                "noStationsOnMap": "No results based on map view",
+                "updateMapCheckbox": "Update results based on map view",
+                "exploreBtn": "Explore All Data"
+            }
         }
     },
     "confirmDeletePhoto": "Are you sure you want to delete this photo?",
@@ -687,6 +701,8 @@
         "noSensors": "Oh snap, this station doesn't appear to have any sensors to show you.",
         "nothingSelected": "Nothing selected to visualize, please choose a station or project from the left.",
         "saveAs": "Save As",
+        "saveAsPng": "Save as PNG",
+        "saveAsSvg": "Save as SVG",
         "chartTypes": {
             "timeSeries": "Time Series",
             "bar": "Bar",
@@ -705,7 +721,8 @@
         "stationTree": {
             "add": "Add",
             "remove": "Remove"
-        }
+        },
+        "timeSeriesXAxisLabel": "Time ({timeZone})"
     },
     "edit": "Edit",
     "save": "Save",
@@ -827,5 +844,12 @@
         "warning": "Warning, continuing will delete your account and all associated data. To confirm, please enter your email address.",
         "done": "Your account has been deleted.",
         "sameEmail": "Does not match your email."
+    },
+    "stationsMapSummary": {
+        "tabs": {
+            "explore": "Explore Data",
+            "notes": "Field Notes",
+            "details": "Station Details"
+        }
     }
 }

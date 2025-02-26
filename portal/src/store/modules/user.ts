@@ -20,6 +20,9 @@ const getters = {
     isTncValid: (state: UserState) => {
         return state?.user?.tncDate != undefined && state.user.tncDate >= Config.tncDate;
     },
+    isAdmin: (state: UserState) => {
+        return state.user?.admin;
+    },
 };
 
 type ActionParameters = { commit: any; dispatch: any; state: UserState };

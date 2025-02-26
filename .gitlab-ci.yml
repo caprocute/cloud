@@ -5,7 +5,7 @@ stages:
   - db
 
 variables:
-  VERSION: 0.3.61
+  VERSION: 0.3.65
 
 test:go:
   stage: test
@@ -43,6 +43,19 @@ test:js:
     - cp src/secrets.ts.template src/secrets.ts
     - node_modules/.bin/vue-cli-service build
     - node_modules/.bin/vue-cli-service test:unit
+
+test:charting:
+  stage: test
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_COMMIT_TAG
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_BRANCH == "main"
+  image: node:18.17.0
+  script:
+    - cd charting && which node && which npm
+    - npm install
+    - node_modules/.bin/tsc -esModuleInterop -t es5 server.ts
 
 test:cypress:
   stage: test
@@ -182,7 +195,24 @@ db:primary:prod:clone:
   script:
     - cd tools
     - docker build -t conservify/fk-cloud-tools:latest .
-    - docker run -e DEPLOY_HOST=${DEPLOY_HOST} -e SYNC_COPY_TARGET_DBS=${SYNC_COPY_TARGET_DBS} -e SYNC_COPY_TARGET_DBS_PATH=${SYNC_COPY_TARGET_DBS_PATH} -e CI_JOB_TOKEN=${CI_JOB_TOKEN} -e CI_PROJECT_ID=${CI_PROJECT_ID} -e DATABASE=${DATABASE} conservify/fk-cloud-tools /work/db-clone.sh
+    - docker run -e DEPLOY_HOST=${DEPLOY_HOST} -e SYNC_COPY_TARGET_DBS=${SYNC_COPY_TARGET_DBS} -e SYNC_COPY_TARGET_DBS_PATH=${SYNC_COPY_TARGET_DBS_PATH} -e CI_JOB_TOKEN=${CI_JOB_TOKEN} -e CI_PROJECT_ID=${CI_PROJECT_ID} -e DATABASE=${DATABASE} -e TABLES=required conservify/fk-cloud-tools /work/db-clone.sh
+
+db:primary:prod:clone-all:
+  stage: db
+  image: docker:24.0.5
+  when: manual
+  timeout: 3h
+  services:
+    - name: docker:24.0.5-dind
+      alias: docker
+  variables:
+    DOCKER_HOST: tcp://docker:2375/
+    DOCKER_TLS_CERTDIR: ""
+    DATABASE: primary
+  script:
+    - cd tools
+    - docker build -t conservify/fk-cloud-tools:latest .
+    - docker run -e DEPLOY_HOST=${DEPLOY_HOST} -e SYNC_COPY_TARGET_DBS=${SYNC_COPY_TARGET_DBS} -e SYNC_COPY_TARGET_DBS_PATH=${SYNC_COPY_TARGET_DBS_PATH} -e CI_JOB_TOKEN=${CI_JOB_TOKEN} -e CI_PROJECT_ID=${CI_PROJECT_ID} -e DATABASE=${DATABASE} -e TABLES=all conservify/fk-cloud-tools /work/db-clone.sh
 
 db:ts:prod:clone:
   stage: db
@@ -199,7 +229,7 @@ db:ts:prod:clone:
   script:
     - cd tools
     - docker build -t conservify/fk-cloud-tools:latest .
-    - docker run -e DEPLOY_HOST=${DEPLOY_HOST} -e SYNC_COPY_TARGET_DBS=${SYNC_COPY_TARGET_DBS} -e SYNC_COPY_TARGET_DBS_PATH=${SYNC_COPY_TARGET_DBS_PATH} -e CI_JOB_TOKEN=${CI_JOB_TOKEN} -e CI_PROJECT_ID=${CI_PROJECT_ID} -e DATABASE=${DATABASE} conservify/fk-cloud-tools /work/db-clone.sh
+    - docker run -e DEPLOY_HOST=${DEPLOY_HOST} -e SYNC_COPY_TARGET_DBS=${SYNC_COPY_TARGET_DBS} -e SYNC_COPY_TARGET_DBS_PATH=${SYNC_COPY_TARGET_DBS_PATH} -e CI_JOB_TOKEN=${CI_JOB_TOKEN} -e CI_PROJECT_ID=${CI_PROJECT_ID} -e DATABASE=${DATABASE} -e TABLES=all conservify/fk-cloud-tools /work/db-clone.sh
 
 db:primary:dev:restore:
   stage: db
