@@ -8,6 +8,9 @@
 package client
 
 import (
+	"fmt"
+	"strconv"
+
 	admin "gitlab.com/fieldkit/cloud/server/api/gen/admin"
 )
 
@@ -19,6 +22,33 @@ func BuildHealthEndpointPayload(adminHealthAuth string) (*admin.HealthPayload, e
 		auth = adminHealthAuth
 	}
 	v := &admin.HealthPayload{}
+	v.Auth = auth
+
+	return v, nil
+}
+
+// BuildUploadBackupPayload builds the payload for the admin upload backup
+// endpoint from CLI flags.
+func BuildUploadBackupPayload(adminUploadBackupContentType string, adminUploadBackupContentLength string, adminUploadBackupAuth string) (*admin.UploadBackupPayload, error) {
+	var err error
+	var contentType string
+	{
+		contentType = adminUploadBackupContentType
+	}
+	var contentLength int64
+	{
+		contentLength, err = strconv.ParseInt(adminUploadBackupContentLength, 10, 64)
+		if err != nil {
+			return nil, fmt.Errorf("invalid value for contentLength, must be INT64")
+		}
+	}
+	var auth string
+	{
+		auth = adminUploadBackupAuth
+	}
+	v := &admin.UploadBackupPayload{}
+	v.ContentType = contentType
+	v.ContentLength = contentLength
 	v.Auth = auth
 
 	return v, nil

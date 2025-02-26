@@ -11,3 +11,8 @@ package server
 func HealthEndpointAdminPath() string {
 	return "/admin/health"
 }
+
+// UploadBackupAdminPath returns the URL path to the admin service upload backup HTTP endpoint.
+func UploadBackupAdminPath() string {
+	return "/admin/backup"
+}

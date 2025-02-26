@@ -1,293 +1,150 @@
 package main
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"flag"
 	"fmt"
-	"math"
-	"time"
+	"io/ioutil"
+	"log"
+	"net/http"
+	"os"
 
-	"github.com/kelseyhightower/envconfig"
-
-	_ "github.com/lib/pq"
-
-	"github.com/hashicorp/go-multierror"
-
-	"gitlab.com/fieldkit/cloud/server/common/sqlxcache"
-
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials"
-	"github.com/aws/aws-sdk-go/aws/session"
-
-	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/vgarvardt/gue/v4"
-	"github.com/vgarvardt/gue/v4/adapter/pgxv5"
-
-	"gitlab.com/fieldkit/cloud/server/backend"
-	"gitlab.com/fieldkit/cloud/server/common/errors"
-	"gitlab.com/fieldkit/cloud/server/common/jobs"
-	"gitlab.com/fieldkit/cloud/server/common/logging"
-	"gitlab.com/fieldkit/cloud/server/files"
-	"gitlab.com/fieldkit/cloud/server/messages"
-	"gitlab.com/fieldkit/cloud/server/storage"
+	backend "gitlab.com/fieldkit/cloud/server/backend"
 )
 
-const SecondsPerWeek = int64(60 * 60 * 24 * 7)
-
 type Options struct {
-	StationID int
-	Ingestion bool
-	Aggregate bool
-	All       bool
-	Recently  bool
-	Fake      bool
-}
-
-type Config struct {
-	PostgresURL  string `split_words:"true" default:"postgres://localhost/fieldkit?sslmode=disable" required:"true"`
-	TimeScaleURL string `split_words:"true"`
-
-	AwsProfile string `envconfig:"aws_profile" default:"fieldkit" required:"true"`
-	AwsId      string `split_words:"true" default:""`
-	AwsSecret  string `split_words:"true" default:""`
-
-	MediaBuckets   []string `split_words:"true" default:""`
-	StreamsBuckets []string `split_words:"true" default:""`
-}
-
-func (c *Config) timeScaleConfig() *storage.TimeScaleDBConfig {
-	if c.TimeScaleURL != "" {
-		return &storage.TimeScaleDBConfig{
-			Url: c.TimeScaleURL,
-		}
-	}
-	return nil
-}
-
-func fail(ctx context.Context, err error) {
-	log := logging.Logger(ctx).Sugar()
-	if se, ok := err.(errors.StructuredError); ok {
-		fmt.Printf("%v\n", se)
-	}
-	log.Errorw("error", "error", err)
-	panic(err)
-}
-
-func getAwsSessionOptions(ctx context.Context, config *Config) session.Options {
-	log := logging.Logger(ctx).Sugar()
-
-	if config.AwsId == "" || config.AwsSecret == "" {
-		log.Infow("using aws profile")
-		return session.Options{
-			Profile: config.AwsProfile,
-			Config: aws.Config{
-				Region:                        aws.String("us-east-1"),
-				CredentialsChainVerboseErrors: aws.Bool(true),
-			},
-		}
-	}
-	log.Infow("using aws credentials")
-	return session.Options{
-		Profile: config.AwsProfile,
-		Config: aws.Config{
-			Region:                        aws.String("us-east-1"),
-			Credentials:                   credentials.NewStaticCredentials(config.AwsId, config.AwsSecret, ""),
-			CredentialsChainVerboseErrors: aws.Bool(true),
-		},
-	}
+	File   string
+	Portal string
 }
 
 func main() {
 	ctx := context.Background()
 
-	options := &Options{}
-
-	flag.IntVar(&options.StationID, "station-id", 0, "station id")
-	flag.BoolVar(&options.Ingestion, "ingestion", false, "ingestion")
-	flag.BoolVar(&options.Aggregate, "aggregate", false, "aggregate")
-	flag.BoolVar(&options.All, "all", false, "all stations")
-	flag.BoolVar(&options.Fake, "fake", false, "create a fake data")
-	flag.BoolVar(&options.Recently, "recently", false, "recently inserted data")
-
+	options := Options{}
+	flag.StringVar(&options.File, "file", "", "fkpb file")
+	flag.StringVar(&options.Portal, "portal", "", "portal url")
 	flag.Parse()
 
-	config := &Config{}
-	if err := envconfig.Process("FIELDKIT", config); err != nil {
-		fail(ctx, err)
-	}
-
-	db, err := sqlxcache.Open(ctx, "postgres", config.PostgresURL)
-	if err != nil {
-		fail(ctx, err)
-	}
-
-	logging.Configure(false, "fkdata")
-
-	log := logging.Logger(ctx).Sugar()
-
-	tsConfig := config.timeScaleConfig()
-
-	var errors *multierror.Error
-
-	if options.Ingestion {
-		awsSessionOptions := getAwsSessionOptions(ctx, config)
-
-		awsSession, err := session.NewSessionWithOptions(awsSessionOptions)
-		if err != nil {
-			fail(ctx, err)
-		}
-
-		metrics := logging.NewMetrics(ctx, &logging.MetricsSettings{
-			Prefix:  "fk.service",
-			Address: "",
-		})
-
-		reading := make([]files.FileArchive, 0)
-		writing := make([]files.FileArchive, 0)
-
-		fs := files.NewLocalFilesArchive()
-		reading = append(reading, fs)
-		writing = append(writing, fs)
-
-		for _, bucketName := range config.StreamsBuckets {
-			s3, err := files.NewS3FileArchive(awsSession, metrics, bucketName, files.NoPrefix)
-			if err != nil {
-				fail(ctx, err)
-			}
-
-			reading = append(reading, s3)
-		}
-
-		pgxcfg, err := pgxpool.ParseConfig(config.PostgresURL)
-		if err != nil {
-			fail(ctx, err)
-		}
-
-		pgxpool, err := pgxpool.NewWithConfig(ctx, pgxcfg)
-		if err != nil {
-			fail(ctx, err)
-		}
-
-		fa := files.NewPrioritizedFilesArchive(reading, writing)
-
-		qc, err := gue.NewClient(pgxv5.NewConnPool(pgxpool))
-		if err != nil {
-			fail(ctx, err)
-		}
-		publisher := jobs.NewQueMessagePublisher(metrics, pgxpool, qc)
-		mc := jobs.NewMessageContext(publisher, nil)
-		isHandler := backend.NewIngestStationHandler(db, pgxpool, fa, metrics, publisher, tsConfig)
-
-		process := func(ctx context.Context, id int32) error {
-			return isHandler.Start(ctx, &messages.IngestStation{
-				StationID: id,
-				UserID:    2, // Jacob
-				Verbose:   true,
-			}, mc)
-		}
-
-		if options.All {
-			ids := []*IDRow{}
-			if err := db.SelectContext(ctx, &ids, `SELECT id FROM fieldkit.station`); err != nil {
-				fail(ctx, err)
-			}
-
-			for _, id := range ids {
-				log.Infow("station", "station_id", id.ID)
-				err := process(ctx, int32(id.ID))
-				if err != nil {
-					errors = multierror.Append(errors, err)
-				}
-			}
-		} else {
-			err := process(ctx, int32(options.StationID))
-			if err != nil {
-				errors = multierror.Append(errors, err)
-			}
-		}
-
-		if errors.ErrorOrNil() != nil {
-			fail(ctx, errors.ErrorOrNil())
-		}
-
+	if options.File == "" {
+		flag.Usage()
 		return
 	}
 
-	if options.Aggregate {
-		if options.All {
-			ids := []*IDRow{}
-			if err := db.SelectContext(ctx, &ids, `SELECT id FROM fieldkit.station`); err != nil {
-				fail(ctx, err)
-			} else {
-				for _, id := range ids {
-					log.Infow("station", "station_id", id.ID)
-					if err := processStation(ctx, db, tsConfig, int32(id.ID), options.Recently); err != nil {
-						errors = multierror.Append(errors, err)
-					}
-				}
-			}
-		} else {
-			if options.StationID > 0 {
-				if err := processStation(ctx, db, tsConfig, int32(options.StationID), options.Recently); err != nil {
-					errors = multierror.Append(errors, err)
-				}
-			}
+	if options.Portal == "" {
+		ms, err := backend.ExtractMeta(ctx, options.File)
+		if err != nil {
+			log.Fatalf("Error: %v", err)
 		}
-	}
 
-	if errors.ErrorOrNil() != nil {
-		fail(ctx, errors.ErrorOrNil())
+		if err := ms.Valid(); err != nil {
+			log.Fatalf("Error: %v", err)
+		}
+	} else {
+		credentials, err := CredentialsFromEnv()
+		if err != nil {
+			log.Fatalf("Error: %v", err)
+		}
+
+		if err := Upload(ctx, options.Portal, credentials, options.File); err != nil {
+			log.Fatalf("Error: %v", err)
+		}
 	}
 }
 
-func processStation(ctx context.Context, db *sqlxcache.DB, tsConfig *storage.TimeScaleDBConfig, stationID int32, recently bool) error {
-	sr, err := backend.NewStationRefresher(db, tsConfig, "")
+type Credentials struct {
+	Email    string
+	Password string
+}
+
+func CredentialsFromEnv() (*Credentials, error) {
+	email := os.Getenv("FIELDKIT_EMAIL")
+	if email == "" {
+		return nil, fmt.Errorf("FIELDKIT_EMAIL missing")
+	}
+
+	password := os.Getenv("FIELDKIT_PASSWORD")
+	if password == "" {
+		return nil, fmt.Errorf("FIELDKIT_PASSWORD missing")
+	}
+
+	return &Credentials{
+		Email:    email,
+		Password: password,
+	}, nil
+}
+
+func Upload(ctx context.Context, url string, credentials *Credentials, path string) error {
+	fkc := NewFkClient(url)
+
+	token, err := fkc.Login(ctx, credentials.Email, credentials.Password)
 	if err != nil {
 		return err
 	}
 
-	if recently {
-		if err := sr.Refresh(ctx, stationID, time.Hour*48, false, false); err != nil {
-			return fmt.Errorf("recently refresh failed: %w", err)
-		}
-	} else {
-		if err := sr.Refresh(ctx, stationID, 0, true, false); err != nil {
-			return fmt.Errorf("complete refresh failed: %w", err)
-		}
+	_, err = backend.UploadWithToken(ctx, url, token, path)
+	if err != nil {
+		return err
 	}
 
 	return nil
 }
 
-type SampleFunc func(t time.Time) float64
-
-type IDRow struct {
-	ID int64 `db:"id"`
+type FkClient struct {
+	base string
+	http *http.Client
+	auth string
 }
 
-type RandomLocation struct {
-	Coords []float64
-}
-
-func NewRandomLocation() (rl *RandomLocation) {
-	return &RandomLocation{
-		Coords: []float64{},
+func NewFkClient(base string) (fkc *FkClient) {
+	return &FkClient{
+		base: base,
+		http: http.DefaultClient,
 	}
 }
 
-func (rl *RandomLocation) Move(t time.Time) {
-	period := SecondsPerWeek * 4
-	scaled := float64(t.Unix()%period) / float64(period)
-	radians := scaled * math.Pi * 2
-	x := math.Sin(radians)
-	y := math.Cos(radians)
-
-	center := []float64{-115.4093893, 35.0691767}
-	radius := float64(1 / 100.0)
-	coords := []float64{
-		center[0] + y*radius,
-		center[1] + x*radius,
-		0,
+func (fkc *FkClient) Login(ctx context.Context, email, password string) (string, error) {
+	type LoginPayload struct {
+		Email    string `json:"email"`
+		Password string `json:"password"`
 	}
-	rl.Coords = coords
+
+	payload := &LoginPayload{
+		Email:    email,
+		Password: password,
+	}
+
+	requestBody, err := json.Marshal(payload)
+	if err != nil {
+		return "", err
+	}
+
+	url := fmt.Sprintf("%s/login", fkc.base)
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestBody))
+	if err != nil {
+		return "", err
+	}
+
+	response, err := fkc.http.Do(req)
+	if err != nil {
+		return "", err
+	}
+
+	defer response.Body.Close()
+
+	if response.StatusCode != http.StatusNoContent {
+		return "", fmt.Errorf("invalid username or password")
+	}
+
+	body, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return "", err
+	}
+
+	fkc.auth = response.Header.Get("Authorization")
+
+	_ = body
+
+	return fkc.auth, nil
 }
