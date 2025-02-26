@@ -176,6 +176,10 @@ func (h *IngestStationHandler) markCompleted(ctx context.Context, mc *jobs.Messa
 				return nil, err
 			}
 
+			if err := mc.Event(ctx, &messages.RefreshAllMaterializedViews{}); err != nil {
+				return nil, err
+			}
+
 			return nil, nil
 		} else if saga.HasMoreIngestions() {
 			ingestionID := saga.NextIngestionID()
