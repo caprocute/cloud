@@ -33,6 +33,7 @@ export interface VizConfig {
     disabled: boolean;
     thresholds: VizThresholds;
     minimumGap: number | undefined;
+    barChart: boolean;
 }
 
 export type SensorStrings = { [index: string]: Record<string, string> };
