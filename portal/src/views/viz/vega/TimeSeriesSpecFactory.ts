@@ -43,7 +43,21 @@ export class TimeSeriesSpecFactory {
         };
 
         const isBarChart = (series: SeriesData): boolean => {
-            return series.vizInfo.viz.length == 1;
+            const timeSeries = series.vizInfo.viz.filter((v) => v.name == "D3TimeSeriesGraph");
+            if (timeSeries.filter((v) => v.barChart).length > 0) {
+                return true;
+            }
+
+            // The old test just looked for a viz array of length 1, which
+            // confused me when I tried adding other settings and ended up seeing a bar chart.
+            // After looking at the data, there's only one sensor that this would have affected
+            // and it uses this name. So this is here for backwards compatibility and cab be
+            // removed once the data is updated to reflect the above.
+            if (series.vizInfo.viz.filter((v) => v.name == "TimeSeriesChart").length == 1) {
+                return true;
+            }
+
+            return false;
         };
 
         const solidColors = true;
