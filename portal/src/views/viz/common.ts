@@ -416,3 +416,27 @@ export class SeriesData {
 export class ExploreContext {
     constructor(public readonly project: number | null = null, public readonly map = false) {}
 }
+
+// Add gap information so we can determine where missing data lies.
+export function addGaps(rows) {
+    for (let i = 0; i < rows.length; ++i) {
+        if (i == rows.length - 1) {
+            rows[i].gap = 0;
+        } else {
+            rows[i].gap = (rows[i + 1].time - rows[i].time) / 1000;
+        }
+    }
+    return rows;
+}
+
+export function addMinimumGap(rows, maybeMinimumGap: number | null, bucketSize: number | null) {
+    if (!maybeMinimumGap || !bucketSize) {
+        return rows;
+    }
+
+    if (bucketSize > maybeMinimumGap) {
+        return rows.map((datum) => _.extend(datum, { minimumGap: bucketSize }));
+    }
+
+    return rows.map((datum) => _.extend(datum, { minimumGap: maybeMinimumGap }));
+}
