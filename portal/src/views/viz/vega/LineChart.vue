@@ -1,7 +1,10 @@
 <template>
     <div class="h-100">
         <ExportChartButton v-if="!settings.tiny" :vega="vega"></ExportChartButton>
-        <div ref="vegaContainer" class="viz linechart"></div>
+        <div ref="vegaContainer" class="viz linechart h-100"></div>
+        <div v-if="isLoading" class="loading-container">
+            <Spinner class="spinner" />
+        </div>
     </div>
 </template>
 
@@ -35,7 +38,8 @@ function roundForDisplay(value: number): number {
 export default Vue.extend({
     name: "LineChart",
     components: {
-        ExportChartButton,
+        Spinner,
+         ExportChartButton,
     },
     props: {
         series: {
@@ -97,7 +101,7 @@ export default Vue.extend({
                 downloadFileName: this.getFileName(this.series),
                 actions: false,
                 scaleFactor: 2,
-                padding: this.settings.mobile ? { left: 0, right: 10 } : { left: 10, right: 50 },
+                padding: this.settings.tiny ? undefined : this.settings.mobile ? { left: 0, right: 10 } : { left: 10, right: 50 },
             });
 
             this.vega = vegaInfo;
