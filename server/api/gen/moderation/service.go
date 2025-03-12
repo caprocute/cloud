@@ -10,6 +10,7 @@ package moderation
 import (
 	"context"
 
+	moderationviews "gitlab.com/fieldkit/cloud/server/api/gen/moderation/views"
 	goa "goa.design/goa/v3/pkg"
 	"goa.design/goa/v3/security"
 )
@@ -18,8 +19,12 @@ import (
 type Service interface {
 	// Add implements add.
 	Add(context.Context, *ModerationAddPayload) (res *ModerationRequest, err error)
-	// Acknowledge implements acknowledge.
+	// Acknowledge a moderation request with action
 	Acknowledge(context.Context, *AcknowledgePayload) (res *ModerationRequest, err error)
+	// List moderation requests
+	ListRequests(context.Context, *ListRequestsPayload) (res *ModerationRequests, err error)
+	// Get content for moderation review
+	GetContent(context.Context, *GetContentPayload) (res string, err error)
 }
 
 // Auther defines the authorization functions to be implemented by the service.
@@ -36,7 +41,7 @@ const ServiceName = "moderation"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [2]string{"add", "acknowledge"}
+var MethodNames = [4]string{"add", "acknowledge", "listRequests", "getContent"}
 
 // ModerationAddPayload is the payload type of the moderation service add
 // method.
@@ -48,21 +53,59 @@ type ModerationAddPayload struct {
 
 // ModerationRequest is the result type of the moderation service add method.
 type ModerationRequest struct {
-	ID             int32
-	PostID         int32
-	PostType       string
-	ReportedBy     int32
-	ReportedAt     string
-	AcknowledgedBy *int32
-	AcknowledgedAt *string
+	ID                 int32
+	PostID             int32
+	PostType           string
+	ReportedBy         int32
+	ReportedByName     *string
+	ReportedAt         string
+	AcknowledgedBy     *int32
+	AcknowledgedByUser *UserInfo
+	AcknowledgedAt     *string
 }
 
 // AcknowledgePayload is the payload type of the moderation service acknowledge
 // method.
 type AcknowledgePayload struct {
-	Auth           *string
-	ID             int32
-	AcknowledgedBy int32
+	// JWT token
+	Auth string
+	// Request ID
+	ID int32
+	// Action to take (delete/keep)
+	Action string
+}
+
+// ListRequestsPayload is the payload type of the moderation service
+// listRequests method.
+type ListRequestsPayload struct {
+	// JWT token
+	Auth string
+	// Page number
+	Page int32
+	// Page size
+	PageSize int32
+}
+
+// ModerationRequests is the result type of the moderation service listRequests
+// method.
+type ModerationRequests struct {
+	Requests   []*ModerationRequest
+	TotalPages int
+}
+
+// GetContentPayload is the payload type of the moderation service getContent
+// method.
+type GetContentPayload struct {
+	// JWT token
+	Auth string
+	// Type of post
+	PostType string
+	// ID of the post
+	PostID int32
+}
+
+type UserInfo struct {
+	Name string
 }
 
 // MakeUnauthorized builds a goa.ServiceError from an error.
@@ -99,4 +142,119 @@ func MakeBadRequest(err error) *goa.ServiceError {
 		ID:      goa.NewErrorID(),
 		Message: err.Error(),
 	}
+}
+
+// NewModerationRequests initializes result type ModerationRequests from viewed
+// result type ModerationRequests.
+func NewModerationRequests(vres *moderationviews.ModerationRequests) *ModerationRequests {
+	return newModerationRequests(vres.Projected)
+}
+
+// NewViewedModerationRequests initializes viewed result type
+// ModerationRequests from result type ModerationRequests using the given view.
+func NewViewedModerationRequests(res *ModerationRequests, view string) *moderationviews.ModerationRequests {
+	p := newModerationRequestsView(res)
+	return &moderationviews.ModerationRequests{Projected: p, View: "default"}
+}
+
+// newModerationRequests converts projected type ModerationRequests to service
+// type ModerationRequests.
+func newModerationRequests(vres *moderationviews.ModerationRequestsView) *ModerationRequests {
+	res := &ModerationRequests{}
+	if vres.TotalPages != nil {
+		res.TotalPages = *vres.TotalPages
+	}
+	if vres.Requests != nil {
+		res.Requests = make([]*ModerationRequest, len(vres.Requests))
+		for i, val := range vres.Requests {
+			res.Requests[i] = transformModerationviewsModerationRequestViewToModerationRequest(val)
+		}
+	}
+	return res
+}
+
+// newModerationRequestsView projects result type ModerationRequests to
+// projected type ModerationRequestsView using the "default" view.
+func newModerationRequestsView(res *ModerationRequests) *moderationviews.ModerationRequestsView {
+	vres := &moderationviews.ModerationRequestsView{
+		TotalPages: &res.TotalPages,
+	}
+	if res.Requests != nil {
+		vres.Requests = make([]*moderationviews.ModerationRequestView, len(res.Requests))
+		for i, val := range res.Requests {
+			vres.Requests[i] = transformModerationRequestToModerationviewsModerationRequestView(val)
+		}
+	}
+	return vres
+}
+
+// transformModerationviewsModerationRequestViewToModerationRequest builds a
+// value of type *ModerationRequest from a value of type
+// *moderationviews.ModerationRequestView.
+func transformModerationviewsModerationRequestViewToModerationRequest(v *moderationviews.ModerationRequestView) *ModerationRequest {
+	if v == nil {
+		return nil
+	}
+	res := &ModerationRequest{
+		ID:             *v.ID,
+		PostID:         *v.PostID,
+		PostType:       *v.PostType,
+		ReportedBy:     *v.ReportedBy,
+		ReportedByName: v.ReportedByName,
+		ReportedAt:     *v.ReportedAt,
+		AcknowledgedBy: v.AcknowledgedBy,
+		AcknowledgedAt: v.AcknowledgedAt,
+	}
+	if v.AcknowledgedByUser != nil {
+		res.AcknowledgedByUser = transformModerationviewsUserInfoViewToUserInfo(v.AcknowledgedByUser)
+	}
+
+	return res
+}
+
+// transformModerationviewsUserInfoViewToUserInfo builds a value of type
+// *UserInfo from a value of type *moderationviews.UserInfoView.
+func transformModerationviewsUserInfoViewToUserInfo(v *moderationviews.UserInfoView) *UserInfo {
+	if v == nil {
+		return nil
+	}
+	res := &UserInfo{
+		Name: *v.Name,
+	}
+
+	return res
+}
+
+// transformModerationRequestToModerationviewsModerationRequestView builds a
+// value of type *moderationviews.ModerationRequestView from a value of type
+// *ModerationRequest.
+func transformModerationRequestToModerationviewsModerationRequestView(v *ModerationRequest) *moderationviews.ModerationRequestView {
+	res := &moderationviews.ModerationRequestView{
+		ID:             &v.ID,
+		PostID:         &v.PostID,
+		PostType:       &v.PostType,
+		ReportedBy:     &v.ReportedBy,
+		ReportedByName: v.ReportedByName,
+		ReportedAt:     &v.ReportedAt,
+		AcknowledgedBy: v.AcknowledgedBy,
+		AcknowledgedAt: v.AcknowledgedAt,
+	}
+	if v.AcknowledgedByUser != nil {
+		res.AcknowledgedByUser = transformUserInfoToModerationviewsUserInfoView(v.AcknowledgedByUser)
+	}
+
+	return res
+}
+
+// transformUserInfoToModerationviewsUserInfoView builds a value of type
+// *moderationviews.UserInfoView from a value of type *UserInfo.
+func transformUserInfoToModerationviewsUserInfoView(v *UserInfo) *moderationviews.UserInfoView {
+	if v == nil {
+		return nil
+	}
+	res := &moderationviews.UserInfoView{
+		Name: &v.Name,
+	}
+
+	return res
 }

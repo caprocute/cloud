@@ -9,6 +9,7 @@ package client
 
 import (
 	moderation "gitlab.com/fieldkit/cloud/server/api/gen/moderation"
+	moderationviews "gitlab.com/fieldkit/cloud/server/api/gen/moderation/views"
 	goa "goa.design/goa/v3/pkg"
 )
 
@@ -19,35 +20,39 @@ type AddRequestBody struct {
 	PostType string `form:"postType" json:"postType" xml:"postType"`
 }
 
-// AcknowledgeRequestBody is the type of the "moderation" service "acknowledge"
-// endpoint HTTP request body.
-type AcknowledgeRequestBody struct {
-	ID             int32 `form:"id" json:"id" xml:"id"`
-	AcknowledgedBy int32 `form:"acknowledgedBy" json:"acknowledgedBy" xml:"acknowledgedBy"`
-}
-
 // AddResponseBody is the type of the "moderation" service "add" endpoint HTTP
 // response body.
 type AddResponseBody struct {
-	ID             *int32  `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
-	PostID         *int32  `form:"postId,omitempty" json:"postId,omitempty" xml:"postId,omitempty"`
-	PostType       *string `form:"postType,omitempty" json:"postType,omitempty" xml:"postType,omitempty"`
-	ReportedBy     *int32  `form:"reportedBy,omitempty" json:"reportedBy,omitempty" xml:"reportedBy,omitempty"`
-	ReportedAt     *string `form:"reportedAt,omitempty" json:"reportedAt,omitempty" xml:"reportedAt,omitempty"`
-	AcknowledgedBy *int32  `form:"acknowledgedBy,omitempty" json:"acknowledgedBy,omitempty" xml:"acknowledgedBy,omitempty"`
-	AcknowledgedAt *string `form:"acknowledgedAt,omitempty" json:"acknowledgedAt,omitempty" xml:"acknowledgedAt,omitempty"`
+	ID                 *int32                `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	PostID             *int32                `form:"postId,omitempty" json:"postId,omitempty" xml:"postId,omitempty"`
+	PostType           *string               `form:"postType,omitempty" json:"postType,omitempty" xml:"postType,omitempty"`
+	ReportedBy         *int32                `form:"reportedBy,omitempty" json:"reportedBy,omitempty" xml:"reportedBy,omitempty"`
+	ReportedByName     *string               `form:"reportedByName,omitempty" json:"reportedByName,omitempty" xml:"reportedByName,omitempty"`
+	ReportedAt         *string               `form:"reportedAt,omitempty" json:"reportedAt,omitempty" xml:"reportedAt,omitempty"`
+	AcknowledgedBy     *int32                `form:"acknowledgedBy,omitempty" json:"acknowledgedBy,omitempty" xml:"acknowledgedBy,omitempty"`
+	AcknowledgedByUser *UserInfoResponseBody `form:"acknowledgedByUser,omitempty" json:"acknowledgedByUser,omitempty" xml:"acknowledgedByUser,omitempty"`
+	AcknowledgedAt     *string               `form:"acknowledgedAt,omitempty" json:"acknowledgedAt,omitempty" xml:"acknowledgedAt,omitempty"`
 }
 
-// AcknowledgeResponseBody is the type of the "moderation" service
+// AcknowledgeOKResponseBody is the type of the "moderation" service
 // "acknowledge" endpoint HTTP response body.
-type AcknowledgeResponseBody struct {
-	ID             *int32  `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
-	PostID         *int32  `form:"postId,omitempty" json:"postId,omitempty" xml:"postId,omitempty"`
-	PostType       *string `form:"postType,omitempty" json:"postType,omitempty" xml:"postType,omitempty"`
-	ReportedBy     *int32  `form:"reportedBy,omitempty" json:"reportedBy,omitempty" xml:"reportedBy,omitempty"`
-	ReportedAt     *string `form:"reportedAt,omitempty" json:"reportedAt,omitempty" xml:"reportedAt,omitempty"`
-	AcknowledgedBy *int32  `form:"acknowledgedBy,omitempty" json:"acknowledgedBy,omitempty" xml:"acknowledgedBy,omitempty"`
-	AcknowledgedAt *string `form:"acknowledgedAt,omitempty" json:"acknowledgedAt,omitempty" xml:"acknowledgedAt,omitempty"`
+type AcknowledgeOKResponseBody struct {
+	ID                 *int32                `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	PostID             *int32                `form:"postId,omitempty" json:"postId,omitempty" xml:"postId,omitempty"`
+	PostType           *string               `form:"postType,omitempty" json:"postType,omitempty" xml:"postType,omitempty"`
+	ReportedBy         *int32                `form:"reportedBy,omitempty" json:"reportedBy,omitempty" xml:"reportedBy,omitempty"`
+	ReportedByName     *string               `form:"reportedByName,omitempty" json:"reportedByName,omitempty" xml:"reportedByName,omitempty"`
+	ReportedAt         *string               `form:"reportedAt,omitempty" json:"reportedAt,omitempty" xml:"reportedAt,omitempty"`
+	AcknowledgedBy     *int32                `form:"acknowledgedBy,omitempty" json:"acknowledgedBy,omitempty" xml:"acknowledgedBy,omitempty"`
+	AcknowledgedByUser *UserInfoResponseBody `form:"acknowledgedByUser,omitempty" json:"acknowledgedByUser,omitempty" xml:"acknowledgedByUser,omitempty"`
+	AcknowledgedAt     *string               `form:"acknowledgedAt,omitempty" json:"acknowledgedAt,omitempty" xml:"acknowledgedAt,omitempty"`
+}
+
+// ListRequestsOKResponseBody is the type of the "moderation" service
+// "listRequests" endpoint HTTP response body.
+type ListRequestsOKResponseBody struct {
+	Requests   []*ModerationRequestResponseBody `form:"requests,omitempty" json:"requests,omitempty" xml:"requests,omitempty"`
+	TotalPages *int                             `form:"total_pages,omitempty" json:"total_pages,omitempty" xml:"total_pages,omitempty"`
 }
 
 // AddUnauthorizedResponseBody is the type of the "moderation" service "add"
@@ -194,22 +199,231 @@ type AcknowledgeBadRequestResponseBody struct {
 	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
 }
 
+// ListRequestsUnauthorizedResponseBody is the type of the "moderation" service
+// "listRequests" endpoint HTTP response body for the "unauthorized" error.
+type ListRequestsUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// ListRequestsForbiddenResponseBody is the type of the "moderation" service
+// "listRequests" endpoint HTTP response body for the "forbidden" error.
+type ListRequestsForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// ListRequestsNotFoundResponseBody is the type of the "moderation" service
+// "listRequests" endpoint HTTP response body for the "not-found" error.
+type ListRequestsNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// ListRequestsBadRequestResponseBody is the type of the "moderation" service
+// "listRequests" endpoint HTTP response body for the "bad-request" error.
+type ListRequestsBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// GetContentUnauthorizedResponseBody is the type of the "moderation" service
+// "getContent" endpoint HTTP response body for the "unauthorized" error.
+type GetContentUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// GetContentForbiddenResponseBody is the type of the "moderation" service
+// "getContent" endpoint HTTP response body for the "forbidden" error.
+type GetContentForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// GetContentNotFoundResponseBody is the type of the "moderation" service
+// "getContent" endpoint HTTP response body for the "not-found" error.
+type GetContentNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// GetContentBadRequestResponseBody is the type of the "moderation" service
+// "getContent" endpoint HTTP response body for the "bad-request" error.
+type GetContentBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// UserInfoResponseBody is used to define fields on response body types.
+type UserInfoResponseBody struct {
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+}
+
+// AcknowledgeNotFoundResponseBody2 is used to define fields on response body
+// types.
+type AcknowledgeNotFoundResponseBody2 struct {
+	ID                 *int32                `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	PostID             *int32                `form:"postId,omitempty" json:"postId,omitempty" xml:"postId,omitempty"`
+	PostType           *string               `form:"postType,omitempty" json:"postType,omitempty" xml:"postType,omitempty"`
+	ReportedBy         *int32                `form:"reportedBy,omitempty" json:"reportedBy,omitempty" xml:"reportedBy,omitempty"`
+	ReportedByName     *string               `form:"reportedByName,omitempty" json:"reportedByName,omitempty" xml:"reportedByName,omitempty"`
+	ReportedAt         *string               `form:"reportedAt,omitempty" json:"reportedAt,omitempty" xml:"reportedAt,omitempty"`
+	AcknowledgedBy     *int32                `form:"acknowledgedBy,omitempty" json:"acknowledgedBy,omitempty" xml:"acknowledgedBy,omitempty"`
+	AcknowledgedByUser *UserInfoResponseBody `form:"acknowledgedByUser,omitempty" json:"acknowledgedByUser,omitempty" xml:"acknowledgedByUser,omitempty"`
+	AcknowledgedAt     *string               `form:"acknowledgedAt,omitempty" json:"acknowledgedAt,omitempty" xml:"acknowledgedAt,omitempty"`
+}
+
+// AcknowledgeUnauthorizedResponseBody2 is used to define fields on response
+// body types.
+type AcknowledgeUnauthorizedResponseBody2 struct {
+	ID                 *int32                `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	PostID             *int32                `form:"postId,omitempty" json:"postId,omitempty" xml:"postId,omitempty"`
+	PostType           *string               `form:"postType,omitempty" json:"postType,omitempty" xml:"postType,omitempty"`
+	ReportedBy         *int32                `form:"reportedBy,omitempty" json:"reportedBy,omitempty" xml:"reportedBy,omitempty"`
+	ReportedByName     *string               `form:"reportedByName,omitempty" json:"reportedByName,omitempty" xml:"reportedByName,omitempty"`
+	ReportedAt         *string               `form:"reportedAt,omitempty" json:"reportedAt,omitempty" xml:"reportedAt,omitempty"`
+	AcknowledgedBy     *int32                `form:"acknowledgedBy,omitempty" json:"acknowledgedBy,omitempty" xml:"acknowledgedBy,omitempty"`
+	AcknowledgedByUser *UserInfoResponseBody `form:"acknowledgedByUser,omitempty" json:"acknowledgedByUser,omitempty" xml:"acknowledgedByUser,omitempty"`
+	AcknowledgedAt     *string               `form:"acknowledgedAt,omitempty" json:"acknowledgedAt,omitempty" xml:"acknowledgedAt,omitempty"`
+}
+
+// AcknowledgeForbiddenResponseBody2 is used to define fields on response body
+// types.
+type AcknowledgeForbiddenResponseBody2 struct {
+	ID                 *int32                `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	PostID             *int32                `form:"postId,omitempty" json:"postId,omitempty" xml:"postId,omitempty"`
+	PostType           *string               `form:"postType,omitempty" json:"postType,omitempty" xml:"postType,omitempty"`
+	ReportedBy         *int32                `form:"reportedBy,omitempty" json:"reportedBy,omitempty" xml:"reportedBy,omitempty"`
+	ReportedByName     *string               `form:"reportedByName,omitempty" json:"reportedByName,omitempty" xml:"reportedByName,omitempty"`
+	ReportedAt         *string               `form:"reportedAt,omitempty" json:"reportedAt,omitempty" xml:"reportedAt,omitempty"`
+	AcknowledgedBy     *int32                `form:"acknowledgedBy,omitempty" json:"acknowledgedBy,omitempty" xml:"acknowledgedBy,omitempty"`
+	AcknowledgedByUser *UserInfoResponseBody `form:"acknowledgedByUser,omitempty" json:"acknowledgedByUser,omitempty" xml:"acknowledgedByUser,omitempty"`
+	AcknowledgedAt     *string               `form:"acknowledgedAt,omitempty" json:"acknowledgedAt,omitempty" xml:"acknowledgedAt,omitempty"`
+}
+
+// ModerationRequestResponseBody is used to define fields on response body
+// types.
+type ModerationRequestResponseBody struct {
+	ID                 *int32                `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	PostID             *int32                `form:"postId,omitempty" json:"postId,omitempty" xml:"postId,omitempty"`
+	PostType           *string               `form:"postType,omitempty" json:"postType,omitempty" xml:"postType,omitempty"`
+	ReportedBy         *int32                `form:"reportedBy,omitempty" json:"reportedBy,omitempty" xml:"reportedBy,omitempty"`
+	ReportedByName     *string               `form:"reportedByName,omitempty" json:"reportedByName,omitempty" xml:"reportedByName,omitempty"`
+	ReportedAt         *string               `form:"reportedAt,omitempty" json:"reportedAt,omitempty" xml:"reportedAt,omitempty"`
+	AcknowledgedBy     *int32                `form:"acknowledgedBy,omitempty" json:"acknowledgedBy,omitempty" xml:"acknowledgedBy,omitempty"`
+	AcknowledgedByUser *UserInfoResponseBody `form:"acknowledgedByUser,omitempty" json:"acknowledgedByUser,omitempty" xml:"acknowledgedByUser,omitempty"`
+	AcknowledgedAt     *string               `form:"acknowledgedAt,omitempty" json:"acknowledgedAt,omitempty" xml:"acknowledgedAt,omitempty"`
+}
+
+// ListRequestsUnauthorizedResponseBody2 is used to define fields on response
+// body types.
+type ListRequestsUnauthorizedResponseBody2 struct {
+	Requests   []*ModerationRequestResponseBody `form:"requests,omitempty" json:"requests,omitempty" xml:"requests,omitempty"`
+	TotalPages *int                             `form:"total_pages,omitempty" json:"total_pages,omitempty" xml:"total_pages,omitempty"`
+}
+
+// ListRequestsForbiddenResponseBody2 is used to define fields on response body
+// types.
+type ListRequestsForbiddenResponseBody2 struct {
+	Requests   []*ModerationRequestResponseBody `form:"requests,omitempty" json:"requests,omitempty" xml:"requests,omitempty"`
+	TotalPages *int                             `form:"total_pages,omitempty" json:"total_pages,omitempty" xml:"total_pages,omitempty"`
+}
+
 // NewAddRequestBody builds the HTTP request body from the payload of the "add"
 // endpoint of the "moderation" service.
 func NewAddRequestBody(p *moderation.ModerationAddPayload) *AddRequestBody {
 	body := &AddRequestBody{
 		PostID:   p.PostID,
 		PostType: p.PostType,
-	}
-	return body
-}
-
-// NewAcknowledgeRequestBody builds the HTTP request body from the payload of
-// the "acknowledge" endpoint of the "moderation" service.
-func NewAcknowledgeRequestBody(p *moderation.AcknowledgePayload) *AcknowledgeRequestBody {
-	body := &AcknowledgeRequestBody{
-		ID:             p.ID,
-		AcknowledgedBy: p.AcknowledgedBy,
 	}
 	return body
 }
@@ -222,9 +436,13 @@ func NewAddModerationRequestOK(body *AddResponseBody) *moderation.ModerationRequ
 		PostID:         *body.PostID,
 		PostType:       *body.PostType,
 		ReportedBy:     *body.ReportedBy,
+		ReportedByName: body.ReportedByName,
 		ReportedAt:     *body.ReportedAt,
 		AcknowledgedBy: body.AcknowledgedBy,
 		AcknowledgedAt: body.AcknowledgedAt,
+	}
+	if body.AcknowledgedByUser != nil {
+		v.AcknowledgedByUser = unmarshalUserInfoResponseBodyToModerationUserInfo(body.AcknowledgedByUser)
 	}
 
 	return v
@@ -289,15 +507,19 @@ func NewAddBadRequest(body *AddBadRequestResponseBody) *goa.ServiceError {
 
 // NewAcknowledgeModerationRequestOK builds a "moderation" service
 // "acknowledge" endpoint result from a HTTP "OK" response.
-func NewAcknowledgeModerationRequestOK(body *AcknowledgeResponseBody) *moderation.ModerationRequest {
+func NewAcknowledgeModerationRequestOK(body *AcknowledgeOKResponseBody) *moderation.ModerationRequest {
 	v := &moderation.ModerationRequest{
 		ID:             *body.ID,
 		PostID:         *body.PostID,
 		PostType:       *body.PostType,
 		ReportedBy:     *body.ReportedBy,
+		ReportedByName: body.ReportedByName,
 		ReportedAt:     *body.ReportedAt,
 		AcknowledgedBy: body.AcknowledgedBy,
 		AcknowledgedAt: body.AcknowledgedAt,
+	}
+	if body.AcknowledgedByUser != nil {
+		v.AcknowledgedByUser = unmarshalUserInfoResponseBodyToModerationUserInfo(body.AcknowledgedByUser)
 	}
 
 	return v
@@ -363,6 +585,140 @@ func NewAcknowledgeBadRequest(body *AcknowledgeBadRequestResponseBody) *goa.Serv
 	return v
 }
 
+// NewListRequestsModerationRequestsOK builds a "moderation" service
+// "listRequests" endpoint result from a HTTP "OK" response.
+func NewListRequestsModerationRequestsOK(body *ListRequestsOKResponseBody) *moderationviews.ModerationRequestsView {
+	v := &moderationviews.ModerationRequestsView{
+		TotalPages: body.TotalPages,
+	}
+	v.Requests = make([]*moderationviews.ModerationRequestView, len(body.Requests))
+	for i, val := range body.Requests {
+		v.Requests[i] = unmarshalModerationRequestResponseBodyToModerationviewsModerationRequestView(val)
+	}
+
+	return v
+}
+
+// NewListRequestsUnauthorized builds a moderation service listRequests
+// endpoint unauthorized error.
+func NewListRequestsUnauthorized(body *ListRequestsUnauthorizedResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
+// NewListRequestsForbidden builds a moderation service listRequests endpoint
+// forbidden error.
+func NewListRequestsForbidden(body *ListRequestsForbiddenResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
+// NewListRequestsNotFound builds a moderation service listRequests endpoint
+// not-found error.
+func NewListRequestsNotFound(body *ListRequestsNotFoundResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
+// NewListRequestsBadRequest builds a moderation service listRequests endpoint
+// bad-request error.
+func NewListRequestsBadRequest(body *ListRequestsBadRequestResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
+// NewGetContentUnauthorized builds a moderation service getContent endpoint
+// unauthorized error.
+func NewGetContentUnauthorized(body *GetContentUnauthorizedResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
+// NewGetContentForbidden builds a moderation service getContent endpoint
+// forbidden error.
+func NewGetContentForbidden(body *GetContentForbiddenResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
+// NewGetContentNotFound builds a moderation service getContent endpoint
+// not-found error.
+func NewGetContentNotFound(body *GetContentNotFoundResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
+// NewGetContentBadRequest builds a moderation service getContent endpoint
+// bad-request error.
+func NewGetContentBadRequest(body *GetContentBadRequestResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
 // ValidateAddResponseBody runs the validations defined on AddResponseBody
 func ValidateAddResponseBody(body *AddResponseBody) (err error) {
 	if body.ID == nil {
@@ -380,12 +736,17 @@ func ValidateAddResponseBody(body *AddResponseBody) (err error) {
 	if body.ReportedAt == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("reportedAt", "body"))
 	}
+	if body.AcknowledgedByUser != nil {
+		if err2 := ValidateUserInfoResponseBody(body.AcknowledgedByUser); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
 	return
 }
 
-// ValidateAcknowledgeResponseBody runs the validations defined on
-// AcknowledgeResponseBody
-func ValidateAcknowledgeResponseBody(body *AcknowledgeResponseBody) (err error) {
+// ValidateAcknowledgeOKResponseBody runs the validations defined on
+// AcknowledgeOKResponseBody
+func ValidateAcknowledgeOKResponseBody(body *AcknowledgeOKResponseBody) (err error) {
 	if body.ID == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
 	}
@@ -400,6 +761,11 @@ func ValidateAcknowledgeResponseBody(body *AcknowledgeResponseBody) (err error) 
 	}
 	if body.ReportedAt == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("reportedAt", "body"))
+	}
+	if body.AcknowledgedByUser != nil {
+		if err2 := ValidateUserInfoResponseBody(body.AcknowledgedByUser); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
 	}
 	return
 }
@@ -592,6 +958,349 @@ func ValidateAcknowledgeBadRequestResponseBody(body *AcknowledgeBadRequestRespon
 	}
 	if body.Fault == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateListRequestsUnauthorizedResponseBody runs the validations defined on
+// listRequests_unauthorized_response_body
+func ValidateListRequestsUnauthorizedResponseBody(body *ListRequestsUnauthorizedResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateListRequestsForbiddenResponseBody runs the validations defined on
+// listRequests_forbidden_response_body
+func ValidateListRequestsForbiddenResponseBody(body *ListRequestsForbiddenResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateListRequestsNotFoundResponseBody runs the validations defined on
+// listRequests_not-found_response_body
+func ValidateListRequestsNotFoundResponseBody(body *ListRequestsNotFoundResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateListRequestsBadRequestResponseBody runs the validations defined on
+// listRequests_bad-request_response_body
+func ValidateListRequestsBadRequestResponseBody(body *ListRequestsBadRequestResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateGetContentUnauthorizedResponseBody runs the validations defined on
+// getContent_unauthorized_response_body
+func ValidateGetContentUnauthorizedResponseBody(body *GetContentUnauthorizedResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateGetContentForbiddenResponseBody runs the validations defined on
+// getContent_forbidden_response_body
+func ValidateGetContentForbiddenResponseBody(body *GetContentForbiddenResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateGetContentNotFoundResponseBody runs the validations defined on
+// getContent_not-found_response_body
+func ValidateGetContentNotFoundResponseBody(body *GetContentNotFoundResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateGetContentBadRequestResponseBody runs the validations defined on
+// getContent_bad-request_response_body
+func ValidateGetContentBadRequestResponseBody(body *GetContentBadRequestResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateUserInfoResponseBody runs the validations defined on
+// UserInfoResponseBody
+func ValidateUserInfoResponseBody(body *UserInfoResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	return
+}
+
+// ValidateAcknowledgeNotFoundResponseBody2 runs the validations defined on
+// AcknowledgeNot FoundResponseBody
+func ValidateAcknowledgeNotFoundResponseBody2(body *AcknowledgeNotFoundResponseBody2) (err error) {
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.PostID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("postId", "body"))
+	}
+	if body.PostType == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("postType", "body"))
+	}
+	if body.ReportedBy == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("reportedBy", "body"))
+	}
+	if body.ReportedAt == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("reportedAt", "body"))
+	}
+	if body.AcknowledgedByUser != nil {
+		if err2 := ValidateUserInfoResponseBody(body.AcknowledgedByUser); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	return
+}
+
+// ValidateAcknowledgeUnauthorizedResponseBody2 runs the validations defined on
+// AcknowledgeUnauthorizedResponseBody
+func ValidateAcknowledgeUnauthorizedResponseBody2(body *AcknowledgeUnauthorizedResponseBody2) (err error) {
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.PostID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("postId", "body"))
+	}
+	if body.PostType == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("postType", "body"))
+	}
+	if body.ReportedBy == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("reportedBy", "body"))
+	}
+	if body.ReportedAt == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("reportedAt", "body"))
+	}
+	if body.AcknowledgedByUser != nil {
+		if err2 := ValidateUserInfoResponseBody(body.AcknowledgedByUser); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	return
+}
+
+// ValidateAcknowledgeForbiddenResponseBody2 runs the validations defined on
+// AcknowledgeForbiddenResponseBody
+func ValidateAcknowledgeForbiddenResponseBody2(body *AcknowledgeForbiddenResponseBody2) (err error) {
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.PostID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("postId", "body"))
+	}
+	if body.PostType == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("postType", "body"))
+	}
+	if body.ReportedBy == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("reportedBy", "body"))
+	}
+	if body.ReportedAt == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("reportedAt", "body"))
+	}
+	if body.AcknowledgedByUser != nil {
+		if err2 := ValidateUserInfoResponseBody(body.AcknowledgedByUser); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	return
+}
+
+// ValidateModerationRequestResponseBody runs the validations defined on
+// ModerationRequestResponseBody
+func ValidateModerationRequestResponseBody(body *ModerationRequestResponseBody) (err error) {
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.PostID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("postId", "body"))
+	}
+	if body.PostType == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("postType", "body"))
+	}
+	if body.ReportedBy == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("reportedBy", "body"))
+	}
+	if body.ReportedAt == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("reportedAt", "body"))
+	}
+	if body.AcknowledgedByUser != nil {
+		if err2 := ValidateUserInfoResponseBody(body.AcknowledgedByUser); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	return
+}
+
+// ValidateListRequestsUnauthorizedResponseBody2 runs the validations defined
+// on ListRequestsUnauthorizedResponseBody
+func ValidateListRequestsUnauthorizedResponseBody2(body *ListRequestsUnauthorizedResponseBody2) (err error) {
+	if body.Requests == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("requests", "body"))
+	}
+	if body.TotalPages == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("total_pages", "body"))
+	}
+	for _, e := range body.Requests {
+		if e != nil {
+			if err2 := ValidateModerationRequestResponseBody(e); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// ValidateListRequestsForbiddenResponseBody2 runs the validations defined on
+// ListRequestsForbiddenResponseBody
+func ValidateListRequestsForbiddenResponseBody2(body *ListRequestsForbiddenResponseBody2) (err error) {
+	if body.Requests == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("requests", "body"))
+	}
+	if body.TotalPages == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("total_pages", "body"))
+	}
+	for _, e := range body.Requests {
+		if e != nil {
+			if err2 := ValidateModerationRequestResponseBody(e); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
 	}
 	return
 }

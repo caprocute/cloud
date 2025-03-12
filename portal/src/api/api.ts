@@ -463,6 +463,25 @@ export enum MapViewType {
     list = "list",
 }
 
+interface ModerationRequestResponse {
+    requests: {
+        id: number;
+        postId: number;
+        postType: string;
+        reportedBy: number;
+        reportedByUser?: {
+            name: string;
+        };
+        reportedAt: string;
+        acknowledgedBy?: number;
+        acknowledgedByUser?: {
+            name: string;
+        };
+        acknowledgedAt?: string;
+    }[];
+    totalPages: number;
+}
+
 class FKApi {
     private readonly baseUrl: string = Config.baseUrl;
     private readonly token: TokenStorage = new TokenStorage();
@@ -1727,22 +1746,57 @@ class FKApi {
     }
 
     public async reportPost(post: Comment | DataEvent): Promise<{ post: Comment }> {
+        const postTypeMap: { [key: string]: string } = {
+            'comment': 'discussion_post',
+            'event': 'data_event'
+        };
 
-        const returned = await this.invoke({
+        const postType = post.type as 'comment' | 'event';
+
+        return await this.invoke({
             auth: Auth.Required,
             method: "POST",
             url: this.baseUrl + "/moderation",
             data: {
-                post_id: post.id,
-                post_type: 'discussion_post'
+                postId: post.id,
+                postType: postTypeMap[postType],
             },
         });
+    }
 
-         console.log("comments", returned);
+    public async getModerationRequests(page: number, pageSize: number): Promise<ModerationRequestResponse> {
+        const qp = new URLSearchParams();
+        qp.append("page", page.toString());
+        qp.append("pageSize", pageSize.toString());
+        
+        try {
+            const response = await this.invoke({
+                auth: Auth.Required,
+                method: "GET",
+                url: this.baseUrl + `/moderation/requests?${qp.toString()}`,
+            });
+            console.log('Moderation response:', response); // Add this for debugging
+            return response;
+        } catch (error) {
+            console.error('Moderation request error:', error); // Add this for debugging
+            throw error;
+        }
+    }
 
-        return {
-            post: returned
-        };
+    public async getModerationContent(postType: string, postId: number): Promise<string> {
+        return await this.invoke({
+            auth: Auth.Required,
+            method: "GET",
+            url: this.baseUrl + `/moderation/content/${postType}/${postId}`,
+        });
+    }
+
+    public async acknowledgeModerationRequest(id: number, action: 'delete' | 'keep'): Promise<void> {
+        return await this.invoke({
+            auth: Auth.Required,
+            method: "POST",
+            url: this.baseUrl + `/moderation/requests/${id}/acknowledge?action=${action}`,
+        });
     }
 }
 

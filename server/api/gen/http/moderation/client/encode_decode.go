@@ -10,12 +10,14 @@ package client
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
 
 	moderation "gitlab.com/fieldkit/cloud/server/api/gen/moderation"
+	moderationviews "gitlab.com/fieldkit/cloud/server/api/gen/moderation/views"
 	goahttp "goa.design/goa/v3/http"
 )
 
@@ -163,7 +165,17 @@ func DecodeAddResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody
 // BuildAcknowledgeRequest instantiates a HTTP request object with method and
 // path set to call the "moderation" service "acknowledge" endpoint
 func (c *Client) BuildAcknowledgeRequest(ctx context.Context, v interface{}) (*http.Request, error) {
-	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: AcknowledgeModerationPath()}
+	var (
+		id int32
+	)
+	{
+		p, ok := v.(*moderation.AcknowledgePayload)
+		if !ok {
+			return nil, goahttp.ErrInvalidType("moderation", "acknowledge", "*moderation.AcknowledgePayload", v)
+		}
+		id = p.ID
+	}
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: AcknowledgeModerationPath(id)}
 	req, err := http.NewRequest("POST", u.String(), nil)
 	if err != nil {
 		return nil, goahttp.ErrInvalidURL("moderation", "acknowledge", u.String(), err)
@@ -183,18 +195,17 @@ func EncodeAcknowledgeRequest(encoder func(*http.Request) goahttp.Encoder) func(
 		if !ok {
 			return goahttp.ErrInvalidType("moderation", "acknowledge", "*moderation.AcknowledgePayload", v)
 		}
-		if p.Auth != nil {
-			head := *p.Auth
+		{
+			head := p.Auth
 			if !strings.Contains(head, " ") {
 				req.Header.Set("Authorization", "Bearer "+head)
 			} else {
 				req.Header.Set("Authorization", head)
 			}
 		}
-		body := NewAcknowledgeRequestBody(p)
-		if err := encoder(req).Encode(&body); err != nil {
-			return goahttp.ErrEncodingError("moderation", "acknowledge", err)
-		}
+		values := req.URL.Query()
+		values.Add("action", p.Action)
+		req.URL.RawQuery = values.Encode()
 		return nil
 	}
 }
@@ -225,14 +236,14 @@ func DecodeAcknowledgeResponse(decoder func(*http.Response) goahttp.Decoder, res
 		switch resp.StatusCode {
 		case http.StatusOK:
 			var (
-				body AcknowledgeResponseBody
+				body AcknowledgeOKResponseBody
 				err  error
 			)
 			err = decoder(resp).Decode(&body)
 			if err != nil {
 				return nil, goahttp.ErrDecodingError("moderation", "acknowledge", err)
 			}
-			err = ValidateAcknowledgeResponseBody(&body)
+			err = ValidateAcknowledgeOKResponseBody(&body)
 			if err != nil {
 				return nil, goahttp.ErrValidationError("moderation", "acknowledge", err)
 			}
@@ -299,4 +310,339 @@ func DecodeAcknowledgeResponse(decoder func(*http.Response) goahttp.Decoder, res
 			return nil, goahttp.ErrInvalidResponse("moderation", "acknowledge", resp.StatusCode, string(body))
 		}
 	}
+}
+
+// BuildListRequestsRequest instantiates a HTTP request object with method and
+// path set to call the "moderation" service "listRequests" endpoint
+func (c *Client) BuildListRequestsRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: ListRequestsModerationPath()}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("moderation", "listRequests", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeListRequestsRequest returns an encoder for requests sent to the
+// moderation listRequests server.
+func EncodeListRequestsRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*moderation.ListRequestsPayload)
+		if !ok {
+			return goahttp.ErrInvalidType("moderation", "listRequests", "*moderation.ListRequestsPayload", v)
+		}
+		{
+			head := p.Auth
+			if !strings.Contains(head, " ") {
+				req.Header.Set("Authorization", "Bearer "+head)
+			} else {
+				req.Header.Set("Authorization", head)
+			}
+		}
+		values := req.URL.Query()
+		values.Add("page", fmt.Sprintf("%v", p.Page))
+		values.Add("pageSize", fmt.Sprintf("%v", p.PageSize))
+		req.URL.RawQuery = values.Encode()
+		return nil
+	}
+}
+
+// DecodeListRequestsResponse returns a decoder for responses returned by the
+// moderation listRequests endpoint. restoreBody controls whether the response
+// body should be restored after having been read.
+// DecodeListRequestsResponse may return the following errors:
+//   - "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//   - "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//   - "not-found" (type *goa.ServiceError): http.StatusNotFound
+//   - "bad-request" (type *goa.ServiceError): http.StatusBadRequest
+//   - error: internal error
+func DecodeListRequestsResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			var (
+				body ListRequestsOKResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("moderation", "listRequests", err)
+			}
+			p := NewListRequestsModerationRequestsOK(&body)
+			view := "default"
+			vres := &moderationviews.ModerationRequests{Projected: p, View: view}
+			if err = moderationviews.ValidateModerationRequests(vres); err != nil {
+				return nil, goahttp.ErrValidationError("moderation", "listRequests", err)
+			}
+			res := moderation.NewModerationRequests(vres)
+			return res, nil
+		case http.StatusUnauthorized:
+			var (
+				body ListRequestsUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("moderation", "listRequests", err)
+			}
+			err = ValidateListRequestsUnauthorizedResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("moderation", "listRequests", err)
+			}
+			return nil, NewListRequestsUnauthorized(&body)
+		case http.StatusForbidden:
+			var (
+				body ListRequestsForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("moderation", "listRequests", err)
+			}
+			err = ValidateListRequestsForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("moderation", "listRequests", err)
+			}
+			return nil, NewListRequestsForbidden(&body)
+		case http.StatusNotFound:
+			var (
+				body ListRequestsNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("moderation", "listRequests", err)
+			}
+			err = ValidateListRequestsNotFoundResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("moderation", "listRequests", err)
+			}
+			return nil, NewListRequestsNotFound(&body)
+		case http.StatusBadRequest:
+			var (
+				body ListRequestsBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("moderation", "listRequests", err)
+			}
+			err = ValidateListRequestsBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("moderation", "listRequests", err)
+			}
+			return nil, NewListRequestsBadRequest(&body)
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("moderation", "listRequests", resp.StatusCode, string(body))
+		}
+	}
+}
+
+// BuildGetContentRequest instantiates a HTTP request object with method and
+// path set to call the "moderation" service "getContent" endpoint
+func (c *Client) BuildGetContentRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	var (
+		postType string
+		postID   int32
+	)
+	{
+		p, ok := v.(*moderation.GetContentPayload)
+		if !ok {
+			return nil, goahttp.ErrInvalidType("moderation", "getContent", "*moderation.GetContentPayload", v)
+		}
+		postType = p.PostType
+		postID = p.PostID
+	}
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: GetContentModerationPath(postType, postID)}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("moderation", "getContent", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeGetContentRequest returns an encoder for requests sent to the
+// moderation getContent server.
+func EncodeGetContentRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*moderation.GetContentPayload)
+		if !ok {
+			return goahttp.ErrInvalidType("moderation", "getContent", "*moderation.GetContentPayload", v)
+		}
+		{
+			head := p.Auth
+			if !strings.Contains(head, " ") {
+				req.Header.Set("Authorization", "Bearer "+head)
+			} else {
+				req.Header.Set("Authorization", head)
+			}
+		}
+		return nil
+	}
+}
+
+// DecodeGetContentResponse returns a decoder for responses returned by the
+// moderation getContent endpoint. restoreBody controls whether the response
+// body should be restored after having been read.
+// DecodeGetContentResponse may return the following errors:
+//   - "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//   - "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//   - "not-found" (type *goa.ServiceError): http.StatusNotFound
+//   - "bad-request" (type *goa.ServiceError): http.StatusBadRequest
+//   - error: internal error
+func DecodeGetContentResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			var (
+				body string
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("moderation", "getContent", err)
+			}
+			return body, nil
+		case http.StatusUnauthorized:
+			var (
+				body GetContentUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("moderation", "getContent", err)
+			}
+			err = ValidateGetContentUnauthorizedResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("moderation", "getContent", err)
+			}
+			return nil, NewGetContentUnauthorized(&body)
+		case http.StatusForbidden:
+			var (
+				body GetContentForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("moderation", "getContent", err)
+			}
+			err = ValidateGetContentForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("moderation", "getContent", err)
+			}
+			return nil, NewGetContentForbidden(&body)
+		case http.StatusNotFound:
+			var (
+				body GetContentNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("moderation", "getContent", err)
+			}
+			err = ValidateGetContentNotFoundResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("moderation", "getContent", err)
+			}
+			return nil, NewGetContentNotFound(&body)
+		case http.StatusBadRequest:
+			var (
+				body GetContentBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("moderation", "getContent", err)
+			}
+			err = ValidateGetContentBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("moderation", "getContent", err)
+			}
+			return nil, NewGetContentBadRequest(&body)
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("moderation", "getContent", resp.StatusCode, string(body))
+		}
+	}
+}
+
+// unmarshalUserInfoResponseBodyToModerationUserInfo builds a value of type
+// *moderation.UserInfo from a value of type *UserInfoResponseBody.
+func unmarshalUserInfoResponseBodyToModerationUserInfo(v *UserInfoResponseBody) *moderation.UserInfo {
+	if v == nil {
+		return nil
+	}
+	res := &moderation.UserInfo{
+		Name: *v.Name,
+	}
+
+	return res
+}
+
+// unmarshalModerationRequestResponseBodyToModerationviewsModerationRequestView
+// builds a value of type *moderationviews.ModerationRequestView from a value
+// of type *ModerationRequestResponseBody.
+func unmarshalModerationRequestResponseBodyToModerationviewsModerationRequestView(v *ModerationRequestResponseBody) *moderationviews.ModerationRequestView {
+	res := &moderationviews.ModerationRequestView{
+		ID:             v.ID,
+		PostID:         v.PostID,
+		PostType:       v.PostType,
+		ReportedBy:     v.ReportedBy,
+		ReportedByName: v.ReportedByName,
+		ReportedAt:     v.ReportedAt,
+		AcknowledgedBy: v.AcknowledgedBy,
+		AcknowledgedAt: v.AcknowledgedAt,
+	}
+	if v.AcknowledgedByUser != nil {
+		res.AcknowledgedByUser = unmarshalUserInfoResponseBodyToModerationviewsUserInfoView(v.AcknowledgedByUser)
+	}
+
+	return res
+}
+
+// unmarshalUserInfoResponseBodyToModerationviewsUserInfoView builds a value of
+// type *moderationviews.UserInfoView from a value of type
+// *UserInfoResponseBody.
+func unmarshalUserInfoResponseBodyToModerationviewsUserInfoView(v *UserInfoResponseBody) *moderationviews.UserInfoView {
+	if v == nil {
+		return nil
+	}
+	res := &moderationviews.UserInfoView{
+		Name: v.Name,
+	}
+
+	return res
 }

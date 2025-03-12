@@ -42,9 +42,7 @@ func (s *ModerationService) Add(ctx context.Context, payload *moderation.Moderat
 }
 
 func (s *ModerationService) add(ctx context.Context, payload *moderation.ModerationAddPayload) (*moderation.ModerationRequest, error) {
-	log := Logger(context.Background()).Sugar()
-
-	p, err := NewPermissions(context.Background(), s.options).Unwrap()
+	p, err := NewPermissions(ctx, s.options).Unwrap()
 	if err != nil {
 		return nil, err
 	}
@@ -52,8 +50,6 @@ func (s *ModerationService) add(ctx context.Context, payload *moderation.Moderat
 	if payload.PostType != string(data.ModerationDiscussionPost) && payload.PostType != string(data.ModerationDataEvent) {
 		return nil, fmt.Errorf("invalid post type")
 	}
-
-	log.Infow("adding moderation request", "post_id", payload.PostID, "post_type", payload.PostType)
 
 	mrRepo := repositories.NewModerationRepository(s.options.Database)
 	mr := &data.ModerationRequest{
@@ -81,16 +77,13 @@ func (s *ModerationService) add(ctx context.Context, payload *moderation.Moderat
 		// Fetch user details to get the email
 		user, err := userRepo.QueryByID(context.Background(), moderator.UserID)
 		if err != nil {
-			log.Errorw("error retrieving user details", "moderator_id", moderator.UserID, "error", err)
 			continue
 		}
 
 		// Simulate email sending (replace with real implementation later)
 		err = sendMockEmail(user.Email, "New Moderation Request", createEmailBody(payload))
 		if err != nil {
-			log.Errorw("error sending email notification", "moderator_id", moderator.UserID, "error", err)
-		} else {
-			log.Infow("email notification sent", "moderator_id", moderator.UserID)
+			continue
 		}
 	}
 
@@ -115,35 +108,45 @@ func sendMockEmail(to string, subject string, body string) error {
 }
 
 func (s *ModerationService) Acknowledge(ctx context.Context, payload *moderation.AcknowledgePayload) (*moderation.ModerationRequest, error) {
+	p, err := NewPermissions(ctx, s.options).Unwrap()
+	if err != nil {
+		return nil, err
+	}
+
+	if !p.IsAdmin() {
+		return nil, moderation.MakeForbidden(errors.New("admin access required"))
+	}
+
+	userID := p.UserID()
+
 	mrRepo := repositories.NewModerationRepository(s.options.Database)
-
-	moderationRequest, err := mrRepo.GetModerationRequest(ctx, int(payload.ID))
+	req, err := mrRepo.AcknowledgeRequest(ctx, payload.ID, userID, payload.Action)
 	if err != nil {
 		return nil, err
 	}
 
-	now := time.Now().UTC()
-	moderationRequest.AcknowledgedAt = &now
-
-	err = mrRepo.UpdateModerationRequest(ctx, moderationRequest)
-	if err != nil {
-		return nil, err
+	// Format time for acknowledged_at
+	var acknowledgedAt *string
+	if req.AcknowledgedAt != nil {
+		formatted := req.AcknowledgedAt.Format(time.RFC3339)
+		acknowledgedAt = &formatted
 	}
 
-	var acknowledgedAtStr *string
-	if moderationRequest.AcknowledgedAt != nil {
-		str := moderationRequest.AcknowledgedAt.Format(time.RFC3339)
-		acknowledgedAtStr = &str
+	var acknowledgedByUser *moderation.UserInfo
+	if req.AcknowledgedByName != nil {
+		acknowledgedByUser = &moderation.UserInfo{Name: *req.AcknowledgedByName}
 	}
 
 	response := &moderation.ModerationRequest{
-		ID:             moderationRequest.ID,
-		PostID:         moderationRequest.PostID,
-		PostType:       string(moderationRequest.PostType),
-		ReportedBy:     moderationRequest.ReportedBy,
-		ReportedAt:     moderationRequest.ReportedAt.Format(time.RFC3339),
-		AcknowledgedBy: &payload.AcknowledgedBy,
-		AcknowledgedAt: acknowledgedAtStr,
+		ID:                 req.ID,
+		PostID:             req.PostID,
+		PostType:           req.PostType,
+		ReportedBy:         req.ReportedBy,
+		ReportedByName:     req.ReportedByName,
+		ReportedAt:         req.ReportedAt.Format(time.RFC3339),
+		AcknowledgedBy:     req.AcknowledgedBy,
+		AcknowledgedByUser: acknowledgedByUser,
+		AcknowledgedAt:     acknowledgedAt,
 	}
 
 	return response, nil
@@ -158,4 +161,76 @@ func (s *ModerationService) JWTAuth(ctx context.Context, token string, scheme *s
 		Unauthorized: func(m string) error { return moderationService.MakeUnauthorized(errors.New(m)) },
 		Forbidden:    func(m string) error { return moderationService.MakeForbidden(errors.New(m)) },
 	})
+}
+
+func (s *ModerationService) ListRequests(ctx context.Context, payload *moderation.ListRequestsPayload) (*moderation.ModerationRequests, error) {
+	p, err := NewPermissions(ctx, s.options).Unwrap()
+	if err != nil {
+		return nil, err
+	}
+
+	if !p.IsAdmin() {
+		return nil, moderation.MakeForbidden(errors.New("admin access required"))
+	}
+
+	mrRepo := repositories.NewModerationRepository(s.options.Database)
+	requests, totalPages, err := mrRepo.GetAllModerationRequests(ctx, payload.Page, payload.PageSize)
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert data.ModerationRequestDetail to moderation.ModerationRequest
+	moderationRequests := make([]*moderation.ModerationRequest, len(requests))
+	for i, req := range requests {
+		var acknowledgedAt *string
+		if req.AcknowledgedAt != nil {
+			formatted := req.AcknowledgedAt.Format(time.RFC3339)
+			acknowledgedAt = &formatted
+		}
+
+		var acknowledgedByUser *moderation.UserInfo
+		if req.AcknowledgedByName != nil {
+			acknowledgedByUser = &moderation.UserInfo{Name: *req.AcknowledgedByName}
+		}
+
+		moderationRequests[i] = &moderation.ModerationRequest{
+			ID:                 req.ID,
+			PostID:             req.PostID,
+			PostType:           req.PostType,
+			ReportedBy:         req.ReportedBy,
+			ReportedByName:     req.ReportedByName,
+			ReportedAt:         req.ReportedAt.Format(time.RFC3339),
+			AcknowledgedBy:     req.AcknowledgedBy,
+			AcknowledgedByUser: acknowledgedByUser,
+			AcknowledgedAt:     acknowledgedAt,
+		}
+	}
+
+	return &moderation.ModerationRequests{
+		Requests:   moderationRequests,
+		TotalPages: int(totalPages),
+	}, nil
+}
+
+func (s *ModerationService) GetContent(ctx context.Context, payload *moderation.GetContentPayload) (string, error) {
+	p, err := NewPermissions(ctx, s.options).Unwrap()
+	if err != nil {
+		return "", err
+	}
+
+	if !p.IsAdmin() {
+		return "", moderation.MakeForbidden(errors.New("admin access required"))
+	}
+
+	mrRepo := repositories.NewModerationRepository(s.options.Database)
+	content, err := mrRepo.GetContent(ctx, data.PostTypeEnum(payload.PostType), payload.PostID)
+	if err != nil {
+		return "", err
+	}
+
+	if content == "" {
+		return "", moderation.MakeNotFound(fmt.Errorf("content not found for type %s and id %d", payload.PostType, payload.PostID))
+	}
+
+	return content, nil
 }

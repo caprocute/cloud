@@ -555,7 +555,9 @@
         "saveSuccess": "Comment saved successfully!",
         "deleteSuccess": "Comment deleted successfully!",
         "dataEventSuccess": "Event saved successfully!",
-        "dataEventDeleteSuccess": "Event deleted successfully!"
+        "dataEventDeleteSuccess": "Event deleted successfully!",
+        "reportSuccess": "Report sent successfully!",
+        "reportError": "Report failed! Please try again later."
     },
     "seeMore": "See more",
     "seeLess": "See less",

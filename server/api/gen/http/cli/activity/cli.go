@@ -58,7 +58,7 @@ export (list- mine|status|download|csv|json- lines)
 firmware (download|add|list|delete)
 following (follow|unfollow|followers)
 ingestion (process- pending|walk- everything|process- station|process- station- ingestions|process- ingestion|refresh- views|delete)
-moderation (add|acknowledge)
+moderation (add|acknowledge|list-requests|get-content)
 modules meta
 notes (update|get|download- media|upload- media|delete- media)
 notifications (listen|seen)
@@ -78,16 +78,16 @@ user (roles|upload- photo|download- photo|login|recovery- lookup|recovery|resume
 
 // UsageExamples produces an example of a valid invocation of the CLI tool.
 func UsageExamples() string {
-	return os.Args[0] + ` activity station --id 7387793786634728127 --page 8540322621804096569 --auth "Dolorem voluptates qui aperiam aut dolores."` + "\n" +
-		os.Args[0] + ` admin health --auth "Commodi et ut dolor tenetur."` + "\n" +
+	return os.Args[0] + ` activity station --id 7310945293571350078 --page 2939128952299025123 --auth "Quisquam quidem."` + "\n" +
+		os.Args[0] + ` admin health --auth "Accusamus iste et."` + "\n" +
 		os.Args[0] + ` csv noop` + "\n" +
-		os.Args[0] + ` data device- summary --device-id "Accusamus iste et." --auth "Ipsam et."` + "\n" +
+		os.Args[0] + ` data device- summary --device-id "Quis omnis." --auth "Modi at maiores ullam voluptatem."` + "\n" +
 		os.Args[0] + ` discourse authenticate --body '{
-      "email": "Modi at maiores ullam voluptatem.",
-      "password": "1ke",
-      "sig": "Quis omnis.",
-      "sso": "Voluptate debitis rerum."
-   }' --token "Consequatur necessitatibus temporibus hic labore et tenetur."` + "\n" +
+      "email": "Impedit molestias magnam.",
+      "password": "ndx",
+      "sig": "Et ipsum magnam et odio sit tempora.",
+      "sso": "Eligendi veritatis."
+   }' --token "Illo id."` + "\n" +
 		""
 }
 
@@ -282,9 +282,20 @@ func ParseEndpoint(
 		moderationAddBodyFlag = moderationAddFlags.String("body", "REQUIRED", "")
 		moderationAddAuthFlag = moderationAddFlags.String("auth", "", "")
 
-		moderationAcknowledgeFlags    = flag.NewFlagSet("acknowledge", flag.ExitOnError)
-		moderationAcknowledgeBodyFlag = moderationAcknowledgeFlags.String("body", "REQUIRED", "")
-		moderationAcknowledgeAuthFlag = moderationAcknowledgeFlags.String("auth", "", "")
+		moderationAcknowledgeFlags      = flag.NewFlagSet("acknowledge", flag.ExitOnError)
+		moderationAcknowledgeIDFlag     = moderationAcknowledgeFlags.String("id", "REQUIRED", "Request ID")
+		moderationAcknowledgeActionFlag = moderationAcknowledgeFlags.String("action", "REQUIRED", "")
+		moderationAcknowledgeAuthFlag   = moderationAcknowledgeFlags.String("auth", "REQUIRED", "")
+
+		moderationListRequestsFlags        = flag.NewFlagSet("list-requests", flag.ExitOnError)
+		moderationListRequestsPageFlag     = moderationListRequestsFlags.String("page", "REQUIRED", "")
+		moderationListRequestsPageSizeFlag = moderationListRequestsFlags.String("page-size", "REQUIRED", "")
+		moderationListRequestsAuthFlag     = moderationListRequestsFlags.String("auth", "REQUIRED", "")
+
+		moderationGetContentFlags        = flag.NewFlagSet("get-content", flag.ExitOnError)
+		moderationGetContentPostTypeFlag = moderationGetContentFlags.String("post-type", "REQUIRED", "Type of post")
+		moderationGetContentPostIDFlag   = moderationGetContentFlags.String("post-id", "REQUIRED", "ID of the post")
+		moderationGetContentAuthFlag     = moderationGetContentFlags.String("auth", "REQUIRED", "")
 
 		modulesFlags = flag.NewFlagSet("modules", flag.ContinueOnError)
 
@@ -774,6 +785,8 @@ func ParseEndpoint(
 	moderationFlags.Usage = moderationUsage
 	moderationAddFlags.Usage = moderationAddUsage
 	moderationAcknowledgeFlags.Usage = moderationAcknowledgeUsage
+	moderationListRequestsFlags.Usage = moderationListRequestsUsage
+	moderationGetContentFlags.Usage = moderationGetContentUsage
 
 	modulesFlags.Usage = modulesUsage
 	modulesMetaFlags.Usage = modulesMetaUsage
@@ -1131,6 +1144,12 @@ func ParseEndpoint(
 
 			case "acknowledge":
 				epf = moderationAcknowledgeFlags
+
+			case "list-requests":
+				epf = moderationListRequestsFlags
+
+			case "get-content":
+				epf = moderationGetContentFlags
 
 			}
 
@@ -1643,7 +1662,13 @@ func ParseEndpoint(
 				data, err = moderationc.BuildAddPayload(*moderationAddBodyFlag, *moderationAddAuthFlag)
 			case "acknowledge":
 				endpoint = c.Acknowledge()
-				data, err = moderationc.BuildAcknowledgePayload(*moderationAcknowledgeBodyFlag, *moderationAcknowledgeAuthFlag)
+				data, err = moderationc.BuildAcknowledgePayload(*moderationAcknowledgeIDFlag, *moderationAcknowledgeActionFlag, *moderationAcknowledgeAuthFlag)
+			case "list-requests":
+				endpoint = c.ListRequests()
+				data, err = moderationc.BuildListRequestsPayload(*moderationListRequestsPageFlag, *moderationListRequestsPageSizeFlag, *moderationListRequestsAuthFlag)
+			case "get-content":
+				endpoint = c.GetContent()
+				data, err = moderationc.BuildGetContentPayload(*moderationGetContentPostTypeFlag, *moderationGetContentPostIDFlag, *moderationGetContentAuthFlag)
 			}
 		case "modules":
 			c := modulesc.NewClient(scheme, host, doer, enc, dec, restore)
@@ -2024,7 +2049,7 @@ Station implements station.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` activity station --id 7387793786634728127 --page 8540322621804096569 --auth "Dolorem voluptates qui aperiam aut dolores."
+    `+os.Args[0]+` activity station --id 7310945293571350078 --page 2939128952299025123 --auth "Quisquam quidem."
 `, os.Args[0])
 }
 
@@ -2037,7 +2062,7 @@ Project implements project.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` activity project --id 59146196273053280 --page 4268172934550794205 --auth "Velit non dolorem."
+    `+os.Args[0]+` activity project --id 6355864670896011465 --page 4267605909038189909 --auth "Eum voluptatem sequi hic."
 `, os.Args[0])
 }
 
@@ -2061,7 +2086,7 @@ Health implements health.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` admin health --auth "Commodi et ut dolor tenetur."
+    `+os.Args[0]+` admin health --auth "Accusamus iste et."
 `, os.Args[0])
 }
 
@@ -2109,7 +2134,7 @@ DeviceSummary implements device summary.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` data device- summary --device-id "Accusamus iste et." --auth "Ipsam et."
+    `+os.Args[0]+` data device- summary --device-id "Quis omnis." --auth "Modi at maiores ullam voluptatem."
 `, os.Args[0])
 }
 
@@ -2136,11 +2161,11 @@ Authenticate implements authenticate.
 
 Example:
     `+os.Args[0]+` discourse authenticate --body '{
-      "email": "Modi at maiores ullam voluptatem.",
-      "password": "1ke",
-      "sig": "Quis omnis.",
-      "sso": "Voluptate debitis rerum."
-   }' --token "Consequatur necessitatibus temporibus hic labore et tenetur."
+      "email": "Impedit molestias magnam.",
+      "password": "ndx",
+      "sig": "Et ipsum magnam et odio sit tempora.",
+      "sso": "Eligendi veritatis."
+   }' --token "Illo id."
 `, os.Args[0])
 }
 
@@ -2170,7 +2195,7 @@ Project implements project.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` discussion project --project-id 358123148 --auth "Aliquid illo id et sequi fugiat."
+    `+os.Args[0]+` discussion project --project-id 1703146338 --auth "Ipsum dicta eaque ut."
 `, os.Args[0])
 }
 
@@ -2182,7 +2207,7 @@ Data implements data.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` discussion data --bookmark "Consequatur consectetur eveniet animi impedit laborum." --auth "Sunt qui sit."
+    `+os.Args[0]+` discussion data --bookmark "Alias ut." --auth "Neque eum voluptatem rem."
 `, os.Args[0])
 }
 
@@ -2201,7 +2226,7 @@ Example:
          "projectId": 1271570708,
          "threadId": 6264850308329228339
       }
-   }' --auth "Consequatur reprehenderit voluptas et."
+   }' --auth "Reiciendis aliquam impedit omnis iusto."
 `, os.Args[0])
 }
 
@@ -2215,8 +2240,8 @@ UpdateMessage implements update message.
 
 Example:
     `+os.Args[0]+` discussion update- message --body '{
-      "body": "Delectus laboriosam harum rerum incidunt."
-   }' --post-id 6563094756373121908 --auth "Exercitationem ipsa."
+      "body": "Laudantium libero et est."
+   }' --post-id 7150001491486151582 --auth "Laborum nesciunt debitis dolores."
 `, os.Args[0])
 }
 
@@ -2228,7 +2253,7 @@ DeleteMessage implements delete message.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` discussion delete- message --post-id 258370770638175285 --auth "Voluptate nemo cupiditate amet eligendi aliquid voluptas."
+    `+os.Args[0]+` discussion delete- message --post-id 5373779315874809540 --auth "Nam rerum voluptatem ipsam ipsum."
 `, os.Args[0])
 }
 
@@ -2257,7 +2282,7 @@ DataEvents implements data events.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` data- events data- events --bookmark "Fuga autem similique." --auth "Omnis ducimus dolor pariatur qui et."
+    `+os.Args[0]+` data- events data- events --bookmark "Magnam aut velit temporibus." --auth "Ullam sit."
 `, os.Args[0])
 }
 
@@ -2278,7 +2303,7 @@ Example:
          "start": 3072237865390360984,
          "title": "Dolorem placeat earum odio iusto est reiciendis."
       }
-   }' --auth "Pariatur possimus odio."
+   }' --auth "Autem doloremque et numquam."
 `, os.Args[0])
 }
 
@@ -2292,11 +2317,11 @@ UpdateDataEvent implements update data event.
 
 Example:
     `+os.Args[0]+` data- events update- data- event --body '{
-      "description": "Similique consequuntur sed.",
-      "end": 3777884821730689432,
-      "start": 2496758607247350557,
-      "title": "Qui et non iste qui."
-   }' --event-id 3176410043285369808 --auth "Doloremque et numquam eum."
+      "description": "Quaerat sit.",
+      "end": 505970632345613340,
+      "start": 4534775901646415309,
+      "title": "Earum ut."
+   }' --event-id 74149822024587834 --auth "Dolor alias eligendi architecto eos quod aut."
 `, os.Args[0])
 }
 
@@ -2308,7 +2333,7 @@ DeleteDataEvent implements delete data event.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` data- events delete- data- event --event-id 8294409450848722425 --auth "Est quaerat."
+    `+os.Args[0]+` data- events delete- data- event --event-id 93686312320379195 --auth "Ut placeat rerum pariatur sed qui."
 `, os.Args[0])
 }
 
@@ -2336,7 +2361,7 @@ ListMine implements list mine.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` export list- mine --auth "Harum quidem commodi qui sint."
+    `+os.Args[0]+` export list- mine --auth "Dolore suscipit voluptas maxime quia ea."
 `, os.Args[0])
 }
 
@@ -2348,7 +2373,7 @@ Status implements status.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` export status --id "Minus quis quaerat omnis eos." --auth "Quam neque corporis."
+    `+os.Args[0]+` export status --id "Ab praesentium." --auth "Quia molestiae repellendus et distinctio repellendus atque."
 `, os.Args[0])
 }
 
@@ -2360,7 +2385,7 @@ Download implements download.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` export download --id "Cum ut dolore." --auth "Eaque aliquam ea iusto corrupti deleniti."
+    `+os.Args[0]+` export download --id "Sed amet." --auth "Omnis nemo laboriosam est eaque."
 `, os.Args[0])
 }
 
@@ -2379,7 +2404,7 @@ Csv implements csv.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` export csv --start 2199641460350783801 --end 2571637276202717001 --stations "Est esse itaque consequatur officiis minima." --sensors "Amet nam omnis nemo laboriosam est." --resolution 438583131 --aggregate "Ipsa alias voluptas ullam." --complete false --tail 470136842 --auth "Impedit nam dicta at."
+    `+os.Args[0]+` export csv --start 7213264915663072777 --end 98546059109118784 --stations "Aut praesentium inventore est nihil iusto harum." --sensors "Autem facilis commodi provident ipsum." --resolution 160482504 --aggregate "At non minima." --complete true --tail 21395898 --auth "Soluta quaerat autem quo."
 `, os.Args[0])
 }
 
@@ -2398,7 +2423,7 @@ JSONLines implements json lines.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` export json- lines --start 67903894471901990 --end 5986736887240582156 --stations "Inventore est nihil iusto harum." --sensors "Autem facilis commodi provident ipsum." --resolution 160482504 --aggregate "At non minima." --complete true --tail 21395898 --auth "Soluta quaerat autem quo."
+    `+os.Args[0]+` export json- lines --start 5585872926806425794 --end 9107842975399819267 --stations "Itaque totam ab." --sensors "Sed quibusdam impedit quam ut officiis et." --resolution 70809098 --aggregate "Vel debitis." --complete true --tail 2041056049 --auth "Pariatur et nemo."
 `, os.Args[0])
 }
 
@@ -2425,7 +2450,7 @@ Download implements download.
     -firmware-id INT32: 
 
 Example:
-    `+os.Args[0]+` firmware download --firmware-id 2120584942
+    `+os.Args[0]+` firmware download --firmware-id 1994792261
 `, os.Args[0])
 }
 
@@ -2438,14 +2463,14 @@ Add implements add.
 
 Example:
     `+os.Args[0]+` firmware add --body '{
-      "etag": "Pariatur et nemo.",
-      "logicalAddress": 8498200775563835365,
-      "meta": "Ut ut et eos dolor error.",
-      "module": "Est debitis ducimus laboriosam earum.",
-      "profile": "Qui dolorem.",
-      "url": "Ut quo incidunt quibusdam.",
-      "version": "Et doloremque labore."
-   }' --auth "Ut qui facere magnam hic et itaque."
+      "etag": "Molestiae nostrum et veniam.",
+      "logicalAddress": 5371191444501827293,
+      "meta": "Qui nulla quo expedita repudiandae.",
+      "module": "Qui labore quis qui fuga.",
+      "profile": "Eos nihil.",
+      "url": "Molestiae praesentium perferendis sed tempore sapiente nihil.",
+      "version": "Ipsam quis."
+   }' --auth "Exercitationem sed quia consectetur atque quibusdam."
 `, os.Args[0])
 }
 
@@ -2460,7 +2485,7 @@ List implements list.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` firmware list --module "Fuga veritatis eos nihil quo ipsam." --profile "Tempore molestiae praesentium perferendis." --page-size 1795878686 --page 1407406433 --auth "Nihil nostrum qui nulla."
+    `+os.Args[0]+` firmware list --module "Dignissimos quidem optio." --profile "Maxime reiciendis ut dolore sequi." --page-size 47440959 --page 1600978354 --auth "Voluptate nihil non."
 `, os.Args[0])
 }
 
@@ -2472,7 +2497,7 @@ Delete implements delete.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` firmware delete --firmware-id 705688969 --auth "Ex dolor."
+    `+os.Args[0]+` firmware delete --firmware-id 2008977010 --auth "Eius molestiae labore et delectus id."
 `, os.Args[0])
 }
 
@@ -2500,7 +2525,7 @@ Follow implements follow.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` following follow --id 9161315557556197271 --auth "Deleniti asperiores inventore sunt omnis et consectetur."
+    `+os.Args[0]+` following follow --id 1755359181426240191 --auth "In ad."
 `, os.Args[0])
 }
 
@@ -2512,7 +2537,7 @@ Unfollow implements unfollow.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` following unfollow --id 8313665937947970073 --auth "Quia libero."
+    `+os.Args[0]+` following unfollow --id 6897530837215585822 --auth "Fugit asperiores non esse."
 `, os.Args[0])
 }
 
@@ -2524,7 +2549,7 @@ Followers implements followers.
     -page INT64: 
 
 Example:
-    `+os.Args[0]+` following followers --id 691940218213680242 --page 8158947251087747473
+    `+os.Args[0]+` following followers --id 5523499240300475710 --page 4784098468276155850
 `, os.Args[0])
 }
 
@@ -2555,7 +2580,7 @@ ProcessPending implements process pending.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` ingestion process- pending --auth "Et et consequatur."
+    `+os.Args[0]+` ingestion process- pending --auth "Aliquam sunt dolor itaque et qui reprehenderit."
 `, os.Args[0])
 }
 
@@ -2566,7 +2591,7 @@ WalkEverything implements walk everything.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` ingestion walk- everything --auth "Soluta dignissimos beatae."
+    `+os.Args[0]+` ingestion walk- everything --auth "Doloribus veritatis vel."
 `, os.Args[0])
 }
 
@@ -2580,7 +2605,7 @@ ProcessStation implements process station.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` ingestion process- station --station-id 123180734 --completely true --skip-manual true --auth "Sunt dolor."
+    `+os.Args[0]+` ingestion process- station --station-id 1790736165 --completely false --skip-manual false --auth "Veritatis ut laudantium."
 `, os.Args[0])
 }
 
@@ -2592,7 +2617,7 @@ ProcessStationIngestions implements process station ingestions.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` ingestion process- station- ingestions --station-id 5414582910250466482 --auth "Voluptates voluptatem doloribus veritatis vel ducimus."
+    `+os.Args[0]+` ingestion process- station- ingestions --station-id 1356168468521620607 --auth "Dolorem vitae."
 `, os.Args[0])
 }
 
@@ -2604,7 +2629,7 @@ ProcessIngestion implements process ingestion.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` ingestion process- ingestion --ingestion-id 215620773325637799 --auth "Soluta veritatis ut laudantium."
+    `+os.Args[0]+` ingestion process- ingestion --ingestion-id 2465503001449618902 --auth "Expedita delectus a nesciunt ullam sit asperiores."
 `, os.Args[0])
 }
 
@@ -2615,7 +2640,7 @@ RefreshViews implements refresh views.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` ingestion refresh- views --auth "Quisquam nostrum dolorem vitae id cupiditate."
+    `+os.Args[0]+` ingestion refresh- views --auth "Facilis asperiores in omnis et error."
 `, os.Args[0])
 }
 
@@ -2627,7 +2652,7 @@ Delete implements delete.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` ingestion delete --ingestion-id 5522041421867755706 --auth "A nesciunt."
+    `+os.Args[0]+` ingestion delete --ingestion-id 2810151889205967267 --auth "Consequuntur sequi distinctio natus aliquam blanditiis."
 `, os.Args[0])
 }
 
@@ -2640,7 +2665,9 @@ Usage:
 
 COMMAND:
     add: Add implements add.
-    acknowledge: Acknowledge implements acknowledge.
+    acknowledge: Acknowledge a moderation request with action
+    list-requests: List moderation requests
+    get-content: Get content for moderation review
 
 Additional help:
     %s moderation COMMAND --help
@@ -2655,24 +2682,48 @@ Add implements add.
 
 Example:
     `+os.Args[0]+` moderation add --body '{
-      "postId": 633512197,
-      "postType": "Praesentium libero."
-   }' --auth "Asperiores in omnis et error et."
+      "postId": 540864754,
+      "postType": "Vitae quis reiciendis quidem consequuntur."
+   }' --auth "Amet tempora harum."
 `, os.Args[0])
 }
 
 func moderationAcknowledgeUsage() {
-	fmt.Fprintf(os.Stderr, `%s [flags] moderation acknowledge -body JSON -auth STRING
+	fmt.Fprintf(os.Stderr, `%s [flags] moderation acknowledge -id INT32 -action STRING -auth STRING
 
-Acknowledge implements acknowledge.
-    -body JSON: 
+Acknowledge a moderation request with action
+    -id INT32: Request ID
+    -action STRING: 
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` moderation acknowledge --body '{
-      "acknowledgedBy": 332309470,
-      "id": 1595984137
-   }' --auth "Harum iure voluptas eum ut voluptas iusto."
+    `+os.Args[0]+` moderation acknowledge --id 561118877 --action "Autem similique excepturi commodi quo." --auth "Bearer 񼔎𲭜󞻕򃗯"
+`, os.Args[0])
+}
+
+func moderationListRequestsUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] moderation list-requests -page INT32 -page-size INT32 -auth STRING
+
+List moderation requests
+    -page INT32: 
+    -page-size INT32: 
+    -auth STRING: 
+
+Example:
+    `+os.Args[0]+` moderation list-requests --page 1980126935 --page-size 1158895746 --auth "Bearer 󎂛񖿥􍒇"
+`, os.Args[0])
+}
+
+func moderationGetContentUsage() {
+	fmt.Fprintf(os.Stderr, `%s [flags] moderation get-content -post-type STRING -post-id INT32 -auth STRING
+
+Get content for moderation review
+    -post-type STRING: Type of post
+    -post-id INT32: ID of the post
+    -auth STRING: 
+
+Example:
+    `+os.Args[0]+` moderation get-content --post-type "Blanditiis facere dignissimos dolorem atque assumenda nostrum." --post-id 1373511493 --auth "Bearer 󀂅"
 `, os.Args[0])
 }
 
@@ -2729,76 +2780,76 @@ Example:
       "notes": {
          "creating": [
             {
-               "body": "Autem maxime quis nihil quia aut sunt.",
-               "key": "Quis laborum modi distinctio.",
+               "body": "Veniam esse et repellendus sit unde.",
+               "key": "Provident aut quia voluptas similique aliquam.",
                "mediaIds": [
-                  1798173126209158554,
-                  664884135366726745,
-                  68882798430372861
+                  1251294882989705864,
+                  7480179259998514284
                ],
-               "title": "Et dolor iure illo odio quod."
+               "title": "Et nobis eos."
             },
             {
-               "body": "Autem maxime quis nihil quia aut sunt.",
-               "key": "Quis laborum modi distinctio.",
+               "body": "Veniam esse et repellendus sit unde.",
+               "key": "Provident aut quia voluptas similique aliquam.",
                "mediaIds": [
-                  1798173126209158554,
-                  664884135366726745,
-                  68882798430372861
+                  1251294882989705864,
+                  7480179259998514284
                ],
-               "title": "Et dolor iure illo odio quod."
-            },
-            {
-               "body": "Autem maxime quis nihil quia aut sunt.",
-               "key": "Quis laborum modi distinctio.",
-               "mediaIds": [
-                  1798173126209158554,
-                  664884135366726745,
-                  68882798430372861
-               ],
-               "title": "Et dolor iure illo odio quod."
+               "title": "Et nobis eos."
             }
          ],
          "notes": [
             {
-               "body": "Explicabo vel dignissimos sit.",
-               "id": 52050004121622967,
-               "key": "Sint sint aut eaque.",
+               "body": "Quo et eum ut reprehenderit libero.",
+               "id": 6553981795884726796,
+               "key": "Autem maxime quis nihil quia aut sunt.",
                "mediaIds": [
-                  6161488173388685877,
-                  7691373380732457695,
-                  8616248544594190336,
-                  6040503403070916538
+                  5371368341172454149,
+                  8617986795041346491,
+                  7689389287360805306,
+                  8288153198603015949
                ],
-               "title": "Quisquam qui."
+               "title": "Nulla odio maxime."
             },
             {
-               "body": "Explicabo vel dignissimos sit.",
-               "id": 52050004121622967,
-               "key": "Sint sint aut eaque.",
+               "body": "Quo et eum ut reprehenderit libero.",
+               "id": 6553981795884726796,
+               "key": "Autem maxime quis nihil quia aut sunt.",
                "mediaIds": [
-                  6161488173388685877,
-                  7691373380732457695,
-                  8616248544594190336,
-                  6040503403070916538
+                  5371368341172454149,
+                  8617986795041346491,
+                  7689389287360805306,
+                  8288153198603015949
                ],
-               "title": "Quisquam qui."
+               "title": "Nulla odio maxime."
             },
             {
-               "body": "Explicabo vel dignissimos sit.",
-               "id": 52050004121622967,
-               "key": "Sint sint aut eaque.",
+               "body": "Quo et eum ut reprehenderit libero.",
+               "id": 6553981795884726796,
+               "key": "Autem maxime quis nihil quia aut sunt.",
                "mediaIds": [
-                  6161488173388685877,
-                  7691373380732457695,
-                  8616248544594190336,
-                  6040503403070916538
+                  5371368341172454149,
+                  8617986795041346491,
+                  7689389287360805306,
+                  8288153198603015949
                ],
-               "title": "Quisquam qui."
+               "title": "Nulla odio maxime."
+            },
+            {
+               "body": "Quo et eum ut reprehenderit libero.",
+               "id": 6553981795884726796,
+               "key": "Autem maxime quis nihil quia aut sunt.",
+               "mediaIds": [
+                  5371368341172454149,
+                  8617986795041346491,
+                  7689389287360805306,
+                  8288153198603015949
+               ],
+               "title": "Nulla odio maxime."
             }
          ]
       }
-   }' --station-id 1532845335 --auth "Nostrum in et delectus."
+   }' --station-id 666124807 --auth "Placeat possimus."
 `, os.Args[0])
 }
 
@@ -2810,7 +2861,7 @@ Get implements get.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` notes get --station-id 299414147 --auth "Dignissimos dolorem atque assumenda nostrum esse."
+    `+os.Args[0]+` notes get --station-id 1229737249 --auth "Enim eaque fugit dolor nemo repudiandae."
 `, os.Args[0])
 }
 
@@ -2822,7 +2873,7 @@ DownloadMedia implements download media.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` notes download- media --media-id 2120875187 --auth "Numquam sit quae."
+    `+os.Args[0]+` notes download- media --media-id 1261534466 --auth "Sunt magnam."
 `, os.Args[0])
 }
 
@@ -2838,7 +2889,7 @@ UploadMedia implements upload media.
     -stream STRING: path to file containing the streamed request body
 
 Example:
-    `+os.Args[0]+` notes upload- media --station-id 163752571 --key "Fuga animi ab corrupti deleniti." --content-type "Omnis tempore." --content-length 2906449150921257157 --auth "Aut nulla et tempore voluptatum." --stream "goa.png"
+    `+os.Args[0]+` notes upload- media --station-id 745057150 --key "Placeat est." --content-type "Numquam pariatur omnis tempora aliquid accusantium." --content-length 2048415618171501819 --auth "Quas necessitatibus ut enim tempore." --stream "goa.png"
 `, os.Args[0])
 }
 
@@ -2850,7 +2901,7 @@ DeleteMedia implements delete media.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` notes delete- media --media-id 986797602 --auth "Earum sed recusandae molestiae eos."
+    `+os.Args[0]+` notes delete- media --media-id 243530663 --auth "Sunt libero fugiat non non veniam sit."
 `, os.Args[0])
 }
 
@@ -2889,12 +2940,12 @@ Seen implements seen.
 Example:
     `+os.Args[0]+` notifications seen --body '{
       "ids": [
-         1728880755431189635,
-         1322035144306163366,
-         9196676725047044889,
-         7553145651520735003
+         7040738096371320372,
+         7330805035721540378,
+         8654540827921792186,
+         5015285611055297451
       ]
-   }' --auth "Officia maxime laudantium."
+   }' --auth "Ipsa eaque aperiam."
 `, os.Args[0])
 }
 
@@ -2922,7 +2973,7 @@ Required implements required.
     -token STRING: 
 
 Example:
-    `+os.Args[0]+` oidc required --after "Cupiditate autem." --follow false --token "Libero fugiat non."
+    `+os.Args[0]+` oidc required --after "Quia eum a voluptatem." --follow true --token "Unde suscipit."
 `, os.Args[0])
 }
 
@@ -2935,7 +2986,7 @@ URL implements url.
     -token STRING: 
 
 Example:
-    `+os.Args[0]+` oidc url --after "Veritatis facilis quia autem ut." --follow true --token "Aut provident."
+    `+os.Args[0]+` oidc url --after "Voluptatem tempore in nulla architecto magni doloremque." --follow true --token "Similique ab nam et aut."
 `, os.Args[0])
 }
 
@@ -2948,7 +2999,7 @@ Authenticate implements authenticate.
     -code STRING: 
 
 Example:
-    `+os.Args[0]+` oidc authenticate --state "Voluptas dolor nobis asperiores." --session-state "Eum earum facilis." --code "Aliquam dicta tempora eligendi sit similique."
+    `+os.Args[0]+` oidc authenticate --state "Laudantium voluptatem nobis." --session-state "Quod reprehenderit sed officia voluptatem sed." --code "Vel asperiores est ratione."
 `, os.Args[0])
 }
 
@@ -2997,8 +3048,8 @@ AddUpdate implements add update.
 
 Example:
     `+os.Args[0]+` project add- update --body '{
-      "body": "Voluptas reiciendis asperiores dolorem consequatur minima quam."
-   }' --project-id 1401624793 --auth "Qui inventore atque."
+      "body": "Soluta adipisci sit veritatis."
+   }' --project-id 1635839137 --auth "Non delectus impedit qui laboriosam ut."
 `, os.Args[0])
 }
 
@@ -3011,7 +3062,7 @@ DeleteUpdate implements delete update.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` project delete- update --project-id 1170396058 --update-id 6803638747921870428 --auth "Placeat omnis temporibus praesentium."
+    `+os.Args[0]+` project delete- update --project-id 67310400 --update-id 4667918881818648681 --auth "Consequatur ad sint qui ex tempore rem."
 `, os.Args[0])
 }
 
@@ -3026,8 +3077,8 @@ ModifyUpdate implements modify update.
 
 Example:
     `+os.Args[0]+` project modify- update --body '{
-      "body": "Maxime enim natus perspiciatis."
-   }' --project-id 271647638 --update-id 1430931843694774569 --auth "A voluptatem et aspernatur unde suscipit quaerat."
+      "body": "Quam veniam necessitatibus rerum vel temporibus laboriosam."
+   }' --project-id 1917285403 --update-id 5179549687796384607 --auth "Sit at consectetur iste voluptatum quisquam."
 `, os.Args[0])
 }
 
@@ -3038,7 +3089,7 @@ Invites implements invites.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` project invites --auth "Architecto magni."
+    `+os.Args[0]+` project invites --auth "Voluptatem mollitia hic quia commodi."
 `, os.Args[0])
 }
 
@@ -3050,7 +3101,7 @@ LookupInvite implements lookup invite.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` project lookup- invite --token "Veritatis sunt sit non delectus." --auth "Qui laboriosam ut itaque."
+    `+os.Args[0]+` project lookup- invite --token "Est enim." --auth "Ut quibusdam qui est."
 `, os.Args[0])
 }
 
@@ -3062,7 +3113,7 @@ AcceptProjectInvite implements accept project invite.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` project accept- project- invite --project-id 1053994699 --auth "Et ad sapiente accusamus aut deleniti."
+    `+os.Args[0]+` project accept- project- invite --project-id 1094548818 --auth "Fuga facere laborum beatae rerum excepturi eum."
 `, os.Args[0])
 }
 
@@ -3074,7 +3125,7 @@ RejectProjectInvite implements reject project invite.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` project reject- project- invite --project-id 2124339683 --auth "Aut tenetur omnis nam consectetur."
+    `+os.Args[0]+` project reject- project- invite --project-id 2139138862 --auth "Placeat aut est maxime."
 `, os.Args[0])
 }
 
@@ -3087,7 +3138,7 @@ AcceptInvite implements accept invite.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` project accept- invite --id 7873323313748358892 --token "Temporibus laboriosam vel." --auth "Rerum sit at."
+    `+os.Args[0]+` project accept- invite --id 8394160185601364102 --token "Facilis est." --auth "Dolor et illum praesentium recusandae."
 `, os.Args[0])
 }
 
@@ -3100,7 +3151,7 @@ RejectInvite implements reject invite.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` project reject- invite --id 6410207054807539683 --token "Laborum sint." --auth "Expedita voluptatem provident."
+    `+os.Args[0]+` project reject- invite --id 899739793040154236 --token "Maxime qui odit nobis." --auth "Autem officia quis sunt officia quo beatae."
 `, os.Args[0])
 }
 
@@ -3113,14 +3164,14 @@ Add implements add.
 
 Example:
     `+os.Args[0]+` project add --body '{
-      "etag": "Pariatur et nemo.",
-      "logicalAddress": 8498200775563835365,
-      "meta": "Ut ut et eos dolor error.",
-      "module": "Est debitis ducimus laboriosam earum.",
-      "profile": "Qui dolorem.",
-      "url": "Ut quo incidunt quibusdam.",
-      "version": "Et doloremque labore."
-   }' --auth "Voluptatem laboriosam non."
+      "etag": "Molestiae nostrum et veniam.",
+      "logicalAddress": 5371191444501827293,
+      "meta": "Qui nulla quo expedita repudiandae.",
+      "module": "Qui labore quis qui fuga.",
+      "profile": "Eos nihil.",
+      "url": "Molestiae praesentium perferendis sed tempore sapiente nihil.",
+      "version": "Ipsam quis."
+   }' --auth "Nihil cum alias voluptas."
 `, os.Args[0])
 }
 
@@ -3136,25 +3187,25 @@ Example:
     `+os.Args[0]+` project update --body '{
       "bounds": {
          "max": [
-            0.5276088937543477,
-            0.7383588707446651
+            0.40567447520674177,
+            0.15229471017399718
          ],
          "min": [
-            0.21585128914843826,
-            0.9244716642342787,
-            0.16091999630154707
+            0.6690953235758833,
+            0.0870833714582645,
+            0.2580563485254365
          ]
       },
-      "description": "Hic architecto est.",
-      "endTime": "Beatae rerum excepturi eum.",
-      "goal": "Molestiae ut quibusdam qui est ipsum ad.",
-      "location": "Distinctio debitis dolor officia qui et.",
-      "name": "Velit voluptatem.",
-      "privacy": 1564559967,
-      "showStations": false,
-      "startTime": "Iure sed fuga facere.",
-      "tags": "Omnis ratione."
-   }' --project-id 2134965100 --auth "Consequatur dicta."
+      "description": "Ex sapiente.",
+      "endTime": "Est ut fugit nesciunt.",
+      "goal": "Suscipit nesciunt veniam quos rerum est tempora.",
+      "location": "Fugit minus saepe.",
+      "name": "Corrupti atque saepe enim totam nostrum officiis.",
+      "privacy": 1267894365,
+      "showStations": true,
+      "startTime": "Enim voluptatum sunt ut nobis.",
+      "tags": "Quaerat reiciendis tenetur sit eos aliquam dicta."
+   }' --project-id 607166720 --auth "Id id."
 `, os.Args[0])
 }
 
@@ -3166,7 +3217,7 @@ Get implements get.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` project get --project-id 905363469 --auth "Excepturi nam non doloribus amet."
+    `+os.Args[0]+` project get --project-id 1575270198 --auth "Ipsam eos sed nesciunt libero totam facilis."
 `, os.Args[0])
 }
 
@@ -3177,7 +3228,7 @@ ListCommunity implements list community.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` project list- community --auth "Doloremque sit aperiam."
+    `+os.Args[0]+` project list- community --auth "Dicta autem nemo quibusdam delectus expedita eum."
 `, os.Args[0])
 }
 
@@ -3188,7 +3239,7 @@ ListMine implements list mine.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` project list- mine --auth "Nesciunt veniam quos rerum."
+    `+os.Args[0]+` project list- mine --auth "Cupiditate sequi quaerat voluptatibus omnis."
 `, os.Args[0])
 }
 
@@ -3202,9 +3253,9 @@ Invite implements invite.
 
 Example:
     `+os.Args[0]+` project invite --body '{
-      "email": "Et corporis enim voluptatum sunt.",
-      "role": 430998823
-   }' --project-id 1891599137 --auth "Est ut fugit nesciunt."
+      "email": "Cum voluptatem.",
+      "role": 1258615549
+   }' --project-id 914853809 --auth "Ea sit illum saepe ipsa libero."
 `, os.Args[0])
 }
 
@@ -3218,9 +3269,9 @@ EditUser implements edit user.
 
 Example:
     `+os.Args[0]+` project edit- user --body '{
-      "email": "Ducimus id tempore ratione et.",
-      "role": 1511587823
-   }' --project-id 878962557 --auth "Consectetur ut et ut."
+      "email": "Voluptas quo.",
+      "role": 76831435
+   }' --project-id 915742794 --auth "Provident quas eius."
 `, os.Args[0])
 }
 
@@ -3234,8 +3285,8 @@ RemoveUser implements remove user.
 
 Example:
     `+os.Args[0]+` project remove- user --body '{
-      "email": "Et sunt dicta sed qui."
-   }' --project-id 338342225 --auth "Aut nihil nam repellendus dolor temporibus voluptatem."
+      "email": "Tenetur est vel consequatur et."
+   }' --project-id 1069342332 --auth "Tenetur ea est enim."
 `, os.Args[0])
 }
 
@@ -3248,7 +3299,7 @@ AddStation implements add station.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` project add- station --project-id 1016773031 --station-id 1447336536 --auth "Labore earum harum."
+    `+os.Args[0]+` project add- station --project-id 662219952 --station-id 1782095450 --auth "Ipsum qui eius numquam."
 `, os.Args[0])
 }
 
@@ -3261,7 +3312,7 @@ RemoveStation implements remove station.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` project remove- station --project-id 1138685040 --station-id 1651838186 --auth "Autem laboriosam nulla ratione libero fugiat vitae."
+    `+os.Args[0]+` project remove- station --project-id 198023313 --station-id 951325014 --auth "Rem voluptas."
 `, os.Args[0])
 }
 
@@ -3273,7 +3324,7 @@ Delete implements delete.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` project delete --project-id 1328427078 --auth "Atque sint recusandae quo ad."
+    `+os.Args[0]+` project delete --project-id 888742781 --auth "Veritatis sapiente enim et soluta unde."
 `, os.Args[0])
 }
 
@@ -3288,7 +3339,7 @@ UploadPhoto implements upload photo.
     -stream STRING: path to file containing the streamed request body
 
 Example:
-    `+os.Args[0]+` project upload- photo --project-id 1694270705 --content-type "Temporibus et eos provident deleniti iste eos." --content-length 5427458076735942960 --auth "Autem nemo." --stream "goa.png"
+    `+os.Args[0]+` project upload- photo --project-id 1707609774 --content-type "Dolores amet magni quod voluptatibus sed aspernatur." --content-length 2673550516266587404 --auth "Qui et optio." --stream "goa.png"
 `, os.Args[0])
 }
 
@@ -3302,7 +3353,7 @@ DownloadPhoto implements download photo.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` project download- photo --project-id 597500266 --size 266831284 --if-none-match "Atque cupiditate sequi quaerat." --auth "Omnis voluptatibus voluptas occaecati dolore quam."
+    `+os.Args[0]+` project download- photo --project-id 1609051270 --size 1078264803 --if-none-match "Est dolores est dignissimos consequatur dolor enim." --auth "Ut modi doloribus."
 `, os.Args[0])
 }
 
@@ -3314,7 +3365,7 @@ ProjectsStation implements projects station.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` project projects- station --id 1183861227 --auth "Delectus unde."
+    `+os.Args[0]+` project projects- station --id 1869223553 --auth "Illo corrupti ea iusto impedit eum ut."
 `, os.Args[0])
 }
 
@@ -3341,7 +3392,7 @@ Data implements data.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` records data --record-id 5098976014297893186 --auth "Quae tenetur."
+    `+os.Args[0]+` records data --record-id 1009289891432512889 --auth "Cum iure beatae."
 `, os.Args[0])
 }
 
@@ -3353,7 +3404,7 @@ Meta implements meta.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` records meta --record-id 1986995062227253950 --auth "Ea amet adipisci beatae et libero molestias."
+    `+os.Args[0]+` records meta --record-id 2993649245466878272 --auth "Esse maxime nesciunt a."
 `, os.Args[0])
 }
 
@@ -3365,7 +3416,7 @@ Resolved implements resolved.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` records resolved --record-id 6864691745441826295 --auth "Enim et soluta unde eum molestiae aliquid."
+    `+os.Args[0]+` records resolved --record-id 26859858320680094 --auth "Dolorem pariatur numquam."
 `, os.Args[0])
 }
 
@@ -3406,7 +3457,7 @@ StationMeta implements station meta.
     -stations STRING: 
 
 Example:
-    `+os.Args[0]+` sensor station- meta --stations "Modi doloribus culpa nam quam atque."
+    `+os.Args[0]+` sensor station- meta --stations "Autem vitae asperiores at illo facere."
 `, os.Args[0])
 }
 
@@ -3436,7 +3487,7 @@ Data implements data.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` sensor data --start 4114400534334567951 --end 1567716671244795643 --stations "Incidunt ut eum illo." --sensors "Ea iusto impedit eum ut nisi." --resolution 27503333 --aggregate "Non tempora culpa id rerum nam libero." --complete true --tail 269938233 --backend "Praesentium dolorum cum iure." --auth "Exercitationem officiis ipsum."
+    `+os.Args[0]+` sensor data --start 7076622003274632532 --end 3127642383183958551 --stations "Optio nulla maxime." --sensors "Repellendus id optio vel at facere." --resolution 975781246 --aggregate "Aut sit voluptatem nesciunt eum voluptas nihil." --complete false --tail 823849024 --backend "Doloremque sequi quas." --auth "Mollitia laudantium."
 `, os.Args[0])
 }
 
@@ -3449,7 +3500,7 @@ Tail implements tail.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` sensor tail --stations "Autem cum." --backend "Ut consequatur voluptatem est." --auth "Excepturi corrupti sit dolores sint."
+    `+os.Args[0]+` sensor tail --stations "Non architecto." --backend "Distinctio magni quasi omnis est." --auth "Error consequatur iure accusamus."
 `, os.Args[0])
 }
 
@@ -3462,7 +3513,7 @@ Recently implements recently.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` sensor recently --stations "Ut atque exercitationem recusandae et." --windows "Nisi et est a sed ut." --auth "Voluptas voluptas odit quis."
+    `+os.Args[0]+` sensor recently --stations "Saepe qui libero eveniet." --windows "Ea excepturi ad optio ut." --auth "Quam quos sapiente est eos."
 `, os.Args[0])
 }
 
@@ -3474,7 +3525,7 @@ Bookmark implements bookmark.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` sensor bookmark --bookmark "Perferendis nostrum alias." --auth "Autem corrupti fugit quibusdam reprehenderit sit qui."
+    `+os.Args[0]+` sensor bookmark --bookmark "Et nihil omnis ut magnam dolor." --auth "Voluptatem sit ut quis qui."
 `, os.Args[0])
 }
 
@@ -3486,7 +3537,7 @@ Resolve implements resolve.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` sensor resolve --v2 "Vel at facere amet." --auth "Aut sit voluptatem nesciunt eum voluptas nihil."
+    `+os.Args[0]+` sensor resolve --v2 "Vel consequatur aperiam eum consequatur voluptatem facilis." --auth "Tempora accusamus."
 `, os.Args[0])
 }
 
@@ -3515,7 +3566,7 @@ Station implements station.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station-note station --station-id 1805311434 --auth "Architecto similique distinctio."
+    `+os.Args[0]+` station-note station --station-id 1109592098 --auth "Harum dicta."
 `, os.Args[0])
 }
 
@@ -3529,9 +3580,9 @@ AddNote implements add note.
 
 Example:
     `+os.Args[0]+` station-note add- note --body '{
-      "body": "Atque ea excepturi.",
-      "userId": 1242790540
-   }' --station-id 346248512 --auth "Ut rerum quam quos sapiente est eos."
+      "body": "Iusto aut voluptatum blanditiis molestiae occaecati voluptatem.",
+      "userId": 861927210
+   }' --station-id 1758644581 --auth "Labore ducimus quis aut iste sed corrupti."
 `, os.Args[0])
 }
 
@@ -3546,8 +3597,8 @@ UpdateNote implements update note.
 
 Example:
     `+os.Args[0]+` station-note update- note --body '{
-      "body": "Omnis ut magnam dolor ab voluptatem."
-   }' --station-id 1204046227 --station-note-id 1769257682 --auth "Qui ad molestiae facilis."
+      "body": "Repudiandae saepe qui aut modi."
+   }' --station-id 770503369 --station-note-id 330456042 --auth "Nobis soluta eos rerum omnis voluptas laudantium."
 `, os.Args[0])
 }
 
@@ -3560,7 +3611,7 @@ DeleteNote implements delete note.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station-note delete- note --station-id 1747337426 --station-note-id 1827381007 --auth "Autem tenetur voluptatem atque et est quo."
+    `+os.Args[0]+` station-note delete- note --station-id 915800782 --station-note-id 472227767 --auth "Qui corrupti ab vero rem sed."
 `, os.Args[0])
 }
 
@@ -3587,7 +3638,7 @@ DeviceLayout implements device layout.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` information device- layout --device-id "Incidunt assumenda vel consequatur." --auth "Eum consequatur voluptatem facilis."
+    `+os.Args[0]+` information device- layout --device-id "Quis et et laborum." --auth "Harum vero harum."
 `, os.Args[0])
 }
 
@@ -3598,7 +3649,7 @@ FirmwareStatistics implements firmware statistics.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` information firmware- statistics --auth "Ipsa cumque quis."
+    `+os.Args[0]+` information firmware- statistics --auth "Omnis non rerum sit et."
 `, os.Args[0])
 }
 
@@ -3672,7 +3723,7 @@ Webhook implements webhook.
     -stream STRING: path to file containing the streamed request body
 
 Example:
-    `+os.Args[0]+` ttn webhook --token "Eligendi eos." --content-type "Est repellendus quia alias qui dolorem." --content-length 4605071714647484512 --auth "Et laborum soluta harum vero harum eos." --stream "goa.png"
+    `+os.Args[0]+` ttn webhook --token "Minima quod voluptatem rerum." --content-type "Voluptas veniam dicta at iure veniam." --content-length 7200518641526417182 --auth "Est sit repellendus." --stream "goa.png"
 `, os.Args[0])
 }
 
@@ -3712,12 +3763,12 @@ Add implements add.
 
 Example:
     `+os.Args[0]+` station add --body '{
-      "description": "Et voluptatem debitis.",
-      "deviceId": "Similique nobis consequatur.",
-      "locationName": "Qui nihil commodi veritatis necessitatibus est aperiam.",
-      "name": "Deserunt dolorem eum ex ut aperiam eos.",
-      "statusPb": "Incidunt aut eum commodi odit velit suscipit."
-   }' --auth "Quia maiores."
+      "description": "Sit consequatur.",
+      "deviceId": "Qui delectus nisi animi.",
+      "locationName": "Rerum molestiae velit praesentium.",
+      "name": "Mollitia omnis non.",
+      "statusPb": "Ullam doloribus eveniet qui laborum."
+   }' --auth "Deserunt rerum pariatur voluptatem."
 `, os.Args[0])
 }
 
@@ -3729,7 +3780,7 @@ Get implements get.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station get --id 2128109809 --auth "Consequatur explicabo eos quia magni at."
+    `+os.Args[0]+` station get --id 1611771978 --auth "Et veniam numquam voluptatibus aliquam."
 `, os.Args[0])
 }
 
@@ -3742,7 +3793,7 @@ Transfer implements transfer.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station transfer --id 1250658266 --owner-id 517549504 --auth "Exercitationem reiciendis expedita."
+    `+os.Args[0]+` station transfer --id 1108262450 --owner-id 517680742 --auth "Id aut."
 `, os.Args[0])
 }
 
@@ -3755,7 +3806,7 @@ DefaultPhoto implements default photo.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station default- photo --id 1639371700 --photo-id 1708286681 --auth "Commodi dolores quia harum rem."
+    `+os.Args[0]+` station default- photo --id 1382015624 --photo-id 516562131 --auth "Et velit quos."
 `, os.Args[0])
 }
 
@@ -3769,11 +3820,11 @@ Update implements update.
 
 Example:
     `+os.Args[0]+` station update --body '{
-      "description": "Voluptate numquam non sit asperiores.",
-      "locationName": "Repellendus quis alias ut ab minima.",
-      "name": "Dicta eum et vero.",
-      "statusPb": "Aut repellat sunt eum repudiandae quam quas."
-   }' --id 1925710817 --auth "At adipisci minima."
+      "description": "Et ipsam.",
+      "locationName": "Placeat quia.",
+      "name": "Fuga fugiat tempora cupiditate.",
+      "statusPb": "Aliquam ratione quod et ut non perspiciatis."
+   }' --id 461197479 --auth "Voluptas dignissimos est consequatur eaque dolor."
 `, os.Args[0])
 }
 
@@ -3784,7 +3835,7 @@ ListMine implements list mine.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station list- mine --auth "Magnam et exercitationem fugiat."
+    `+os.Args[0]+` station list- mine --auth "Maxime sequi sint quas dolores commodi repellendus."
 `, os.Args[0])
 }
 
@@ -3797,7 +3848,7 @@ ListProject implements list project.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station list- project --id 1116793213 --disable-filtering true --auth "Consectetur sit."
+    `+os.Args[0]+` station list- project --id 1770142861 --disable-filtering false --auth "Eos a debitis et."
 `, os.Args[0])
 }
 
@@ -3809,7 +3860,7 @@ ListAssociated implements list associated.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station list- associated --id 624010742 --auth "Rerum sapiente magnam eos fugiat."
+    `+os.Args[0]+` station list- associated --id 467845461 --auth "Voluptatem consectetur ipsam repellendus."
 `, os.Args[0])
 }
 
@@ -3821,7 +3872,7 @@ ListProjectAssociated implements list project associated.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station list- project- associated --project-id 1646318152 --auth "Repellendus doloremque aspernatur."
+    `+os.Args[0]+` station list- project- associated --project-id 891826428 --auth "Quo eveniet et."
 `, os.Args[0])
 }
 
@@ -3835,7 +3886,7 @@ DownloadPhoto implements download photo.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station download- photo --station-id 1235739298 --size 1199402180 --if-none-match "Numquam maiores natus." --auth "Impedit deleniti qui."
+    `+os.Args[0]+` station download- photo --station-id 15852165 --size 1390119645 --if-none-match "Beatae reprehenderit maiores soluta eum et voluptatibus." --auth "Perferendis rerum ullam omnis."
 `, os.Args[0])
 }
 
@@ -3851,7 +3902,7 @@ ListAll implements list all.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station list- all --page 567123297 --page-size 1737100934 --owner-id 1054216720 --query "Qui consequuntur laudantium itaque." --sort-by "Velit qui commodi dolores iusto possimus eveniet." --auth "Quo enim et velit."
+    `+os.Args[0]+` station list- all --page 502812630 --page-size 151235781 --owner-id 1059631287 --query "Porro pariatur." --sort-by "Et debitis et ea quas." --auth "Perferendis repellendus."
 `, os.Args[0])
 }
 
@@ -3863,7 +3914,7 @@ Delete implements delete.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station delete --station-id 924789637 --auth "Eaque dolor."
+    `+os.Args[0]+` station delete --station-id 882180660 --auth "Ipsa est ut rem est facilis numquam."
 `, os.Args[0])
 }
 
@@ -3875,7 +3926,7 @@ AdminSearch implements admin search.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station admin- search --query "Sit animi." --auth "Suscipit alias aut."
+    `+os.Args[0]+` station admin- search --query "Quo rerum qui." --auth "Laborum vitae omnis illum quisquam."
 `, os.Args[0])
 }
 
@@ -3887,7 +3938,7 @@ Progress implements progress.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` station progress --station-id 1890653181 --auth "Dicta nostrum sed sequi rerum."
+    `+os.Args[0]+` station progress --station-id 1095659104 --auth "Dolorem eum."
 `, os.Args[0])
 }
 
@@ -3902,8 +3953,8 @@ UpdateModule implements update module.
 
 Example:
     `+os.Args[0]+` station update- module --body '{
-      "label": "Repellendus nihil et distinctio cum."
-   }' --id 490818314 --module-id 1528748523 --auth "Placeat ut libero quod harum dolorem."
+      "label": "Expedita omnis vel."
+   }' --id 736495378 --module-id 1109300513 --auth "Magnam quisquam nostrum impedit."
 `, os.Args[0])
 }
 
@@ -3950,7 +4001,7 @@ Roles implements roles.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user roles --auth "Sit nostrum."
+    `+os.Args[0]+` user roles --auth "Necessitatibus blanditiis laboriosam rerum."
 `, os.Args[0])
 }
 
@@ -3964,7 +4015,7 @@ UploadPhoto implements upload photo.
     -stream STRING: path to file containing the streamed request body
 
 Example:
-    `+os.Args[0]+` user upload- photo --content-type "Quos odit." --content-length 5477002325351166768 --auth "Magni iste quo repellat." --stream "goa.png"
+    `+os.Args[0]+` user upload- photo --content-type "Dolores placeat quia." --content-length 1367274246900640071 --auth "Reiciendis numquam nihil tempore sint similique." --stream "goa.png"
 `, os.Args[0])
 }
 
@@ -3977,7 +4028,7 @@ DownloadPhoto implements download photo.
     -if-none-match STRING: 
 
 Example:
-    `+os.Args[0]+` user download- photo --user-id 502812630 --size 151235781 --if-none-match "Earum porro pariatur aliquam et."
+    `+os.Args[0]+` user download- photo --user-id 1833840995 --size 713974248 --if-none-match "Autem quibusdam mollitia asperiores ipsam voluptas."
 `, os.Args[0])
 }
 
@@ -3989,8 +4040,8 @@ Login implements login.
 
 Example:
     `+os.Args[0]+` user login --body '{
-      "email": "dog",
-      "password": "7k0"
+      "email": "46r",
+      "password": "69s"
    }'
 `, os.Args[0])
 }
@@ -4003,7 +4054,7 @@ RecoveryLookup implements recovery lookup.
 
 Example:
     `+os.Args[0]+` user recovery- lookup --body '{
-      "email": "Quia vitae temporibus."
+      "email": "Cumque ut ex tempore."
    }'
 `, os.Args[0])
 }
@@ -4016,8 +4067,8 @@ Recovery implements recovery.
 
 Example:
     `+os.Args[0]+` user recovery --body '{
-      "password": "eop",
-      "token": "Quisquam porro ducimus excepturi ipsa est ut."
+      "password": "90a",
+      "token": "Rerum vero."
    }'
 `, os.Args[0])
 }
@@ -4030,7 +4081,7 @@ Resume implements resume.
 
 Example:
     `+os.Args[0]+` user resume --body '{
-      "token": "Et est nobis aut deserunt ut ex."
+      "token": "Delectus et et sunt quia non voluptatum."
    }'
 `, os.Args[0])
 }
@@ -4042,7 +4093,7 @@ Logout implements logout.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user logout --auth "Dolorem sint laboriosam cumque itaque voluptatem."
+    `+os.Args[0]+` user logout --auth "Occaecati voluptatibus nihil nemo adipisci voluptates dolore."
 `, os.Args[0])
 }
 
@@ -4054,7 +4105,7 @@ Refresh implements refresh.
 
 Example:
     `+os.Args[0]+` user refresh --body '{
-      "refreshToken": "Accusamus maiores aut magnam et."
+      "refreshToken": "Inventore omnis ab eveniet."
    }'
 `, os.Args[0])
 }
@@ -4066,7 +4117,7 @@ SendValidation implements send validation.
     -user-id INT32: 
 
 Example:
-    `+os.Args[0]+` user send- validation --user-id 1094436544
+    `+os.Args[0]+` user send- validation --user-id 458119961
 `, os.Args[0])
 }
 
@@ -4077,7 +4128,7 @@ Validate implements validate.
     -token STRING: 
 
 Example:
-    `+os.Args[0]+` user validate --token "Qui explicabo necessitatibus blanditiis."
+    `+os.Args[0]+` user validate --token "Ut dolore voluptas."
 `, os.Args[0])
 }
 
@@ -4089,13 +4140,13 @@ Add implements add.
 
 Example:
     `+os.Args[0]+` user add --body '{
-      "etag": "Pariatur et nemo.",
-      "logicalAddress": 8498200775563835365,
-      "meta": "Ut ut et eos dolor error.",
-      "module": "Est debitis ducimus laboriosam earum.",
-      "profile": "Qui dolorem.",
-      "url": "Ut quo incidunt quibusdam.",
-      "version": "Et doloremque labore."
+      "etag": "Molestiae nostrum et veniam.",
+      "logicalAddress": 5371191444501827293,
+      "meta": "Qui nulla quo expedita repudiandae.",
+      "module": "Qui labore quis qui fuga.",
+      "profile": "Eos nihil.",
+      "url": "Molestiae praesentium perferendis sed tempore sapiente nihil.",
+      "version": "Ipsam quis."
    }'
 `, os.Args[0])
 }
@@ -4112,25 +4163,25 @@ Example:
     `+os.Args[0]+` user update --body '{
       "bounds": {
          "max": [
-            0.5276088937543477,
-            0.7383588707446651
+            0.40567447520674177,
+            0.15229471017399718
          ],
          "min": [
-            0.21585128914843826,
-            0.9244716642342787,
-            0.16091999630154707
+            0.6690953235758833,
+            0.0870833714582645,
+            0.2580563485254365
          ]
       },
-      "description": "Hic architecto est.",
-      "endTime": "Beatae rerum excepturi eum.",
-      "goal": "Molestiae ut quibusdam qui est ipsum ad.",
-      "location": "Distinctio debitis dolor officia qui et.",
-      "name": "Velit voluptatem.",
-      "privacy": 1564559967,
-      "showStations": false,
-      "startTime": "Iure sed fuga facere.",
-      "tags": "Omnis ratione."
-   }' --user-id 1085327888 --auth "Vero voluptas dolor molestiae numquam."
+      "description": "Ex sapiente.",
+      "endTime": "Est ut fugit nesciunt.",
+      "goal": "Suscipit nesciunt veniam quos rerum est tempora.",
+      "location": "Fugit minus saepe.",
+      "name": "Corrupti atque saepe enim totam nostrum officiis.",
+      "privacy": 1267894365,
+      "showStations": true,
+      "startTime": "Enim voluptatum sunt ut nobis.",
+      "tags": "Quaerat reiciendis tenetur sit eos aliquam dicta."
+   }' --user-id 1482505498 --auth "Esse sed esse."
 `, os.Args[0])
 }
 
@@ -4144,9 +4195,9 @@ ChangePassword implements change password.
 
 Example:
     `+os.Args[0]+` user change- password --body '{
-      "newPassword": "ycf",
-      "oldPassword": "qtq"
-   }' --user-id 962657822 --auth "Ut ex tempore sed et."
+      "newPassword": "z9f",
+      "oldPassword": "xqs"
+   }' --user-id 392881807 --auth "Et doloremque numquam."
 `, os.Args[0])
 }
 
@@ -4161,7 +4212,7 @@ AcceptTnc implements accept tnc.
 Example:
     `+os.Args[0]+` user accept- tnc --body '{
       "accept": false
-   }' --user-id 676077217 --auth "Aut porro qui."
+   }' --user-id 1304894760 --auth "Saepe dolores adipisci ea."
 `, os.Args[0])
 }
 
@@ -4172,7 +4223,7 @@ GetCurrent implements get current.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user get- current --auth "Explicabo occaecati voluptatibus nihil."
+    `+os.Args[0]+` user get- current --auth "Aut magni autem cum iusto dolorum ut."
 `, os.Args[0])
 }
 
@@ -4184,7 +4235,7 @@ ListByProject implements list by project.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user list- by- project --project-id 1600390656 --auth "Et vel."
+    `+os.Args[0]+` user list- by- project --project-id 1507841406 --auth "Consequuntur deserunt rerum et nesciunt nemo ut."
 `, os.Args[0])
 }
 
@@ -4195,7 +4246,7 @@ IssueTransmissionToken implements issue transmission token.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user issue- transmission- token --auth "Ratione voluptatem harum voluptate."
+    `+os.Args[0]+` user issue- transmission- token --auth "Illo occaecati cum."
 `, os.Args[0])
 }
 
@@ -4218,8 +4269,8 @@ AdminTermsAndConditions implements admin terms and conditions.
 
 Example:
     `+os.Args[0]+` user admin- terms- and- conditions --body '{
-      "email": "Sunt molestiae qui."
-   }' --auth "Voluptatem ut ex earum rem."
+      "email": "Aperiam saepe sint."
+   }' --auth "Quo qui at optio."
 `, os.Args[0])
 }
 
@@ -4230,7 +4281,7 @@ DeleteAccount implements delete account.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user delete- account --auth "Adipisci eligendi ab eaque rerum."
+    `+os.Args[0]+` user delete- account --auth "Officia aperiam hic."
 `, os.Args[0])
 }
 
@@ -4243,9 +4294,9 @@ AdminDelete implements admin delete.
 
 Example:
     `+os.Args[0]+` user admin- delete --body '{
-      "email": "Consequatur tempora tempore.",
-      "password": "Aliquid sapiente necessitatibus hic."
-   }' --auth "Velit rerum et praesentium amet consequatur praesentium."
+      "email": "Et vero suscipit quia rerum dolorem voluptates.",
+      "password": "Aperiam aut dolores."
+   }' --auth "Voluptatibus hic nulla adipisci praesentium cum."
 `, os.Args[0])
 }
 
@@ -4257,7 +4308,7 @@ AdminSearch implements admin search.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user admin- search --query "Numquam voluptatem dolorem distinctio autem et." --auth "Similique dolor ut aspernatur pariatur."
+    `+os.Args[0]+` user admin- search --query "Molestias quisquam voluptates." --auth "Odio laboriosam."
 `, os.Args[0])
 }
 
@@ -4271,6 +4322,6 @@ Mentionables implements mentionables.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` user mentionables --project-id 1538828375 --bookmark "Repellendus atque qui laboriosam odit." --query "Enim omnis quia autem saepe dolores." --auth "Ea error."
+    `+os.Args[0]+` user mentionables --project-id 1269993407 --bookmark "Ea accusamus et aut." --query "Occaecati vel dolor sint corrupti aperiam." --auth "A necessitatibus ipsa."
 `, os.Args[0])
 }

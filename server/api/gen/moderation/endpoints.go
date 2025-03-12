@@ -16,8 +16,10 @@ import (
 
 // Endpoints wraps the "moderation" service endpoints.
 type Endpoints struct {
-	Add         goa.Endpoint
-	Acknowledge goa.Endpoint
+	Add          goa.Endpoint
+	Acknowledge  goa.Endpoint
+	ListRequests goa.Endpoint
+	GetContent   goa.Endpoint
 }
 
 // NewEndpoints wraps the methods of the "moderation" service with endpoints.
@@ -25,8 +27,10 @@ func NewEndpoints(s Service) *Endpoints {
 	// Casting service to Auther interface
 	a := s.(Auther)
 	return &Endpoints{
-		Add:         NewAddEndpoint(s, a.JWTAuth),
-		Acknowledge: NewAcknowledgeEndpoint(s, a.JWTAuth),
+		Add:          NewAddEndpoint(s, a.JWTAuth),
+		Acknowledge:  NewAcknowledgeEndpoint(s, a.JWTAuth),
+		ListRequests: NewListRequestsEndpoint(s, a.JWTAuth),
+		GetContent:   NewGetContentEndpoint(s, a.JWTAuth),
 	}
 }
 
@@ -34,6 +38,8 @@ func NewEndpoints(s Service) *Endpoints {
 func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.Add = m(e.Add)
 	e.Acknowledge = m(e.Acknowledge)
+	e.ListRequests = m(e.ListRequests)
+	e.GetContent = m(e.GetContent)
 }
 
 // NewAddEndpoint returns an endpoint function that calls the method "add" of
@@ -68,16 +74,55 @@ func NewAcknowledgeEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpo
 		sc := security.JWTScheme{
 			Name:           "jwt",
 			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
-			RequiredScopes: []string{"api:access"},
+			RequiredScopes: []string{},
 		}
-		var token string
-		if p.Auth != nil {
-			token = *p.Auth
-		}
-		ctx, err = authJWTFn(ctx, token, &sc)
+		ctx, err = authJWTFn(ctx, p.Auth, &sc)
 		if err != nil {
 			return nil, err
 		}
 		return s.Acknowledge(ctx, p)
+	}
+}
+
+// NewListRequestsEndpoint returns an endpoint function that calls the method
+// "listRequests" of service "moderation".
+func NewListRequestsEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*ListRequestsPayload)
+		var err error
+		sc := security.JWTScheme{
+			Name:           "jwt",
+			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
+			RequiredScopes: []string{},
+		}
+		ctx, err = authJWTFn(ctx, p.Auth, &sc)
+		if err != nil {
+			return nil, err
+		}
+		res, err := s.ListRequests(ctx, p)
+		if err != nil {
+			return nil, err
+		}
+		vres := NewViewedModerationRequests(res, "default")
+		return vres, nil
+	}
+}
+
+// NewGetContentEndpoint returns an endpoint function that calls the method
+// "getContent" of service "moderation".
+func NewGetContentEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*GetContentPayload)
+		var err error
+		sc := security.JWTScheme{
+			Name:           "jwt",
+			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
+			RequiredScopes: []string{},
+		}
+		ctx, err = authJWTFn(ctx, p.Auth, &sc)
+		if err != nil {
+			return nil, err
+		}
+		return s.GetContent(ctx, p)
 	}
 }

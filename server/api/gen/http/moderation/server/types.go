@@ -9,6 +9,7 @@ package server
 
 import (
 	moderation "gitlab.com/fieldkit/cloud/server/api/gen/moderation"
+	moderationviews "gitlab.com/fieldkit/cloud/server/api/gen/moderation/views"
 	goa "goa.design/goa/v3/pkg"
 )
 
@@ -19,35 +20,39 @@ type AddRequestBody struct {
 	PostType *string `form:"postType,omitempty" json:"postType,omitempty" xml:"postType,omitempty"`
 }
 
-// AcknowledgeRequestBody is the type of the "moderation" service "acknowledge"
-// endpoint HTTP request body.
-type AcknowledgeRequestBody struct {
-	ID             *int32 `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
-	AcknowledgedBy *int32 `form:"acknowledgedBy,omitempty" json:"acknowledgedBy,omitempty" xml:"acknowledgedBy,omitempty"`
-}
-
 // AddResponseBody is the type of the "moderation" service "add" endpoint HTTP
 // response body.
 type AddResponseBody struct {
-	ID             int32   `form:"id" json:"id" xml:"id"`
-	PostID         int32   `form:"postId" json:"postId" xml:"postId"`
-	PostType       string  `form:"postType" json:"postType" xml:"postType"`
-	ReportedBy     int32   `form:"reportedBy" json:"reportedBy" xml:"reportedBy"`
-	ReportedAt     string  `form:"reportedAt" json:"reportedAt" xml:"reportedAt"`
-	AcknowledgedBy *int32  `form:"acknowledgedBy,omitempty" json:"acknowledgedBy,omitempty" xml:"acknowledgedBy,omitempty"`
-	AcknowledgedAt *string `form:"acknowledgedAt,omitempty" json:"acknowledgedAt,omitempty" xml:"acknowledgedAt,omitempty"`
+	ID                 int32                 `form:"id" json:"id" xml:"id"`
+	PostID             int32                 `form:"postId" json:"postId" xml:"postId"`
+	PostType           string                `form:"postType" json:"postType" xml:"postType"`
+	ReportedBy         int32                 `form:"reportedBy" json:"reportedBy" xml:"reportedBy"`
+	ReportedByName     *string               `form:"reportedByName,omitempty" json:"reportedByName,omitempty" xml:"reportedByName,omitempty"`
+	ReportedAt         string                `form:"reportedAt" json:"reportedAt" xml:"reportedAt"`
+	AcknowledgedBy     *int32                `form:"acknowledgedBy,omitempty" json:"acknowledgedBy,omitempty" xml:"acknowledgedBy,omitempty"`
+	AcknowledgedByUser *UserInfoResponseBody `form:"acknowledgedByUser,omitempty" json:"acknowledgedByUser,omitempty" xml:"acknowledgedByUser,omitempty"`
+	AcknowledgedAt     *string               `form:"acknowledgedAt,omitempty" json:"acknowledgedAt,omitempty" xml:"acknowledgedAt,omitempty"`
 }
 
-// AcknowledgeResponseBody is the type of the "moderation" service
+// AcknowledgeOKResponseBody is the type of the "moderation" service
 // "acknowledge" endpoint HTTP response body.
-type AcknowledgeResponseBody struct {
-	ID             int32   `form:"id" json:"id" xml:"id"`
-	PostID         int32   `form:"postId" json:"postId" xml:"postId"`
-	PostType       string  `form:"postType" json:"postType" xml:"postType"`
-	ReportedBy     int32   `form:"reportedBy" json:"reportedBy" xml:"reportedBy"`
-	ReportedAt     string  `form:"reportedAt" json:"reportedAt" xml:"reportedAt"`
-	AcknowledgedBy *int32  `form:"acknowledgedBy,omitempty" json:"acknowledgedBy,omitempty" xml:"acknowledgedBy,omitempty"`
-	AcknowledgedAt *string `form:"acknowledgedAt,omitempty" json:"acknowledgedAt,omitempty" xml:"acknowledgedAt,omitempty"`
+type AcknowledgeOKResponseBody struct {
+	ID                 int32                 `form:"id" json:"id" xml:"id"`
+	PostID             int32                 `form:"postId" json:"postId" xml:"postId"`
+	PostType           string                `form:"postType" json:"postType" xml:"postType"`
+	ReportedBy         int32                 `form:"reportedBy" json:"reportedBy" xml:"reportedBy"`
+	ReportedByName     *string               `form:"reportedByName,omitempty" json:"reportedByName,omitempty" xml:"reportedByName,omitempty"`
+	ReportedAt         string                `form:"reportedAt" json:"reportedAt" xml:"reportedAt"`
+	AcknowledgedBy     *int32                `form:"acknowledgedBy,omitempty" json:"acknowledgedBy,omitempty" xml:"acknowledgedBy,omitempty"`
+	AcknowledgedByUser *UserInfoResponseBody `form:"acknowledgedByUser,omitempty" json:"acknowledgedByUser,omitempty" xml:"acknowledgedByUser,omitempty"`
+	AcknowledgedAt     *string               `form:"acknowledgedAt,omitempty" json:"acknowledgedAt,omitempty" xml:"acknowledgedAt,omitempty"`
+}
+
+// ListRequestsOKResponseBody is the type of the "moderation" service
+// "listRequests" endpoint HTTP response body.
+type ListRequestsOKResponseBody struct {
+	Requests   []*ModerationRequestResponseBody `form:"requests" json:"requests" xml:"requests"`
+	TotalPages int                              `form:"total_pages" json:"total_pages" xml:"total_pages"`
 }
 
 // AddUnauthorizedResponseBody is the type of the "moderation" service "add"
@@ -194,6 +199,169 @@ type AcknowledgeBadRequestResponseBody struct {
 	Fault bool `form:"fault" json:"fault" xml:"fault"`
 }
 
+// ListRequestsUnauthorizedResponseBody is the type of the "moderation" service
+// "listRequests" endpoint HTTP response body for the "unauthorized" error.
+type ListRequestsUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// ListRequestsForbiddenResponseBody is the type of the "moderation" service
+// "listRequests" endpoint HTTP response body for the "forbidden" error.
+type ListRequestsForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// ListRequestsNotFoundResponseBody is the type of the "moderation" service
+// "listRequests" endpoint HTTP response body for the "not-found" error.
+type ListRequestsNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// ListRequestsBadRequestResponseBody is the type of the "moderation" service
+// "listRequests" endpoint HTTP response body for the "bad-request" error.
+type ListRequestsBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// GetContentUnauthorizedResponseBody is the type of the "moderation" service
+// "getContent" endpoint HTTP response body for the "unauthorized" error.
+type GetContentUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// GetContentForbiddenResponseBody is the type of the "moderation" service
+// "getContent" endpoint HTTP response body for the "forbidden" error.
+type GetContentForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// GetContentNotFoundResponseBody is the type of the "moderation" service
+// "getContent" endpoint HTTP response body for the "not-found" error.
+type GetContentNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// GetContentBadRequestResponseBody is the type of the "moderation" service
+// "getContent" endpoint HTTP response body for the "bad-request" error.
+type GetContentBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// UserInfoResponseBody is used to define fields on response body types.
+type UserInfoResponseBody struct {
+	Name string `form:"name" json:"name" xml:"name"`
+}
+
+// ModerationRequestResponseBody is used to define fields on response body
+// types.
+type ModerationRequestResponseBody struct {
+	ID                 int32                 `form:"id" json:"id" xml:"id"`
+	PostID             int32                 `form:"postId" json:"postId" xml:"postId"`
+	PostType           string                `form:"postType" json:"postType" xml:"postType"`
+	ReportedBy         int32                 `form:"reportedBy" json:"reportedBy" xml:"reportedBy"`
+	ReportedByName     *string               `form:"reportedByName,omitempty" json:"reportedByName,omitempty" xml:"reportedByName,omitempty"`
+	ReportedAt         string                `form:"reportedAt" json:"reportedAt" xml:"reportedAt"`
+	AcknowledgedBy     *int32                `form:"acknowledgedBy,omitempty" json:"acknowledgedBy,omitempty" xml:"acknowledgedBy,omitempty"`
+	AcknowledgedByUser *UserInfoResponseBody `form:"acknowledgedByUser,omitempty" json:"acknowledgedByUser,omitempty" xml:"acknowledgedByUser,omitempty"`
+	AcknowledgedAt     *string               `form:"acknowledgedAt,omitempty" json:"acknowledgedAt,omitempty" xml:"acknowledgedAt,omitempty"`
+}
+
 // NewAddResponseBody builds the HTTP response body from the result of the
 // "add" endpoint of the "moderation" service.
 func NewAddResponseBody(res *moderation.ModerationRequest) *AddResponseBody {
@@ -202,24 +370,47 @@ func NewAddResponseBody(res *moderation.ModerationRequest) *AddResponseBody {
 		PostID:         res.PostID,
 		PostType:       res.PostType,
 		ReportedBy:     res.ReportedBy,
+		ReportedByName: res.ReportedByName,
 		ReportedAt:     res.ReportedAt,
 		AcknowledgedBy: res.AcknowledgedBy,
 		AcknowledgedAt: res.AcknowledgedAt,
 	}
+	if res.AcknowledgedByUser != nil {
+		body.AcknowledgedByUser = marshalModerationUserInfoToUserInfoResponseBody(res.AcknowledgedByUser)
+	}
 	return body
 }
 
-// NewAcknowledgeResponseBody builds the HTTP response body from the result of
-// the "acknowledge" endpoint of the "moderation" service.
-func NewAcknowledgeResponseBody(res *moderation.ModerationRequest) *AcknowledgeResponseBody {
-	body := &AcknowledgeResponseBody{
+// NewAcknowledgeOKResponseBody builds the HTTP response body from the result
+// of the "acknowledge" endpoint of the "moderation" service.
+func NewAcknowledgeOKResponseBody(res *moderation.ModerationRequest) *AcknowledgeOKResponseBody {
+	body := &AcknowledgeOKResponseBody{
 		ID:             res.ID,
 		PostID:         res.PostID,
 		PostType:       res.PostType,
 		ReportedBy:     res.ReportedBy,
+		ReportedByName: res.ReportedByName,
 		ReportedAt:     res.ReportedAt,
 		AcknowledgedBy: res.AcknowledgedBy,
 		AcknowledgedAt: res.AcknowledgedAt,
+	}
+	if res.AcknowledgedByUser != nil {
+		body.AcknowledgedByUser = marshalModerationUserInfoToUserInfoResponseBody(res.AcknowledgedByUser)
+	}
+	return body
+}
+
+// NewListRequestsOKResponseBody builds the HTTP response body from the result
+// of the "listRequests" endpoint of the "moderation" service.
+func NewListRequestsOKResponseBody(res *moderationviews.ModerationRequestsView) *ListRequestsOKResponseBody {
+	body := &ListRequestsOKResponseBody{
+		TotalPages: *res.TotalPages,
+	}
+	if res.Requests != nil {
+		body.Requests = make([]*ModerationRequestResponseBody, len(res.Requests))
+		for i, val := range res.Requests {
+			body.Requests[i] = marshalModerationviewsModerationRequestViewToModerationRequestResponseBody(val)
+		}
 	}
 	return body
 }
@@ -336,6 +527,118 @@ func NewAcknowledgeBadRequestResponseBody(res *goa.ServiceError) *AcknowledgeBad
 	return body
 }
 
+// NewListRequestsUnauthorizedResponseBody builds the HTTP response body from
+// the result of the "listRequests" endpoint of the "moderation" service.
+func NewListRequestsUnauthorizedResponseBody(res *goa.ServiceError) *ListRequestsUnauthorizedResponseBody {
+	body := &ListRequestsUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewListRequestsForbiddenResponseBody builds the HTTP response body from the
+// result of the "listRequests" endpoint of the "moderation" service.
+func NewListRequestsForbiddenResponseBody(res *goa.ServiceError) *ListRequestsForbiddenResponseBody {
+	body := &ListRequestsForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewListRequestsNotFoundResponseBody builds the HTTP response body from the
+// result of the "listRequests" endpoint of the "moderation" service.
+func NewListRequestsNotFoundResponseBody(res *goa.ServiceError) *ListRequestsNotFoundResponseBody {
+	body := &ListRequestsNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewListRequestsBadRequestResponseBody builds the HTTP response body from the
+// result of the "listRequests" endpoint of the "moderation" service.
+func NewListRequestsBadRequestResponseBody(res *goa.ServiceError) *ListRequestsBadRequestResponseBody {
+	body := &ListRequestsBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewGetContentUnauthorizedResponseBody builds the HTTP response body from the
+// result of the "getContent" endpoint of the "moderation" service.
+func NewGetContentUnauthorizedResponseBody(res *goa.ServiceError) *GetContentUnauthorizedResponseBody {
+	body := &GetContentUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewGetContentForbiddenResponseBody builds the HTTP response body from the
+// result of the "getContent" endpoint of the "moderation" service.
+func NewGetContentForbiddenResponseBody(res *goa.ServiceError) *GetContentForbiddenResponseBody {
+	body := &GetContentForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewGetContentNotFoundResponseBody builds the HTTP response body from the
+// result of the "getContent" endpoint of the "moderation" service.
+func NewGetContentNotFoundResponseBody(res *goa.ServiceError) *GetContentNotFoundResponseBody {
+	body := &GetContentNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewGetContentBadRequestResponseBody builds the HTTP response body from the
+// result of the "getContent" endpoint of the "moderation" service.
+func NewGetContentBadRequestResponseBody(res *goa.ServiceError) *GetContentBadRequestResponseBody {
+	body := &GetContentBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
 // NewAddModerationAddPayload builds a moderation service add endpoint payload.
 func NewAddModerationAddPayload(body *AddRequestBody, auth *string) *moderation.ModerationAddPayload {
 	v := &moderation.ModerationAddPayload{
@@ -349,11 +652,31 @@ func NewAddModerationAddPayload(body *AddRequestBody, auth *string) *moderation.
 
 // NewAcknowledgePayload builds a moderation service acknowledge endpoint
 // payload.
-func NewAcknowledgePayload(body *AcknowledgeRequestBody, auth *string) *moderation.AcknowledgePayload {
-	v := &moderation.AcknowledgePayload{
-		ID:             *body.ID,
-		AcknowledgedBy: *body.AcknowledgedBy,
-	}
+func NewAcknowledgePayload(id int32, action string, auth string) *moderation.AcknowledgePayload {
+	v := &moderation.AcknowledgePayload{}
+	v.ID = id
+	v.Action = action
+	v.Auth = auth
+
+	return v
+}
+
+// NewListRequestsPayload builds a moderation service listRequests endpoint
+// payload.
+func NewListRequestsPayload(page int32, pageSize int32, auth string) *moderation.ListRequestsPayload {
+	v := &moderation.ListRequestsPayload{}
+	v.Page = page
+	v.PageSize = pageSize
+	v.Auth = auth
+
+	return v
+}
+
+// NewGetContentPayload builds a moderation service getContent endpoint payload.
+func NewGetContentPayload(postType string, postID int32, auth string) *moderation.GetContentPayload {
+	v := &moderation.GetContentPayload{}
+	v.PostType = postType
+	v.PostID = postID
 	v.Auth = auth
 
 	return v
@@ -366,18 +689,6 @@ func ValidateAddRequestBody(body *AddRequestBody) (err error) {
 	}
 	if body.PostType == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("postType", "body"))
-	}
-	return
-}
-
-// ValidateAcknowledgeRequestBody runs the validations defined on
-// AcknowledgeRequestBody
-func ValidateAcknowledgeRequestBody(body *AcknowledgeRequestBody) (err error) {
-	if body.ID == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
-	}
-	if body.AcknowledgedBy == nil {
-		err = goa.MergeErrors(err, goa.MissingFieldError("acknowledgedBy", "body"))
 	}
 	return
 }

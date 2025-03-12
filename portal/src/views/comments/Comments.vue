@@ -205,6 +205,7 @@
                                     v-if="user"
                                     @listItemOptionClick="onListItemOptionClick($event, item)"
                                     :options="getCommentOptions(item)"
+                                    :ref="'options-' + item.id"
                                 />
                                 <span class="timestamp">{{ formatTimestamp(item.createdAt) }}</span>
                             </div>
@@ -797,8 +798,27 @@ export default Vue.extend({
                 }
             }
             if (event === "report") {
-                console.log("report", item);
-                this.$services.api.reportPost(item);
+                this.$services.api.reportPost(item)
+                    .then(() => {
+                        this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
+                            message: this.$tc("comments.reportSuccess"),
+                            type: SnackbarStyle.success,
+                        });
+                        // Close the menu by removing the visible class
+                        const optionsRef = this.$refs['options-' + item.id];
+                        if (Array.isArray(optionsRef) && optionsRef[0] && 'querySelector' in (optionsRef[0] as Vue).$el) {
+                            const menuEl = ((optionsRef[0] as Vue).$el as HTMLElement).querySelector('.options-btns');
+                            if (menuEl) {
+                                menuEl.classList.remove('visible');
+                            }
+                        }
+                    })
+                    .catch(() => {
+                        this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
+                            message: this.$tc("comments.reportError"),
+                            type: SnackbarStyle.fail,
+                        });
+                    });
             }
         },
         getCommentOptions(post: Comment): { label: string; event: string }[] {

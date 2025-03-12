@@ -15,15 +15,19 @@ import (
 
 // Client is the "moderation" service client.
 type Client struct {
-	AddEndpoint         goa.Endpoint
-	AcknowledgeEndpoint goa.Endpoint
+	AddEndpoint          goa.Endpoint
+	AcknowledgeEndpoint  goa.Endpoint
+	ListRequestsEndpoint goa.Endpoint
+	GetContentEndpoint   goa.Endpoint
 }
 
 // NewClient initializes a "moderation" service client given the endpoints.
-func NewClient(add, acknowledge goa.Endpoint) *Client {
+func NewClient(add, acknowledge, listRequests, getContent goa.Endpoint) *Client {
 	return &Client{
-		AddEndpoint:         add,
-		AcknowledgeEndpoint: acknowledge,
+		AddEndpoint:          add,
+		AcknowledgeEndpoint:  acknowledge,
+		ListRequestsEndpoint: listRequests,
+		GetContentEndpoint:   getContent,
 	}
 }
 
@@ -45,4 +49,24 @@ func (c *Client) Acknowledge(ctx context.Context, p *AcknowledgePayload) (res *M
 		return
 	}
 	return ires.(*ModerationRequest), nil
+}
+
+// ListRequests calls the "listRequests" endpoint of the "moderation" service.
+func (c *Client) ListRequests(ctx context.Context, p *ListRequestsPayload) (res *ModerationRequests, err error) {
+	var ires interface{}
+	ires, err = c.ListRequestsEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*ModerationRequests), nil
+}
+
+// GetContent calls the "getContent" endpoint of the "moderation" service.
+func (c *Client) GetContent(ctx context.Context, p *GetContentPayload) (res string, err error) {
+	var ires interface{}
+	ires, err = c.GetContentEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(string), nil
 }

@@ -10,8 +10,10 @@ package client
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
 
 	moderation "gitlab.com/fieldkit/cloud/server/api/gen/moderation"
+	goa "goa.design/goa/v3/pkg"
 )
 
 // BuildAddPayload builds the payload for the moderation add endpoint from CLI
@@ -22,7 +24,7 @@ func BuildAddPayload(moderationAddBody string, moderationAddAuth string) (*moder
 	{
 		err = json.Unmarshal([]byte(moderationAddBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"postId\": 633512197,\n      \"postType\": \"Praesentium libero.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"postId\": 540864754,\n      \"postType\": \"Vitae quis reiciendis quidem consequuntur.\"\n   }'")
 		}
 	}
 	var auth *string
@@ -42,25 +44,103 @@ func BuildAddPayload(moderationAddBody string, moderationAddAuth string) (*moder
 
 // BuildAcknowledgePayload builds the payload for the moderation acknowledge
 // endpoint from CLI flags.
-func BuildAcknowledgePayload(moderationAcknowledgeBody string, moderationAcknowledgeAuth string) (*moderation.AcknowledgePayload, error) {
+func BuildAcknowledgePayload(moderationAcknowledgeID string, moderationAcknowledgeAction string, moderationAcknowledgeAuth string) (*moderation.AcknowledgePayload, error) {
 	var err error
-	var body AcknowledgeRequestBody
+	var id int32
 	{
-		err = json.Unmarshal([]byte(moderationAcknowledgeBody), &body)
+		var v int64
+		v, err = strconv.ParseInt(moderationAcknowledgeID, 10, 32)
+		id = int32(v)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"acknowledgedBy\": 332309470,\n      \"id\": 1595984137\n   }'")
+			return nil, fmt.Errorf("invalid value for id, must be INT32")
 		}
 	}
-	var auth *string
+	var action string
 	{
-		if moderationAcknowledgeAuth != "" {
-			auth = &moderationAcknowledgeAuth
+		action = moderationAcknowledgeAction
+	}
+	var auth string
+	{
+		auth = moderationAcknowledgeAuth
+		err = goa.MergeErrors(err, goa.ValidatePattern("auth", auth, "^Bearer [^ ]+$"))
+		if err != nil {
+			return nil, err
 		}
 	}
-	v := &moderation.AcknowledgePayload{
-		ID:             body.ID,
-		AcknowledgedBy: body.AcknowledgedBy,
+	v := &moderation.AcknowledgePayload{}
+	v.ID = id
+	v.Action = action
+	v.Auth = auth
+
+	return v, nil
+}
+
+// BuildListRequestsPayload builds the payload for the moderation listRequests
+// endpoint from CLI flags.
+func BuildListRequestsPayload(moderationListRequestsPage string, moderationListRequestsPageSize string, moderationListRequestsAuth string) (*moderation.ListRequestsPayload, error) {
+	var err error
+	var page int32
+	{
+		var v int64
+		v, err = strconv.ParseInt(moderationListRequestsPage, 10, 32)
+		page = int32(v)
+		if err != nil {
+			return nil, fmt.Errorf("invalid value for page, must be INT32")
+		}
 	}
+	var pageSize int32
+	{
+		var v int64
+		v, err = strconv.ParseInt(moderationListRequestsPageSize, 10, 32)
+		pageSize = int32(v)
+		if err != nil {
+			return nil, fmt.Errorf("invalid value for pageSize, must be INT32")
+		}
+	}
+	var auth string
+	{
+		auth = moderationListRequestsAuth
+		err = goa.MergeErrors(err, goa.ValidatePattern("auth", auth, "^Bearer [^ ]+$"))
+		if err != nil {
+			return nil, err
+		}
+	}
+	v := &moderation.ListRequestsPayload{}
+	v.Page = page
+	v.PageSize = pageSize
+	v.Auth = auth
+
+	return v, nil
+}
+
+// BuildGetContentPayload builds the payload for the moderation getContent
+// endpoint from CLI flags.
+func BuildGetContentPayload(moderationGetContentPostType string, moderationGetContentPostID string, moderationGetContentAuth string) (*moderation.GetContentPayload, error) {
+	var err error
+	var postType string
+	{
+		postType = moderationGetContentPostType
+	}
+	var postID int32
+	{
+		var v int64
+		v, err = strconv.ParseInt(moderationGetContentPostID, 10, 32)
+		postID = int32(v)
+		if err != nil {
+			return nil, fmt.Errorf("invalid value for postID, must be INT32")
+		}
+	}
+	var auth string
+	{
+		auth = moderationGetContentAuth
+		err = goa.MergeErrors(err, goa.ValidatePattern("auth", auth, "^Bearer [^ ]+$"))
+		if err != nil {
+			return nil, err
+		}
+	}
+	v := &moderation.GetContentPayload{}
+	v.PostType = postType
+	v.PostID = postID
 	v.Auth = auth
 
 	return v, nil

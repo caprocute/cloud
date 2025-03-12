@@ -20,10 +20,12 @@ import (
 
 // Server lists the moderation service endpoint HTTP handlers.
 type Server struct {
-	Mounts      []*MountPoint
-	Add         http.Handler
-	Acknowledge http.Handler
-	CORS        http.Handler
+	Mounts       []*MountPoint
+	Add          http.Handler
+	Acknowledge  http.Handler
+	ListRequests http.Handler
+	GetContent   http.Handler
+	CORS         http.Handler
 }
 
 // ErrorNamer is an interface implemented by generated error structs that
@@ -60,13 +62,19 @@ func New(
 	return &Server{
 		Mounts: []*MountPoint{
 			{"Add", "POST", "/moderation"},
-			{"Acknowledge", "POST", "/moderation/acknowledge"},
+			{"Acknowledge", "POST", "/moderation/requests/{id}/acknowledge"},
+			{"ListRequests", "GET", "/moderation/requests"},
+			{"GetContent", "GET", "/moderation/content/{postType}/{postId}"},
 			{"CORS", "OPTIONS", "/moderation"},
-			{"CORS", "OPTIONS", "/moderation/acknowledge"},
+			{"CORS", "OPTIONS", "/moderation/requests/{id}/acknowledge"},
+			{"CORS", "OPTIONS", "/moderation/requests"},
+			{"CORS", "OPTIONS", "/moderation/content/{postType}/{postId}"},
 		},
-		Add:         NewAddHandler(e.Add, mux, decoder, encoder, errhandler, formatter),
-		Acknowledge: NewAcknowledgeHandler(e.Acknowledge, mux, decoder, encoder, errhandler, formatter),
-		CORS:        NewCORSHandler(),
+		Add:          NewAddHandler(e.Add, mux, decoder, encoder, errhandler, formatter),
+		Acknowledge:  NewAcknowledgeHandler(e.Acknowledge, mux, decoder, encoder, errhandler, formatter),
+		ListRequests: NewListRequestsHandler(e.ListRequests, mux, decoder, encoder, errhandler, formatter),
+		GetContent:   NewGetContentHandler(e.GetContent, mux, decoder, encoder, errhandler, formatter),
+		CORS:         NewCORSHandler(),
 	}
 }
 
@@ -77,6 +85,8 @@ func (s *Server) Service() string { return "moderation" }
 func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.Add = m(s.Add)
 	s.Acknowledge = m(s.Acknowledge)
+	s.ListRequests = m(s.ListRequests)
+	s.GetContent = m(s.GetContent)
 	s.CORS = m(s.CORS)
 }
 
@@ -84,6 +94,8 @@ func (s *Server) Use(m func(http.Handler) http.Handler) {
 func Mount(mux goahttp.Muxer, h *Server) {
 	MountAddHandler(mux, h.Add)
 	MountAcknowledgeHandler(mux, h.Acknowledge)
+	MountListRequestsHandler(mux, h.ListRequests)
+	MountGetContentHandler(mux, h.GetContent)
 	MountCORSHandler(mux, h.CORS)
 }
 
@@ -147,7 +159,7 @@ func MountAcknowledgeHandler(mux goahttp.Muxer, h http.Handler) {
 			h.ServeHTTP(w, r)
 		}
 	}
-	mux.Handle("POST", "/moderation/acknowledge", f)
+	mux.Handle("POST", "/moderation/requests/{id}/acknowledge", f)
 }
 
 // NewAcknowledgeHandler creates a HTTP handler which loads the HTTP request
@@ -189,6 +201,108 @@ func NewAcknowledgeHandler(
 	})
 }
 
+// MountListRequestsHandler configures the mux to serve the "moderation"
+// service "listRequests" endpoint.
+func MountListRequestsHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := handleModerationOrigin(h).(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("GET", "/moderation/requests", f)
+}
+
+// NewListRequestsHandler creates a HTTP handler which loads the HTTP request
+// and calls the "moderation" service "listRequests" endpoint.
+func NewListRequestsHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeListRequestsRequest(mux, decoder)
+		encodeResponse = EncodeListRequestsResponse(encoder)
+		encodeError    = EncodeListRequestsError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "listRequests")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "moderation")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
+// MountGetContentHandler configures the mux to serve the "moderation" service
+// "getContent" endpoint.
+func MountGetContentHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := handleModerationOrigin(h).(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("GET", "/moderation/content/{postType}/{postId}", f)
+}
+
+// NewGetContentHandler creates a HTTP handler which loads the HTTP request and
+// calls the "moderation" service "getContent" endpoint.
+func NewGetContentHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeGetContentRequest(mux, decoder)
+		encodeResponse = EncodeGetContentResponse(encoder)
+		encodeError    = EncodeGetContentError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "getContent")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "moderation")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		res, err := endpoint(ctx, payload)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
 // MountCORSHandler configures the mux to serve the CORS endpoints for the
 // service moderation.
 func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
@@ -200,7 +314,9 @@ func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
 		}
 	}
 	mux.Handle("OPTIONS", "/moderation", f)
-	mux.Handle("OPTIONS", "/moderation/acknowledge", f)
+	mux.Handle("OPTIONS", "/moderation/requests/{id}/acknowledge", f)
+	mux.Handle("OPTIONS", "/moderation/requests", f)
+	mux.Handle("OPTIONS", "/moderation/content/{postType}/{postId}", f)
 }
 
 // NewCORSHandler creates a HTTP handler which returns a simple 200 response.

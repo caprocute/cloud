@@ -7,12 +7,26 @@
 
 package client
 
+import (
+	"fmt"
+)
+
 // AddModerationPath returns the URL path to the moderation service add HTTP endpoint.
 func AddModerationPath() string {
 	return "/moderation"
 }
 
 // AcknowledgeModerationPath returns the URL path to the moderation service acknowledge HTTP endpoint.
-func AcknowledgeModerationPath() string {
-	return "/moderation/acknowledge"
+func AcknowledgeModerationPath(id int32) string {
+	return fmt.Sprintf("/moderation/requests/%v/acknowledge", id)
+}
+
+// ListRequestsModerationPath returns the URL path to the moderation service listRequests HTTP endpoint.
+func ListRequestsModerationPath() string {
+	return "/moderation/requests"
+}
+
+// GetContentModerationPath returns the URL path to the moderation service getContent HTTP endpoint.
+func GetContentModerationPath(postType string, postID int32) string {
+	return fmt.Sprintf("/moderation/content/%v/%v", postType, postID)
 }

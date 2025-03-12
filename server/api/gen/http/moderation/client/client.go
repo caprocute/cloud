@@ -24,6 +24,14 @@ type Client struct {
 	// endpoint.
 	AcknowledgeDoer goahttp.Doer
 
+	// ListRequests Doer is the HTTP client used to make requests to the
+	// listRequests endpoint.
+	ListRequestsDoer goahttp.Doer
+
+	// GetContent Doer is the HTTP client used to make requests to the getContent
+	// endpoint.
+	GetContentDoer goahttp.Doer
+
 	// CORS Doer is the HTTP client used to make requests to the  endpoint.
 	CORSDoer goahttp.Doer
 
@@ -49,6 +57,8 @@ func NewClient(
 	return &Client{
 		AddDoer:             doer,
 		AcknowledgeDoer:     doer,
+		ListRequestsDoer:    doer,
+		GetContentDoer:      doer,
 		CORSDoer:            doer,
 		RestoreResponseBody: restoreBody,
 		scheme:              scheme,
@@ -101,6 +111,54 @@ func (c *Client) Acknowledge() goa.Endpoint {
 		resp, err := c.AcknowledgeDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("moderation", "acknowledge", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// ListRequests returns an endpoint that makes HTTP requests to the moderation
+// service listRequests server.
+func (c *Client) ListRequests() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeListRequestsRequest(c.encoder)
+		decodeResponse = DecodeListRequestsResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildListRequestsRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.ListRequestsDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("moderation", "listRequests", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// GetContent returns an endpoint that makes HTTP requests to the moderation
+// service getContent server.
+func (c *Client) GetContent() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeGetContentRequest(c.encoder)
+		decodeResponse = DecodeGetContentResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildGetContentRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.GetContentDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("moderation", "getContent", err)
 		}
 		return decodeResponse(resp)
 	}
