@@ -1,7 +1,7 @@
 <template>
     <div class="datafiles-container">
         <div class="heading">{{ $t("project.dataFiles") }}</div>
-        <div class="message"> {{ $t("project.noDataFiles") }} </div>
+        <div class="message">{{ $t("project.noDataFiles") }}</div>
     </div>
 </template>
 

@@ -32,7 +32,6 @@ import {
 import { VizSensor, VizConfig } from "@/views/viz/viz";
 
 import * as d3 from "d3";
-import { SnackbarStyle } from "@/store/modules/snackbar";
 
 export const NEED_SENSOR_META = "NEED_SENSOR_META";
 export const HAVE_USER_STATIONS = "HAVE_USER_STATIONS";
@@ -584,16 +583,32 @@ const actions = (services: Services) => {
         [ActionTypes.AUTHENTICATED]: async ({ dispatch }: { dispatch: any }) => {
             await dispatch(ActionTypes.NEED_COMMON);
         },
-        [ActionTypes.NEED_COMMON]: async ({ dispatch, commit }: { dispatch: any; commit: any }) => {
+        [ActionTypes.NEED_COMMON]: async ({ dispatch, commit: _commit }: { dispatch: any; commit: any }) => {
             await dispatch(NEED_SENSOR_META);
             await Promise.all([dispatch(ActionTypes.NEED_PROJECTS), dispatch(ActionTypes.NEED_STATIONS)]);
         },
-        [NEED_SENSOR_META]: async ({ commit, dispatch, state }: { commit: any; dispatch: any; state: StationsState }) => {
+        [NEED_SENSOR_META]: async ({
+            commit,
+            dispatch: _dispatch,
+            state: _state,
+        }: {
+            commit: any;
+            dispatch: any;
+            state: StationsState;
+        }) => {
             const meta = await services.api.getAllSensorsMemoized()(); // TODO  Why?
             const sensorMeta = new SensorMeta(meta);
             commit(SENSOR_META, sensorMeta);
         },
-        [ActionTypes.NEED_PROJECTS]: async ({ commit, dispatch, state }: { commit: any; dispatch: any; state: StationsState }) => {
+        [ActionTypes.NEED_PROJECTS]: async ({
+            commit,
+            dispatch: _dispatch,
+            state: _state,
+        }: {
+            commit: any;
+            dispatch: any;
+            state: StationsState;
+        }) => {
             commit(MutationTypes.LOADING, { projects: true });
             const [communityProjects, userProjects] = await Promise.all([
                 services.api.getPublicProjects(),
@@ -607,7 +622,15 @@ const actions = (services: Services) => {
             commit(HAVE_USER_PROJECTS, userProjects.projects);
             commit(MutationTypes.LOADING, { projects: false });
         },
-        [ActionTypes.NEED_STATIONS]: async ({ commit, dispatch, state }: { commit: any; dispatch: any; state: StationsState }) => {
+        [ActionTypes.NEED_STATIONS]: async ({
+            commit,
+            dispatch: _dispatch,
+            state: _state,
+        }: {
+            commit: any;
+            dispatch: any;
+            state: StationsState;
+        }) => {
             commit(MutationTypes.LOADING, { stations: true });
             const [stations] = await Promise.all([
                 services.api.getUserStations(() => {
@@ -623,7 +646,7 @@ const actions = (services: Services) => {
             commit(MutationTypes.LOADING, { stations: false });
         },
         [ActionTypes.NEED_PROJECT]: async (
-            { commit, dispatch, state }: { commit: any; dispatch: any; state: StationsState },
+            { commit, dispatch: _dispatch, state: _state }: { commit: any; dispatch: any; state: StationsState },
             payload: { id: number }
         ) => {
             if (!_.isNumber(payload.id)) throw new Error("Expected numeric project id");
@@ -645,7 +668,7 @@ const actions = (services: Services) => {
             commit(MutationTypes.LOADING, { projects: false });
         },
         [ActionTypes.NEED_STATION]: async (
-            { commit, dispatch, state }: { commit: any; dispatch: any; state: StationsState },
+            { commit, dispatch: _dispatch, state: _state }: { commit: any; dispatch: any; state: StationsState },
             payload: { id: number }
         ) => {
             commit(MutationTypes.LOADING, { stations: true });
@@ -660,7 +683,7 @@ const actions = (services: Services) => {
             commit(MutationTypes.LOADING, { stations: false });
         },
         [ActionTypes.UPDATE_STATION]: async (
-            { commit, dispatch, state }: { commit: any; dispatch: any; state: StationsState },
+            { commit, dispatch: _dispatch, state: _state }: { commit: any; dispatch: any; state: StationsState },
             payload: { id: number; name: string; description: string | null }
         ) => {
             commit(MutationTypes.LOADING, { stations: true });
@@ -675,29 +698,35 @@ const actions = (services: Services) => {
                 });
         },
         [ActionTypes.CLEAR_STATION]: async (
-            { commit, dispatch, state }: { commit: any; dispatch: any; state: StationsState },
+            { commit, dispatch: _dispatch, state: _state }: { commit: any; dispatch: any; state: StationsState },
             id: number
         ) => {
             commit(STATION_CLEAR, id);
         },
         [ActionTypes.UPDATE_STATION_MODULE]: async (
-            { commit, dispatch, state }: { commit: any; dispatch: any; state: StationsState },
+            { commit, dispatch: _dispatch, state: _state }: { commit: any; dispatch: any; state: StationsState },
             payload: { stationId: number; moduleId: number; label: string }
         ) => {
             return services.api.updateModule(payload).then((station) => {
                 commit(STATION_UPDATE, { station });
             });
         },
-        [ActionTypes.PROJECT_FOLLOW]: async ({ commit, dispatch }: { commit: any; dispatch: any }, payload: { projectId: number }) => {
+        [ActionTypes.PROJECT_FOLLOW]: async (
+            { commit, dispatch: _dispatch }: { commit: any; dispatch: any },
+            payload: { projectId: number }
+        ) => {
             await services.api.followProject(payload.projectId);
             commit(PROJECT_LOADED, await services.api.getProject(payload.projectId));
         },
-        [ActionTypes.PROJECT_UNFOLLOW]: async ({ commit, dispatch }: { commit: any; dispatch: any }, payload: { projectId: number }) => {
+        [ActionTypes.PROJECT_UNFOLLOW]: async (
+            { commit, dispatch: _dispatch }: { commit: any; dispatch: any },
+            payload: { projectId: number }
+        ) => {
             await services.api.unfollowProject(payload.projectId);
             commit(PROJECT_LOADED, await services.api.getProject(payload.projectId));
         },
         [ActionTypes.STATION_PROJECT_ADD]: async (
-            { commit, dispatch }: { commit: any; dispatch: any },
+            { commit, dispatch: _dispatch }: { commit: any; dispatch: any },
             payload: { stationId: number; projectId: number }
         ) => {
             await services.api.addStationToProject(payload);
@@ -706,7 +735,7 @@ const actions = (services: Services) => {
             commit(PROJECT_STATIONS, { projectId: payload.projectId, stations: stations.stations });
         },
         [ActionTypes.STATION_PROJECT_REMOVE]: async (
-            { commit, dispatch }: { commit: any; dispatch: any },
+            { commit, dispatch: _dispatch }: { commit: any; dispatch: any },
             payload: { stationId: number; projectId: number }
         ) => {
             await services.api.removeStationFromProject(payload);
@@ -715,7 +744,7 @@ const actions = (services: Services) => {
             commit(PROJECT_STATIONS, { projectId: payload.projectId, stations: stations.stations });
         },
         [ActionTypes.PROJECT_INVITE]: async (
-            { commit, dispatch }: { commit: any; dispatch: any },
+            { commit, dispatch: _dispatch }: { commit: any; dispatch: any },
             payload: { projectId: number; email: string; role: string }
         ) => {
             await services.api.sendInvite(payload);
@@ -723,7 +752,7 @@ const actions = (services: Services) => {
             commit(PROJECT_USERS, { projectId: payload.projectId, users: usersReply.users });
         },
         [ActionTypes.PROJECT_REMOVE]: async (
-            { commit, dispatch }: { commit: any; dispatch: any },
+            { commit, dispatch: _dispatch }: { commit: any; dispatch: any },
             payload: { projectId: number; email: string }
         ) => {
             await services.api.removeUserFromProject(payload);
@@ -731,24 +760,30 @@ const actions = (services: Services) => {
             commit(PROJECT_USERS, { projectId: payload.projectId, users: usersReply.users });
         },
         [ActionTypes.PROJECT_EDIT_ROLE]: async (
-            { commit, dispatch }: { commit: any; dispatch: any },
+            { commit, dispatch: _dispatch }: { commit: any; dispatch: any },
             payload: { projectId: number; email: string; role: number }
         ) => {
             await services.api.editRole(payload);
             const usersReply = await services.api.getUsersByProject(payload.projectId);
             commit(PROJECT_USERS, { projectId: payload.projectId, users: usersReply.users });
         },
-        [ActionTypes.ACCEPT_PROJECT]: async ({ commit, dispatch }: { commit: any; dispatch: any }, payload: { projectId: number }) => {
+        [ActionTypes.ACCEPT_PROJECT]: async (
+            { commit, dispatch: _dispatch }: { commit: any; dispatch: any },
+            payload: { projectId: number }
+        ) => {
             await services.api.acceptProjectInvite(payload);
 
             const userProjects = await services.api.getUserProjects(OnNoReject);
             commit(HAVE_USER_PROJECTS, userProjects.projects);
         },
-        [ActionTypes.DECLINE_PROJECT]: async ({ commit, dispatch }: { commit: any; dispatch: any }, payload: { projectId: number }) => {
+        [ActionTypes.DECLINE_PROJECT]: async (
+            { commit: _commit, dispatch: _dispatch }: { commit: any; dispatch: any },
+            payload: { projectId: number }
+        ) => {
             await services.api.declineProjectInvite(payload);
         },
         [ActionTypes.ACCEPT_PROJECT_INVITE]: async (
-            { commit, dispatch }: { commit: any; dispatch: any },
+            { commit, dispatch: _dispatch }: { commit: any; dispatch: any },
             payload: { id: number; token: string }
         ) => {
             await services.api.acceptInvite(payload);
@@ -757,26 +792,29 @@ const actions = (services: Services) => {
             commit(HAVE_USER_PROJECTS, userProjects.projects);
         },
         [ActionTypes.DECLINE_PROJECT_INVITE]: async (
-            { commit, dispatch }: { commit: any; dispatch: any },
+            { commit: _commit, dispatch: _dispatch }: { commit: any; dispatch: any },
             payload: { id: number; token: string }
         ) => {
             await services.api.declineInvite(payload);
         },
-        [ActionTypes.DELETE_PROJECT]: async ({ commit, dispatch }: { commit: any; dispatch: any }, payload: { projectId: number }) => {
+        [ActionTypes.DELETE_PROJECT]: async (
+            { commit, dispatch: _dispatch }: { commit: any; dispatch: any },
+            payload: { projectId: number }
+        ) => {
             await services.api.deleteProject(payload);
 
             commit(PROJECT_DELETED, payload);
 
             return payload;
         },
-        [ActionTypes.ADD_PROJECT]: async ({ commit, dispatch }: { commit: any; dispatch: any }, payload: any) => {
+        [ActionTypes.ADD_PROJECT]: async ({ commit, dispatch: _dispatch }: { commit: any; dispatch: any }, payload: any) => {
             const project = await services.api.addProject(payload);
 
             commit(PROJECT_UPDATE, project);
 
             return project;
         },
-        [ActionTypes.SAVE_PROJECT]: async ({ commit, dispatch }: { commit: any; dispatch: any }, payload: any) => {
+        [ActionTypes.SAVE_PROJECT]: async ({ commit, dispatch: _dispatch }: { commit: any; dispatch: any }, payload: any) => {
             const project = await services.api.updateProject(payload);
 
             commit(PROJECT_UPDATE, project);
@@ -784,7 +822,7 @@ const actions = (services: Services) => {
             return project;
         },
         [ActionTypes.NEED_PROJECTS_FOR_STATION]: async (
-            { commit, dispatch, state }: { commit: any; dispatch: any; state: StationsState },
+            { commit, dispatch: _dispatch, state: _state }: { commit: any; dispatch: any; state: StationsState },
             payload: { id: number }
         ) => {
             commit(MutationTypes.LOADING, { stationProjects: true });
@@ -800,7 +838,7 @@ function makeDisplayStations(sensorMeta: SensorMeta | null, stations: Station[],
     if (sensorMeta === null) throw new Error("fatal: Sensor meta load order error");
     return stations.map((station) => {
         if (recently) {
-            const windows = _.mapValues(recently.windows, (rows, hours) => {
+            const windows = _.mapValues(recently.windows, (rows, _hours) => {
                 return rows.filter((row) => row.stationId == station.id);
             });
             const readings = new StationReadings(station.id, sensorMeta, windows, recently.stations[station.id]);

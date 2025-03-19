@@ -142,6 +142,7 @@ export default Vue.extend({
                         this.$store.dispatch(new MarkNotificationsSeen([notification.notificationId]));
                     })
                     .catch((err) => {
+                        console.log(err);
                         return;
                     });
             }
@@ -156,6 +157,7 @@ export default Vue.extend({
                         this.$store.dispatch(new MarkNotificationsSeen([notification.notificationId]));
                     })
                     .catch((err) => {
+                        console.log(err);
                         return;
                     });
             }

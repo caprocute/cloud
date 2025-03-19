@@ -12,7 +12,7 @@
 
 <script lang="ts">
 import _ from "lodash";
-import Vue, { PropType } from "vue";
+import Vue from "vue";
 
 export default Vue.extend({
     name: "StationPickerStation",
@@ -37,15 +37,13 @@ export default Vue.extend({
                 .map((v) => v.toFixed(3))
                 .join(", ");
             const locations = [gps, "Unknown"];
-            return _(locations)
-                .compact()
-                .first();
+            return _(locations).compact().first();
         },
         status(this: any) {
             if (this.station.deployedAt) {
-                return this.$t('station.deployed');
+                return this.$t("station.deployed");
             }
-          return this.$t('station.readyToDeploy');
+            return this.$t("station.readyToDeploy");
         },
     },
     methods: {

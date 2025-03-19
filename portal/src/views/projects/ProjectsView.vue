@@ -38,10 +38,7 @@ export default Vue.extend({
         StandardLayout,
         ProjectThumbnails,
     },
-    data(): {
-        invites: PendingInvites | null;
-    }
-     {
+    data(): { invites: PendingInvites | null } {
         return {
             invites: null,
         };

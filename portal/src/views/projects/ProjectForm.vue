@@ -48,11 +48,11 @@
 
             <div class="dates-row">
                 <DateField v-model="form.startTime" @input="$emit('change')" :label="$tc('project.form.startDate')"></DateField>
-                <DateField v-model="form.endTime" @input="$emit('change')" :label="$tc('project.form.endDate')" :minDate="form.startTime"></DateField>
+                <DateField v-model="form.endTime" @input="$emit('change')" :label="$tc('project.form.endDate')" :minDate="form.startTime" />
             </div>
 
             <div class="outer-input-container tags-container">
-                <span v-bind:class="{ focused: smallTagsLabel }">{{ $tc('project.form.tags.label') }}</span>
+                <span v-bind:class="{ focused: smallTagsLabel }">{{ $tc("project.form.tags.label") }}</span>
                 <vue-tags-input
                     v-model="form.tag"
                     :tags="form.tags"
@@ -120,7 +120,7 @@
 import _ from "lodash";
 import moment from "moment";
 import Vue from "vue";
-import { BoundingRectangle, GlobalState, LngLat, MappedStations } from "@/store";
+import { BoundingRectangle, GlobalState, MappedStations } from "@/store";
 import CommonComponents from "@/views/shared";
 import VueTagsInput from "@johmun/vue-tags-input";
 import { UploadedImage } from "@/views/shared/ImageUploader.vue";
@@ -135,8 +135,8 @@ import { mapState } from "vuex";
 import StationsMap from "@/views/shared/StationsMap.vue";
 import { SnackbarStyle } from "@/store/modules/snackbar";
 
-const afterOtherDate = (afterOtherDate) =>
-    helpers.withParams({ type: "afterOtherDate", after: afterOtherDate }, function(this: any, value, parentVm) {
+const _afterOtherDate = (afterOtherDate) =>
+    helpers.withParams({ type: "afterOtherDate", after: afterOtherDate }, function (this: any, value, parentVm) {
         const other = helpers.ref(afterOtherDate, this, parentVm);
         if (!other || other.length === 0) {
             return true;

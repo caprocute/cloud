@@ -32,7 +32,7 @@ export function serializePromiseChain(all, fn) {
 }
 
 export function promiseAfter(t, v = undefined) {
-    return new Promise(function(resolve) {
+    return new Promise(function (resolve) {
         setTimeout(resolve.bind(null, v), t);
     });
 }

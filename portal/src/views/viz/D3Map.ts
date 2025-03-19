@@ -3,9 +3,6 @@ import Vue from "vue";
 import Mapbox from "mapbox-gl-vue";
 import { LngLatBounds } from "mapbox-gl";
 
-import * as d3 from "d3";
-
-import { Time, TimeRange, Margins, ChartLayout, DataQueryParams } from "./common";
 import { Graph, QueriedData, Workspace, GeoZoom, VizInfo } from "./viz";
 import { MapStore, Map } from "./MapStore";
 
@@ -46,7 +43,7 @@ export const D3Map = Vue.extend({
         },
     },
     watch: {
-        data(newValue: unknown, oldValue: unknown): void {
+        data(_newValue: unknown, _oldValue: unknown): void {
             this.viz.log("graphing (data)");
             this.refresh();
         },
@@ -260,7 +257,7 @@ export const D3Map = Vue.extend({
             mapStore.set(this.viz.id, map).resize();
             this.refresh();
         },
-        mapMoveEnd(...args) {
+        mapMoveEnd(..._args) {
             const map = this.getMap();
             if (this.ready() && this.refreshed && map) {
                 this.viz.log("map-move-end");
@@ -269,7 +266,7 @@ export const D3Map = Vue.extend({
                 this.viz.log("map-move-end(ignored)");
             }
         },
-        mapZoomEnd(...args) {
+        mapZoomEnd(..._args) {
             // Our moveEnd handler above is enough.
             /*
             if (this.ready() && this.refreshed) {

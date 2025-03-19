@@ -39,7 +39,7 @@ const mutations = {
 const actions = () => {
     return {
         [ActionTypes.SHOW_SNACKBAR]: async (
-            { commit, dispatch, state }: { commit: any; dispatch: any; state: SnackbarState },
+            { commit, dispatch, state: _state }: { commit: any; dispatch: any; state: SnackbarState },
             message: string
         ) => {
             commit(MutationTypes.SHOW_SNACKBAR, message);
@@ -47,7 +47,15 @@ const actions = () => {
                 dispatch(ActionTypes.HIDE_SNACKBAR);
             }, 5000); // persitence time is actually done via the animation from snackbar comp, this is just to clear the state
         },
-        [ActionTypes.HIDE_SNACKBAR]: async ({ commit, dispatch, state }: { commit: any; dispatch: any; state: SnackbarState }) => {
+        [ActionTypes.HIDE_SNACKBAR]: async ({
+            commit,
+            dispatch: _dispatch,
+            state: _state,
+        }: {
+            commit: any;
+            dispatch: any;
+            state: SnackbarState;
+        }) => {
             commit(MutationTypes.HIDE_SNACKBAR);
         },
     };

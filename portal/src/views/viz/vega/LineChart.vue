@@ -20,7 +20,6 @@ import { ChartSettings } from "./SpecFactory";
 import chartStyles from "./chartStyles";
 import { TimeSeriesSpecFactory } from "./TimeSeriesSpecFactory";
 import ExportChartButton from "@/views/viz/vega/ExportChartButton.vue";
-import { ActionTypes } from "@/store";
 
 type DragTimeSignal = [number, number] | null;
 
@@ -39,7 +38,7 @@ export default Vue.extend({
     name: "LineChart",
     components: {
         Spinner,
-         ExportChartButton,
+        ExportChartButton,
     },
     props: {
         series: {
@@ -121,7 +120,7 @@ export default Vue.extend({
                     });
 
                     // Watch for brush drag outside the window
-                    vegaInfo.view.addEventListener("mousedown", (e) => {
+                    vegaInfo.view.addEventListener("mousedown", (_e) => {
                         window.addEventListener("mouseup", (e) => {
                             if (e.target instanceof Element) {
                                 if (scrubbed.length == 2 && e.target && e.target.nodeName !== "path") {

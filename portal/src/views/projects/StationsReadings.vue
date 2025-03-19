@@ -25,7 +25,7 @@ import Vue from "vue";
 
 import LatestStationReadings from "@/views/shared/LatestStationReadings.vue";
 import PaginationControls from "@/views/shared/PaginationControls.vue";
-import { DisplayProject, DisplayStation } from "@/store";
+import { DisplayStation } from "@/store";
 
 export default Vue.extend({
     name: "StationsReadings",

@@ -50,7 +50,7 @@
 <script lang="ts">
 import Vue from "vue";
 import CommonComponents from "@/views/shared";
-import { required, email, minLength, sameAs } from "vuelidate/lib/validators";
+import { required, minLength, sameAs } from "vuelidate/lib/validators";
 import Logo from "@/views/shared/Logo.vue";
 
 export default Vue.extend({

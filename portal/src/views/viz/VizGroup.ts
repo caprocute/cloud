@@ -1,8 +1,8 @@
 import Vue from "vue";
 
-import {Group, TimeZoom, Workspace} from "./viz";
-import {VizGraph} from "./VizGraph";
-import {VegaScrubber} from "./VegaScrubber";
+import { Group, TimeZoom, Workspace } from "./viz";
+import { VizGraph } from "./VizGraph";
+import { VegaScrubber } from "./VegaScrubber";
 
 export const VizGroup = Vue.extend({
     components: {

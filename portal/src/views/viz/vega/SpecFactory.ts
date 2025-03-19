@@ -1,13 +1,7 @@
 import _ from "lodash";
 import type { VizSensor, DataRow, SensorDataResponse, ModuleSensorMeta, SensorsResponse } from "../common";
 import { getString, getSeriesThresholds, getAxisLabel } from "./customizations";
-import {
-    SeriesData,
-    DataSetSeries,
-    TimeRange,
-    VizInfo,
-    QueriedData
-} from "../common";
+import { SeriesData, DataSetSeries, TimeRange, VizInfo, QueriedData } from "../common";
 
 export {
     getAxisLabel,
@@ -29,14 +23,14 @@ export type MapFunction<T> = (series: SeriesData, i: number) => T;
 
 interface WidthAndHeight {
     w: number;
-    h: number
-};
+    h: number;
+}
 
 export class ChartSettings {
     constructor(
         public readonly timeRange = TimeRange.eternity,
         public readonly estimated: WidthAndHeight | undefined = undefined,
-        public readonly size: WidthAndHeight  = { w: 0, h:0},
+        public readonly size: WidthAndHeight = { w: 0, h: 0 },
         public readonly auto = false,
         public readonly tiny = false,
         public readonly mobile = false
@@ -75,7 +69,7 @@ export class ChartSettings {
             w: window.innerWidth,
             h: window.innerHeight,
         };
-        return new ChartSettings(TimeRange.eternity, estimated , { w: 0, h: 0 }, true, false, false);
+        return new ChartSettings(TimeRange.eternity, estimated, { w: 0, h: 0 }, true, false, false);
     }
 
     public static DefaultMobile = new ChartSettings(TimeRange.eternity, undefined, { w: 0, h: 0 }, true, false, true);

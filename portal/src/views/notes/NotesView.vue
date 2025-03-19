@@ -97,7 +97,6 @@ import Vue from "vue";
 import Promise from "bluebird";
 import CommonComponents from "@/views/shared";
 import StandardLayout from "../StandardLayout.vue";
-import StationTabs from "./StationTabs.vue";
 import NotesForm from "./NotesForm.vue";
 
 import { mapState, mapGetters } from "vuex";

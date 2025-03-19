@@ -41,7 +41,7 @@
                         <div class="title">{{ $t("project.activity.deployedStation") }}</div>
                         <div class="date">{{ activity.time.toLocaleDateString() }}</div>
                     </div>
-                    <div class="activity-text">{{ $t("project.activity.activityDeployed", {activityName: activity.name})}}</div>
+                    <div class="activity-text">{{ $t("project.activity.activityDeployed", { activityName: activity.name }) }}</div>
                     <div class="activity-text">
                         <img src="@/assets/icon-location.svg" />
                         {{ activity.location[1] | prettyCoordinate }}, {{ activity.location[0] | prettyCoordinate }}

@@ -37,7 +37,7 @@
 
 import _ from "lodash";
 import Config from "@/secrets";
-import { MappedStations, LngLat, BoundingRectangle, VisibleReadings, DecoratedReading, DisplayProject, DisplayStation } from "@/store";
+import { MappedStations, LngLat, BoundingRectangle, VisibleReadings, DisplayProject, DisplayStation } from "@/store";
 
 import mapboxgl from "mapbox-gl";
 import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";

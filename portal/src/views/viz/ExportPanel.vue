@@ -35,7 +35,7 @@ import _ from "lodash";
 import Vue from "vue";
 import CommonComponents from "@/views/shared";
 
-import { mapState, mapGetters } from "vuex";
+import { mapState } from "vuex";
 import * as ActionTypes from "@/store/actions";
 import { ExportDataAction, ExportParams } from "@/store/typed-actions";
 import { GlobalState } from "@/store/modules/global";

@@ -130,7 +130,7 @@ export interface PartnerCustomization {
         project: Component | null;
     };
     latestPrimaryNoDataColor: string;
-    googleTagManagerIds?: {staging: string, prod: string} | null;
+    googleTagManagerIds?: { staging: string; prod: string } | null;
     queryRecentlyQueryString: (station: number[]) => URLSearchParams;
 }
 
@@ -259,7 +259,7 @@ export function getPartnerCustomizationWithDefault(): PartnerCustomization {
             return station.deployedAt ? moment(station.deployedAt).format("M/D/YYYY") : "N/A";
         },
         viz: {
-            groupStation: (station: DisplayStation): string | null => {
+            groupStation: (_station: DisplayStation): string | null => {
                 return null;
             },
         },

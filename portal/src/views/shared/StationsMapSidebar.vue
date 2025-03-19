@@ -236,7 +236,7 @@ export default Vue.extend({
     font-size: 14px;
     color: #000;
     display: flex;
-    align-items: end;
+    align-items: flex-end;
     margin-bottom: 23px;
     user-select: none;
 
