@@ -33,7 +33,8 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "../../scss/mixins";
+@use "src/scss/mixins";
+@use "src/scss/variables";
 
 .follow-panel {
     display: flex;
@@ -46,7 +47,7 @@ export default Vue.extend({
     border-top: solid 1px var(--color-border);
     margin-top: 10px;
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         padding-top: 14px;
     }
 }

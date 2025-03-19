@@ -364,13 +364,15 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "../../scss/global";
+@use "src/scss/global";
+@use "src/scss/mixins";
+@use "src/scss/variables";
 
 .map-view #map {
     height: calc(100% - 88px);
     position: relative;
 
-    @include bp-down($lg) {
+    @include mixins.bp-down(variables.$lg) {
         height: 100%;
     }
 }
@@ -390,7 +392,7 @@ export default Vue.extend({
     border-radius: 0;
     height: 40px;
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         width: 40px;
     }
 
@@ -399,7 +401,7 @@ export default Vue.extend({
     }
 
     &:not(.mapboxgl-ctrl-geocoder--collapsed) {
-        @include bp-down($xs) {
+        @include mixins.bp-down(variables.$xs) {
             min-width: calc(100vw - 20px) !important;
         }
     }
@@ -420,7 +422,7 @@ export default Vue.extend({
 ::v-deep .mapboxgl-ctrl-geocoder--icon-close {
     margin-top: 4px;
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         margin-top: 3px;
     }
 }

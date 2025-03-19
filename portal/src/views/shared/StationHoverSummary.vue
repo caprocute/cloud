@@ -226,7 +226,8 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "../../scss/mixins";
+@use "src/scss/mixins";
+@use "src/scss/variables";
 
 .station-hover-summary {
     position: absolute;
@@ -245,10 +246,10 @@ export default Vue.extend({
     }
 
     * {
-        font-family: $font-family-light;
+        font-family: variables.$font-family-light;
     }
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         width: 100% !important;
         left: 0 !important;
         top: 0 !important;
@@ -306,12 +307,12 @@ export default Vue.extend({
 
 .close-button {
     cursor: pointer;
-    @include position(absolute, -7px -5px null null);
+    @include mixins.position(absolute, -7px -5px null null);
 }
 
 .navigate-button {
     cursor: pointer;
-    @include position(absolute, -10px 20px null null);
+    @include mixins.position(absolute, -10px 20px null null);
 }
 
 .readings-container {
@@ -359,10 +360,10 @@ export default Vue.extend({
 
 .latest-primary {
     font-size: 12px;
-    font-family: $font-family-bold;
-    @include flex(center, flex-end);
+    font-family: variables.$font-family-bold;
+    @include mixins.flex(center, flex-end);
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         margin-top: 10px;
     }
 
@@ -380,7 +381,7 @@ export default Vue.extend({
 
     .no-data {
         color: #777a80;
-        font-family: $font-family-bold;
+        font-family: variables.$font-family-bold;
 
         body.floodnet & {
             color: #cccccc;

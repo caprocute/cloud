@@ -58,14 +58,16 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "../../scss/global";
+@use "src/scss/global";
+@use "src/scss/mixins";
+@use "src/scss/variables";
 
 .icon-ellipsis {
     display: block;
     cursor: pointer;
 
     &:after {
-        @include flex(flex-end);
+        @include mixins.flex(flex-end);
         content: "...";
         height: 7px;
         font-size: 32px;
@@ -90,13 +92,13 @@ button {
     }
 
     &-btns {
-        @include position(absolute, 0 null null 45px);
+        @include mixins.position(absolute, 0 null null 45px);
         opacity: 0;
         visibility: hidden;
         padding: 8px 12px;
         box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.5);
         background: #fff;
-        z-index: $z-index-top;
+        z-index: variables.$z-index-top;
         transition: opacity 0.33s;
         min-width: 100px;
         cursor: initial;
@@ -121,7 +123,7 @@ button {
         width: 16px;
         margin-right: 8px;
         margin-top: -1px;
-        @include flex(center, center);
+        @include mixins.flex(center, center);
 
         .icon {
             font-size: 16px;

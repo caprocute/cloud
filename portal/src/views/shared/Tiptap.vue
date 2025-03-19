@@ -293,7 +293,9 @@ export default Vue.extend({
 });
 </script>
 <style lang="scss">
-@import "../../scss/global";
+@use "src/scss/global";
+@use "src/scss/mixins";
+@use "src/scss/variables";
 
 .tiptap-container {
     width: 100%;
@@ -310,11 +312,11 @@ export default Vue.extend({
     padding-left: 10px;
     padding-right: 80px;
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         max-height: 60vh;
     }
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         padding-right: 60px;
     }
 }
@@ -426,7 +428,7 @@ export default Vue.extend({
             padding: 10px 0;
         }
 
-        @include bp-down($sm) {
+        @include mixins.bp-down(variables.$sm) {
             right: 10px;
         }
 

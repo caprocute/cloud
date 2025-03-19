@@ -71,22 +71,24 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "../../scss/mixins";
+@use "src/scss/mixins";
+@use "src/scss/variables";
+
 .projects-view {
     display: flex;
     flex-direction: column;
     padding: 10px 72px 60px;
     text-align: left;
 
-    @include bp-down($lg) {
+    @include mixins.bp-down(variables.$lg) {
         padding: 10px 45px 60px;
     }
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         padding: 0 20px 30px;
     }
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         padding: 0 10px 30px;
     }
 }
@@ -101,12 +103,12 @@ export default Vue.extend({
     margin-bottom: 30px;
     margin-top: 40px;
 
-    @include bp-down($lg) {
+    @include mixins.bp-down(variables.$lg) {
         margin-bottom: 20px;
         margin-top: 30px;
     }
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         margin-bottom: 25px;
         margin-top: 20px;
     }
@@ -115,11 +117,11 @@ export default Vue.extend({
         font-size: 36px;
         margin: 0;
 
-        @include bp-down($lg) {
+        @include mixins.bp-down(variables.$lg) {
             font-size: 32px;
         }
 
-        @include bp-down($xs) {
+        @include mixins.bp-down(variables.$xs) {
             font-size: 24px;
         }
     }
@@ -142,7 +144,7 @@ export default Vue.extend({
     margin-left: auto;
     cursor: pointer;
     font-size: 16px;
-    @include flex(center);
+    @include mixins.flex(center);
 
     i {
         margin-right: 7px;

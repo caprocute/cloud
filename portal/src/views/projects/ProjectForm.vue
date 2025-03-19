@@ -395,8 +395,10 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "../../scss/forms";
-@import "../../scss/global";
+@use "src/scss/forms";
+@use "src/scss/global";
+@use "src/scss/mixins";
+@use "src/scss/variables";
 
 form > .outer-input-container {
     margin-bottom: 20px;
@@ -408,7 +410,7 @@ form > .outer-input-container {
 }
 
 .dates-row {
-    @include flex(center, space-between);
+    @include mixins.flex(center, space-between);
     flex-direction: row;
     margin-bottom: 20px;
 }
@@ -457,7 +459,7 @@ form > .outer-input-container {
     position: relative;
     cursor: pointer;
     min-height: 22px;
-    @include flex(center);
+    @include mixins.flex(center);
 
     input {
         opacity: 0;
@@ -472,7 +474,7 @@ form > .outer-input-container {
         border-radius: 100px;
         border: solid 1px rgba(0, 0, 0, 0.1);
         background: #f2f4f7;
-        @include position(absolute, 0 null null 0);
+        @include mixins.position(absolute, 0 null null 0);
     }
 
     &-container {
@@ -483,7 +485,7 @@ form > .outer-input-container {
 
     input:checked ~ .radio-btn {
         &:after {
-            @include position(absolute, 5px null null 5px);
+            @include mixins.position(absolute, 5px null null 5px);
             content: "";
             width: 10px;
             height: 10px;
@@ -499,7 +501,7 @@ form > .outer-input-container {
 }
 .close-form-button {
     cursor: pointer;
-    @include position(absolute, 14px 14px null null);
+    @include mixins.position(absolute, 14px 14px null null);
 }
 .btn {
     width: 280px;
@@ -533,8 +535,8 @@ form > .outer-input-container {
             color: #6a6d71;
             transition: all 0.2s;
             cursor: text;
-            z-index: $z-index-top;
-            @include position(absolute, 11px null null 0);
+            z-index: variables.$z-index-top;
+            @include mixins.position(absolute, 11px null null 0);
 
             &.focused {
                 font-size: 75%;
@@ -679,6 +681,6 @@ form > .outer-input-container {
 
 .date-picker-hidden-input {
     opacity: 0;
-    @include position(absolute, 0 null 3px null);
+    @include mixins.position(absolute, 0 null 3px null);
 }
 </style>

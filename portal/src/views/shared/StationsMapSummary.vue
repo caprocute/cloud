@@ -351,7 +351,8 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "../../scss/mixins";
+@use "src/scss/mixins";
+@use "src/scss/variables";
 
 .station-map-summary {
     height: calc(100% - 88px);
@@ -369,7 +370,7 @@ export default Vue.extend({
     margin-left: 1px;
     overflow-y: scroll;
 
-    @include bp-down($lg) {
+    @include mixins.bp-down(variables.$lg) {
         border: 0;
     }
 }
@@ -378,7 +379,7 @@ export default Vue.extend({
     transform: translateX(0);
     width: 430px;
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         width: 100%;
     }
 
@@ -399,7 +400,7 @@ export default Vue.extend({
 .station-header {
     padding: 40px 25px 30px;
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         padding: 35px 25px 35px;
     }
 }
@@ -409,7 +410,7 @@ export default Vue.extend({
     font-weight: 900;
     color: #2c3e50;
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         font-size: 16px;
     }
 }
@@ -419,7 +420,7 @@ export default Vue.extend({
     width: 100%;
     object-fit: cover;
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         height: 155px;
     }
 }
@@ -432,7 +433,7 @@ export default Vue.extend({
 .station-battery-container {
     padding: 20px 16px 30px 25px;
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         padding: 18px;
     }
 }
@@ -461,10 +462,10 @@ export default Vue.extend({
     }
 
     * {
-        font-family: $font-family-light;
+        font-family: variables.$font-family-light;
     }
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         width: 100% !important;
         left: 0 !important;
         top: 0 !important;
@@ -522,13 +523,13 @@ export default Vue.extend({
 
 .close-button {
     cursor: pointer;
-    @include position(absolute, -7px -5px null null);
+    @include mixins.position(absolute, -7px -5px null null);
 }
 
 .navigate-button {
     margin: 0 8px;
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         height: 16px;
     }
 }
@@ -574,10 +575,10 @@ export default Vue.extend({
 
 .latest-primary {
     font-size: 12px;
-    font-family: $font-family-bold;
-    @include flex(center, flex-end);
+    font-family: variables.$font-family-bold;
+    @include mixins.flex(center, flex-end);
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         margin-top: 10px;
     }
 
@@ -595,7 +596,7 @@ export default Vue.extend({
 
     .no-data {
         color: #777a80;
-        font-family: $font-family-bold;
+        font-family: variables.$font-family-bold;
 
         body.floodnet & {
             color: #cccccc;
@@ -608,7 +609,7 @@ export default Vue.extend({
     top: 40px;
     right: 20px;
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         top: 20px;
     }
 }
@@ -622,14 +623,14 @@ export default Vue.extend({
     justify-content: space-between;
     padding: 30px 20px 25px;
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         padding: 15px 0 0;
     }
 
     > a {
         padding: 4px 4px;
 
-        @include bp-down($xs) {
+        @include mixins.bp-down(variables.$xs) {
             flex: 1 1 auto;
             text-align: center;
             padding: 0;
@@ -639,7 +640,7 @@ export default Vue.extend({
             border-bottom: 1.5px solid var(--color-dark);
             padding-bottom: 3px;
 
-            @include bp-down($xs) {
+            @include mixins.bp-down(variables.$xs) {
                 display: block;
                 padding-bottom: 15px;
             }
@@ -652,7 +653,7 @@ export default Vue.extend({
     padding: 25px 0;
     border-top: solid 1px #d8dce0;
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         margin: 0;
         padding: 15px;
     }
@@ -689,7 +690,7 @@ export default Vue.extend({
 .station-modules {
     margin-left: 10px;
     flex-wrap: wrap;
-    @include flex;
+    @include mixins.flex;
 
     img {
         margin-right: 8px;

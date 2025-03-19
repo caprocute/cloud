@@ -179,10 +179,11 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "../../scss/mixins";
+@use "src/scss/mixins";
+@use "src/scss/variables";
 
 .container-side {
-    @include flex();
+    @include mixins.flex();
     flex-direction: column;
     position: relative;
     background: #fff;
@@ -190,7 +191,7 @@ export default Vue.extend({
     flex: 0 0 65px;
     transition: all 0.25s;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.28);
-    z-index: $z-index-menu;
+    z-index: variables.$z-index-menu;
 
     &.active {
         width: 240px;
@@ -201,11 +202,11 @@ export default Vue.extend({
         max-height: 100vh;
     }
 
-    @include bp-down($md) {
+    @include mixins.bp-down(variables.$md) {
         width: 0;
         background: #fff;
         height: 100%;
-        @include position(fixed, 0 null null 0);
+        @include mixins.position(fixed, 0 null null 0);
     }
 }
 
@@ -218,13 +219,13 @@ export default Vue.extend({
     opacity: 0;
     transition: 0.25s all;
     overflow: hidden;
-    @include flex(center, center);
+    @include mixins.flex(center, center);
 
     @at-root .container-side.active & {
         opacity: 1;
     }
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         justify-content: flex-start;
         padding: 0 20px;
         flex: 0 0 54px;
@@ -259,7 +260,7 @@ export default Vue.extend({
     }
 }
 .nav-label {
-    @include flex(center);
+    @include mixins.flex(center);
     font-family: var(--font-family-bold);
     font-size: 16px;
     margin: 12px 0;
@@ -277,12 +278,12 @@ export default Vue.extend({
     }
 }
 .selected {
-    border-bottom: 2px solid $color-primary;
+    border-bottom: 2px solid variables.$color-primary;
     height: 100%;
     display: inline-block;
 
     body.floodnet & {
-        font-family: $font-family-floodnet-bold;
+        font-family: variables.$font-family-floodnet-bold;
     }
 }
 .unselected {
@@ -300,7 +301,7 @@ export default Vue.extend({
 
 .nav-link {
     cursor: pointer;
-    font-family: $font-family-light;
+    font-family: variables.$font-family-light;
     font-size: 14px;
     margin: 0 0 0 30px;
     display: inline-block;
@@ -313,9 +314,9 @@ export default Vue.extend({
 
 #header-logo {
     font-size: 32px;
-    @include flex(center);
+    @include mixins.flex(center);
 
-    @include bp-down($md) {
+    @include mixins.bp-down(variables.$md) {
         display: none;
     }
 }
@@ -328,7 +329,7 @@ export default Vue.extend({
     transform: translateX(0);
     width: 65px;
     height: 66px;
-    @include position(absolute, 0 null null 0);
+    @include mixins.position(absolute, 0 null null 0);
 
     @at-root .container-side.active & {
         transition: all 0.33s;
@@ -337,7 +338,7 @@ export default Vue.extend({
         transform: translateX(100px);
     }
 
-    @include bp-down($md) {
+    @include mixins.bp-down(variables.$md) {
         display: none;
     }
 
@@ -359,9 +360,9 @@ export default Vue.extend({
 .sidebar-trigger {
     transition: all 0.25s;
     cursor: pointer;
-    @include position(absolute, 23px null null 77px);
+    @include mixins.position(absolute, 23px null null 77px);
 
-    @include bp-down($md) {
+    @include mixins.bp-down(variables.$md) {
         left: 10px;
         top: 16px;
     }
@@ -369,7 +370,7 @@ export default Vue.extend({
     .container-side.active & {
         left: 251px;
 
-        @include bp-down($md) {
+        @include mixins.bp-down(variables.$md) {
             left: 188px;
         }
     }

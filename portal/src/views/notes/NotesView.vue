@@ -283,13 +283,15 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "../../scss/layout";
+@use "src/scss/layout";
+@use "src/scss/mixins";
+@use "src/scss/variables";
 
 .notes-view {
-    @include bp-down($md) {
+    @include mixins.bp-down(variables.$md) {
         max-width: 600px;
     }
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         padding-bottom: 100px;
     }
 }
@@ -299,13 +301,13 @@ export default Vue.extend({
     margin-top: 20px;
     position: relative;
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         margin-top: -15px;
     }
 }
 .loading-container {
     height: 100%;
-    @include flex(center);
+    @include mixins.flex(center);
 }
 .notes-view .lower .loading-container.empty {
     padding: 20px;
@@ -344,7 +346,7 @@ export default Vue.extend({
     border-left: 1px solid var(--color-border);
     border-bottom: 1px solid var(--color-border);
 
-    @include bp-down($md) {
+    @include mixins.bp-down(variables.$md) {
         flex-basis: 100%;
     }
 }
@@ -352,7 +354,7 @@ export default Vue.extend({
     border-bottom: 1px solid var(--color-border);
     cursor: pointer;
 
-    @include bp-down($md) {
+    @include mixins.bp-down(variables.$md) {
         border-right: 1px solid var(--color-border);
         border-bottom: 0;
     }
@@ -360,7 +362,7 @@ export default Vue.extend({
     &.active {
         border-left: 4px solid var(--color-primary);
 
-        @include bp-down($md) {
+        @include mixins.bp-down(variables.$md) {
             border-left: 0;
         }
     }
@@ -370,7 +372,7 @@ export default Vue.extend({
         padding: 16px 13px;
         z-index: 10;
 
-        @include bp-down($md) {
+        @include mixins.bp-down(variables.$md) {
             padding: 16px 10px;
             border-right: 0;
             transition: max-height 0.33s;
@@ -382,7 +384,7 @@ export default Vue.extend({
                 width: 20px;
                 height: 20px;
                 transition: all 0.33s;
-                @include position(absolute, 50% 20px null null);
+                @include mixins.position(absolute, 50% 20px null null);
 
                 .tab.active & {
                     transform: rotate(270deg) translateX(50%);
@@ -391,23 +393,23 @@ export default Vue.extend({
         }
 
         .tab.active &:before {
-            @include bp-up($md) {
+            @include mixins.bp-up(variables.$md) {
                 content: "";
                 width: 3px;
                 height: 100%;
                 background: #fff;
-                z-index: $z-index-top;
-                @include position(absolute, 0 -2px null null);
+                z-index: variables.$z-index-top;
+                @include mixins.position(absolute, 0 -2px null null);
             }
         }
     }
 
     &-content {
         width: calc(100% - 250px);
-        z-index: $z-index-top;
+        z-index: variables.$z-index-top;
         border: 1px solid var(--color-border);
 
-        @include bp-down($md) {
+        @include mixins.bp-down(variables.$md) {
             padding-top: 1px;
             width: 100%;
             max-height: 0;
@@ -434,7 +436,7 @@ export default Vue.extend({
     margin-bottom: 1px;
 }
 .undeployed {
-    @include bp-down($md) {
+    @include mixins.bp-down(variables.$md) {
         padding: 0 10px 0 14px;
         width: calc(100% + 24px);
         box-sizing: border-box;
@@ -454,7 +456,7 @@ export default Vue.extend({
     color: #2c3e50;
     font-size: 14px !important;
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         font-size: 12px !important;
     }
 }

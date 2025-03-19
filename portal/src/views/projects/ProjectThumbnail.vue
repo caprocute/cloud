@@ -93,7 +93,8 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@import "../../scss/mixins";
+@use "src/scss/mixins";
+@use "src/scss/variables";
 
 .project-container {
     flex-basis: 270px;
@@ -103,19 +104,19 @@ export default {
     transition: all 0.33s;
     flex-direction: column;
     line-height: 1.4;
-    @include flex();
-    @include position(relative, 0 0 0 0);
+    @include mixins.flex();
+    @include mixins.position(relative, 0 0 0 0);
 
-    @include attention() {
+    @include mixins.attention() {
         top: -3px;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);
     }
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         flex-basis: calc(50% - 24px);
     }
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         margin: 0 0 40px;
         flex-basis: 100%;
     }
@@ -126,7 +127,7 @@ export default {
     margin: 13px 15px 0 15px;
 }
 .project-description {
-    font-family: $font-family-light;
+    font-family: variables.$font-family-light;
     font-size: 14px;
     margin: 2px 15px 15px 15px;
     overflow-wrap: anywhere;
@@ -155,7 +156,7 @@ export default {
     z-index: 10;
 }
 .social {
-    @include flex(center);
+    @include mixins.flex(center);
     font-size: 14px;
     font-weight: 500;
     margin: 0 14px 0 15px;
@@ -166,7 +167,7 @@ export default {
 
     &-container {
         margin-top: auto;
-        @include flex();
+        @include mixins.flex();
     }
 }
 
@@ -198,7 +199,7 @@ export default {
     border: solid 1px #cccdcf;
     white-space: nowrap;
     flex-grow: 1;
-    @include flex(center);
+    @include mixins.flex(center);
 }
 .invited-container .reject {
     padding: 5px;
@@ -206,7 +207,7 @@ export default {
     color: #2c3e50;
     white-space: nowrap;
     flex-grow: 1;
-    @include flex(center);
+    @include mixins.flex(center);
 
     span {
         padding-top: 2px;

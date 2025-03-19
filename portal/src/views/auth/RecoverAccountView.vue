@@ -94,7 +94,9 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "../../scss/forms";
+@use "src/scss/forms";
+@use "src/scss/mixins";
+@use "src/scss/variables";
 
 .reset-instructions {
     margin-bottom: 50px;
@@ -103,7 +105,7 @@ export default Vue.extend({
 .form-submit {
     margin-top: 80px;
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         margin-top: 70px;
     }
 }

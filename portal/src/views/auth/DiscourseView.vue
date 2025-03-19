@@ -103,5 +103,5 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "../../scss/forms.scss";
+@use "src/scss/forms.scss";
 </style>

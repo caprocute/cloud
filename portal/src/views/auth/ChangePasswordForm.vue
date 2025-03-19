@@ -82,8 +82,9 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "../../scss/global";
-@import "../../scss/mixins";
+@use "src/scss/global";
+@use "src/scss/mixins";
+@use "src/scss/variables";
 
 .main-panel {
     display: flex;
@@ -132,7 +133,7 @@ form {
     margin-top: 15px;
     margin-bottom: 20px;
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         width: 100%;
     }
 }

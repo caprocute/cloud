@@ -244,7 +244,8 @@ export default Vue.extend({
 </script>
 
 <style lang="scss">
-@import "src/scss/mixins";
+@use "src/scss/mixins";
+@use "src/scss/variables";
 
 .viz {
     width: 100%;
@@ -258,7 +259,7 @@ export default Vue.extend({
     margin-right: 3.2em !important;
     opacity: 1 !important;
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         bottom: -195px;
         top: unset !important;
         left: 50%;
@@ -267,7 +268,7 @@ export default Vue.extend({
 
         span {
             font-size: 14px;
-            font-family: $font-family-bold;
+            font-family: variables.$font-family-bold;
         }
     }
 }
@@ -276,7 +277,7 @@ export default Vue.extend({
     height: 16px !important;
     display: inline-block;
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         width: 20px !important;
         height: 20px !important;
     }
@@ -284,7 +285,7 @@ export default Vue.extend({
 .vega-embed .vega-actions {
     right: 3em !important;
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         bottom: -225px;
         top: unset !important;
         right: 50% !important;
@@ -292,7 +293,7 @@ export default Vue.extend({
 }
 
 .vega-embed.has-actions {
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         padding-right: 0 !important;
     }
 }

@@ -58,7 +58,8 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "../../scss/mixins";
+@use "src/scss/mixins";
+@use "src/scss/variables";
 
 .actions {
     display: flex;
@@ -72,7 +73,7 @@ export default Vue.extend({
     margin-left: auto;
     margin-top: auto;
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         flex-basis: 100%;
         margin: 15px 0;
     }
@@ -89,7 +90,7 @@ export default Vue.extend({
     margin-bottom: 1px;
 
     body.floodnet & {
-        font-family: $font-family-floodnet-bold;
+        font-family: variables.$font-family-floodnet-bold;
     }
 }
 .two {

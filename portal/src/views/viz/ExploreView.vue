@@ -1,3 +1,5 @@
+
+
 <template>
     <ExploreWorkspace
         v-if="visibleBookmark"

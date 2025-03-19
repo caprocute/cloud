@@ -206,7 +206,7 @@ export default Vue.extend({
 </script>
 
 <style lang="scss">
-@import "src/scss/variables";
+@use "src/scss/variables";
 .viz {
     width: 100%;
 }

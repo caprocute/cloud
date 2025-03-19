@@ -148,12 +148,14 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "../../scss/mixins";
+@use "src/scss/mixins";
+@use "src/scss/variables";
+
 .heading {
     padding: 1em;
     display: flex;
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         font-size: 20px;
     }
 }

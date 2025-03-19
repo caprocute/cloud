@@ -48,8 +48,10 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "../../scss/project";
-@import "../../scss/global";
+@use "src/scss/project";
+@use "src/scss/global";
+@use "src/scss/mixins";
+@use "src/scss/variables";
 
 .map-header {
     display: none;
@@ -59,21 +61,21 @@ export default Vue.extend({
     box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.12);
     text-align: left;
     padding: 24px 20px;
-    z-index: $z-index-top;
+    z-index: variables.$z-index-top;
 
-    @include bp-up($md) {
+    @include mixins.bp-up(variables.$md) {
         display: flex;
     }
 
     body.floodnet & {
         background-color: #f6f9f8;
 
-        @include bp-down($sm) {
+        @include mixins.bp-down(variables.$sm) {
             background-color: #ffffff;
         }
     }
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         width: 100%;
         padding: 10px;
         top: 52px;
@@ -99,20 +101,20 @@ export default Vue.extend({
     }
 
     ::v-deep .link {
-        color: $color-primary;
+        color: variables.$color-primary;
         font-size: 12px;
         letter-spacing: 0.07px;
         text-decoration: initial;
         display: block;
 
-        @include bp-down($sm) {
-            font-family: $font-family-medium;
+        @include mixins.bp-down(variables.$sm) {
+            font-family: variables.$font-family-medium;
             font-size: 14px;
         }
 
         body.floodnet & {
-            @include bp-up($sm) {
-                color: $color-dark;
+            @include mixins.bp-up(variables.$sm) {
+                color: variables.$color-dark;
             }
         }
     }
@@ -123,7 +125,7 @@ export default Vue.extend({
 }
 
 ::v-deep .detail-title {
-    font-family: $font-family-bold;
+    font-family: variables.$font-family-bold;
     font-size: 18px;
     margin-top: 0;
     margin-bottom: 2px;
@@ -132,7 +134,7 @@ export default Vue.extend({
     overflow: hidden;
     white-space: nowrap;
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         margin-bottom: 0;
     }
 }
@@ -153,13 +155,13 @@ export default Vue.extend({
         text-decoration: underline;
     }
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         display: none;
     }
 }
 
 ::v-deep .detail-links {
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         position: absolute;
         top: 51px;
         left: 0;
@@ -177,8 +179,8 @@ export default Vue.extend({
         }
 
         .link {
-            color: $color-dark;
-            border: 1px solid $color-dark;
+            color: variables.$color-dark;
+            border: 1px solid variables.$color-dark;
             border-radius: 25px;
             padding: 6px 12px;
             display: inline-block;
@@ -196,7 +198,7 @@ export default Vue.extend({
         border-radius: 2px;
     }
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         flex-basis: 30px;
         height: 30px;
     }

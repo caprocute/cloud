@@ -167,7 +167,8 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "../../scss/mixins";
+@use "src/scss/mixins";
+@use "src/scss/variables";
 
 .header {
     background: #fff;
@@ -176,16 +177,16 @@ export default Vue.extend({
     float: left;
     padding: 0 10px;
     box-sizing: border-box;
-    z-index: $z-index-header;
+    z-index: variables.$z-index-header;
     flex: 0 0 65px;
     padding-right: 85px;
-    @include flex(center, flex-end);
+    @include mixins.flex(center, flex-end);
 
-    @include bp-down($lg) {
+    @include mixins.bp-down(variables.$lg) {
         padding-right: 14px;
     }
 
-    @include bp-down($md) {
+    @include mixins.bp-down(variables.$md) {
         padding: 0 10px;
         height: 54px;
         position: fixed;
@@ -204,14 +205,14 @@ export default Vue.extend({
         text-align: right;
         position: relative;
         height: 100%;
-        @include flex(center);
+        @include mixins.flex(center);
 
         &-name {
             font-size: 16px;
             font-weight: 500;
-            z-index: $z-index-top;
+            z-index: variables.$z-index-top;
 
-            @include bp-down($sm) {
+            @include mixins.bp-down(variables.$sm) {
                 display: none;
             }
         }
@@ -226,13 +227,13 @@ export default Vue.extend({
             transition: all 0.33s;
             transform: translateY(-50%);
             cursor: pointer;
-            @include position(absolute, 50% null null calc(100% + 5px));
+            @include mixins.position(absolute, 50% null null calc(100% + 5px));
 
-            @include bp-down($lg) {
+            @include mixins.bp-down(variables.$lg) {
                 right: 0;
             }
 
-            @include bp-down($sm) {
+            @include mixins.bp-down(variables.$sm) {
                 display: none;
             }
         }
@@ -255,10 +256,10 @@ export default Vue.extend({
         box-sizing: border-box;
         box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.5);
         z-index: -1;
-        @include position(absolute, calc(100% - 5px) 70px null null);
+        @include mixins.position(absolute, calc(100% - 5px) 70px null null);
 
-        @include bp-down($lg) {
-            @include position(fixed, 60px 10px null unset);
+        @include mixins.bp-down(variables.$lg) {
+            @include mixins.position(fixed, 60px 10px null unset);
         }
 
         &.active {
@@ -275,8 +276,8 @@ export default Vue.extend({
 }
 
 ::v-deep .triangle {
-    @include position(absolute, null null -10px 5px);
-    z-index: $z-index-top;
+    @include mixins.position(absolute, null null -10px 5px);
+    z-index: variables.$z-index-top;
     width: 0;
     height: 0;
     border-style: solid;
@@ -284,7 +285,7 @@ export default Vue.extend({
     border-color: transparent transparent #fff transparent;
     filter: drop-shadow(0px -2px 1px rgba(0, 0, 0, 0.1));
 
-    @include bp-down($md) {
+    @include mixins.bp-down(variables.$md) {
         left: 2px;
         border-width: 0 12px 9px 12px;
     }
@@ -293,30 +294,30 @@ export default Vue.extend({
 ::v-deep .default-user-icon {
     margin: 0 10px 0 0;
 
-    @include bp-down($md) {
+    @include mixins.bp-down(variables.$md) {
         width: 30px;
         height: 30px;
     }
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         margin: 0;
     }
 }
 
 .badge {
-    @include position(absolute, -5px null null -7px);
+    @include mixins.position(absolute, -5px null null -7px);
     height: 20px;
     width: 20px;
     background: var(--color-primary);
     border-radius: 50%;
 
     > * {
-        @include position(absolute, 5px null null 50%);
+        @include mixins.position(absolute, 5px null null 50%);
         transform: translateX(-50%);
         color: #fff;
         font-size: 11px;
         font-style: normal;
-        font-family: $font-family-bold;
+        font-family: variables.$font-family-bold;
 
         body.floodnet & {
             color: var(--color-dark);
@@ -339,7 +340,7 @@ button {
 
 .notifications {
     &-header {
-        @include flex(center, space-between);
+        @include mixins.flex(center, space-between);
         height: 50px;
         border-bottom: solid 1px #d8dce0;
         margin-bottom: 15px;
@@ -354,7 +355,7 @@ button {
     &-footer {
         border-top: solid 1px #d8dce0;
         margin-top: auto;
-        @include flex(center, space-between);
+        @include mixins.flex(center, space-between);
 
         button {
             padding: 13px 15px 10px 15px;
@@ -377,20 +378,20 @@ button {
         z-index: -1;
         opacity: 0;
         visibility: hidden;
-        @include flex();
-        @include position(absolute, calc(100% + 1px) 30px null null);
+        @include mixins.flex();
+        @include mixins.position(absolute, calc(100% + 1px) 30px null null);
 
-        @include bp-down($lg) {
+        @include mixins.bp-down(variables.$lg) {
             top: 100%;
             right: 30px;
         }
 
-        @include bp-down($sm) {
+        @include mixins.bp-down(variables.$sm) {
             right: -10px;
             height: calc(100vh - 55px);
         }
 
-        @include bp-down($xs) {
+        @include mixins.bp-down(variables.$xs) {
             width: 100vw;
             right: -10px;
         }
@@ -418,15 +419,15 @@ button {
 #header-logo {
     display: none;
 
-    @include bp-down($md) {
-        @include position(fixed, null null null 50%);
-        @include flex(center);
+    @include mixins.bp-down(variables.$md) {
+        @include mixins.position(fixed, null null null 50%);
+        @include mixins.flex(center);
         font-size: 32px;
         height: 50px;
         transform: translateX(-50%);
     }
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         font-size: 26px;
     }
 }
