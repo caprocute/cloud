@@ -18,6 +18,16 @@ type HealthResponseBody struct {
 	Queue *QueueHealthResponseBody `form:"queue,omitempty" json:"queue,omitempty" xml:"queue,omitempty"`
 }
 
+// UploadBackupResponseBody is the type of the "admin" service "upload backup"
+// endpoint HTTP response body.
+type UploadBackupResponseBody struct {
+	DeviceName   *string  `form:"deviceName,omitempty" json:"deviceName,omitempty" xml:"deviceName,omitempty"`
+	DeviceID     *string  `form:"deviceId,omitempty" json:"deviceId,omitempty" xml:"deviceId,omitempty"`
+	GenerationID *string  `form:"generationId,omitempty" json:"generationId,omitempty" xml:"generationId,omitempty"`
+	Records      []int32  `form:"records,omitempty" json:"records,omitempty" xml:"records,omitempty"`
+	Errors       []string `form:"errors,omitempty" json:"errors,omitempty" xml:"errors,omitempty"`
+}
+
 // HealthUnauthorizedResponseBody is the type of the "admin" service "health"
 // endpoint HTTP response body for the "unauthorized" error.
 type HealthUnauthorizedResponseBody struct {
@@ -75,6 +85,78 @@ type HealthNotFoundResponseBody struct {
 // HealthBadRequestResponseBody is the type of the "admin" service "health"
 // endpoint HTTP response body for the "bad-request" error.
 type HealthBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// UploadBackupUnauthorizedResponseBody is the type of the "admin" service
+// "upload backup" endpoint HTTP response body for the "unauthorized" error.
+type UploadBackupUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// UploadBackupForbiddenResponseBody is the type of the "admin" service "upload
+// backup" endpoint HTTP response body for the "forbidden" error.
+type UploadBackupForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// UploadBackupNotFoundResponseBody is the type of the "admin" service "upload
+// backup" endpoint HTTP response body for the "not-found" error.
+type UploadBackupNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID *string `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message *string `form:"message,omitempty" json:"message,omitempty" xml:"message,omitempty"`
+	// Is the error temporary?
+	Temporary *bool `form:"temporary,omitempty" json:"temporary,omitempty" xml:"temporary,omitempty"`
+	// Is the error a timeout?
+	Timeout *bool `form:"timeout,omitempty" json:"timeout,omitempty" xml:"timeout,omitempty"`
+	// Is the error a server-side fault?
+	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
+}
+
+// UploadBackupBadRequestResponseBody is the type of the "admin" service
+// "upload backup" endpoint HTTP response body for the "bad-request" error.
+type UploadBackupBadRequestResponseBody struct {
 	// Name is the name of this class of errors.
 	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
 	// ID is a unique identifier for this particular occurrence of the problem.
@@ -162,6 +244,88 @@ func NewHealthBadRequest(body *HealthBadRequestResponseBody) *goa.ServiceError {
 	return v
 }
 
+// NewUploadBackupBackupCheckOK builds a "admin" service "upload backup"
+// endpoint result from a HTTP "OK" response.
+func NewUploadBackupBackupCheckOK(body *UploadBackupResponseBody) *adminviews.BackupCheckView {
+	v := &adminviews.BackupCheckView{
+		DeviceName:   body.DeviceName,
+		DeviceID:     body.DeviceID,
+		GenerationID: body.GenerationID,
+	}
+	if body.Records != nil {
+		v.Records = make([]int32, len(body.Records))
+		for i, val := range body.Records {
+			v.Records[i] = val
+		}
+	}
+	v.Errors = make([]string, len(body.Errors))
+	for i, val := range body.Errors {
+		v.Errors[i] = val
+	}
+
+	return v
+}
+
+// NewUploadBackupUnauthorized builds a admin service upload backup endpoint
+// unauthorized error.
+func NewUploadBackupUnauthorized(body *UploadBackupUnauthorizedResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
+// NewUploadBackupForbidden builds a admin service upload backup endpoint
+// forbidden error.
+func NewUploadBackupForbidden(body *UploadBackupForbiddenResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
+// NewUploadBackupNotFound builds a admin service upload backup endpoint
+// not-found error.
+func NewUploadBackupNotFound(body *UploadBackupNotFoundResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
+// NewUploadBackupBadRequest builds a admin service upload backup endpoint
+// bad-request error.
+func NewUploadBackupBadRequest(body *UploadBackupBadRequestResponseBody) *goa.ServiceError {
+	v := &goa.ServiceError{
+		Name:      *body.Name,
+		ID:        *body.ID,
+		Message:   *body.Message,
+		Temporary: *body.Temporary,
+		Timeout:   *body.Timeout,
+		Fault:     *body.Fault,
+	}
+
+	return v
+}
+
 // ValidateHealthUnauthorizedResponseBody runs the validations defined on
 // health_unauthorized_response_body
 func ValidateHealthUnauthorizedResponseBody(body *HealthUnauthorizedResponseBody) (err error) {
@@ -237,6 +401,102 @@ func ValidateHealthNotFoundResponseBody(body *HealthNotFoundResponseBody) (err e
 // ValidateHealthBadRequestResponseBody runs the validations defined on
 // health_bad-request_response_body
 func ValidateHealthBadRequestResponseBody(body *HealthBadRequestResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateUploadBackupUnauthorizedResponseBody runs the validations defined on
+// upload backup_unauthorized_response_body
+func ValidateUploadBackupUnauthorizedResponseBody(body *UploadBackupUnauthorizedResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateUploadBackupForbiddenResponseBody runs the validations defined on
+// upload backup_forbidden_response_body
+func ValidateUploadBackupForbiddenResponseBody(body *UploadBackupForbiddenResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateUploadBackupNotFoundResponseBody runs the validations defined on
+// upload backup_not-found_response_body
+func ValidateUploadBackupNotFoundResponseBody(body *UploadBackupNotFoundResponseBody) (err error) {
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
+	}
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Message == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("message", "body"))
+	}
+	if body.Temporary == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("temporary", "body"))
+	}
+	if body.Timeout == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("timeout", "body"))
+	}
+	if body.Fault == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateUploadBackupBadRequestResponseBody runs the validations defined on
+// upload backup_bad-request_response_body
+func ValidateUploadBackupBadRequestResponseBody(body *UploadBackupBadRequestResponseBody) (err error) {
 	if body.Name == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
 	}

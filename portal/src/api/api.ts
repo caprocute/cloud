@@ -739,6 +739,15 @@ class FKApi {
         }
     }
 
+    public async adminUploadBackup(payload): Promise<void> {
+        return this.invoke({
+            auth: Auth.Required,
+            method: "POST",
+            url: this.baseUrl + "/admin/backup",
+            data: payload.file,
+        });
+    }
+
     register(user) {
         return this.invoke({
             auth: Auth.None,
@@ -924,8 +933,7 @@ class FKApi {
         });
     }
 
-    addStation(data: {name: string, deviceId: string, locationName?: string, statusPb: string, description: string}) {
-
+    addStation(data: { name: string; deviceId: string; locationName?: string; statusPb: string; description: string }) {
         return this.invoke({
             auth: Auth.Required,
             method: "POST",

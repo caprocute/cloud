@@ -19,6 +19,14 @@ type Health struct {
 	View string
 }
 
+// BackupCheck is the viewed result type that is projected based on a view.
+type BackupCheck struct {
+	// Type to project
+	Projected *BackupCheckView
+	// View to render
+	View string
+}
+
 // HealthView is a type that runs validations on a projected type.
 type HealthView struct {
 	Queue *QueueHealthView
@@ -30,12 +38,32 @@ type QueueHealthView struct {
 	Errors  *int64
 }
 
+// BackupCheckView is a type that runs validations on a projected type.
+type BackupCheckView struct {
+	DeviceName   *string
+	DeviceID     *string
+	GenerationID *string
+	Records      []int32
+	Errors       []string
+}
+
 var (
 	// HealthMap is a map of attribute names in result type Health indexed by view
 	// name.
 	HealthMap = map[string][]string{
 		"default": []string{
 			"queue",
+		},
+	}
+	// BackupCheckMap is a map of attribute names in result type BackupCheck
+	// indexed by view name.
+	BackupCheckMap = map[string][]string{
+		"default": []string{
+			"deviceName",
+			"deviceId",
+			"generationId",
+			"records",
+			"errors",
 		},
 	}
 )
@@ -45,6 +73,18 @@ func ValidateHealth(result *Health) (err error) {
 	switch result.View {
 	case "default", "":
 		err = ValidateHealthView(result.Projected)
+	default:
+		err = goa.InvalidEnumValueError("view", result.View, []interface{}{"default"})
+	}
+	return
+}
+
+// ValidateBackupCheck runs the validations defined on the viewed result type
+// BackupCheck.
+func ValidateBackupCheck(result *BackupCheck) (err error) {
+	switch result.View {
+	case "default", "":
+		err = ValidateBackupCheckView(result.Projected)
 	default:
 		err = goa.InvalidEnumValueError("view", result.View, []interface{}{"default"})
 	}
@@ -70,6 +110,15 @@ func ValidateQueueHealthView(result *QueueHealthView) (err error) {
 	if result.Pending == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("pending", "result"))
 	}
+	if result.Errors == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("errors", "result"))
+	}
+	return
+}
+
+// ValidateBackupCheckView runs the validations defined on BackupCheckView
+// using the "default" view.
+func ValidateBackupCheckView(result *BackupCheckView) (err error) {
 	if result.Errors == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("errors", "result"))
 	}

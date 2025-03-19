@@ -372,7 +372,7 @@ export default Vue.extend({
 }
 .stations-panel {
     transition: width 0.5s;
-    flex: 1;
+    flex: 0 1 38%;
     display: flex;
     flex-direction: column;
 
@@ -444,7 +444,16 @@ export default Vue.extend({
 
 .pagination {
     margin-top: auto;
+    margin-right: 0;
     padding-bottom: 1em;
+
+    @include bp-down($xs) {
+        margin-left: unset !important;
+    }
+
+    ::v-deep .pages {
+        margin-top: 4px;
+    }
 }
 
 ::v-deep .station-hover-summary {

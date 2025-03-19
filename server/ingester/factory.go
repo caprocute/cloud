@@ -125,6 +125,6 @@ func createFileArchive(_ context.Context, config *Config, awsSession *session.Se
 		}
 		return files.NewS3FileArchive(awsSession, metrics, config.StreamsBucketName, files.NoPrefix)
 	default:
-		return nil, fmt.Errorf("unknown archiver: " + config.Archiver)
+		return nil, fmt.Errorf("unknown archiver: %s", config.Archiver)
 	}
 }

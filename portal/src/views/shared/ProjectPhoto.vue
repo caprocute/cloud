@@ -2,7 +2,7 @@
     <div v-if="loading" class="station-photo loading-container">
         <Spinner class="spinner" />
     </div>
-    <img v-else-if="photo" :src="photo" class="project-photo project-image photo" alt="Project Image" />
+    <img v-else-if="photo" :src="photo" class="project-photo project-image photo" alt="Project Image" @load="emitPhoto" />
     <img v-else src="@/assets/fieldkit_project.png" class="project-photo project-image photo" alt="FieldKit Project" />
 </template>
 
@@ -54,6 +54,9 @@ export default Vue.extend({
             } else {
                 this.photo = null;
             }
+        },
+        emitPhoto() {
+            this.$emit("project-photo-loaded", this.photo);
         },
     },
 });

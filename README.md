@@ -118,6 +118,11 @@ npm install --global yarn
 Navigate to the project's portal folder and run:
 
 ```bash
+npm install
+```
+or
+
+```bash
 yarn install
 ```
 
@@ -129,7 +134,11 @@ yarn install
 npm install tiptap
 ```
 
-2. Run `make`.
+2. Copy the secrets template in `portal/src` to a file named `secrets.ts`
+
+```bash
+cp portal/src/secrets.ts.template portal/src/secrets.ts
+```
 
 ## Running the Project
 
@@ -143,13 +152,13 @@ sudo docker-compose up
 
 ```bash
 cd portal
-npm run serve
+yarn serve
 ```
 
 ## Known Issues
 
-```bash
-- Issue with `@secrets` that's not getting resolved.
+- Issue with `@/secrets` that's not getting resolved:
+  - This will occur if `portal/src/secrets.ts` does not exist. `@` is set up as an alias for `src` within the portal project.  
 ```
 
 If you run into this, copy `/portal/src/secets.ts.template` to `portal/src/secrets.ts`.
