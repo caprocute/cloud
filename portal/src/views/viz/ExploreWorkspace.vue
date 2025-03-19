@@ -1158,4 +1158,9 @@ export default Vue.extend({
     padding: 10px;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.07);
 }
+
+::v-deep .chart-type.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
 </style>
