@@ -1,16 +1,13 @@
 // From https://matthiashager.com/converting-snake-case-to-camel-case-object-keys-with-javascript
-const isArray = function(a) {
+const isArray = function (a) {
     return Array.isArray(a);
 };
-const isObject = function(o) {
+const isObject = function (o) {
     return o === Object(o) && !isArray(o) && typeof o !== "function";
 };
 const toCamel = (s) => {
     return s.replace(/([-_][a-z])/gi, ($1) => {
-        return $1
-            .toUpperCase()
-            .replace("-", "")
-            .replace("_", "");
+        return $1.toUpperCase().replace("-", "").replace("_", "");
     });
 };
 

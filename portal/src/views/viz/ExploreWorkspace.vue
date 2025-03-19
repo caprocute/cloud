@@ -233,7 +233,7 @@ export default Vue.extend({
         },
     },
     watch: {
-        async bookmark(newValue: Bookmark, oldValue: Bookmark): Promise<void> {
+        async bookmark(newValue: Bookmark, _oldValue: Bookmark): Promise<void> {
             console.log(`viz: bookmark-route(ew):`, newValue);
             if (this.workspace) {
                 await this.workspace.updateFromBookmark(newValue);
@@ -241,7 +241,7 @@ export default Vue.extend({
                 await this.createWorkspaceIfNecessary();
             }
         },
-        async selectedId(newValue: number, oldValue: number): Promise<void> {
+        async selectedId(newValue: number, _oldValue: number): Promise<void> {
             console.log("viz: selected-changed-associated", newValue);
         },
     },

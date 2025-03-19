@@ -25,9 +25,7 @@
                         <template v-if="station.status === StationStatus.down">-</template>
                         <template v-else>{{ visibleReadingValue | prettyReadingNarrowSpace }}</template>
                     </i>
-                    <i v-else :style="{ 'background-color': latestPrimaryColor }">
-                        –
-                    </i>
+                    <i v-else :style="{ 'background-color': latestPrimaryColor }">–</i>
                 </div>
             </template>
 

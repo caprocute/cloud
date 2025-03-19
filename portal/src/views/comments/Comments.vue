@@ -314,20 +314,18 @@ import _ from "lodash";
 import Vue, { PropType } from "vue";
 import CommonComponents from "@/views/shared";
 import moment from "moment";
-import { DataEventsErrorsEnum, NewComment, NewDataEvent } from "@/views/comments/model";
+import { NewComment, NewDataEvent } from "@/views/comments/model";
 import { Comment, DataEvent, DiscussionBase } from "@/views/comments/model";
 import { CurrentUser, ProjectUser } from "@/api";
-import { CommentsErrorsEnum } from "@/views/comments/model";
 import ListItemOptions from "@/views/shared/ListItemOptions.vue";
 import Tiptap from "@/views/shared/Tiptap.vue";
 import { deserializeBookmark, Workspace } from "../viz/viz";
 import SectionToggle from "@/views/shared/SectionToggle.vue";
 import { Bookmark } from "@/views/viz/viz";
 import { TimeRange } from "@/views/viz/common";
-import { ActionTypes, DisplayProject } from "@/store";
-import { interpolatePartner, isCustomisationEnabled } from "@/views/shared/partners";
+import { ActionTypes } from "@/store";
+import { interpolatePartner } from "@/views/shared/partners";
 import InfoTooltip from "@/views/shared/InfoTooltip.vue";
-import { PortalStationFieldNotes } from "@/views/fieldNotes/model";
 import { SnackbarStyle } from "@/store/modules/snackbar";
 
 export default Vue.extend({

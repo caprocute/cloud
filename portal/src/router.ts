@@ -1,5 +1,5 @@
 import Vue from "vue";
-import Router, {Route} from "vue-router";
+import Router, { Route } from "vue-router";
 import VueBodyClass from "vue-body-class";
 
 import LoginView from "./views/auth/LoginView.vue";
@@ -48,7 +48,7 @@ function makeDefaultRouteForProject(projectId: number) {
         path: "/",
         name: "root",
         component: ProjectBigMap,
-        props: (route) => {
+        props: (_route) => {
             return {
                 id: projectId,
                 forcePublic: false,
@@ -121,7 +121,7 @@ const routes = [
         path: "/spoof",
         name: "spoof",
         component: LoginView,
-        props: (route) => {
+        props: (_route) => {
             return {
                 spoofing: true,
             };
@@ -558,7 +558,7 @@ const routes = [
         path: "/notes",
         name: "viewMyNotes",
         component: NotesView,
-        props: (route) => {
+        props: (_route) => {
             return {};
         },
         meta: {
@@ -590,7 +590,7 @@ const routes = [
         path: "/admin/playground",
         name: "adminPlayground",
         component: Playground,
-        props: (route) => {
+        props: (_route) => {
             return {};
         },
         meta: {
@@ -602,7 +602,7 @@ const routes = [
         path: "/admin",
         name: "adminMain",
         component: AdminMain,
-        props: (route) => {
+        props: (_route) => {
             return {};
         },
         meta: {
@@ -614,7 +614,7 @@ const routes = [
         path: "/admin/users",
         name: "adminUsers",
         component: AdminUsers,
-        props: (route) => {
+        props: (_route) => {
             return {};
         },
         meta: {
@@ -647,7 +647,7 @@ export default function routerFactory(store) {
         mode: "history",
         base: process.env.BASE_URL,
         routes: routes,
-        scrollBehavior(to, from, savedPosition) {
+        scrollBehavior(to, from, _savedPosition) {
             if (to.name == from.name) {
                 return null;
             }

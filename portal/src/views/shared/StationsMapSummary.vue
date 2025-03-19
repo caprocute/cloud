@@ -310,7 +310,6 @@ export default Vue.extend({
             if (window.screen.availWidth > 1040) {
                 return;
             }
-            const paneContentEl = this.$refs["paneContent"] as HTMLDivElement;
             this.cupertinoPane = new CupertinoPane(".js-cupertinoPaneSummary", {
                 parentElement: "body",
                 breaks: {

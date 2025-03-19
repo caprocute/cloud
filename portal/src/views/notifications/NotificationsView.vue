@@ -14,7 +14,7 @@
                     </span>
                     <span :class="{ active: this.filter === 'mention' }" v-on:click="viewKind('mention')">
                         {{ $t("notifications.filters.mention") }}
-                    </span><!---->
+                    </span>
                 </div>
                 <NotificationsList
                     v-on:notification-click="notificationNavigate"
@@ -29,7 +29,7 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+import Vue from "vue";
 import { mapState, mapGetters } from "vuex";
 import StandardLayout from "../StandardLayout.vue";
 import { GlobalState } from "@/store/modules/global";
@@ -72,6 +72,7 @@ export default Vue.extend({
                         hash: `#comment-id-${notification.postId}`,
                     })
                     .catch((err) => {
+                        console.log(err);
                         return;
                     });
             }
@@ -83,6 +84,7 @@ export default Vue.extend({
                         hash: `#comment-id-${notification.postId}`,
                     })
                     .catch((err) => {
+                        console.log(err);
                         return;
                     });
             }

@@ -39,10 +39,10 @@ export default Vue.extend({
 
                 if (!(optionsMenu as HTMLElement).classList.contains("visible")) {
                     (optionsMenu as HTMLElement).classList.add("visible");
-                    setTimeout(function() {
+                    setTimeout(function () {
                         document.addEventListener(
                             "click",
-                            function() {
+                            function () {
                                 (optionsMenu as HTMLElement).classList.remove("visible");
                             },
                             {

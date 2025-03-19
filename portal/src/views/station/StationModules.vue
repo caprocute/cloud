@@ -18,7 +18,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { DisplayModule, DisplayStation, StationStatus } from "@/store";
+import { DisplayModule, DisplayStation } from "@/store";
 import * as utils from "@/utilities";
 import TinyChart from "@/views/viz/TinyChart.vue";
 import { BookmarkFactory, serializeBookmark } from "@/views/viz/viz";

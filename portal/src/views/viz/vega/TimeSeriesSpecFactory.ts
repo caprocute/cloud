@@ -2,7 +2,7 @@ import _ from "lodash";
 import { ChartSettings, DataRow, SeriesData, getSeriesThresholds, getAxisLabel } from "./SpecFactory";
 import chartStyles from "./chartStyles";
 import { makeRange, truncateTime, addDays, addSeconds, addGaps, addMinimumGap } from "../common";
-import i18n from '../i18n-charts';
+import i18n from "../i18n-charts";
 
 export interface TimeSeriesDataRow extends DataRow {
     gap: number;
@@ -63,9 +63,8 @@ export class TimeSeriesSpecFactory {
         const solidColors = true;
 
         // Always showing hovering state.
-        const alwaysShowHovering = (i: number, hovering: any, otherwise: any) => `${hovering}`;
+        const alwaysShowHovering = (i: number, hovering: any, _otherwise: any) => `${hovering}`;
         // Early hovering behavior.
-        // `hover.name == '${makeHoverName(i)}' ? ${hovering} : ${otherwise}`;
         const ifHovering = alwaysShowHovering;
 
         const makeSeriesThresholds = (series: SeriesData) => {
@@ -159,7 +158,7 @@ export class TimeSeriesSpecFactory {
             return makeSeriesDomain(series, i);
         });
 
-        const getBarConfiguration = (i: number, timeRange: number[] | null): { units: string[]; step: number | undefined } => {
+        const getBarConfiguration = (i: number, _timeRange: number[] | null): { units: string[]; step: number | undefined } => {
             const bucketSize = this.allSeries[i].queried.bucketSize;
             const step = bucketSize > 300 ? bucketSize / 60 : 5;
             return {

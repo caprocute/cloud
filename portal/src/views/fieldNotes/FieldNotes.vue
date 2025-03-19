@@ -121,7 +121,6 @@ import _ from "lodash";
 import { PortalStationFieldNotes } from "@/views/fieldNotes/model";
 import { jsPDF } from "jspdf";
 import { SnackbarStyle } from "@/store/modules/snackbar";
-import { field } from "vega";
 
 interface GroupedFieldNotes {
     [date: string]: PortalStationFieldNotes[];
@@ -180,7 +179,7 @@ export default Vue.extend({
         fieldNotes() {
             this.groupByMonth();
         },
-        stationName(newStationName) {
+        stationName(_newStationName) {
             this.$store.dispatch(ActionTypes.NEED_FIELD_NOTES, { id: this.stationId });
         },
     },

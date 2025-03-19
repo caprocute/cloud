@@ -1,6 +1,6 @@
 <template>
     <form @submit.prevent="saveForm">
-        <h3 class="heading">{{$t('user.profile.form.password.title')}}</h3>
+        <h3 class="heading">{{ $t("user.profile.form.password.title") }}</h3>
         <div>
             <TextField v-model="form.existing" :label="$t('user.profile.form.password.existing.label')" type="password" />
 
@@ -35,11 +35,7 @@
 import Vue from "vue";
 import CommonComponents from "@/views/shared";
 
-import { required, email, minLength, sameAs } from "vuelidate/lib/validators";
-
-import Promise from "bluebird";
-import { mapState, mapGetters } from "vuex";
-import * as ActionTypes from "@/store/actions";
+import { required, minLength, sameAs } from "vuelidate/lib/validators";
 
 export default Vue.extend({
     name: "ChangePasswordFOrm",

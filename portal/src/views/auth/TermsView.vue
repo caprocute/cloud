@@ -37,14 +37,6 @@ export default Vue.extend({
     methods: {
         async agree(): Promise<void> {
             if (this.user) {
-                const payload = {
-                    id: this.user?.id,
-                    name: this.user?.name,
-                    email: this.user?.email,
-                    bio: this.user?.bio,
-                    tncDate: this.user?.tncDate,
-                    tncAccept: true,
-                };
                 await this.$services.api.accept(this.user.id);
                 await this.$store.dispatch(ActionTypes.REFRESH_CURRENT_USER, {});
                 await this.$router.push({ name: "projects" }).catch((e) => {

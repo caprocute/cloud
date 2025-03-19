@@ -53,8 +53,8 @@ import ProjectActivity from "./ProjectActivity.vue";
 import { mapState, mapGetters } from "vuex";
 import * as ActionTypes from "@/store/actions";
 import { GlobalState } from "@/store/modules/global";
-import { AuthenticationRequiredError, ForbiddenError } from "@/api";
-import { getPartnerCustomizationWithDefault, isCustomisationEnabled, PartnerCustomization } from "@/views/shared/partners";
+import { ForbiddenError } from "@/api";
+import { getPartnerCustomizationWithDefault, PartnerCustomization } from "@/views/shared/partners";
 import { confirmLeaveWithDirtyCheck } from "@/store/modules/dirty";
 import ForbiddenBanner from "@/views/shared/ForbiddenBanner.vue";
 

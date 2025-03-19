@@ -11,7 +11,7 @@ const getters = {
 
 const actions = () => {
     return {
-        [ActionTypes.RESET_VIZ_STATION_SENSOR_SELECTION]: async ({ commit, state }: { commit: any; state: VizState }) => {
+        [ActionTypes.RESET_VIZ_STATION_SENSOR_SELECTION]: async ({ commit, state: _state }: { commit: any; state: VizState }) => {
             commit(MutationTypes.RESET_VIZ_STATION_SENSOR_SELECTION);
         },
 

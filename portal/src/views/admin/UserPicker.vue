@@ -28,7 +28,7 @@
                     <span class="option__title">{{ props.option.name }} ({{ props.option.email }})</span>
                 </div>
             </template>
-            <span slot="noResult">{{$t('admin.userPicker.noResult')}}</span>
+            <span slot="noResult">{{ $t("admin.userPicker.noResult") }}</span>
         </multiselect>
     </div>
 </template>

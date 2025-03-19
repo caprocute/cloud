@@ -1,5 +1,4 @@
 import _ from "lodash";
-import * as MutationTypes from "../mutations";
 import { DisplayStation } from "./stations";
 import { GlobalState, GlobalGetters } from "./global";
 
@@ -22,12 +21,12 @@ export class LayoutState {
 }
 
 const getters = {
-    layout: (state: LayoutState, getters: any, rootState: GlobalState, rootGetters: GlobalGetters) => {
+    layout: (_state: LayoutState, _getters: any, _rootState: GlobalState, _rootGetters: GlobalGetters) => {
         return {};
     },
 };
 
-const actions = (services: Services) => {
+const actions = (_services: Services) => {
     return {};
 };
 

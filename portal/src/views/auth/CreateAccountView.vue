@@ -98,7 +98,6 @@ import Vue from "vue";
 import CommonComponents from "@/views/shared";
 
 import { required, email, minLength, sameAs } from "vuelidate/lib/validators";
-import FKApi from "@/api/api";
 import Logo from "@/views/shared/Logo.vue";
 
 export default Vue.extend({
@@ -142,7 +141,7 @@ export default Vue.extend({
             email: {
                 required,
                 email,
-                taken: function(this: any) {
+                taken: function (this: any) {
                     return this.available;
                 },
             },

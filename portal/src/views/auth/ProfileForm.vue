@@ -50,8 +50,6 @@
 import Vue from "vue";
 import CommonComponents from "@/views/shared";
 import { required, email, minLength, sameAs } from "vuelidate/lib/validators";
-import { mapState, mapGetters } from "vuex";
-import * as ActionTypes from "@/store/actions";
 import { DisplayStation } from "@/store";
 
 export default Vue.extend({

@@ -227,7 +227,6 @@ import {
     GlobalState,
     MappedStations,
     ProjectAttribute,
-    ProjectModule,
     VisibleReadings,
 } from "@/store";
 import * as utils from "@/utilities";
@@ -238,17 +237,14 @@ import ProjectAttributes from "@/views/projects/ProjectAttributes.vue";
 import StationBattery from "@/views/station/StationBattery.vue";
 import { getPartnerCustomizationWithDefault, isCustomisationEnabled, PartnerCustomization } from "@/views/shared/partners";
 import UserPhoto from "@/views/shared/UserPhoto.vue";
-import { Project } from "@/api";
 import { mapState } from "vuex";
-import { SensorDataQuerier } from "@/views/shared/sensor_data_querier";
-import TinyChart from "@/views/viz/TinyChart.vue";
 import { BookmarkFactory, serializeBookmark } from "@/views/viz/viz";
 import { ExploreContext } from "@/views/viz/common";
 import FieldNotes from "@/views/fieldNotes/FieldNotes.vue";
 import { confirmLeaveWithDirtyCheck } from "@/store/modules/dirty";
 import { SnackbarStyle } from "@/store/modules/snackbar";
 import StationModules from "@/views/station/StationModules.vue";
-import StationProjects from '@/views/station/StationProjects.vue';
+import StationProjects from "@/views/station/StationProjects.vue";
 
 export default Vue.extend({
     name: "StationView",
