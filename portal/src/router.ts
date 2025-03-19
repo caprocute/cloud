@@ -1,6 +1,7 @@
 import Vue from "vue";
 import Router, {Route} from "vue-router";
 import VueBodyClass from "vue-body-class";
+import i18n from "./i18n";
 
 import LoginView from "./views/auth/LoginView.vue";
 import DeleteAccountView from "./views/auth/DeleteAccountView.vue";
@@ -659,6 +660,20 @@ export default function routerFactory(store) {
     const vueBodyClass = new VueBodyClass(routes);
     router.beforeEach((to, from, next) => {
         vueBodyClass.guard(to, next);
+    });
+    
+    // Global navigation guard to set the page title
+    router.afterEach((to) => {
+        const routeName = to.name;
+        if (routeName) {
+            const title = i18n.t(`pageTitles.${routeName}`, "", { fallbackWarn: false });
+            const titleStr = String(title);
+            if (titleStr !== `pageTitles.${routeName}`) {
+                document.title = titleStr;
+            } else {
+                document.title = String(i18n.t('pageTitles.default'));
+            }
+        }
     });
 
     router.beforeEach(async (to, from, next) => {
