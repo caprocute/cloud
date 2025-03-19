@@ -64,7 +64,8 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "../../scss/mixins";
+@use "src/scss/mixins";
+@use "src/scss/variables";
 
 .toggle-text {
     display: none;
@@ -90,7 +91,7 @@ export default Vue.extend({
     align-items: center;
     box-sizing: border-box;
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         margin-right: 0;
         flex-direction: column;
         height: auto;
@@ -123,14 +124,14 @@ export default Vue.extend({
         cursor: pointer;
         @include position(absolute, 50% null null calc(100% - 5px));
 
-        @include bp-down($lg) {
+        @include mixins.bp-down(variables.$lg) {
             top: 26px;
             right: 15px;
             left: unset;
         }
     }
 
-    @include bp-up($sm) {
+    @include mixins.bp-up(variables.$sm) {
         &:hover {
             &:after {
                 transform: rotate(180deg) translateY(50%);
@@ -157,7 +158,7 @@ export default Vue.extend({
     visibility: hidden;
     padding-top: 10px;
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         position: unset;
         visibility: visible;
         opacity: 1;
@@ -180,7 +181,7 @@ export default Vue.extend({
             background-color: #f4f5f7;
         }
 
-        @include bp-down($sm) {
+        @include mixins.bp-down(variables.$sm) {
             font-size: 12px;
             font-weight: 900;
             text-align: center;
@@ -191,7 +192,7 @@ export default Vue.extend({
 .icon-globe {
     font-size: 16px;
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         margin-top: -3px;
     }
 }

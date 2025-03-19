@@ -20,15 +20,16 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
-@import "src/scss/mixins";
+@use "src/scss/mixins";
+@use "src/scss/variables";
 
 .info {
     position: relative;
     padding: 7px;
     margin-top: -3px;
-    font-family: $font-family-bold;
+    font-family: variables.$font-family-bold;
 
-    @include bp-up($sm) {
+    @include mixins.bp-up(variables.$sm) {
         display: none;
     }
 
@@ -52,7 +53,7 @@ export default Vue.extend({
     border-radius: 50%;
     opacity: 0.3;
     font-size: 10px;
-    font-family: $font-family-medium;
+    font-family: variables.$font-family-medium;
 }
 
 .info-content {
@@ -67,6 +68,6 @@ export default Vue.extend({
     border: solid 1px #cccdcf;
     background-color: #fff;
     width: 200px;
-    z-index: $z-index-top;
+    z-index: variables.$z-index-top;
 }
 </style>

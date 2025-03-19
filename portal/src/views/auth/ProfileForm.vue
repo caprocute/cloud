@@ -155,13 +155,15 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "../../scss/forms";
-@import "../../scss/global";
+@use "src/scss/forms";
+@use "src/scss/global";
+@use "src/scss/mixins";
+@use "src/scss/variables";
 
 .image-container {
     margin-bottom: 33px;
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         margin-bottom: 40px;
     }
 }
@@ -186,7 +188,7 @@ form > div {
 .button-solid {
     margin-top: 25px;
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         width: 100%;
     }
 }

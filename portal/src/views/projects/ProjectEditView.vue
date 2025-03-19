@@ -94,8 +94,8 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "../../scss/mixins";
-@import "../../scss/layout";
+@use "src/scss/mixins";
+@use "src/scss/layout";
 
 .small-arrow {
     font-size: 11px;

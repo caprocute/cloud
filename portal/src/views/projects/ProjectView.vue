@@ -167,7 +167,9 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "../../scss/layout";
+@use "src/scss/layout";
+@use "src/scss/mixins";
+@use "src/scss/variables";
 
 .small-arrow {
     font-size: 11px;
@@ -212,10 +214,10 @@ export default Vue.extend({
     cursor: pointer;
     font-family: var(--font-family-bold);
     padding: 10px 22px;
-    @include flex(center, center);
+    @include mixins.flex(center, center);
 
     body.floodnet & {
-        font-family: $font-family-floodnet-button;
+        font-family: variables.$font-family-floodnet-button;
     }
 
     .icon {
@@ -241,8 +243,8 @@ export default Vue.extend({
     width: 30em;
     paddinig: 1em;
 
-    @include bp-down($sm) {
-        @include position(fixed, 55px null null 0);
+    @include mixins.bp-down(variables.$sm) {
+        @include mixins.position(fixed, 55px null null 0);
         border: 0;
         width: 100%;
         padding: 20px 0;
@@ -254,7 +256,7 @@ export default Vue.extend({
 
 ::v-deep .pagination {
     > div {
-        @include flex(center, ceenter);
+        @include mixins.flex(center, ceenter);
     }
 
     .button {

@@ -136,7 +136,7 @@ export default Vue.extend({
 </script>
 
 <style lang="scss">
-@import "src/scss/mixins";
+@use "src/scss/mixins";
 
 .share-panel .heading {
     padding: 25px 20px;
@@ -238,7 +238,7 @@ export default Vue.extend({
         transition: opacity 0.25s;
         border-radius: 4px;
         display: flex;
-        @include position(absolute, null 0 -35px null);
+        @include mixins.position(absolute, null 0 -35px null);
 
         &.visible {
             opacity: 1;

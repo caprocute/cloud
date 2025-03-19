@@ -187,8 +187,8 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "../../scss/forms";
-@import "../../scss/global";
+@use "src/scss/forms";
+@use "src/scss/global";
 
 .checkbox {
     margin-top: 25px;

@@ -108,14 +108,16 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "../../scss/forms.scss";
+@use "src/scss/forms.scss";
+@use "src/scss/mixins";
+@use "src/scss/variables";
 
 .contact-link {
     cursor: pointer;
     font-weight: 500;
     text-decoration: underline;
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         font-size: 14px;
     }
 }

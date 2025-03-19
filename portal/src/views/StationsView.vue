@@ -232,13 +232,14 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "src/scss/mixins.scss";
+@use "src/scss/mixins.scss";
+@use "src/scss/variables";
 
 .container-map {
     width: 100%;
     height: calc(100% - 66px);
     margin-top: 0;
-    @include position(absolute, 66px null null 0);
+    @include mixins.position(absolute, 66px null null 0);
 
     ::v-deep .station-hover-summary {
         left: 50%;
@@ -246,7 +247,7 @@ export default Vue.extend({
         transform: translate(-50%, -50%);
     }
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         top: 54px;
         height: calc(100% - 54px);
     }
@@ -257,7 +258,7 @@ body:not(.floodnet) .container-map {
     max-height: calc(100vh - 66px);
     overflow: hidden;
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         max-height: calc(100vh - 54px);
     }
 }
@@ -272,20 +273,20 @@ body:not(.floodnet) .container-map {
     z-index: 2;
     box-sizing: border-box;
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         width: calc(100% - 20px);
         padding: 31px 13px;
     }
 
     a {
-        @include bp-down($xs) {
+        @include mixins.bp-down(variables.$xs) {
             display: block;
         }
 
         &:nth-of-type(1) {
             margin-right: 27px;
 
-            @include bp-down($xs) {
+            @include mixins.bp-down(variables.$xs) {
                 margin-right: 0;
                 margin-bottom: 14px;
             }
@@ -307,22 +308,22 @@ body:not(.floodnet) .container-map {
 }
 
 ::v-deep .stations-list {
-    @include flex();
+    @include mixins.flex();
     flex-wrap: wrap;
     padding: 100px 40px;
     width: 100%;
     box-sizing: border-box;
 
-    @include bp-down($md) {
+    @include mixins.bp-down(variables.$md) {
         padding: 100px 20px;
         margin: 30px -20px -20px;
     }
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         justify-content: center;
     }
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         padding: 80px 0px;
         margin: 55px 0 -5px 0;
         transform: translateX(10px);
@@ -337,19 +338,19 @@ body:not(.floodnet) .container-map {
         box-sizing: border-box;
         box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.07);
 
-        @include bp-down($md) {
+        @include mixins.bp-down(variables.$md) {
             padding: 19px 11px;
             flex-basis: calc(50% - 40px);
         }
 
-        @include bp-down($sm) {
+        @include mixins.bp-down(variables.$sm) {
             justify-self: center;
             flex: 1 1 389px;
             max-width: 389px;
             margin: 10px 0;
         }
 
-        @include bp-down($xs) {
+        @include mixins.bp-down(variables.$xs) {
             margin: 5px 0;
             width: auto;
         }
@@ -368,7 +369,7 @@ body:not(.floodnet) .container-map {
 ::v-deep .mapboxgl-ctrl-geocoder {
     margin: 24px 0 0 25px;
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         margin: 13px 0 0 10px;
     }
 }
@@ -378,7 +379,7 @@ body:not(.floodnet) .container-map {
 }
 
 ::v-deep .view-type-container {
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         top: 68px;
     }
 }

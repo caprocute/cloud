@@ -163,7 +163,8 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "../../scss/mixins";
+@use "src/scss/mixins";
+@use "src/scss/variables";
 
 .readings-simple {
     display: flex;
@@ -179,7 +180,7 @@ export default Vue.extend({
     flex: 0 0 calc(50% - 5px);
     margin-bottom: 10px;
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         flex-basis: 100%;
     }
 }

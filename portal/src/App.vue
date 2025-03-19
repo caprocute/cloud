@@ -85,11 +85,13 @@ export default Vue.extend({
 });
 </script>
 <style lang="scss">
-@import "scss/mixins";
-@import "scss/typography";
-@import "scss/icons";
-@import "scss/layout.scss";
-@import "icomoon/style.css";
+@use "src/scss/mixins";
+@use "src/scss/typography";
+@use "src/scss/icons";
+@use "src/scss/layout.scss";
+@use "src/scss/variables";
+
+@use "icomoon/style.css";
 
 html {
 }
@@ -103,14 +105,14 @@ body,
 }
 
 body {
-    --color-primary: #{$color-fieldkit-primary};
-    --color-secondary: #{$color-fieldkit-secondary};
-    --color-dark: #{$color-fieldkit-dark};
-    --color-border: #{$color-fieldkit-border};
-    --color-danger: #{$color-fieldkit-danger};
-    --font-family-medium: #{$font-family-fieldkit-medium};
-    --font-family-light: #{$font-family-fieldkit-light};
-    --font-family-bold: #{$font-family-fieldkit-bold};
+    --color-primary: #{variables.$color-fieldkit-primary};
+    --color-secondary: #{variables.$color-fieldkit-secondary};
+    --color-dark: #{variables.$color-fieldkit-dark};
+    --color-border: #{variables.$color-fieldkit-border};
+    --color-danger: #{variables.$color-fieldkit-danger};
+    --font-family-medium: #{variables.$font-family-fieldkit-medium};
+    --font-family-light: #{variables.$font-family-fieldkit-light};
+    --font-family-bold: #{variables.$font-family-fieldkit-bold};
 
     text-align: center;
     margin: 0;
@@ -122,14 +124,14 @@ body {
     -moz-osx-font-smoothing: grayscale;
 
     &.floodnet {
-        --color-primary: #{$color-floodnet-primary};
-        --color-secondary: #{$color-floodnet-dark};
-        --color-dark: #{$color-floodnet-dark};
-        --color-border: #{$color-floodnet-border};
-        --color-danger: #{$color-fieldkit-danger};
-        --font-family-medium: #{$font-family-floodnet-medium};
-        --font-family-light: #{$font-family-floodnet-medium};
-        --font-family-bold: #{$font-family-floodnet-bold};
+        --color-primary: #{variables.$color-floodnet-primary};
+        --color-secondary: #{variables.$color-floodnet-dark};
+        --color-dark: #{variables.$color-floodnet-dark};
+        --color-border: #{variables.$color-floodnet-border};
+        --color-danger: #{variables.$color-fieldkit-danger};
+        --font-family-medium: #{variables.$font-family-floodnet-medium};
+        --font-family-light: #{variables.$font-family-floodnet-medium};
+        --font-family-bold: #{variables.$font-family-floodnet-bold};
     }
 }
 
@@ -144,12 +146,12 @@ body.disable-scrolling {
 body.blue-background {
     background-color: #1b80c9;
 
-    @include bp-down($md) {
+    @include mixins.bp-down(variables.$md) {
         background-color: #fff;
     }
 
     &.floodnet {
-        @include bp-up($md) {
+        @include mixins.bp-up(variables.$md) {
             background-color: var(--color-dark);
         }
     }
@@ -173,7 +175,7 @@ button {
     color: inherit;
 
     body.floodnet & {
-        font-family: $font-family-floodnet-button;
+        font-family: variables.$font-family-floodnet-button;
     }
 }
 
@@ -212,13 +214,13 @@ li {
 .vue-treeselect__control {
     border: 1px solid var(--color-border);
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         border-radius: 2px;
     }
 }
 
 .vue-treeselect__control-arrow {
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         width: 11px;
         height: 11px;
     }
@@ -237,7 +239,7 @@ li {
 }
 
 .vc-popover-caret {
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         display: none !important;
     }
 }

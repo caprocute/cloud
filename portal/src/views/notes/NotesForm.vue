@@ -152,6 +152,6 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "../../scss/global";
-@import "../../scss/notes";
+@use "src/scss/global";
+@use "src/scss/notes";
 </style>
