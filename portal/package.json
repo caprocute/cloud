@@ -47,7 +47,7 @@
         "vega": "5.24.0",
         "vega-embed": "^6.20.5",
         "vega-lite": "^5.2.0",
-        "vue": "2.7.14",
+        "vue": "2.7.16",
         "vue-body-class": "^3.0.2",
         "vue-class-component": "^7.2.3",
         "vue-confirm-dialog": "1.0.2",
