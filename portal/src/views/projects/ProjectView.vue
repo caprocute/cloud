@@ -44,7 +44,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "@/store/strong-vue";
+import Vue from "vue";
 import CommonComponents from "@/views/shared";
 import StandardLayout from "../StandardLayout.vue";
 import ProjectPublic from "./ProjectPublic.vue";
@@ -52,6 +52,7 @@ import ProjectAdmin from "./ProjectAdmin.vue";
 import ProjectActivity from "./ProjectActivity.vue";
 import { mapState, mapGetters } from "vuex";
 import * as ActionTypes from "@/store/actions";
+import { DisplayProject } from "@/store";
 import { GlobalState } from "@/store/modules/global";
 import { ForbiddenError } from "@/api";
 import { getPartnerCustomizationWithDefault, PartnerCustomization } from "@/views/shared/partners";
@@ -95,21 +96,21 @@ export default Vue.extend({
             user: (s: GlobalState) => s.user.user,
             stations: (s: GlobalState) => Object.values(s.stations.user.stations),
             userProjects: (s: GlobalState) => Object.values(s.stations.user.projects),
-            displayProject() {
-                return this.$getters.projectsById[this.id];
-            },
-            isAdministrator() {
-                if (!this.forcePublic) {
-                    const p = this.$getters.projectsById[this.id];
-                    if (p) {
-                        return !p.project.readOnly;
-                    }
-                }
-                return false;
-            },
         }),
         partnerCustomization(): PartnerCustomization {
             return getPartnerCustomizationWithDefault();
+        },
+        displayProject(): DisplayProject {
+            return this.$getters.projectsById[this.id];
+        },
+        isAdministrator(): boolean {
+            if (!this.forcePublic) {
+                const p = this.$getters.projectsById[this.id];
+                if (p) {
+                    return !p.project.readOnly;
+                }
+            }
+            return false;
         },
     },
     watch: {

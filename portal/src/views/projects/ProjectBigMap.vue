@@ -96,6 +96,7 @@ import {
     ActionTypes,
     BoundingRectangle,
     DisplayStation,
+    DisplayProject,
     GlobalState,
     MappedStations,
     Project,
@@ -154,10 +155,10 @@ export default Vue.extend({
         ...mapState({
             user: (s: GlobalState) => s.user.user,
             userStations: (s: GlobalState) => Object.values(s.stations.user.stations),
-            displayProject() {
-                return this.$getters.projectsById[this.id];
-            },
         }),
+        displayProject(): DisplayProject {
+            return this.$getters.projectsById[this.id];
+        },
         visibleReadings(): VisibleReadings {
             return this.recentMapMode ? VisibleReadings.Last72h : VisibleReadings.Current;
         },

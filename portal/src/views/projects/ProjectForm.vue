@@ -255,10 +255,10 @@ export default Vue.extend({
         },
         ...mapState({
             stations: (s: GlobalState) => Object.values(s.stations.user.stations),
-            mappedStations(): MappedStations | null {
-                return this.project ? this.$getters.projectsById[this.project.id]?.mapped : MappedStations.make([]);
-            },
         }),
+        mappedStations(): MappedStations | null {
+            return this.project ? this.$getters.projectsById[this.project.id]?.mapped : MappedStations.make([]);
+        },
     },
     methods: {
         onTagsFocus(): void {
