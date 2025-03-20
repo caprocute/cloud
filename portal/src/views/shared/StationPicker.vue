@@ -73,7 +73,7 @@ export default Vue.extend({
         },
         filter: {
             type: Function as PropType<(station: DisplayStation) => boolean>,
-            default: (_station) => true,
+            default: () => (_station) => true,
         },
     },
     data(): {
