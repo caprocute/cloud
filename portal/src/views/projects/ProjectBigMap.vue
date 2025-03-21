@@ -251,7 +251,9 @@ export default Vue.extend({
     methods: {
         switchView(): void {
             this.activeStationId = null;
-            this.layoutChanges++;
+            this.$nextTick(() => {
+                this.layoutChanges++;
+            });
         },
         getModuleImg(module: ProjectModule): string {
             return this.$loadAsset(utils.getModuleImg(module));
@@ -262,6 +264,10 @@ export default Vue.extend({
         },
         onCloseSummary(): void {
             this.activeStationId = null;
+            this.$nextTick(() => {
+                this.layoutChanges++;
+                console.log("ProjectBigMap: Incrementing layoutChanges after closing summary");
+            });
         },
         getThresholds(stations: DisplayStation[]): VizThresholds {
             try {
@@ -274,9 +280,9 @@ export default Vue.extend({
             }
         },
         sidebarToggle() {
-            setTimeout(() => {
+            this.$nextTick(() => {
                 this.layoutChanges++;
-            }, 250);
+            });
         },
         isPartnerCustomisationEnabled(): boolean {
             return isCustomisationEnabled();

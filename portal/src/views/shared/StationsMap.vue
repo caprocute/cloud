@@ -131,7 +131,7 @@ export default Vue.extend({
         },
     },
     watch: {
-        layoutChanges(): void {
+        layoutChanges(newVal, oldVal): void {
             this.handleLayoutChanges();
         },
         mapped(): void {
@@ -353,9 +353,11 @@ export default Vue.extend({
         handleLayoutChanges(): void {
             console.log("map: layout changed");
             if (this.protectedData.map) {
-                // TODO Not a fan of this.
+                // need timeout because css animation needs time to complete
                 this.$nextTick(() => {
-                    this.protectedData.map.resize();
+                    setTimeout(() => {
+                        this.protectedData.map.resize();
+                    }, 250);
                 });
             }
         },

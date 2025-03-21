@@ -1,5 +1,5 @@
 <template>
-    <StandardLayout :viewingStations="true" :viewingStation="activeStation" @sidebar-toggle="layoutChanges++">
+    <StandardLayout :viewingStations="true" :viewingStation="activeStation" @sidebar-toggle="onSidebarToggle">
         <template v-if="viewType === 'list'">
             <div class="stations-list" v-if="stations && stations.length > 0">
                 <div v-for="station in stations" v-bind:key="station.id">
@@ -223,9 +223,15 @@ export default Vue.extend({
                     },
                 });
             }
+            this.layoutChange();
         },
         layoutChange() {
-            this.layoutChanges++;
+            this.$nextTick(() => {
+                this.layoutChanges++;
+            });
+        },
+        onSidebarToggle() {
+            this.layoutChange();
         },
     },
 });

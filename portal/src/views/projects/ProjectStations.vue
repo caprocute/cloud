@@ -269,9 +269,15 @@ export default Vue.extend({
         },
         onCloseSummary(): void {
             this.activeStationId = null;
+            this.$nextTick(() => {
+                this.layoutChanges++;
+                console.log("ProjectStations: Incrementing layoutChanges after closing summary");
+            });
         },
         toggleStationsPanel(): void {
-            this.layoutChanges++;
+            this.$nextTick(() => {
+                this.layoutChanges++;
+            });
             this.showStationsPanel = !this.showStationsPanel;
             console.log("toggle", this.showStationsPanel, this.layoutChanges);
         },
