@@ -33,6 +33,11 @@ func (h *stationModelRecordHandler) OnMeta(ctx context.Context, provision *data.
 
 	sr := repositories.NewStationRepository(h.db)
 
+	if rawMeta.Modules == nil || len(rawMeta.Modules) == 0 {
+		log.Infow("station-model:meta-no-modules", "meta_record_id", db.ID)
+		return nil
+	}
+
 	configuration := &data.StationConfiguration{
 		ProvisionID:  provision.ID,
 		MetaRecordID: &db.ID,
