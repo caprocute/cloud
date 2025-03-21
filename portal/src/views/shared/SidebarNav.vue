@@ -29,7 +29,7 @@
             </div>
 
             <div class="nav-section" v-if="stations.length > 0">
-                <router-link :to="{ name: 'mapAllStations' }">
+                <router-link :to="{ name: 'mapAllStations' }" @click.native="onStationsClick">
                     <div class="nav-label">
                         <i class="icon icon-stations"></i>
                         <span v-bind:class="{ selected: viewingStations }"><StationOrSensor /></span>
@@ -147,6 +147,10 @@ export default Vue.extend({
         },
     },
     methods: {
+        onStationsClick(): void {
+            this.$emit("sidebar-toggle");
+            this.closeMenuOnMobile();
+        },
         showStation(station: DisplayStation): void {
             this.$emit("show-station", station);
             this.closeMenuOnMobile();
