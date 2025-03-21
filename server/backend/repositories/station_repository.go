@@ -350,8 +350,8 @@ func (r *StationRepository) UpsertModuleSensor(ctx context.Context, sensor *data
 
 	if err := r.db.NamedGetContext(ctx, sensor, `
 		INSERT INTO fieldkit.module_sensor AS s
-			(module_id, configuration_id, sensor_index, unit_of_measure, name, reading_last, reading_time) VALUES
-			(:module_id, :configuration_id, :sensor_index, :unit_of_measure, :name, :reading_last, :reading_time)
+			(module_id, sensor_index, unit_of_measure, name, reading_last, reading_time) VALUES
+			(:module_id, :sensor_index, :unit_of_measure, :name, :reading_last, :reading_time)
 		ON CONFLICT (module_id, sensor_index)
 			DO UPDATE SET name = EXCLUDED.name,
                           unit_of_measure = EXCLUDED.unit_of_measure,

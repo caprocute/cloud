@@ -72,11 +72,10 @@ func (h *stationModelRecordHandler) OnMeta(ctx context.Context, provision *data.
 
 		for sensorIndex, s := range m.Sensors {
 			sensor := &data.ModuleSensor{
-				ModuleID:        module.ID,
-				ConfigurationID: configuration.ID,
-				Index:           uint32(sensorIndex),
-				UnitOfMeasure:   s.UnitOfMeasure,
-				Name:            s.Name,
+				ModuleID:      module.ID,
+				Index:         uint32(sensorIndex),
+				UnitOfMeasure: s.UnitOfMeasure,
+				Name:          s.Name,
 			}
 			if _, err := sr.UpsertModuleSensor(ctx, sensor); err != nil {
 				return err
