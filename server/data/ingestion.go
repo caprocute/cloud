@@ -287,14 +287,13 @@ type StationModule struct {
 }
 
 type ModuleSensor struct {
-	ID              int64      `db:"id" json:"id"`
-	ModuleID        int64      `db:"module_id" json:"module_id"`
-	ConfigurationID int64      `db:"configuration_id" json:"configuration_id"`
-	Index           uint32     `db:"sensor_index" json:"sensor_index"`
-	UnitOfMeasure   string     `db:"unit_of_measure" json:"unit_of_measure"`
-	Name            string     `db:"name" json:"name"`
-	ReadingValue    *float64   `db:"reading_last" json:"reading_last"`
-	ReadingTime     *time.Time `db:"reading_time" json:"reading_time"`
+	ID            int64      `db:"id" json:"id"`
+	ModuleID      int64      `db:"module_id" json:"module_id"`
+	Index         uint32     `db:"sensor_index" json:"sensor_index"`
+	UnitOfMeasure string     `db:"unit_of_measure" json:"unit_of_measure"`
+	Name          string     `db:"name" json:"name"`
+	ReadingValue  *float64   `db:"reading_last" json:"reading_last"`
+	ReadingTime   *time.Time `db:"reading_time" json:"reading_time"`
 }
 
 type RecordRangeFlagEnum int
