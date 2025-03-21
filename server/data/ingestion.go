@@ -272,6 +272,13 @@ type StationConfiguration struct {
 	UpdatedAt    time.Time `db:"updated_at" json:"updated_at"`
 }
 
+type ConfigurationModule struct {
+	ConfigurationID int64  `db:"configuration_id" json:"configuration_id"`
+	ModuleID        int64  `db:"module_id" json:"module_id"`
+	Index           uint32 `db:"module_index" json:"module_index"`
+	Position        uint32 `db:"position" json:"position"`
+}
+
 type StationModule struct {
 	ID              int64   `db:"id" json:"id"`
 	ConfigurationID int64   `db:"configuration_id" json:"configuration_id"`

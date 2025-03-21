@@ -123,13 +123,14 @@ func (h *stationModelRecordHandler) OnDone(ctx context.Context) error {
 		SELECT
              c.id AS configuration_id,
 			 s.id AS sensor_id,
-			 m.module_index AS module_index,
+			 cm.module_index AS module_index,
 			 s.sensor_index AS sensor_index
 		FROM fieldkit.module_sensor AS s JOIN
 			 fieldkit.station_module AS m ON (s.module_id = m.id) JOIN
-			 fieldkit.station_configuration AS c ON (m.configuration_id = c.id)
+			 fieldkit.configuration_module AS cm ON (m.id = cm.module_id) JOIN
+			 fieldkit.station_configuration AS c ON (cm.configuration_id = c.id)
 		WHERE c.provision_id = $1 AND c.meta_record_id = $2
-		ORDER BY m.module_index, s.sensor_index
+		ORDER BY cm.module_index, s.sensor_index
 		`, h.provision.ID, h.dbMeta.ID); err != nil {
 		return err
 	}
