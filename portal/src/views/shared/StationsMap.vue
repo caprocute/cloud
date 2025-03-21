@@ -131,7 +131,7 @@ export default Vue.extend({
         },
     },
     watch: {
-        layoutChanges(newVal, oldVal): void {
+        layoutChanges(): void {
             this.handleLayoutChanges();
         },
         mapped(): void {

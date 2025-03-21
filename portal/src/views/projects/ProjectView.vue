@@ -1,5 +1,14 @@
 <template>
-    <StandardLayout :viewingProjects="true" :viewingProject="displayProject" :disableScrolling="activityVisible" @sidebar-toggle="$nextTick(() => { layoutChanges++; })">
+    <StandardLayout
+        :viewingProjects="true"
+        :viewingProject="displayProject"
+        :disableScrolling="activityVisible"
+        @sidebar-toggle="
+            $nextTick(() => {
+                layoutChanges++;
+            })
+        "
+    >
         <div class="container-wrap">
             <template v-if="displayProject">
                 <DoubleHeader
@@ -89,7 +98,7 @@ export default Vue.extend({
     },
     data: () => {
         return {
-            layoutChanges: 0
+            layoutChanges: 0,
         };
     },
     computed: {

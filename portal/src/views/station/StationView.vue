@@ -1,5 +1,11 @@
 <template>
-    <StandardLayout @sidebar-toggle="$nextTick(() => { layoutChanges++; })">
+    <StandardLayout
+        @sidebar-toggle="
+            $nextTick(() => {
+                layoutChanges++;
+            })
+        "
+    >
         <div class="container-wrap" v-if="station">
             <DoubleHeader
                 :backRoute="projectId ? 'viewProject' : 'mapStation'"
@@ -196,7 +202,13 @@
 
             <section v-if="showMap">
                 <div class="container-map">
-                    <StationsMap :mapped="mapped" :showStations="true" :mapBounds="mapped.bounds" :visibleReadings="visibleReadings" :layoutChanges="layoutChanges" />
+                    <StationsMap
+                        :mapped="mapped"
+                        :showStations="true"
+                        :mapBounds="mapped.bounds"
+                        :visibleReadings="visibleReadings"
+                        :layoutChanges="layoutChanges"
+                    />
                 </div>
             </section>
 
