@@ -219,8 +219,9 @@ func (r *StationRepository) QueryStationConfigurationByMetaID(ctx context.Contex
 func (r *StationRepository) QueryStationModulesByConfigurationID(ctx context.Context, configurationID int64) ([]*data.StationModule, error) {
 	modules := []*data.StationModule{}
 	if err := r.db.SelectContext(ctx, &modules, `
-		SELECT id, configuration_id, hardware_id, module_index, position, flags, manufacturer, kind, version, name
-		FROM fieldkit.station_module WHERE configuration_id = $1
+		SELECT id, cm.configuration_id, hardware_id, cm.module_index, cm.position, flags, manufacturer, kind, version, name
+		FROM fieldkit.configuration_module AS cm JOIN fieldkit.station_module AS sm ON (cm.module_id = sm.id)
+		WHERE cm.configuration_id = $1
 		`, configurationID); err != nil {
 		return nil, err
 	}
@@ -230,23 +231,25 @@ func (r *StationRepository) QueryStationModulesByConfigurationID(ctx context.Con
 func (r *StationRepository) QueryStationModulesByMetaID(ctx context.Context, metaRecordID int64) ([]*data.StationModule, error) {
 	modules := []*data.StationModule{}
 	if err := r.db.SelectContext(ctx, &modules, `
-		SELECT id, configuration_id, hardware_id, module_index, position, flags, manufacturer, kind, version, name
-		FROM fieldkit.station_module WHERE configuration_id IN (SELECT id FROM fieldkit.station_configuration WHERE meta_record_id = $1)
+		SELECT id, cm.configuration_id, hardware_id, cm.module_index, cm.position, flags, manufacturer, kind, version, name
+		FROM fieldkit.configuration_module AS cm JOIN fieldkit.station_module AS sm ON (cm.module_id = sm.id)
+		WHERE cm.configuration_id IN (SELECT id FROM fieldkit.station_configuration WHERE meta_record_id = $1)
 		`, metaRecordID); err != nil {
 		return nil, err
 	}
 	return modules, nil
 }
 
-func (r *StationRepository) QueryStationModulesByHardwareID(ctx context.Context, hardwareID []byte) ([]*data.StationModule, error) {
-	modules := []*data.StationModule{}
-	if err := r.db.SelectContext(ctx, &modules, `
-		SELECT id, configuration_id, hardware_id, module_index, position, flags, manufacturer, kind, version, name
-		FROM fieldkit.station_module WHERE hardware_id = $1
-		`, hardwareID); err != nil {
+func (r *StationRepository) InsertConfigurationModule(ctx context.Context, configuration *data.ConfigurationModule) (*data.ConfigurationModule, error) {
+	if _, err := r.db.NamedExecContext(ctx, `
+		INSERT INTO fieldkit.configuration_module
+			(configuration_id, module_id, position, module_index) VALUES
+			(:configuration_id, :module_id, :position, :module_index)
+		ON CONFLICT (configuration_id, module_id) DO UPDATE SET position = EXCLUDED.position, module_index = EXCLUDED.module_index
+		`, configuration); err != nil {
 		return nil, err
 	}
-	return modules, nil
+	return configuration, nil
 }
 
 func (r *StationRepository) UpsertConfiguration(ctx context.Context, configuration *data.StationConfiguration) (*data.StationConfiguration, error) {
@@ -287,25 +290,50 @@ func migrateModuleName(name string) string {
 	return name
 }
 
+func (r *StationRepository) QueryAllStationModules(ctx context.Context) ([]*data.StationModule, error) {
+	modules := []*data.StationModule{}
+	if err := r.db.SelectContext(ctx, &modules, `
+		SELECT
+			sm.id, sm.configuration_id, sm.hardware_id, sm.module_index, sm.position, sm.flags, sm.manufacturer, sm.kind, sm.version, sm.name, sm.label
+		FROM 
+		(
+			SELECT sm.id AS module_id, MAX(ms.reading_time) AS max_reading, COUNT(ms.id) AS number_sensors
+			FROM station_module AS sm LEFT JOIN module_sensor AS ms ON (sm.id = ms.module_id)
+			GROUP BY sm.id
+		) AS q
+		JOIN station_module AS sm ON (q.module_id = sm.id)
+		ORDER BY q.max_reading DESC
+		`); err != nil {
+		return nil, err
+	}
+	return modules, nil
+}
+
 func (r *StationRepository) UpsertStationModule(ctx context.Context, module *data.StationModule) (*data.StationModule, error) {
 	originalName := module.Name
 	module.Name = migrateModuleName(originalName)
 
 	if err := r.db.NamedGetContext(ctx, module, `
 		INSERT INTO fieldkit.station_module
-			(configuration_id, hardware_id, module_index, position, flags, name, manufacturer, kind, version) VALUES
-			(:configuration_id, :hardware_id, :module_index, :position, :flags, :name, :manufacturer, :kind, :version)
+			(configuration_id, hardware_id, flags, name, manufacturer, kind, version) VALUES
+			(0, :hardware_id, :flags, :name, :manufacturer, :kind, :version)
 		ON CONFLICT (configuration_id, hardware_id)
-			DO UPDATE SET module_index = EXCLUDED.module_index,
-                          position = EXCLUDED.position,
-                          flags = EXCLUDED.flags,
+			DO UPDATE SET flags = EXCLUDED.flags,
                           name = EXCLUDED.name,
                           manufacturer = EXCLUDED.manufacturer,
                           kind = EXCLUDED.kind,
-						  version = EXCLUDED.version,
-						  label = EXCLUDED.label
+						  version = EXCLUDED.version
 		RETURNING id
 		`, module); err != nil {
+		return nil, err
+	}
+
+	if _, err := r.InsertConfigurationModule(ctx, &data.ConfigurationModule{
+		ConfigurationID: module.ConfigurationID,
+		ModuleID:        module.ID,
+		Index:           module.Index,
+		Position:        module.Position,
+	}); err != nil {
 		return nil, err
 	}
 
@@ -317,7 +345,6 @@ func (r *StationRepository) UpsertStationModule(ctx context.Context, module *dat
 }
 
 func (r *StationRepository) UpdateStationModule(ctx context.Context, module *data.StationModule) (*data.StationModule, error) {
-
 	if _, err := r.db.NamedExecContext(ctx, `
         UPDATE fieldkit.station_module SET
 			  module_index = :module_index,
@@ -640,6 +667,15 @@ func (r *StationRepository) QueryNearbyProjectStations(ctx context.Context, proj
 	return nearby, nil
 }
 
+func (r *StationRepository) QueryStationModels(ctx context.Context) ([]*data.StationModel, error) {
+	models := []*data.StationModel{}
+	if err := r.db.SelectContext(ctx, &models, `SELECT * FROM fieldkit.station_model`); err != nil {
+		return nil, err
+	}
+
+	return models, nil
+}
+
 func (r *StationRepository) QueryStationFull(ctx context.Context, id int32) (*data.StationFull, error) {
 	stations := []*data.Station{}
 	if err := r.db.SelectContext(ctx, &stations, `
@@ -742,6 +778,21 @@ func (r *StationRepository) QueryStationFull(ctx context.Context, id int32) (*da
 	modules := []*data.StationModule{}
 	if err := r.db.SelectContext(ctx, &modules, `
 		SELECT
+			sm.id, cm.configuration_id, sm.hardware_id, cm.module_index, cm.position, sm.flags, sm.manufacturer, sm.kind, sm.version, sm.name, sm.label
+		FROM fieldkit.configuration_module AS cm JOIN fieldkit.station_module AS sm ON (cm.module_id = sm.id)
+		WHERE cm.configuration_id IN (
+			SELECT id FROM fieldkit.station_configuration WHERE provision_id IN (
+				SELECT id FROM fieldkit.provision WHERE device_id = $1
+			)
+		)
+		ORDER BY cm.module_index
+		`, stations[0].DeviceID); err != nil {
+		return nil, err
+	}
+
+	oldModules := []*data.StationModule{}
+	if err := r.db.SelectContext(ctx, &oldModules, `
+		SELECT
 			sm.id, sm.configuration_id, sm.hardware_id, sm.module_index, sm.position, sm.flags, sm.manufacturer, sm.kind, sm.version, sm.name, sm.label
 		FROM fieldkit.station_module AS sm
 		WHERE sm.configuration_id IN (
@@ -754,14 +805,18 @@ func (r *StationRepository) QueryStationFull(ctx context.Context, id int32) (*da
 		return nil, err
 	}
 
+	modules = append(modules, oldModules...)
+
 	sensors := []*data.ModuleSensor{}
 	if err := r.db.SelectContext(ctx, &sensors, `
 		SELECT
-			ms.id, ms.module_id, ms.configuration_id, ms.sensor_index, ms.unit_of_measure, ms.name, ms.reading_last, ms.reading_time
+			ms.id, ms.module_id, ms.sensor_index, ms.unit_of_measure, ms.name, ms.reading_last, ms.reading_time
 		FROM fieldkit.module_sensor AS ms
-		WHERE ms.configuration_id IN (
-			SELECT id FROM fieldkit.station_configuration WHERE provision_id IN (
-				SELECT id FROM fieldkit.provision WHERE device_id = $1
+		WHERE ms.module_id IN (
+			SELECT module_id FROM fieldkit.configuration_module WHERE configuration_id IN (
+				SELECT id FROM fieldkit.station_configuration WHERE provision_id IN (
+					SELECT id FROM fieldkit.provision WHERE device_id = $1
+				)
 			)
 		)
 		ORDER BY ms.sensor_index
@@ -904,14 +959,14 @@ func (r *StationRepository) QueryStationFullByOwnerID(ctx context.Context, id in
 	modules := []*data.StationModule{}
 	if err := r.db.SelectContext(ctx, &modules, `
 		SELECT
-			sm.id, sm.configuration_id, sm.hardware_id, sm.module_index, sm.position, sm.flags, sm.manufacturer, sm.kind, sm.version, sm.name, sm.label
-		FROM fieldkit.station_module AS sm
-		WHERE sm.configuration_id IN (
+			sm.id, cm.configuration_id, sm.hardware_id, cm.module_index, cm.position, sm.flags, sm.manufacturer, sm.kind, sm.version, sm.name, sm.label
+		FROM fieldkit.configuration_module AS cm JOIN fieldkit.station_module AS sm ON (cm.module_id = sm.id)
+		WHERE cm.configuration_id IN (
 			SELECT id FROM fieldkit.station_configuration WHERE provision_id IN (
 				SELECT id FROM fieldkit.provision WHERE device_id IN (SELECT device_id FROM fieldkit.station WHERE owner_id = $1)
 			)
 		)
-		ORDER BY sm.configuration_id, sm.module_index
+		ORDER BY cm.configuration_id, cm.module_index
 		`, id); err != nil {
 		return nil, err
 	}
@@ -919,14 +974,16 @@ func (r *StationRepository) QueryStationFullByOwnerID(ctx context.Context, id in
 	sensors := []*data.ModuleSensor{}
 	if err := r.db.SelectContext(ctx, &sensors, `
 		SELECT
-			ms.id, ms.module_id, ms.configuration_id, ms.sensor_index, ms.unit_of_measure, ms.name, ms.reading_last, ms.reading_time
+			ms.id, ms.module_id, ms.sensor_index, ms.unit_of_measure, ms.name, ms.reading_last, ms.reading_time
 		FROM fieldkit.module_sensor AS ms
-		WHERE ms.configuration_id IN (
-			SELECT id FROM fieldkit.station_configuration WHERE provision_id IN (
-				SELECT id FROM fieldkit.provision WHERE device_id IN (SELECT device_id FROM fieldkit.station WHERE owner_id = $1)
+		WHERE ms.module_id IN (
+			SELECT module_id FROM fieldkit.configuration_module WHERE configuration_id IN (
+				SELECT id FROM fieldkit.station_configuration WHERE provision_id IN (
+					SELECT id FROM fieldkit.provision WHERE device_id IN (SELECT device_id FROM fieldkit.station WHERE owner_id = $1)
+				)
 			)
 		)
-		ORDER BY ms.configuration_id, ms.sensor_index
+		ORDER BY ms.module_id, ms.sensor_index
 		`, id); err != nil {
 		return nil, err
 	}
@@ -1072,9 +1129,9 @@ func (r *StationRepository) QueryStationFullByProjectID(ctx context.Context, id 
 	modules := []*data.StationModule{}
 	if err := r.db.SelectContext(ctx, &modules, `
 		SELECT
-			sm.id, sm.configuration_id, sm.hardware_id, sm.module_index, sm.position, sm.flags, sm.manufacturer, sm.kind, sm.version, sm.name, sm.label
-		FROM fieldkit.station_module AS sm
-        WHERE sm.configuration_id IN (
+			sm.id, cm.configuration_id, sm.hardware_id, cm.module_index, cm.position, sm.flags, sm.manufacturer, sm.kind, sm.version, sm.name, sm.label
+		FROM fieldkit.configuration_module AS cm JOIN fieldkit.station_module AS sm ON (cm.module_id = sm.id)
+        WHERE cm.configuration_id IN (
 			SELECT id FROM fieldkit.station_configuration WHERE provision_id IN (
 				SELECT id FROM fieldkit.provision WHERE device_id IN (
 					SELECT device_id FROM fieldkit.station WHERE id IN (
@@ -1083,7 +1140,7 @@ func (r *StationRepository) QueryStationFullByProjectID(ctx context.Context, id 
 				)
 			)
 		)
-		ORDER BY sm.configuration_id, sm.module_index
+		ORDER BY cm.configuration_id, cm.module_index
 		`, id); err != nil {
 		return nil, err
 	}
@@ -1091,18 +1148,20 @@ func (r *StationRepository) QueryStationFullByProjectID(ctx context.Context, id 
 	sensors := []*data.ModuleSensor{}
 	if err := r.db.SelectContext(ctx, &sensors, `
 		SELECT
-			ms.id, ms.module_id, ms.configuration_id, ms.sensor_index, ms.unit_of_measure, ms.name, ms.reading_last, ms.reading_time
+			ms.id, ms.module_id, ms.sensor_index, ms.unit_of_measure, ms.name, ms.reading_last, ms.reading_time
 		FROM fieldkit.module_sensor AS ms
-		WHERE ms.configuration_id IN (
-			SELECT id FROM fieldkit.station_configuration WHERE provision_id IN (
-				SELECT id FROM fieldkit.provision WHERE device_id IN (
-					SELECT device_id FROM fieldkit.station WHERE id IN (
-						SELECT station_id FROM fieldkit.project_station WHERE project_id = $1
+		WHERE ms.module_id IN (
+			SELECT module_id FROM fieldkit.configuration_module WHERE configuration_id IN (
+				SELECT id FROM fieldkit.station_configuration WHERE provision_id IN (
+					SELECT id FROM fieldkit.provision WHERE device_id IN (
+						SELECT device_id FROM fieldkit.station WHERE id IN (
+							SELECT station_id FROM fieldkit.project_station WHERE project_id = $1
+						)
 					)
 				)
 			)
 		)
-		ORDER BY ms.configuration_id, ms.sensor_index
+		ORDER BY ms.module_id, ms.sensor_index
 		`, id); err != nil {
 		return nil, err
 	}
@@ -1267,13 +1326,13 @@ func newStationModule(m *pbapp.ModuleCapabilities, c *data.StationConfiguration,
 
 func newModuleSensor(s *pbapp.SensorCapabilities, m *data.StationModule, c *data.StationConfiguration, sensorIndex uint32, time *time.Time, value *float64) *data.ModuleSensor {
 	return &data.ModuleSensor{
-		ModuleID:        m.ID,
-		ConfigurationID: c.ID,
-		Index:           sensorIndex,
-		UnitOfMeasure:   s.UnitOfMeasure,
-		Name:            s.Name,
-		ReadingTime:     time,
-		ReadingValue:    value,
+		ModuleID: m.ID,
+		// ConfigurationID: c.ID,
+		Index:         sensorIndex,
+		UnitOfMeasure: s.UnitOfMeasure,
+		Name:          s.Name,
+		ReadingTime:   time,
+		ReadingValue:  value,
 	}
 }
 
@@ -1354,6 +1413,22 @@ func (sr *StationRepository) Search(ctx context.Context, query string) (*Queried
 		Stations: stations,
 		Total:    total,
 	}, nil
+}
+
+func (sr *StationRepository) DeleteStationModule(ctx context.Context, moduleID int64) error {
+	if _, err := sr.db.ExecContext(ctx, `DELETE FROM fieldkit.aggregated_sensor_updated WHERE module_id = $1`, moduleID); err != nil {
+		return err
+	}
+
+	if _, err := sr.db.ExecContext(ctx, `DELETE FROM fieldkit.module_sensor WHERE module_id = $1`, moduleID); err != nil {
+		return err
+	}
+
+	if _, err := sr.db.ExecContext(ctx, `DELETE FROM fieldkit.station_module WHERE id = $1`, moduleID); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (sr *StationRepository) Delete(ctx context.Context, stationID int32) error {
@@ -1437,7 +1512,8 @@ func (sr *StationRepository) QueryStationSensors(ctx context.Context, stations [
 				module_sensor.reading_time AS sensor_read_at
 			FROM fieldkit.station AS station
 			LEFT JOIN fieldkit.visible_configuration AS vc ON (vc.station_id = station.id)
-			LEFT JOIN fieldkit.station_module AS station_module ON (vc.configuration_id = station_module.configuration_id)
+			LEFT JOIN fieldkit.configuration_module AS config_module ON (vc.configuration_id = config_module.configuration_id)
+			LEFT JOIN fieldkit.station_module AS station_module ON (config_module.module_id = station_module.id)
 			LEFT JOIN fieldkit.module_sensor AS module_sensor ON (module_sensor.module_id = station_module.id)
 			WHERE station.id IN (?)
 			ORDER BY sensor_read_at DESC
