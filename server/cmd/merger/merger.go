@@ -89,12 +89,21 @@ func (s *StationMerger) MergeSensorData(ctx context.Context, tx *sqlx.Tx, keepin
 	return nil
 }
 
-func (s *StationMerger) processModel(outerCtx context.Context, options *Options, modelID int32) error {
+func (s *StationMerger) ProcessAllStations(outerCtx context.Context, options *Options) error {
 	log := logging.Logger(outerCtx).Sugar()
 
-	stations, err := s.queryStations.QueryAllStationsByModelID(outerCtx, modelID)
+	models, err := s.queryStations.QueryStationModels(outerCtx)
 	if err != nil {
 		return err
+	}
+	stations := make([]*data.Station, 0)
+	for _, model := range models {
+		modelStations, err := s.queryStations.QueryAllStationsByModelID(outerCtx, model.ID)
+		if err != nil {
+			return err
+		}
+
+		stations = append(stations, modelStations...)
 	}
 
 	modules, err := s.queryStations.QueryAllStationModules(outerCtx)
@@ -102,7 +111,7 @@ func (s *StationMerger) processModel(outerCtx context.Context, options *Options,
 		return err
 	}
 
-	log.Infow("modules", "total_modules", len(modules))
+	log.Infow("preparing", "total_modules", len(modules), "total_stations", len(stations))
 
 	byHardwareId := make(map[string][]int64)
 	deletingModules := make(map[int64]int64)
@@ -118,6 +127,10 @@ func (s *StationMerger) processModel(outerCtx context.Context, options *Options,
 	}
 
 	log.Infow("modules", "unique_modules", len(byHardwareId), "deleting", len(deletingModules))
+
+	if len(byHardwareId) == len(modules) {
+		return nil
+	}
 
 	moduleStations := make(map[int64][]int32)
 
@@ -294,23 +307,6 @@ func (s *StationMerger) processModel(outerCtx context.Context, options *Options,
 	}
 
 	_ = log
-
-	return nil
-}
-
-func (s *StationMerger) ProcessAllStations(ctx context.Context, options *Options) error {
-	models, err := s.queryStations.QueryStationModels(ctx)
-	if err != nil {
-		return err
-	}
-
-	for _, model := range models {
-		if model.ID == 1 {
-			if err := s.processModel(ctx, options, model.ID); err != nil {
-				return err
-			}
-		}
-	}
 
 	return nil
 }
