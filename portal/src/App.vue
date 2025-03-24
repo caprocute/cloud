@@ -9,11 +9,12 @@
 import Vue from "vue";
 import * as ActionTypes from "@/store/actions";
 import { AuthenticationRequiredError } from "@/api";
-import { getPartnerCustomization, PartnerCustomization } from "./views/shared/partners";
+import { getPartnerCustomization, PartnerCustomization, isCustomisationEnabled } from "./views/shared/partners";
 import SnackBar from "@/views/shared/SnackBar.vue";
 import { Locales } from "@/views/shared/LanguageSelector.vue";
 import moment from "moment";
 import i18n from "@/i18n";
+import { updateDocumentTitle } from './router';
 
 export default Vue.extend({
     components: {
@@ -35,7 +36,6 @@ export default Vue.extend({
     },
     mounted(): void {
         this.setCustomFavicon();
-        this.setCustomPageTitle();
     },
     computed: {
         partnerCustomization(): PartnerCustomization | null {
@@ -44,6 +44,14 @@ export default Vue.extend({
     },
     beforeUpdate(): void {
         this.applyCustomClasses();
+    },
+    watch: {
+        '$i18n.locale': {
+            handler() {
+                this.updateDocumentTitle();
+            },
+            immediate: true
+        }
     },
     errorCaptured(err): boolean {
         console.log("vuejs:error-captured", JSON.stringify(err));
@@ -54,6 +62,9 @@ export default Vue.extend({
         return true;
     },
     methods: {
+        updateDocumentTitle(): void {
+            updateDocumentTitle();
+        },
         applyCustomClasses(): void {
             if (this.partnerCustomization != null) {
                 document.body.classList.add(this.partnerCustomization.class);
@@ -63,11 +74,6 @@ export default Vue.extend({
             const faviconEl = document.getElementById("favicon") as HTMLAnchorElement;
             if (this.partnerCustomization != null) {
                 faviconEl.href = window.location.origin + this.partnerCustomization.icon;
-            }
-        },
-        setCustomPageTitle(): void {
-            if (this.partnerCustomization != null) {
-                document.title = this.partnerCustomization.title;
             }
         },
         changeLang(locale: Locales) {

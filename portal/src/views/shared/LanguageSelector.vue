@@ -16,6 +16,7 @@
 import Vue from "vue";
 import { ActionTypes } from "@/store";
 import { isSmallScreen } from "@/utilities";
+import { updateDocumentTitle } from "@/router";
 
 export enum Locales {
     enUS = "en-US",
@@ -43,6 +44,7 @@ export default Vue.extend({
             this.$i18n.locale = locale;
             localStorage.setItem("locale", locale);
             this.$store.dispatch(ActionTypes.REFRESH_WORKSPACE);
+            updateDocumentTitle();
         },
         onMouseOver(): void {
             if (!isSmallScreen()) {
