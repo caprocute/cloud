@@ -58,25 +58,26 @@ func NewStationMerger(primaryDb *sqlxcache.DB, tsDb *sqlxcache.DB) *StationMerge
 func (s *StationMerger) MergeSensorData(ctx context.Context, tx *sqlx.Tx, keepingModuleID int64, emptyingModuleID int64) error {
 	log := logging.Logger(ctx).Sugar()
 
-	row := tx.QueryRowContext(ctx, `SELECT MAX(time) AS max_time FROM fieldkit.sensor_data WHERE module_id = $1`, keepingModuleID)
+	if false {
+		row := tx.QueryRowContext(ctx, `SELECT MAX(time) AS max_time FROM fieldkit.sensor_data WHERE module_id = $1`, keepingModuleID)
+		if err := row.Err(); err != nil {
+			return err
+		}
 
-	if err := row.Err(); err != nil {
-		return err
-	}
+		before := time.Time{}
+		if err := row.Scan(&before); err != nil {
+			return err
+		}
 
-	before := time.Time{}
-	if err := row.Scan(&before); err != nil {
-		return err
-	}
+		log.Infow("original:max", "time", before, "keeping_module_id", keepingModuleID, "emptying_module_id", emptyingModuleID)
 
-	log.Infow("original:max", "time", before, "keeping_module_id", keepingModuleID, "emptying_module_id", emptyingModuleID)
-
-	if _, err := tx.ExecContext(ctx, `
+		if _, err := tx.ExecContext(ctx, `
 		DELETE FROM fieldkit.sensor_data WHERE module_id = $1 AND time <=
 			(SELECT MAX(time) FROM fieldkit.sensor_data WHERE module_id = $2)
 		`,
-		emptyingModuleID, keepingModuleID); err != nil {
-		return err
+			emptyingModuleID, keepingModuleID); err != nil {
+			return err
+		}
 	}
 
 	if _, err := tx.ExecContext(ctx, `
@@ -233,56 +234,6 @@ func (s *StationMerger) ProcessAllStations(outerCtx context.Context, options *Op
 		if err != nil {
 			return err
 		}
-
-		/*
-			primaryTx, err := s.primaryDb.Begin(ctx)
-			if err != nil {
-				return err
-			}
-
-			tsTx, err := s.tsDb.Begin(ctx)
-			if err != nil {
-				return err
-			}
-
-			modulesUpdate, err := tx.ExecContext(txCtx, "UPDATE station_module SET station_id = $1 WHERE configuration_id = $2", station.ID, configID)
-			if err != nil {
-				return err
-			}
-
-			numberModules, err := modulesUpdate.RowsAffected()
-			if err != nil {
-				return err
-			}
-
-			sensorsUpdate, err := tx.ExecContext(txCtx, "UPDATE module_sensor SET station_id = $1 WHERE configuration_id = $2", station.ID, configID)
-			if err != nil {
-				return err
-			}
-
-			numberSensors, err := sensorsUpdate.RowsAffected()
-			if err != nil {
-				return err
-			}
-
-			log.Infow("config:solo", "modules", numberModules, "sensors", numberSensors)
-
-			if options.Commit {
-				if err := primaryTx.Commit(); err != nil {
-					return err
-				}
-				if err := tsTx.Commit(); err != nil {
-					return err
-				}
-			} else {
-				if err := primaryTx.Rollback(); err != nil {
-					return err
-				}
-				if err := tsTx.Rollback(); err != nil {
-					return err
-				}
-			}
-		*/
 	}
 
 	err = s.primaryDb.WithNewOwnedTransaction(outerCtx, func(ctx context.Context, tx *sqlx.Tx) error {
@@ -294,6 +245,27 @@ func (s *StationMerger) ProcessAllStations(outerCtx context.Context, options *Op
 			}
 
 			_ = keepingID
+		}
+
+		if options.Commit {
+			return tx.Commit()
+		} else {
+			return tx.Rollback()
+		}
+	})
+	if err != nil {
+		return err
+	}
+
+	log.Infow("modules", "unique_modules", len(byHardwareId), "deleting", len(deletingModules))
+
+	err = s.tsDb.WithNewOwnedTransaction(outerCtx, func(ctx context.Context, tx *sqlx.Tx) error {
+		for deletingID, keepingID := range deletingModules {
+			log.Infow("merging data", "module_id", deletingID)
+
+			if err := s.MergeSensorData(ctx, tx, keepingID, deletingID); err != nil {
+				return err
+			}
 		}
 
 		if options.Commit {
