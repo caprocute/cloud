@@ -95,19 +95,19 @@ export default Vue.extend({
             set(this: any, value) {
                 this.$emit("change", this.note.withBody(this.note.body, value));
             },
-        }
+        },
     },
     methods: {
         isTranslationKey(text: string | undefined): boolean {
-            return Boolean(text && typeof text === 'string' && text.startsWith('notes.fields.'));
-        }
+            return Boolean(text && typeof text === "string" && text.startsWith("notes.fields."));
+        },
     },
     mounted() {
-        this.$root.$on('language-changed', this.$forceUpdate);
+        this.$root.$on("language-changed", this.$forceUpdate);
     },
     beforeDestroy() {
-        this.$root.$off('language-changed', this.$forceUpdate);
-    }
+        this.$root.$off("language-changed", this.$forceUpdate);
+    },
 });
 </script>
 
