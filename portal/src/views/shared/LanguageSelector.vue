@@ -12,6 +12,7 @@
 <script lang="ts">
 import Vue from "vue";
 import {ActionTypes} from '@/store';
+import moment from 'moment';
 
 export enum Locales {
     enUS = "en-US",
@@ -29,7 +30,8 @@ export default Vue.extend({
         changeLang(locale: Locales) {
             this.$i18n.locale = locale;
             localStorage.setItem("locale", locale);
-            this.$store.dispatch(ActionTypes.REFRESH_WORKSPACE);
+            moment.locale(locale);
+            this.$root.$emit('language-changed');
         },
     },
 });
