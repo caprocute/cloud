@@ -5,6 +5,8 @@ import (
 	"encoding/hex"
 	"flag"
 	"fmt"
+	"maps"
+	"slices"
 	"time"
 
 	"github.com/jmoiron/sqlx"
@@ -116,6 +118,7 @@ func (s *StationMerger) ProcessAllStations(outerCtx context.Context, options *Op
 
 	byHardwareId := make(map[string][]int64)
 	deletingModules := make(map[int64]int64)
+	moduleConfigurations := make(map[int64]int64)
 	for _, module := range modules {
 		id := hex.EncodeToString(module.HardwareID)
 		if byHardwareId[id] == nil {
@@ -125,6 +128,7 @@ func (s *StationMerger) ProcessAllStations(outerCtx context.Context, options *Op
 		if len(byHardwareId[id]) > 1 {
 			deletingModules[module.ID] = byHardwareId[id][0]
 		}
+		moduleConfigurations[module.ID] = module.ConfigurationID
 	}
 
 	log.Infow("modules", "unique_modules", len(byHardwareId), "deleting", len(deletingModules))
@@ -238,10 +242,18 @@ func (s *StationMerger) ProcessAllStations(outerCtx context.Context, options *Op
 
 	err = s.primaryDb.WithNewOwnedTransaction(outerCtx, func(ctx context.Context, tx *sqlx.Tx) error {
 		for deletingID, keepingID := range deletingModules {
-			log.Infow("deleting", "module_id", deletingID)
+			configurationID := moduleConfigurations[deletingID]
 
-			if err := s.queryStations.DeleteStationModule(ctx, deletingID); err != nil {
-				return err
+			log.Infow("deleting", "module_id", deletingID, "keeping_id", keepingID)
+
+			if false {
+				if err := s.queryStations.DeleteStationModule(ctx, deletingID); err != nil {
+					return err
+				}
+			} else {
+				if _, err := tx.ExecContext(ctx, "INSERT INTO fieldkit.merged_module (configuration_id, deleted_id, keeping_id) VALUES ($1, $2, $3)", configurationID, deletingID, keepingID); err != nil {
+					return err
+				}
 			}
 
 			_ = keepingID
@@ -259,23 +271,40 @@ func (s *StationMerger) ProcessAllStations(outerCtx context.Context, options *Op
 
 	log.Infow("modules", "unique_modules", len(byHardwareId), "deleting", len(deletingModules))
 
-	err = s.tsDb.WithNewOwnedTransaction(outerCtx, func(ctx context.Context, tx *sqlx.Tx) error {
-		for deletingID, keepingID := range deletingModules {
-			log.Infow("merging data", "module_id", deletingID)
+	if false {
+		failed := make([]int64, 0)
+		done := make([]int64, 0)
+		sortedDeletingID := slices.Sorted(maps.Keys(deletingModules))
+		for _, deletingID := range sortedDeletingID {
+			keepingID := deletingModules[deletingID]
+			err = s.tsDb.WithNewOwnedTransaction(outerCtx, func(ctx context.Context, tx *sqlx.Tx) error {
+				progress := float64(len(failed)+len(done)) / float64(len(sortedDeletingID))
+				log.Infow("merging", "module_id", deletingID, "keeping_id", keepingID, "progress", progress)
 
-			if err := s.MergeSensorData(ctx, tx, keepingID, deletingID); err != nil {
-				return err
-			}
+				if false {
+					if err := s.MergeSensorData(ctx, tx, keepingID, deletingID); err != nil {
+						log.Warnf("failed: %v", err)
+						log.Infof("rollback: %v", tx.Rollback())
+						failed = append(failed, deletingID)
+						return nil
+					}
+				}
+
+				done = append(done, deletingID)
+
+				if options.Commit {
+					return tx.Commit()
+				} else {
+					return tx.Rollback()
+				}
+
+			})
+		}
+		if err != nil {
+			return err
 		}
 
-		if options.Commit {
-			return tx.Commit()
-		} else {
-			return tx.Rollback()
-		}
-	})
-	if err != nil {
-		return err
+		log.Infow("failed %v", failed)
 	}
 
 	_ = log
