@@ -124,18 +124,24 @@ export class AddedPhoto {
     }
 }
 
-export const NoteCustomTitleDefault = i18n.tc("notes.fields.customKey");
+export const NoteCustomTitleDefault = "notes.fields.customKey";
 
 export class Notes {
     static Keys = ["studyObjective", "sitePurpose", "siteCriteria", "siteDescription", "customKey"];
 
-    public readonly studyObjective: NoteForm = new NoteForm("", new NoteHelp(i18n.tc("notes.fields.studyObjective")));
-    public readonly sitePurpose: NoteForm = new NoteForm("", new NoteHelp(i18n.tc("notes.fields.sitePurpose")));
-    public readonly siteCriteria: NoteForm = new NoteForm("", new NoteHelp(i18n.tc("notes.fields.siteCriteria")));
-    public readonly siteDescription: NoteForm = new NoteForm("", new NoteHelp(i18n.tc("notes.fields.siteDescription")));
-    public readonly customKey: NoteForm = new NoteForm("", new NoteHelp(NoteCustomTitleDefault));
+    public readonly studyObjective: NoteForm;
+    public readonly sitePurpose: NoteForm;
+    public readonly siteCriteria: NoteForm;
+    public readonly siteDescription: NoteForm;
+    public readonly customKey: NoteForm;
 
-    constructor(public readonly addedPhotos: AddedPhoto[] = []) {}
+    constructor(public readonly addedPhotos: AddedPhoto[] = []) {
+        this.studyObjective = new NoteForm("", new NoteHelp("notes.fields.studyObjective"));
+        this.sitePurpose = new NoteForm("", new NoteHelp("notes.fields.sitePurpose"));
+        this.siteCriteria = new NoteForm("", new NoteHelp("notes.fields.siteCriteria"));
+        this.siteDescription = new NoteForm("", new NoteHelp("notes.fields.siteDescription"));
+        this.customKey = new NoteForm("", new NoteHelp(NoteCustomTitleDefault));
+    }
 
     private isNoteCompleted(note: NoteForm): boolean {
         return note.body.length > 0 || note.photos.length > 0 || note.audio.length > 0;
@@ -201,10 +207,14 @@ export function mergeNotes(portalNotes: PortalStationNotesReply, notesForm: Note
         .value();
     const creating = modifications
         .map((v) => v.creating)
-        .filter((v) => v !== null && (v.body.length > 0 || v.title !== NoteCustomTitleDefault)) as NewFieldNote[];
+        .filter((v) => v !== null && (v.body.length > 0 || !isDefaultCustomTitle(v.title))) as NewFieldNote[];
     const updating = modifications
         .map((v) => v.updating)
-        .filter((v) => v !== null && v.title !== NoteCustomTitleDefault) as ExistingFieldNote[];
+        .filter((v) => v !== null && !isDefaultCustomTitle(v.title)) as ExistingFieldNote[];
 
     return new PatchPortalNote(creating, updating);
+}
+
+function isDefaultCustomTitle(title: string): boolean {
+    return title === NoteCustomTitleDefault;
 }
