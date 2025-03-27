@@ -5,8 +5,6 @@ import (
 	"encoding/hex"
 	"flag"
 	"fmt"
-	"maps"
-	"slices"
 	"time"
 
 	"github.com/jmoiron/sqlx"
@@ -274,11 +272,9 @@ func (s *StationMerger) ProcessAllStations(outerCtx context.Context, options *Op
 	if false {
 		failed := make([]int64, 0)
 		done := make([]int64, 0)
-		sortedDeletingID := slices.Sorted(maps.Keys(deletingModules))
-		for _, deletingID := range sortedDeletingID {
-			keepingID := deletingModules[deletingID]
+		for deletingID, keepingID := range deletingModules {
 			err = s.tsDb.WithNewOwnedTransaction(outerCtx, func(ctx context.Context, tx *sqlx.Tx) error {
-				progress := float64(len(failed)+len(done)) / float64(len(sortedDeletingID))
+				progress := float64(len(failed)+len(done)) / float64(len(deletingModules))
 				log.Infow("merging", "module_id", deletingID, "keeping_id", keepingID, "progress", progress)
 
 				if false {
