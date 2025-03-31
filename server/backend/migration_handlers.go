@@ -49,6 +49,9 @@ func (h *MergeModulesHandler) Merge(ctx context.Context, m *messages.MergeModule
 		return err
 	}
 	if v, err := tx.Exec(scopeCtx, "UPDATE fieldkit.sensor_data d SET module_id = $1 WHERE d.module_id = $2", m.KeepingID, m.DeletingID); err != nil {
+		if err := scope.Rollback(ctx); err != nil {
+			log.Warnw("merge:rollback", "error", err)
+		}
 		return err
 	} else {
 		log.Infow("merged:update", "rows_affected", v.RowsAffected())
