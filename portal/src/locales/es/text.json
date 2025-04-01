@@ -106,7 +106,8 @@
             "community": "Proyectos de la comunidad",
             "anonymous": "Proyectos"
         },
-        "add": "Agregar proyecto"
+        "add": "Agregar proyecto",
+        "noUserProjects": "Aún no tienes ningún proyecto. Crea uno para empezar!"
     },
     "project": {
         "details": {
