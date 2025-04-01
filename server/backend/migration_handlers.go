@@ -93,7 +93,7 @@ FROM fieldkit.station AS s
     JOIN fieldkit.provision AS p ON (s.device_id = p.device_id)
 	JOIN fieldkit.station_configuration AS sc ON (p.id = sc.provision_id) 
 	JOIN fieldkit.merged_module AS mm ON (mm.configuration_id = sc.id)
-WHERE NOT mm.merged
+WHERE mm.tried IS NULL
 ORDER BY s.updated_at DESC
 	`)
 	if err != nil {
@@ -115,6 +115,10 @@ ORDER BY s.updated_at DESC
 				if err := h.publisher.Publish(ctx, work); err != nil {
 					return err
 				}
+
+				if _, err := h.db.ExecContext(ctx, "UPDATE fieldkit.merged_module SET tried = NOW() WHERE deleted_id = $1 AND keeping_id = $2", row.DeletedID, row.KeepingID); err != nil {
+					return err
+				}
 			}
 
 		} else if m.Stations != nil {
@@ -128,6 +132,10 @@ ORDER BY s.updated_at DESC
 						KeepingID:       row.KeepingID,
 					}
 					if err := h.publisher.Publish(ctx, work); err != nil {
+						return err
+					}
+
+					if _, err := h.db.ExecContext(ctx, "UPDATE fieldkit.merged_module SET tried = NOW() WHERE deleted_id = $1 AND keeping_id = $2", row.DeletedID, row.KeepingID); err != nil {
 						return err
 					}
 				} else {
