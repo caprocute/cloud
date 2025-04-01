@@ -137,7 +137,8 @@
             "community": "Community Projects",
             "anonymous": "Projects"
         },
-        "add": "Add Project"
+        "add": "Add Project",
+        "noUserProjects": "You don't have any projects yet. Create one to get started!"
     },
     "project": {
         "details": {

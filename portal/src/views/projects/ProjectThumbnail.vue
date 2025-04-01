@@ -199,6 +199,7 @@ export default {
     border: solid 1px #cccdcf;
     white-space: nowrap;
     flex-grow: 1;
+    cursor: pointer;
     @include mixins.flex(center);
 }
 .invited-container .reject {
@@ -207,6 +208,7 @@ export default {
     color: #2c3e50;
     white-space: nowrap;
     flex-grow: 1;
+    cursor: pointer;
     @include mixins.flex(center);
 
     span {

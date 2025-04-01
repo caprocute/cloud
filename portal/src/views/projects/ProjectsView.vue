@@ -1,7 +1,7 @@
 <template>
     <StandardLayout :viewingProjects="true">
         <div class="projects-view">
-            <div class="container mine" v-if="userProjects.length > 0">
+            <div v-if="isAuthenticated" class="container mine">
                 <div class="header">
                     <h1 v-if="isAuthenticated">{{ $t("projects.title.mine") }}</h1>
                     <h1 v-if="!isAuthenticated">{{ $t("projects.title.anonymous") }}</h1>
@@ -11,8 +11,15 @@
                     </div>
                 </div>
 
-                <ProjectThumbnails :projects="userProjects" />
-                <ProjectThumbnails :projects="invites.projects" :invited="true" v-if="invites" />
+                <template v-if="userProjects.length > 0 || invites?.projects.length > 0">
+                    <ProjectThumbnails :projects="userProjects" />
+                    <ProjectThumbnails :projects="invites.projects" :invited="true" v-if="invites" />
+                </template>
+                <template v-else-if="invites?.projects.length === 0">
+                    <div class="no-projects-message">
+                        {{ $t("projects.noUserProjects") }}
+                    </div>
+                </template>
             </div>
             <div class="container community">
                 <div class="header">
@@ -93,9 +100,10 @@ export default Vue.extend({
     }
 }
 
-.container.community {
-    border-top: 1px solid var(--color-border);
+.container.mine {
+    border-bottom: 1px solid var(--color-border);
 }
+
 .container .header {
     display: flex;
     flex-direction: row;
@@ -150,5 +158,9 @@ export default Vue.extend({
         margin-right: 7px;
         margin-top: -3px;
     }
+}
+.no-projects-message {
+    font-size: 18px;
+    margin-bottom: 20px;
 }
 </style>
