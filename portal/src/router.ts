@@ -1,5 +1,5 @@
 import Vue from "vue";
-import Router, {Route} from "vue-router";
+import Router, { Route } from "vue-router";
 import VueBodyClass from "vue-body-class";
 
 import LoginView from "./views/auth/LoginView.vue";
@@ -509,7 +509,7 @@ const routes = [
         },
         meta: {
             bodyClass: "disable-scrolling",
-            secured: false,
+            secured: true,
         },
     },
     {
