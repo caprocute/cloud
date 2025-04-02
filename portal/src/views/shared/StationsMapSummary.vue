@@ -72,7 +72,7 @@
                     <FieldNotes :stationName="station.name"></FieldNotes>
                 </template>
                 <template v-if="selectedTab == SummaryTabsEnum.details">
-                    <StationProjects :stationId="station.id"></StationProjects>
+                    <!-- <StationProjects :stationId="station.id"></StationProjects> -->
                     <div v-if="station.modules.length > 0" class="details-row">
                         <span class="bold">{{ $tc("station.modules") }}</span>
                         <div class="station-modules ml-10">

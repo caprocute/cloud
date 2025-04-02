@@ -108,7 +108,7 @@
             "anonymous": "Projects"
         },
         "add": "Add Project",
-        "noUserProjects": "You don't have any projects yet. Create one to get started!"
+        "noUserProjects": "You're not a member of any projects yet. Create one to get started!"
     },
     "project": {
         "details": {

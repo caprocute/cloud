@@ -75,18 +75,20 @@ export default {
         getImageUrl(this: any, project) {
             return this.$config.baseUrl + project.photo;
         },
-        onAccept(this: any, ev: any) {
+        async onAccept(this: any, ev: any) {
             console.log("accept", ev);
-            return this.$store.dispatch(ActionTypes.ACCEPT_PROJECT, { projectId: this.project.id }).then(() => {
+            const success = await this.$store.dispatch(ActionTypes.ACCEPT_PROJECT, { projectId: this.project.id });
+            if (success) {
                 this.accepted = true;
                 this.visible = false;
-            });
+            }
         },
-        onDecline(this: any, ev: any) {
+        async onDecline(this: any, ev: any) {
             console.log("decline", ev);
-            return this.$store.dispatch(ActionTypes.DECLINE_PROJECT, { projectId: this.project.id }).then(() => {
+            const success = await this.$store.dispatch(ActionTypes.DECLINE_PROJECT, { projectId: this.project.id });
+            if (success) {
                 this.visible = false;
-            });
+            }
         },
     },
 };
