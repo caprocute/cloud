@@ -509,7 +509,7 @@ const routes = [
         },
         meta: {
             bodyClass: "disable-scrolling",
-            secured: false,
+            secured: true,
         },
     },
     {
