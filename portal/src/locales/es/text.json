@@ -137,7 +137,7 @@
             "anonymous": "Proyectos"
         },
         "add": "Agregar proyecto",
-        "noUserProjects": "Aún no tienes ningún proyecto. Crea uno para empezar!"
+        "noUserProjects": "Aún no eres miembro de ningún proyecto. ¡Crea uno para empezar!"
     },
     "project": {
         "details": {

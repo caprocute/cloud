@@ -11,11 +11,11 @@
                     </div>
                 </div>
 
-                <template v-if="userProjects.length > 0 || invites?.projects.length > 0">
+                <template v-if="userProjects.length > 0 || pendingProjectInvites.length > 0">
                     <ProjectThumbnails :projects="userProjects" />
-                    <ProjectThumbnails :projects="invites.projects" :invited="true" v-if="invites" />
+                    <ProjectThumbnails :projects="pendingProjectInvites" :invited="true" v-if="pendingProjectInvites.length > 0" />
                 </template>
-                <template v-else-if="invites?.projects.length === 0">
+                <template v-else>
                     <div class="no-projects-message">
                         {{ $t("projects.noUserProjects") }}
                     </div>
@@ -36,8 +36,8 @@ import Vue from "vue";
 import { mapState, mapGetters } from "vuex";
 import StandardLayout from "../StandardLayout.vue";
 import ProjectThumbnails from "./ProjectThumbnails.vue";
-import { PendingInvites } from "@/api";
 import { StationsState } from "@/store/modules/stations";
+import * as ActionTypes from "@/store/actions";
 
 export default Vue.extend({
     name: "ProjectsView",
@@ -45,13 +45,11 @@ export default Vue.extend({
         StandardLayout,
         ProjectThumbnails,
     },
-    data(): { invites: PendingInvites | null } {
-        return {
-            invites: null,
-        };
-    },
     computed: {
-        ...mapGetters({ isAuthenticated: "isAuthenticated" }),
+        ...mapGetters({
+            isAuthenticated: "isAuthenticated",
+            pendingProjectInvites: "pendingProjectInvites",
+        }),
         ...mapState({
             userProjects: (s: { stations: StationsState }) => Object.values(s.stations.user.projects),
             publicProjects: (s: { stations: StationsState }) => Object.values(s.stations.community.projects),
@@ -59,7 +57,7 @@ export default Vue.extend({
     },
     async mounted(): Promise<void> {
         if (this.isAuthenticated) {
-            this.invites = await this.$services.api.getInvitesByUser();
+            await this.$store.dispatch(ActionTypes.NEED_PROJECT_INVITES);
         }
     },
     methods: {
