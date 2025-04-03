@@ -1,6 +1,8 @@
 import Vue from "vue";
 import Router, {Route} from "vue-router";
 import VueBodyClass from "vue-body-class";
+import i18n from "./i18n";
+import { getPartnerCustomization, isCustomisationEnabled } from "@/views/shared/partners";
 
 import LoginView from "./views/auth/LoginView.vue";
 import DeleteAccountView from "./views/auth/DeleteAccountView.vue";
@@ -37,9 +39,10 @@ import { deserializeBookmark } from "./views/viz/viz";
 import TermsView from "@/views/auth/TermsView.vue";
 import { ActionTypes } from "@/store";
 
-import { getPartnerCustomization } from "@/views/shared/partners";
 import StationPhotosView from "@/views/station/StationPhotosView.vue";
 import { MapViewType } from "@/api/api";
+
+let vueRouter: Router;
 
 Vue.use(Router);
 
@@ -655,10 +658,18 @@ export default function routerFactory(store) {
             return { x: 0, y: 0 };
         },
     });
+    
+    vueRouter = router;
 
     const vueBodyClass = new VueBodyClass(routes);
     router.beforeEach((to, from, next) => {
         vueBodyClass.guard(to, next);
+    });
+    
+    // Global navigation guard to set the page title
+    router.afterEach((to) => {
+        const routeName = to.name;
+        updateDocumentTitle();
     });
 
     router.beforeEach(async (to, from, next) => {
@@ -723,4 +734,20 @@ export default function routerFactory(store) {
     });
 
     return router;
+}
+
+export function updateDocumentTitle(): void {
+    const routeName = vueRouter ? vueRouter.currentRoute.name : null;
+    
+    if (routeName) {
+        const partnerName = isCustomisationEnabled() ? "FloodNet" : "FieldKit";
+        
+        const titleText = i18n.t(`pageTitles.${routeName}`, "", { fallbackWarn: false });
+        
+        if (String(titleText) !== `pageTitles.${routeName}`) {
+            document.title = `${titleText} - ${partnerName}`;
+        } else {
+            document.title = partnerName;
+        }
+    }
 }
