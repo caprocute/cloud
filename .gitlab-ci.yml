@@ -185,10 +185,9 @@ db:primary:prod:clone:
   image: docker:24.0.5
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule"
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      when: manual
     - if: $CI_COMMIT_BRANCH  == $CI_DEFAULT_BRANCH
       when: manual
+      allow_failure: true
   timeout: 3h
   services:
     - name: docker:24.0.5-dind
@@ -224,10 +223,9 @@ db:ts:prod:clone:
   image: docker:24.0.5
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule"
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      when: manual
     - if: $CI_COMMIT_BRANCH  == $CI_DEFAULT_BRANCH
       when: manual
+      allow_failure: true
   timeout: 6h
   services:
     - name: docker:24.0.5-dind
