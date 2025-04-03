@@ -2,7 +2,10 @@
     <div class="note-editor">
         <div class="title">
             <TextAreaField v-if="editingTitle" v-model="title" :data-cy="'customKeyTitle'" />
-            <template v-else>{{ $t(title) }}</template>
+            <template v-else>
+                <template v-if="isTranslationKey(title)">{{ $t(title) }}</template>
+                <template v-else>{{ title }}</template>
+            </template>
             <a
                 class="edit-btn"
                 v-if="editableTitle && !editingTitle && !readonly"
@@ -34,6 +37,7 @@
 import Vue from "vue";
 import CommonComponents from "@/views/shared";
 import AudioPlayer from "./AudioPlayer.vue";
+import i18n from "@/i18n";
 
 export default Vue.extend({
     model: {
@@ -92,6 +96,17 @@ export default Vue.extend({
                 this.$emit("change", this.note.withBody(this.note.body, value));
             },
         },
+    },
+    methods: {
+        isTranslationKey(text: string | undefined): boolean {
+            return Boolean(text && typeof text === "string" && text.startsWith("notes.fields."));
+        },
+    },
+    mounted() {
+        this.$root.$on("language-changed", this.$forceUpdate);
+    },
+    beforeDestroy() {
+        this.$root.$off("language-changed", this.$forceUpdate);
     },
 });
 </script>
