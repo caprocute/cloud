@@ -2,7 +2,7 @@
     <StandardLayout>
         <div class="container-wrap" v-if="station">
             <DoubleHeader
-                :backRoute="projectId ? 'viewProject' : 'mapStation'"
+                :backRoute="backRoute"
                 :backTitle="projectId ? $tc('layout.backProjectDashboard') : $tc(partnerCustomization().nav.viz.back.map.label)"
                 :backRouteParams="{ id: projectId || station.id }"
             >
@@ -248,7 +248,7 @@ import FieldNotes from "@/views/fieldNotes/FieldNotes.vue";
 import { confirmLeaveWithDirtyCheck } from "@/store/modules/dirty";
 import { SnackbarStyle } from "@/store/modules/snackbar";
 import StationModules from "@/views/station/StationModules.vue";
-import StationProjects from '@/views/station/StationProjects.vue';
+import StationProjects from "@/views/station/StationProjects.vue";
 
 export default Vue.extend({
     name: "StationView",
@@ -303,6 +303,12 @@ export default Vue.extend({
         ...mapState({
             userStations: (s: GlobalState) => Object.values(s.stations.user.stations),
         }),
+        backRoute(): string {
+            if (this.projectId) {
+                return "viewProject";
+            }
+            return this.isPartnerCustomisationEnabled ? "root" : "mapStation";
+        },
         visibleReadings(): VisibleReadings {
             return VisibleReadings.Current;
         },
