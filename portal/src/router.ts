@@ -1,5 +1,5 @@
 import Vue from "vue";
-import Router, {Route} from "vue-router";
+import Router, { Route } from "vue-router";
 import VueBodyClass from "vue-body-class";
 import i18n from "./i18n";
 import { getPartnerCustomization, isCustomisationEnabled } from "@/views/shared/partners";
@@ -512,7 +512,7 @@ const routes = [
         },
         meta: {
             bodyClass: "disable-scrolling",
-            secured: false,
+            secured: true,
         },
     },
     {
