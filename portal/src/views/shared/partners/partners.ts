@@ -94,7 +94,6 @@ const FloodNetProjectDescription = Vue.extend({
 });
 
 export interface PartnerCustomization {
-    title: string; // TODO i18n
     class: string;
     icon: string;
     sharing: {
@@ -159,7 +158,6 @@ export function getPartnerCustomization(): PartnerCustomization | null {
     const hostname = Config.partners.hostOverride || window.location.hostname;
     if (hostname.indexOf("floodnet.") >= 0) {
         return {
-            title: "Data Dashboard - FloodNet",
             class: "floodnet",
             icon: "/favicon-floodnet.ico",
             exportSupported: false,
@@ -225,7 +223,6 @@ export function getPartnerCustomizationWithDefault(): PartnerCustomization {
     }
 
     return {
-        title: "Data Dashboard - FieldKit",
         class: "fieldkit",
         icon: "/favicon-fieldkit.ico",
         exportSupported: true,

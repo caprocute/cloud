@@ -2,7 +2,7 @@
     <StandardLayout>
         <div class="container-wrap" v-if="station">
             <DoubleHeader
-                :backRoute="projectId ? 'viewProject' : 'mapStation'"
+                :backRoute="backRoute"
                 :backTitle="projectId ? $tc('layout.backProjectDashboard') : $tc(partnerCustomization().nav.viz.back.map.label)"
                 :backRouteParams="{ id: projectId || station.id }"
             >
@@ -299,6 +299,12 @@ export default Vue.extend({
         ...mapState({
             userStations: (s: GlobalState) => Object.values(s.stations.user.stations),
         }),
+        backRoute(): string {
+            if (this.projectId) {
+                return "viewProject";
+            }
+            return this.isPartnerCustomisationEnabled ? "root" : "mapStation";
+        },
         visibleReadings(): VisibleReadings {
             return VisibleReadings.Current;
         },
