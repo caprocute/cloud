@@ -27,7 +27,8 @@
         "user": "Perfil de usuario",
         "adminMain": "Panel de administración",
         "adminUsers": "Usuarios (Admin)",
-        "adminStations": "Estaciones (Admin)"
+        "adminStations": "Estaciones (Admin)",
+        "notFound": "Página no encontrada"
     },
     "hello": "Hello from i18n!",
     "water.ec.name": "Conductividad de agua",
@@ -856,5 +857,10 @@
         "warning": "Advertencia, al continuar se eliminará tu cuenta y todos los datos asociados. Para confirmar, por favor ingresa tu dirección de correo electrónico.",
         "done": "Tu cuenta ha sido eliminada.",
         "sameEmail": "El correo electrónico no coincide."
+    },
+    "notFound": {
+        "title": "Página no encontrada",
+        "message": "La página que estás buscando no existe o ha sido movida.",
+        "toDashboard": "Ir al Panel Principal"
     }
 }
