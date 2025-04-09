@@ -1319,7 +1319,7 @@ func (sr *StationRepository) QueryEssentialStations(ctx context.Context, qp *Ess
 		(
 			SELECT
 				s.id, s.device_id, s.name, u.id AS owner_id, u.name AS owner_name, u.email AS owner_email,
-				s.created_at, s.updated_at,
+				s.created_at, s.updated_at, s.model_id,
 				s.memory_used, s.memory_available,
 				s.firmware_time, s.firmware_number,
 				s.recording_started_at,
@@ -1328,7 +1328,7 @@ func (sr *StationRepository) QueryEssentialStations(ctx context.Context, qp *Ess
 			FROM fieldkit.station AS s
 			JOIN fieldkit.user AS u ON (s.owner_id = u.id)
         ) AS q
-		ORDER BY CASE WHEN q.last_ingestion_at IS NULL THEN q.updated_at ELSE q.last_ingestion_at END DESC, name
+		ORDER BY q.model_id, CASE WHEN q.last_ingestion_at IS NULL THEN q.updated_at ELSE q.last_ingestion_at END DESC, name
 		LIMIT $1 OFFSET $2
 		`, qp.PageSize, qp.PageSize*qp.Page); err != nil {
 		return nil, err
@@ -1354,7 +1354,7 @@ func (sr *StationRepository) Search(ctx context.Context, query string) (*Queried
 		(
 			SELECT
 				s.id, s.device_id, s.name, u.id AS owner_id, u.name AS owner_name,
-				s.created_at, s.updated_at,
+				s.created_at, s.updated_at, s.model_id,
 				s.memory_used, s.memory_available,
 				s.firmware_time, s.firmware_number,
 				s.recording_started_at,
@@ -1364,7 +1364,7 @@ func (sr *StationRepository) Search(ctx context.Context, query string) (*Queried
 			JOIN fieldkit.user AS u ON (s.owner_id = u.id)
         ) AS q
 		WHERE LOWER(q.name) LIKE LOWER($1)
-		ORDER BY CASE WHEN q.last_ingestion_at IS NULL THEN q.updated_at ELSE q.last_ingestion_at END DESC, name
+		ORDER BY q.model_id, CASE WHEN q.last_ingestion_at IS NULL THEN q.updated_at ELSE q.last_ingestion_at END DESC, name
 		LIMIT $2 OFFSET $3
 		`, likeQuery, 100, 0); err != nil {
 		return nil, err

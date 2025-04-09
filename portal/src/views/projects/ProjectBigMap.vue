@@ -42,12 +42,24 @@
                 </div>
                 <div class="container-map">
                     <StationsMap
+                        v-if="isPartnerCustomisationEnabled"
                         @show-summary="showSummary"
                         :mapped="mappedProject"
                         :layoutChanges="layoutChanges"
                         :showStations="project.showStations"
                         :visibleReadings="visibleReadings"
                         :mapBounds="mapBounds"
+                    />
+
+                    <StationsMap
+                        v-else
+                        @show-summary="showSummary"
+                        :mapped="mappedProject"
+                        :layoutChanges="layoutChanges"
+                        :showStations="project.showStations"
+                        :visibleReadings="visibleReadings"
+                        :mapBounds="mapBounds"
+                        :showSidebar="true"
                     />
 
                     <StationHoverSummary
@@ -280,6 +292,7 @@ export default Vue.extend({
     width: 100%;
     height: calc(100% - 157px);
     margin-top: 0;
+    overflow: hidden;
     @include position(absolute, 157px null null 0);
 
     @include bp-down($sm) {

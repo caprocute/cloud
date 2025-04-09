@@ -229,6 +229,7 @@ type EssentialStation struct {
 	ID                 int64      `db:"id"`
 	Name               string     `db:"name"`
 	DeviceID           []byte     `db:"device_id"`
+	ModelID            int32      `db:"model_id"`
 	OwnerID            int32      `db:"owner_id"`
 	OwnerName          string     `db:"owner_name"`
 	OwnerEmail         string     `db:"owner_email"`

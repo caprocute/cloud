@@ -108,11 +108,17 @@
     color: #2c3e50;
     margin-left: 7px;
     margin-bottom: 0;
+    user-select: none;
     @include flex(center, center);
 
     @include bp-down($xs) {
         height: 25px;
         transform: translateY(8px);
+    }
+
+    &.disabled {
+        pointer-events: none;
+        opacity: 0.6;
     }
 }
 
