@@ -11,8 +11,8 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { ActionTypes } from '@/store';
-import { updateDocumentTitle } from '@/router';
+import { ActionTypes } from "@/store";
+import { updateDocumentTitle } from "@/router";
 import moment from "moment";
 
 export enum Locales {

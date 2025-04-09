@@ -3,6 +3,7 @@ import Vue from "vue";
 import * as MutationTypes from "../mutations";
 import * as ActionTypes from "../actions";
 import { BoundingRectangle, LngLat, Location } from "../map-types";
+import { SnackbarStyle } from "./snackbar";
 
 import {
     Activity,
@@ -27,6 +28,7 @@ import {
     RecentlyAggregatedLast,
     UserRolesEnum,
     Owner,
+    PendingInvites,
 } from "@/api";
 
 import { VizSensor, VizConfig } from "@/views/viz/viz";
@@ -48,6 +50,9 @@ export const PROJECT_LOADED = "PROJECT_LOADED";
 export const PROJECT_UPDATE = "PROJECT_UPDATE";
 export const PROJECT_DELETED = "PROJECT_DELETED";
 export const SENSOR_META = "SENSOR_META";
+export const HAVE_PROJECT_INVITES = "HAVE_PROJECT_INVITES";
+export const PROJECT_INVITATION_DECLINED = "PROJECT_INVITATION_DECLINED";
+export const PROJECT_INVITATION_ACCEPTED = "PROJECT_INVITATION_ACCEPTED";
 
 export class SensorMeta {
     constructor(private readonly meta: SensorsResponse) {}
@@ -492,6 +497,7 @@ export class StationsState {
     projectFollowers: { [index: number]: ProjectFollowers } = {};
     projectStations: { [index: number]: DisplayStation[] } = {};
     projectActivities: { [index: number]: Activity[] } = {};
+    projectInvites: PendingInvites = { pending: [], projects: [] };
     user: {
         stations: { [index: number]: DisplayStation };
         projects: { [index: number]: Project };
@@ -572,6 +578,9 @@ const getters = {
     },
     stationProjects(state: StationsState): { [index: number]: Project } {
         return state.stationProjects;
+    },
+    pendingProjectInvites(state: StationsState) {
+        return state.projectInvites.projects || [];
     },
 };
 
@@ -767,20 +776,35 @@ const actions = (services: Services) => {
             const usersReply = await services.api.getUsersByProject(payload.projectId);
             commit(PROJECT_USERS, { projectId: payload.projectId, users: usersReply.users });
         },
-        [ActionTypes.ACCEPT_PROJECT]: async (
-            { commit, dispatch: _dispatch }: { commit: any; dispatch: any },
-            payload: { projectId: number }
-        ) => {
-            await services.api.acceptProjectInvite(payload);
-
-            const userProjects = await services.api.getUserProjects(OnNoReject);
-            commit(HAVE_USER_PROJECTS, userProjects.projects);
+        [ActionTypes.ACCEPT_PROJECT]: async ({ commit, dispatch }: { commit: any; dispatch: any }, payload: { projectId: number }) => {
+            try {
+                await services.api.acceptProjectInvite(payload);
+                commit(PROJECT_INVITATION_ACCEPTED, payload.projectId);
+                const userProjects = await services.api.getUserProjects(OnNoReject);
+                commit(HAVE_USER_PROJECTS, userProjects.projects);
+                return true;
+            } catch (error) {
+                console.error("Failed to accept project invitation:", error);
+                dispatch(ActionTypes.SHOW_SNACKBAR, {
+                    message: "Failed to accept project invitation. Please try again.",
+                    style: SnackbarStyle.fail,
+                });
+                return false;
+            }
         },
-        [ActionTypes.DECLINE_PROJECT]: async (
-            { commit: _commit, dispatch: _dispatch }: { commit: any; dispatch: any },
-            payload: { projectId: number }
-        ) => {
-            await services.api.declineProjectInvite(payload);
+        [ActionTypes.DECLINE_PROJECT]: async ({ commit, dispatch }: { commit: any; dispatch: any }, payload: { projectId: number }) => {
+            try {
+                await services.api.declineProjectInvite(payload);
+                commit(PROJECT_INVITATION_DECLINED, payload.projectId);
+                return true;
+            } catch (error) {
+                console.error("Failed to decline project invitation:", error);
+                dispatch(ActionTypes.SHOW_SNACKBAR, {
+                    message: "Failed to decline project invitation. Please try again.",
+                    style: SnackbarStyle.fail,
+                });
+                return false;
+            }
         },
         [ActionTypes.ACCEPT_PROJECT_INVITE]: async (
             { commit, dispatch: _dispatch }: { commit: any; dispatch: any },
@@ -830,6 +854,20 @@ const actions = (services: Services) => {
             const stationProjects = await services.api.getProjectsForStation(payload.id);
             commit(HAVE_STATION_PROJECTS, stationProjects.projects);
             commit(MutationTypes.LOADING, { stationProjects: false });
+        },
+        [ActionTypes.NEED_PROJECT_INVITES]: async ({ commit, dispatch }: { commit: any; dispatch: any }) => {
+            try {
+                const invites = await services.api.getInvitesByUser();
+                commit(HAVE_PROJECT_INVITES, invites);
+                return invites;
+            } catch (error) {
+                console.error("Failed to fetch project invitations:", error);
+                dispatch(ActionTypes.SHOW_SNACKBAR, {
+                    message: "Failed to load project invitations. Please refresh the page.",
+                    style: SnackbarStyle.fail,
+                });
+                return { pending: [], projects: [] };
+            }
         },
     };
 };
@@ -928,6 +966,21 @@ const mutations = {
     },
     [SENSOR_META]: (state: StationsState, payload: SensorMeta) => {
         state.sensorMeta = payload;
+    },
+    [HAVE_PROJECT_INVITES]: (state: StationsState, invites: PendingInvites) => {
+        Vue.set(state, "projectInvites", invites);
+    },
+    [PROJECT_INVITATION_ACCEPTED]: (state: StationsState, projectId: number) => {
+        const updatedPending = state.projectInvites.pending.filter((invite) => invite.project.id !== projectId);
+        const updatedProjects = state.projectInvites.projects.filter((project) => project.id !== projectId);
+        Vue.set(state.projectInvites, "pending", updatedPending);
+        Vue.set(state.projectInvites, "projects", updatedProjects);
+    },
+    [PROJECT_INVITATION_DECLINED]: (state: StationsState, projectId: number) => {
+        const updatedPending = state.projectInvites.pending.filter((invite) => invite.project.id !== projectId);
+        const updatedProjects = state.projectInvites.projects.filter((project) => project.id !== projectId);
+        Vue.set(state.projectInvites, "pending", updatedPending);
+        Vue.set(state.projectInvites, "projects", updatedProjects);
     },
 };
 
