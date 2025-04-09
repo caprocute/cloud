@@ -458,7 +458,7 @@ export const ViewingControls = Vue.extend({
                 <SelectionControls :viz="viz" :workspace="workspace" @viz-change-sensors="raiseChangeSensors" />
 
 				<div class="right half" v-if="chartTypes.length > 1">
-                    <div class="chart-type">
+                    <div class="chart-type" :class="{ disabled: viz.isDataSetEmpty() }">
                         <treeselect :disabled="viz.busy" :options="chartTypes" :value="selectedChartType" open-direction="bottom" @select="raiseChangeChartType" :clearable="false" />
                     </div>
 				</div>
