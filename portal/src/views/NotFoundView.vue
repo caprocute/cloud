@@ -5,7 +5,7 @@
             <div class="not-found-content">
                 <h1>{{ $t("notFound.title") }}</h1>
                 <p>{{ $t("notFound.message") }}</p>
-                <router-link to="/dashboard" class="button-solid not-found-button">{{ $t("notFound.toDashboard") }}</router-link>
+                <router-link to="/" class="button-solid not-found-button">{{ $t("notFound.toDashboard") }}</router-link>
             </div>
         </div>
     </StandardLayout>
