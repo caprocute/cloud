@@ -104,6 +104,8 @@ ORDER BY s.updated_at DESC
 
 	if len(queue) > 0 {
 		if m.Rows != nil {
+			log.Infow("pop-queue", "migration", "modules", "queue_length", len(queue), "rows", m.Rows)
+
 			for i := 0; i < *m.Rows; i += 1 {
 				row := queue[i]
 				work := messages.MergeModules{
@@ -115,30 +117,21 @@ ORDER BY s.updated_at DESC
 				if err := h.publisher.Publish(ctx, work); err != nil {
 					return err
 				}
-
 				if _, err := h.db.ExecContext(ctx, "UPDATE fieldkit.merged_module SET tried = NOW() WHERE deleted_id = $1 AND keeping_id = $2", row.DeletedID, row.KeepingID); err != nil {
 					return err
 				}
 			}
 		} else if m.Stations != nil {
 			remaining := *m.Stations
+			log.Infow("pop-queue", "migration", "modules", "queue_length", len(queue), "stations", remaining)
+
+			published := 0
 			station := queue[0].StationID
 			for _, row := range queue {
-				if row.StationID == station {
-					work := messages.MergeModules{
-						StationID:       row.StationID,
-						ConfigurationID: row.ConfigurationID,
-						DeletingID:      row.DeletedID,
-						KeepingID:       row.KeepingID,
-					}
-					if err := h.publisher.Publish(ctx, work); err != nil {
-						return err
-					}
+				if row.StationID != station {
+					log.Infow("pop-queue", "migration", "modules", "queue_length", len(queue), "station_id", station, "published", published)
 
-					if _, err := h.db.ExecContext(ctx, "UPDATE fieldkit.merged_module SET tried = NOW() WHERE deleted_id = $1 AND keeping_id = $2", row.DeletedID, row.KeepingID); err != nil {
-						return err
-					}
-				} else {
+					published = 1
 					remaining -= 1
 					if remaining > 0 {
 						station = row.StationID
@@ -146,6 +139,21 @@ ORDER BY s.updated_at DESC
 						break
 					}
 				}
+
+				work := messages.MergeModules{
+					StationID:       row.StationID,
+					ConfigurationID: row.ConfigurationID,
+					DeletingID:      row.DeletedID,
+					KeepingID:       row.KeepingID,
+				}
+				if err := h.publisher.Publish(ctx, work); err != nil {
+					return err
+				}
+				if _, err := h.db.ExecContext(ctx, "UPDATE fieldkit.merged_module SET tried = NOW() WHERE deleted_id = $1 AND keeping_id = $2", row.DeletedID, row.KeepingID); err != nil {
+					return err
+				}
+
+				published += 1
 			}
 		} else {
 			log.Warnw("pop-queue:noop")
