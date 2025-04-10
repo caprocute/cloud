@@ -388,6 +388,7 @@ export default Vue.extend({
                     query: { after: this.$route.path },
                 });
             }
+            return this.$router.push({ name: "notFound" });
         });
     },
     methods: {
