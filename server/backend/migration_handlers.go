@@ -120,8 +120,8 @@ ORDER BY s.updated_at DESC
 					return err
 				}
 			}
-
 		} else if m.Stations != nil {
+			remaining := *m.Stations
 			station := queue[0].StationID
 			for _, row := range queue {
 				if row.StationID == station {
@@ -139,7 +139,12 @@ ORDER BY s.updated_at DESC
 						return err
 					}
 				} else {
-					break
+					remaining -= 1
+					if remaining > 0 {
+						station = row.StationID
+					} else {
+						break
+					}
 				}
 			}
 		} else {
