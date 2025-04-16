@@ -805,7 +805,9 @@ func (r *StationRepository) QueryStationFull(ctx context.Context, id int32) (*da
 		return nil, err
 	}
 
-	modules = append(modules, oldModules...)
+	if len(oldModules) > 0 && len(modules) == 0 {
+		modules = append(modules, oldModules...)
+	}
 
 	sensors := []*data.ModuleSensor{}
 	if err := r.db.SelectContext(ctx, &sensors, `
