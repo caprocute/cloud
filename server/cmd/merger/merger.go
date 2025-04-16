@@ -114,24 +114,25 @@ func (s *StationMerger) ProcessAllStations(outerCtx context.Context, options *Op
 
 	log.Infow("preparing", "total_modules", len(modules), "total_stations", len(stations))
 
-	byHardwareId := make(map[string][]int64)
+	byHardwareID := make(map[string][]int64)
 	deletingModules := make(map[int64]int64)
 	moduleConfigurations := make(map[int64]int64)
 	for _, module := range modules {
 		id := hex.EncodeToString(module.HardwareID)
-		if byHardwareId[id] == nil {
-			byHardwareId[id] = make([]int64, 0)
+		if byHardwareID[id] == nil {
+			byHardwareID[id] = make([]int64, 0)
 		}
-		byHardwareId[id] = append(byHardwareId[id], module.ID)
-		if len(byHardwareId[id]) > 1 {
-			deletingModules[module.ID] = byHardwareId[id][0]
+		byHardwareID[id] = append(byHardwareID[id], module.ID)
+		if len(byHardwareID[id]) > 1 {
+			deletingModules[module.ID] = byHardwareID[id][0]
+			log.Infow("module:will-delete", "deleting_id", module.ID, "keeping_id", byHardwareID[id][0])
 		}
 		moduleConfigurations[module.ID] = module.ConfigurationID
 	}
 
-	log.Infow("modules", "unique_modules", len(byHardwareId), "deleting", len(deletingModules))
+	log.Infow("modules", "unique_modules", len(byHardwareID), "deleting", len(deletingModules))
 
-	if len(byHardwareId) == len(modules) {
+	if len(byHardwareID) == len(modules) {
 		return nil
 	}
 
@@ -163,7 +164,7 @@ func (s *StationMerger) ProcessAllStations(outerCtx context.Context, options *Op
 						Position:        module.Position,
 					}
 
-					log.Infow("config:module", "configuration_id", config.ID, "module_id", module.ID, "merged_module_id", moduleConfig.ModuleID)
+					log.Infow("config:module:solo", "configuration_id", config.ID, "module_id", module.ID, "merged_module_id", moduleConfig.ModuleID)
 
 					_, err := s.queryStations.InsertConfigurationModule(ctx, &moduleConfig)
 					if err != nil {
@@ -193,7 +194,7 @@ func (s *StationMerger) ProcessAllStations(outerCtx context.Context, options *Op
 								Position:        module.Position,
 							}
 
-							log.Infow("config:module", "configuration_id", config.ID, "module_id", module.ID, "merged_module_id", moduleConfig.ModuleID)
+							log.Infow("config:module:multiple", "configuration_id", config.ID, "module_id", module.ID, "merged_module_id", moduleConfig.ModuleID)
 
 							_, err := s.queryStations.InsertConfigurationModule(ctx, &moduleConfig)
 							if err != nil {
@@ -267,7 +268,7 @@ func (s *StationMerger) ProcessAllStations(outerCtx context.Context, options *Op
 		return err
 	}
 
-	log.Infow("modules", "unique_modules", len(byHardwareId), "deleting", len(deletingModules))
+	log.Infow("modules", "unique_modules", len(byHardwareID), "deleting", len(deletingModules))
 
 	if false {
 		failed := make([]int64, 0)
