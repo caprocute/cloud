@@ -64,7 +64,8 @@ func (h *stationModelRecordHandler) OnMeta(ctx context.Context, provision *data.
 			Kind:            m.Header.Kind,
 			Version:         m.Header.Version,
 		}
-		if _, err := sr.UpsertStationModule(ctx, module); err != nil {
+		module, err := sr.UpsertStationModule(ctx, module)
+		if err != nil {
 			return err
 		}
 
