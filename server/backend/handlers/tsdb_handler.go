@@ -103,6 +103,9 @@ func (v *TsDBHandler) OnData(ctx context.Context, provision *data.Provision, raw
 
 		v.stationModules = make(map[uint32]*data.StationModule)
 		for _, sm := range modules {
+			if v.stationModules[sm.Index] != nil {
+				return fmt.Errorf("duplicate module indices")
+			}
 			v.stationModules[sm.Index] = sm
 		}
 

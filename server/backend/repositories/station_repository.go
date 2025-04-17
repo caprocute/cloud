@@ -309,28 +309,55 @@ func (r *StationRepository) QueryAllStationModules(ctx context.Context) ([]*data
 	return modules, nil
 }
 
+func (r *StationRepository) queryModuleByHardwareID(ctx context.Context, configurationID int64, hardwareID []byte) (*data.StationModule, error) {
+	modules := []*data.StationModule{}
+	if err := r.db.SelectContext(ctx, &modules, `
+		SELECT
+			sm.id, sm.hardware_id, sm.flags, sm.manufacturer, sm.kind, sm.version, sm.name, sm.label
+		FROM station_module AS sm
+		WHERE sm.hardware_id = $1
+		`, hardwareID); err != nil {
+		return nil, err
+	}
+	if len(modules) == 0 {
+		return nil, nil
+	}
+	if len(modules) == 1 {
+		return modules[0], nil
+	}
+	return nil, fmt.Errorf("duplicate hardware id in station_modules")
+}
+
 func (r *StationRepository) UpsertStationModule(ctx context.Context, module *data.StationModule) (*data.StationModule, error) {
+	log := Logger(ctx).Sugar()
 	originalName := module.Name
 	module.Name = migrateModuleName(originalName)
 
-	if err := r.db.NamedGetContext(ctx, module, `
-		INSERT INTO fieldkit.station_module
-			(configuration_id, hardware_id, flags, name, manufacturer, kind, version) VALUES
-			(0, :hardware_id, :flags, :name, :manufacturer, :kind, :version)
-		ON CONFLICT (configuration_id, hardware_id)
-			DO UPDATE SET flags = EXCLUDED.flags,
-                          name = EXCLUDED.name,
-                          manufacturer = EXCLUDED.manufacturer,
-                          kind = EXCLUDED.kind,
-						  version = EXCLUDED.version
-		RETURNING id
-		`, module); err != nil {
+	returning, err := r.queryModuleByHardwareID(ctx, module.ConfigurationID, module.HardwareID)
+	if err != nil {
 		return nil, err
+	}
+
+	if returning == nil {
+		if err := r.db.NamedGetContext(ctx, module, `
+			INSERT INTO fieldkit.station_module
+			(hardware_id, flags, name, manufacturer, kind, version) VALUES
+			(:hardware_id, :flags, :name, :manufacturer, :kind, :version)
+			RETURNING id
+		`, module); err != nil {
+			return nil, err
+		}
+
+		returning = module
+
+		log.Infow("module:inserted", "name", module.Name, "module_id", module.ID, "verbose", true)
+	} else {
+		log.Infow("module:existing", "name", returning.Name, "module_id", returning.ID, "verbose", true)
 	}
 
 	if _, err := r.InsertConfigurationModule(ctx, &data.ConfigurationModule{
 		ConfigurationID: module.ConfigurationID,
-		ModuleID:        module.ID,
+		ModuleID:        returning.ID,
 		Index:           module.Index,
 		Position:        module.Position,
 	}); err != nil {
@@ -338,10 +365,10 @@ func (r *StationRepository) UpsertStationModule(ctx context.Context, module *dat
 	}
 
 	if originalName != module.Name {
-		Logger(ctx).Sugar().Infow("module:renamed", "original_name", originalName, "name", module.Name, "module_id", module.ID, "verbose", true)
+		log.Infow("module:renamed", "original_name", originalName, "name", module.Name, "module_id", module.ID, "verbose", true)
 	}
 
-	return module, nil
+	return returning, nil
 }
 
 func (r *StationRepository) UpdateStationModule(ctx context.Context, module *data.StationModule) (*data.StationModule, error) {
@@ -372,9 +399,11 @@ func migrateSensorName(name string) string {
 }
 
 func (r *StationRepository) UpsertModuleSensor(ctx context.Context, sensor *data.ModuleSensor) (*data.ModuleSensor, error) {
+	log := Logger(ctx).Sugar()
 	originalName := sensor.Name
 	sensor.Name = migrateSensorName(sensor.Name)
 
+	log.Infow("sensor:upserting", "module_id", sensor.ModuleID)
 	if err := r.db.NamedGetContext(ctx, sensor, `
 		INSERT INTO fieldkit.module_sensor AS s
 			(module_id, sensor_index, unit_of_measure, name, reading_last, reading_time) VALUES
@@ -446,7 +475,8 @@ func (r *StationRepository) updateStationConfigurationFromStatus(ctx context.Con
 				m := lrm.Module
 
 				module := newStationModule(m, configuration, uint32(moduleIndex))
-				if _, err := r.UpsertStationModule(ctx, module); err != nil {
+				module, err := r.UpsertStationModule(ctx, module)
+				if err != nil {
 					return err
 				}
 
@@ -478,7 +508,8 @@ func (r *StationRepository) updateStationConfigurationFromStatus(ctx context.Con
 	} else {
 		for moduleIndex, m := range statusReply.Modules {
 			module := newStationModule(m, configuration, uint32(moduleIndex))
-			if _, err := r.UpsertStationModule(ctx, module); err != nil {
+			module, err := r.UpsertStationModule(ctx, module)
+			if err != nil {
 				return err
 			}
 
@@ -606,17 +637,7 @@ func (r *StationRepository) deleteModuleSensorsExcept(ctx context.Context, modul
 func (r *StationRepository) deleteStationModulesExcept(ctx context.Context, configurationID int64, keeping []int64) error {
 	if len(keeping) > 0 {
 		if query, args, err := sqlx.In(`
-			DELETE FROM fieldkit.module_sensor WHERE module_id IN (SELECT id FROM fieldkit.station_module WHERE configuration_id = ? AND id NOT IN (?))
-		`, configurationID, keeping); err != nil {
-			return err
-		} else {
-			if _, err := r.db.ExecContext(ctx, r.db.Rebind(query), args...); err != nil {
-				return err
-			}
-		}
-
-		if query, args, err := sqlx.In(`
-			DELETE FROM fieldkit.station_module WHERE configuration_id = ? AND id NOT IN (?)
+			DELETE FROM fieldkit.configuration_module WHERE configuration_id = ? AND module_id NOT IN (?)
 		`, configurationID, keeping); err != nil {
 			return err
 		} else {
@@ -625,16 +646,14 @@ func (r *StationRepository) deleteStationModulesExcept(ctx context.Context, conf
 			}
 		}
 	} else {
-		if _, err := r.db.ExecContext(ctx, `
-			DELETE FROM fieldkit.module_sensor WHERE module_id IN (SELECT id FROM fieldkit.station_module WHERE configuration_id = $1)
+		if query, args, err := sqlx.In(`
+			DELETE FROM fieldkit.configuration_module WHERE configuration_id = ?
 		`, configurationID); err != nil {
 			return err
-		}
-
-		if _, err := r.db.ExecContext(ctx, `
-			DELETE FROM fieldkit.station_module WHERE configuration_id = $1
-		`, configurationID); err != nil {
-			return err
+		} else {
+			if _, err := r.db.ExecContext(ctx, r.db.Rebind(query), args...); err != nil {
+				return err
+			}
 		}
 	}
 
@@ -1643,7 +1662,7 @@ func (r *StationRepository) QueryStationModuleByID(ctx context.Context, id int32
 	module = &data.StationModule{}
 	if err := r.db.GetContext(ctx, module, `
 		SELECT
-			id, configuration_id, hardware_id, module_index, position, flags, name, manufacturer, kind, version
+			id, hardware_id, module_index, position, flags, name, manufacturer, kind, version
 		FROM fieldkit.station_module WHERE id = $1
 		`, id); err != nil {
 		return nil, err
