@@ -326,7 +326,8 @@ func (dq *DataQuerier) GetIDs(ctx context.Context, mas []ModuleAndSensor) (*Sens
 		)
 		SELECT s.station_id, m.id AS module_id, m.hardware_id
 		FROM fieldkit.station_module AS m
-		LEFT JOIN fieldkit.station_configuration AS c ON (c.id = m.configuration_id)
+		LEFT JOIN fieldkit.configuration_module AS cm ON (cm.module_id = m.id)
+		LEFT JOIN fieldkit.station_configuration AS c ON (c.id = cm.configuration_id)
 		LEFT JOIN fieldkit.provision AS p ON (c.provision_id = p.id)
 		LEFT JOIN station_ids AS s ON (p.device_id = s.device_id)
 		WHERE m.hardware_id IN (?)

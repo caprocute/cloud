@@ -291,22 +291,25 @@ func migrateModuleName(name string) string {
 }
 
 func (r *StationRepository) QueryAllStationModules(ctx context.Context) ([]*data.StationModule, error) {
-	modules := []*data.StationModule{}
-	if err := r.db.SelectContext(ctx, &modules, `
-		SELECT
-			sm.id, sm.configuration_id, sm.hardware_id, sm.module_index, sm.position, sm.flags, sm.manufacturer, sm.kind, sm.version, sm.name, sm.label
-		FROM 
-		(
-			SELECT sm.id AS module_id, MAX(ms.reading_time) AS max_reading, COUNT(ms.id) AS number_sensors
-			FROM station_module AS sm LEFT JOIN module_sensor AS ms ON (sm.id = ms.module_id)
-			GROUP BY sm.id
-		) AS q
-		JOIN station_module AS sm ON (q.module_id = sm.id)
-		ORDER BY q.max_reading DESC
-		`); err != nil {
-		return nil, err
-	}
-	return modules, nil
+	/*
+		modules := []*data.StationModule{}
+		if err := r.db.SelectContext(ctx, &modules, `
+			SELECT
+				sm.id, sm.configuration_id, sm.hardware_id, sm.module_index, sm.position, sm.flags, sm.manufacturer, sm.kind, sm.version, sm.name, sm.label
+			FROM
+			(
+				SELECT sm.id AS module_id, MAX(ms.reading_time) AS max_reading, COUNT(ms.id) AS number_sensors
+				FROM station_module AS sm LEFT JOIN module_sensor AS ms ON (sm.id = ms.module_id)
+				GROUP BY sm.id
+			) AS q
+			JOIN station_module AS sm ON (q.module_id = sm.id)
+			ORDER BY q.max_reading DESC
+			`); err != nil {
+			return nil, err
+		}
+		return modules, nil
+	*/
+	panic("Unsupported, used for merger migration.")
 }
 
 func (r *StationRepository) queryModuleByHardwareID(ctx context.Context, configurationID int64, hardwareID []byte) (*data.StationModule, error) {
@@ -807,25 +810,6 @@ func (r *StationRepository) QueryStationFull(ctx context.Context, id int32) (*da
 		ORDER BY cm.module_index
 		`, stations[0].DeviceID); err != nil {
 		return nil, err
-	}
-
-	oldModules := []*data.StationModule{}
-	if err := r.db.SelectContext(ctx, &oldModules, `
-		SELECT
-			sm.id, sm.configuration_id, sm.hardware_id, sm.module_index, sm.position, sm.flags, sm.manufacturer, sm.kind, sm.version, sm.name, sm.label
-		FROM fieldkit.station_module AS sm
-		WHERE sm.configuration_id IN (
-			SELECT id FROM fieldkit.station_configuration WHERE provision_id IN (
-				SELECT id FROM fieldkit.provision WHERE device_id = $1
-			)
-		)
-		ORDER BY sm.module_index
-		`, stations[0].DeviceID); err != nil {
-		return nil, err
-	}
-
-	if len(oldModules) > 0 && len(modules) == 0 {
-		modules = append(modules, oldModules...)
 	}
 
 	sensors := []*data.ModuleSensor{}
