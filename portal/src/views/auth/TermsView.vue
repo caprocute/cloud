@@ -37,14 +37,6 @@ export default Vue.extend({
     methods: {
         async agree(): Promise<void> {
             if (this.user) {
-                const payload = {
-                    id: this.user?.id,
-                    name: this.user?.name,
-                    email: this.user?.email,
-                    bio: this.user?.bio,
-                    tncDate: this.user?.tncDate,
-                    tncAccept: true,
-                };
                 await this.$services.api.accept(this.user.id);
                 await this.$store.dispatch(ActionTypes.REFRESH_CURRENT_USER, {});
                 await this.$router.push({ name: "projects" }).catch((e) => {
@@ -67,9 +59,10 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "../../scss/forms";
-@import "../../scss/global";
-@import "../../scss/mixins";
+@use "src/scss/forms";
+@use "src/scss/global";
+@use "src/scss/mixins";
+@use "src/scss/variables";
 
 .logo {
     width: 150px;
@@ -84,13 +77,13 @@ export default Vue.extend({
     min-height: 100vh;
     color: #2c3e50;
     text-align: left;
-    @include flex(center, center);
+    @include mixins.flex(center, center);
 
     &-header-logo {
         width: 211px;
         margin-bottom: 45px;
 
-        @include bp-down($xs) {
+        @include mixins.bp-down(variables.$xs) {
             width: 117px;
             margin-bottom: 20px;
         }
@@ -102,12 +95,12 @@ export default Vue.extend({
         padding: 25px 45px 45px 45px;
         box-sizing: border-box;
 
-        @include bp-down($sm) {
+        @include mixins.bp-down(variables.$sm) {
             width: calc(100% - 40px);
             padding: 22px 20px;
         }
 
-        @include bp-down($xs) {
+        @include mixins.bp-down(variables.$xs) {
             width: calc(100% - 20px);
             padding: 22px 14px;
         }

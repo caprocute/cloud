@@ -129,8 +129,8 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
-@import "src/scss/variables";
-@import "src/scss/mixins";
+@use "src/scss/variables";
+@use "src/scss/mixins";
 
 .pagination .button {
     color: #d8d8d8;
@@ -149,9 +149,9 @@ export default Vue.extend({
     &.next {
         .arrow {
             border-width: 8px 0 8px 15px;
-            border-color: transparent transparent transparent $color-dark;
+            border-color: transparent transparent transparent variables.$color-dark;
 
-            @include bp-down($sm) {
+            @include mixins.bp-down(variables.$sm) {
                 border-width: 6px 0 6px 12px;
             }
         }
@@ -160,9 +160,9 @@ export default Vue.extend({
     &.prev {
         .arrow {
             border-width: 8px 15px 8px 0;
-            border-color: transparent $color-dark transparent transparent;
+            border-color: transparent variables.$color-dark transparent transparent;
 
-            @include bp-down($sm) {
+            @include mixins.bp-down(variables.$sm) {
                 border-width: 6px 12px 6px 0;
             }
         }

@@ -11,8 +11,8 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { ActionTypes } from '@/store';
-import { updateDocumentTitle } from '@/router';
+import { ActionTypes } from "@/store";
+import { updateDocumentTitle } from "@/router";
 import moment from "moment";
 
 export enum Locales {
@@ -41,7 +41,8 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "../../scss/mixins";
+@use "src/scss/mixins";
+@use "src/scss/variables";
 
 .language-selector {
     margin-right: 20px;
@@ -53,7 +54,7 @@ export default Vue.extend({
     align-items: center;
     box-sizing: border-box;
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         margin-right: 5px;
     }
 
@@ -63,7 +64,7 @@ export default Vue.extend({
         bottom: -2px;
     }
 
-    @include attention() {
+    @include mixins.attention() {
         .language-list,
         .triangle {
             visibility: visible;
@@ -79,13 +80,13 @@ export default Vue.extend({
         transition: all 0.33s;
         transform: translateY(-50%);
         cursor: pointer;
-        @include position(absolute, 50% null null calc(100% - 5px));
+        @include mixins.position(absolute, 50% null null calc(100% - 5px));
 
-        @include bp-down($lg) {
+        @include mixins.bp-down(variables.$lg) {
             right: 0;
         }
 
-        @include bp-down($sm) {
+        @include mixins.bp-down(variables.$sm) {
             display: none;
         }
     }
@@ -109,7 +110,7 @@ export default Vue.extend({
     visibility: hidden;
     padding-top: 10px;
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         top: 55px;
     }
 

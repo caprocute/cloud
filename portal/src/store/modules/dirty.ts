@@ -15,20 +15,20 @@ const getters = {
 const actions = () => {
     return {
         [ActionTypes.NEW_DIRTY_FIELD]: async (
-            { commit, dispatch, state }: { commit: any; dispatch: any; state: DirtyState },
+            { commit, dispatch: _dispatch, state: _state }: { commit: any; dispatch: any; state: DirtyState },
             payload: string
         ) => {
             commit("ADD_DIRTY_FIELD", payload);
         },
         [ActionTypes.CLEAR_DIRTY_FIELD]: async (
-            { commit, dispatch, state }: { commit: any; dispatch: any; state: DirtyState },
+            { commit, dispatch: _dispatch, state: _state }: { commit: any; dispatch: any; state: DirtyState },
             payload: string
         ) => {
             commit("CLEAR_DIRTY_FIELD", payload);
         },
         [ActionTypes.CLEAR_ALL_DIRTY_FIELDS]: async (
-            { commit, dispatch, state }: { commit: any; dispatch: any; state: DirtyState },
-            payload: string
+            { commit, dispatch: _dispatch, state: _state }: { commit: any; dispatch: any; state: DirtyState },
+            _payload: string
         ) => {
             commit("CLEAR_ALL_DIRTY_FIELDS");
         },

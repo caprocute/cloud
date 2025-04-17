@@ -204,17 +204,18 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "src/scss/mixins";
+@use "src/scss/mixins";
+@use "src/scss/variables";
 
 .photo-options {
-    @include position(absolute, 20px 20px null null);
+    @include mixins.position(absolute, 20px 20px null null);
     width: 35px;
     height: 35px;
     background-color: #fff;
     border: solid 1px #cccdcf;
     padding: 0;
     border-radius: 50px;
-    z-index: $z-index-top;
+    z-index: variables.$z-index-top;
 
     ::v-deep .options-trigger {
         padding: 0;
@@ -280,7 +281,7 @@ input[type="file"] {
         margin-top: 15px;
     }
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         &:nth-of-type(even) {
             .options-btns {
                 right: auto;
@@ -298,7 +299,7 @@ input[type="file"] {
 }
 
 ::v-deep #silentbox-overlay__arrow-buttons {
-    @include bp-down($md) {
+    @include mixins.bp-down(variables.$md) {
         .arrow-previous {
             left: 30px;
         }
@@ -307,7 +308,7 @@ input[type="file"] {
         }
     }
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         .arrow-previous {
             left: 15px;
         }
@@ -318,12 +319,12 @@ input[type="file"] {
 }
 
 ::v-deep #silentbox-overlay__close-button .icon {
-    @include bp-down($md) {
+    @include mixins.bp-down(variables.$md) {
         left: 35px;
         top: -20px;
     }
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         left: 45px;
         top: -40px;
     }

@@ -25,7 +25,7 @@ import Vue from "vue";
 
 import LatestStationReadings from "@/views/shared/LatestStationReadings.vue";
 import PaginationControls from "@/views/shared/PaginationControls.vue";
-import { DisplayProject, DisplayStation } from "@/store";
+import { DisplayStation } from "@/store";
 
 export default Vue.extend({
     name: "StationsReadings",
@@ -66,7 +66,9 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "../../scss/mixins";
+@use "src/scss/mixins";
+@use "src/scss/variables";
+
 .readings-container {
     display: flex;
     flex-direction: column;
@@ -89,6 +91,6 @@ export default Vue.extend({
     margin-top: auto;
 }
 .empty-project {
-    font-family: $font-family-light;
+    font-family: variables.$font-family-light;
 }
 </style>

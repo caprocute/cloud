@@ -20,10 +20,7 @@ export function createSensorColorScale(sensor: SensorDetails | null): ColorScale
 
     const range = sensor.ranges[0];
 
-    return d3
-        .scaleSequential()
-        .domain([range.minimum, range.maximum])
-        .interpolator(d3.interpolatePlasma);
+    return d3.scaleSequential().domain([range.minimum, range.maximum]).interpolator(d3.interpolatePlasma);
 }
 
 export function appendYAxisLabel(svg: d3, unitOfMeasure: string, layout: ChartLayout): void {

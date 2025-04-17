@@ -19,11 +19,11 @@ export default Vue.extend({
 
         window.ZohoHCAsap =
             window.ZohoHCAsap ||
-            function(a, b) {
+            function (a, b) {
                 global.ZohoHCAsap[a] = b;
             };
 
-        (function() {
+        (function () {
             const d = document;
             const s = d.createElement("script");
             s.type = "text/javascript";

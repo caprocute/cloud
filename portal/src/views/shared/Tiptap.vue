@@ -17,13 +17,11 @@
 <script lang="ts">
 import _ from "lodash";
 import Vue from "vue";
-import { ResizeAuto } from "./ResizeAuto";
 import { Editor, JSONContent, EditorContent, VueRenderer, Extension } from "@tiptap/vue-2";
 import Document from "@tiptap/extension-document";
 import Paragraph from "@tiptap/extension-paragraph";
 import Text from "@tiptap/extension-text";
 import Mention from "@tiptap/extension-mention";
-import Placeholder from "@tiptap/extension-placeholder";
 import MentionList from "../comments/MentionList.vue";
 import tippy, { Props } from "tippy.js";
 import { CharacterCount } from "@tiptap/extension-character-count";
@@ -103,7 +101,7 @@ export default Vue.extend({
                 this.$emit("empty", true);
             }
         };
-        const saved = (editor, ...args) => {
+        const saved = (editor, ..._args) => {
             if (!editor.isEmpty) {
                 this.$emit("save", editor.getJSON());
                 editor.commands.clearContent();
@@ -136,7 +134,7 @@ export default Vue.extend({
         const ModifyEnter = Extension.create({
             addKeyboardShortcuts() {
                 return {
-                    Enter: (...args) => {
+                    Enter: (..._args) => {
                         saved(this.editor);
                         // return true prevents default behaviour
                         return true;
@@ -233,10 +231,10 @@ export default Vue.extend({
             onUpdate({ editor }) {
                 changed(editor);
             },
-            onBlur({ editor }) {
+            onBlur({ editor: _editor }) {
                 console.log("editor-blur");
             },
-            onFocus({ editor }) {
+            onFocus({ editor: _editor }) {
                 console.log("editor-focus");
                 thisComp.$emit("editor-focus");
             },
@@ -295,7 +293,9 @@ export default Vue.extend({
 });
 </script>
 <style lang="scss">
-@import "../../scss/global";
+@use "src/scss/global";
+@use "src/scss/mixins";
+@use "src/scss/variables";
 
 .tiptap-container {
     width: 100%;
@@ -312,11 +312,11 @@ export default Vue.extend({
     padding-left: 10px;
     padding-right: 80px;
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         max-height: 60vh;
     }
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         padding-right: 60px;
     }
 }
@@ -428,7 +428,7 @@ export default Vue.extend({
             padding: 10px 0;
         }
 
-        @include bp-down($sm) {
+        @include mixins.bp-down(variables.$sm) {
             right: 10px;
         }
 

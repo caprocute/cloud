@@ -145,7 +145,8 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "../../scss/forms.scss";
+@use "src/scss/forms.scss";
+@use "src/scss/mixins";
 
 .form-submit {
     position: relative;
@@ -153,8 +154,8 @@ export default Vue.extend({
 
 .loading-spinner {
     &-wrap {
-        @include position(absolute, 50% null null 50%);
-        @include flex(center, center);
+        @include mixins.position(absolute, 50% null null 50%);
+        @include mixins.flex(center, center);
         transform: translate(-50%, -50%);
     }
 }

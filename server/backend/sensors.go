@@ -267,7 +267,8 @@ func (dq *DataQuerier) GetStationIDs(ctx context.Context, stationIDs []int32) (*
 		FROM fieldkit.station AS s
 		RIGHT JOIN fieldkit.provision AS p ON (s.device_id = p.device_id)
 		RIGHT JOIN fieldkit.station_configuration AS c ON (c.provision_id = p.id)
-		RIGHT JOIN fieldkit.station_module AS m ON (c.id = m.configuration_id)
+		RIGHT JOIN fieldkit.configuration_module AS config_module ON (config_module.configuration_id = c.id)
+		RIGHT JOIN fieldkit.station_module AS m ON (config_module.module_id = m.id)
 		WHERE s.id IN (?)
 	`, stationIDs)
 	if err != nil {

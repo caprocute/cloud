@@ -268,12 +268,11 @@ func (m *ModelAdapter) Save(ctx context.Context, pm *ParsedMessage) (*WebHookSta
 				if !sensorSchema.Transient {
 					// Add or create the sensor..
 					sensor := &data.ModuleSensor{
-						ConfigurationID: configuration.ID,
-						ModuleID:        module.ID,
-						Index:           uint32(index),
-						Name:            sensorSchema.Key,
-						ReadingValue:    nil,
-						ReadingTime:     nil,
+						ModuleID:     module.ID,
+						Index:        uint32(index),
+						Name:         sensorSchema.Key,
+						ReadingValue: nil,
+						ReadingTime:  nil,
 					}
 
 					var parsedReading *ParsedReading
