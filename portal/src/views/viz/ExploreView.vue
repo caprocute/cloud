@@ -88,7 +88,6 @@ export default Vue.extend({
         async refreshBookmarkFromToken(): Promise<void> {
             const token = this.token;
             // console.log(`viz: bookmark-resolving`, token);
-
             try {
                 if (!this.resolved[token] && token) {
                     const savedBookmark = await this.$services.api.resolveBookmark(token);
@@ -109,6 +108,7 @@ export default Vue.extend({
                 const savedBookmark = await this.$services.api.saveBookmark(encoded);
                 Vue.set(this.bookmarkToToken, encoded, savedBookmark.token);
                 Vue.set(this.resolved, savedBookmark.token, bookmark);
+                await this.$store.dispatch(ActionTypes.SET_DISCUSSION_PERMISSIONS, savedBookmark.permissions);
                 // console.log(`viz: open-bookmark-saved`, savedBookmark.token);
             }
             await this.$router.push({ name: "exploreShortBookmark", query: { v: this.bookmarkToToken[encoded] } });
