@@ -9,6 +9,8 @@ import { Graph, StationTreeOption, SensorTreeOption, Workspace, FastTime, TimeZo
 import { vueTickHack } from "@/utilities";
 import chartStyles from "./vega/chartStyles";
 import { getPartnerCustomization } from "@/views/shared/partners";
+import * as ActionTypes from "@/store/actions";
+import { UPDATE_VIZ_STATION } from "@/store/actions";
 
 interface VueDatepickerStyles {
     // This type might be extended with other customizations, it was found at https://github.com/nathanreyes/v-calendar/issues/531
@@ -63,6 +65,10 @@ export const SensorSelectionRow = Vue.extend({
             type: Array as PropType<StationTreeOption[]>,
             required: true,
         },
+        index: {
+            type: Number,
+            required: true,
+        },
     },
     computed: {
         selectedStation(): string | null {
@@ -89,12 +95,16 @@ export const SensorSelectionRow = Vue.extend({
             return !(window.screen.availWidth <= 768);
         },
     },
+    mounted() {
+        this.storePreselectedOptions();
+    },
     methods: {
         raiseChangeStation(node: StationTreeOption): void {
             vueTickHack(() => {
                 if (!node.stationId) throw new Error();
                 const newSeries = this.workspace.makeSeries(Number(node.stationId), null);
                 console.log("raising viz-change-series", newSeries);
+                this.$store.dispatch(ActionTypes.UPDATE_VIZ_STATION, { index: this.index, stationName: node.label });
                 this.$emit("viz-change-series", newSeries);
             });
         },
@@ -104,8 +114,25 @@ export const SensorSelectionRow = Vue.extend({
                 if (!node.sensorId) throw new Error();
                 const newSeries = this.workspace.makeSeries(node.stationId || this.ds.stationId, [node.moduleId, node.sensorId]);
                 console.log("raising viz-change-series", newSeries);
+                this.$store.dispatch(ActionTypes.UPDATE_VIZ_SENSOR, { index: this.index, sensorName: node.label });
                 this.$emit("viz-change-series", newSeries);
             });
+        },
+        storePreselectedOptions() {
+            const stationName = this.stationOptions
+                .flatMap((option) => option.children || [])
+                .find((child) => child.id === this.selectedStation)?.label;
+
+            const sensorName = this.sensorOptions
+                .map((option) => (option.id === this.selectedSensor ? option : option.children || []))
+                .flat()
+                .find((child) => child.id === this.selectedSensor)?.label;
+
+            if (stationName && sensorName) {
+                this.$store.dispatch(ActionTypes.UPDATE_VIZ_STATION, { index: this.index, stationName: stationName }).then(() => {
+                    this.$store.dispatch(ActionTypes.UPDATE_VIZ_SENSOR, { index: this.index, sensorName: sensorName });
+                });
+            }
         },
     },
     template: `
@@ -180,6 +207,7 @@ export const SelectionControls = Vue.extend({
             const newParams = this.viz.removeSeries(index);
             this.viz.log("raise viz-change-sensors", newParams);
             this.$emit("viz-change-sensors", newParams);
+            this.$store.dispatch(ActionTypes.RESET_VIZ_STATION_SENSOR_SELECTION);
         },
         getKeyColor(idx) {
             const color = idx === 0 ? chartStyles.primaryLine.stroke : chartStyles.secondaryLine.stroke;
@@ -190,7 +218,7 @@ export const SelectionControls = Vue.extend({
 		<div class="left half">
             <div class="row" v-for="(ds, index) in viz.dataSets" v-bind:key="index">
                 <div class="tree-key" :style="{color: getKeyColor(index)}">&#9632;</div>
-                <SensorSelectionRow :viz="viz" :ds="ds" :workspace="workspace" :stationOptions="stationOptions" :sensorOptions="sensorOptions(ds.vizSensor)" @viz-change-series="(newSeries) => raiseChangeSeries(index, newSeries)"/>
+                <SensorSelectionRow :viz="viz" :ds="ds" :workspace="workspace" :stationOptions="stationOptions" :sensorOptions="sensorOptions(ds.vizSensor)" :index="index" @viz-change-series="(newSeries) => raiseChangeSeries(index, newSeries)"/>
                 <div class="actions" v-if="showAdd || showRemove">
                     <div class="button" :alt="$t('dataView.stationTree.add')" @click="() => addSeries()" v-if="showAdd"> {{ $t('dataView.stationTree.add') }} </div>
                     <div class="button" :alt="$t('dataView.stationTree.remove')" @click="() => removeSeries(index)" v-if="showRemove"> {{ $t('dataView.stationTree.remove') }} </div>
@@ -384,7 +412,7 @@ export const ViewingControls = Vue.extend({
 				<div class="right time">
                     <div class="fast-time-container">
                         <span class="view-by"> {{ $t('dataView.viewBy.btn') }}</span>
-                        <div class="fast-time" @click="ev => raiseFastTime(ev, 1)" v-bind:class="{ selected: viz.fastTime == 1 }"> {{ $t('dataView.viewBy.btn') }}</div>
+                        <div class="fast-time" @click="ev => raiseFastTime(ev, 1)" v-bind:class="{ selected: viz.fastTime == 1 }"> {{ $t('dataView.viewBy.day') }}</div>
                         <div class="fast-time" @click="ev => raiseFastTime(ev, 7)" v-bind:class="{ selected: viz.fastTime == 7 }"> {{ $t('dataView.viewBy.week') }}</div>
                         <div class="fast-time" @click="ev => raiseFastTime(ev, 14)" v-bind:class="{ selected: viz.fastTime == 14 }"> 2 {{ $t('dataView.viewBy.week') }}</div>
                         <div class="fast-time" @click="ev => raiseFastTime(ev, 30)" v-bind:class="{ selected: viz.fastTime == 30 }"> {{ $t('dataView.viewBy.month') }}</div>
@@ -430,7 +458,7 @@ export const ViewingControls = Vue.extend({
                 <SelectionControls :viz="viz" :workspace="workspace" @viz-change-sensors="raiseChangeSensors" />
 
 				<div class="right half" v-if="chartTypes.length > 1">
-                    <div class="chart-type">
+                    <div class="chart-type" :class="{ disabled: viz.isDataSetEmpty() }">
                         <treeselect :disabled="viz.busy" :options="chartTypes" :value="selectedChartType" open-direction="bottom" @select="raiseChangeChartType" :clearable="false" />
                     </div>
 				</div>

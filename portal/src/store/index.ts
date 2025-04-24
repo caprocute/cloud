@@ -32,8 +32,10 @@ import * as MutationTypes from "./mutations";
 import * as ActionTypes from "./actions";
 import { notes } from "@/store/modules/notes";
 import { snackbar } from "@/store/modules/snackbar";
-import {fieldNotes} from '@/store/modules/fieldNotes';
-import {dirty} from '@/store/modules/dirty';
+import { fieldNotes } from '@/store/modules/fieldNotes';
+import { dirty } from '@/store/modules/dirty';
+import { viz } from '@/store/modules/viz';
+import { exploreView } from '@/store/modules/exploreView';
 
 export { MutationTypes, ActionTypes };
 
@@ -86,6 +88,8 @@ export default function (services: Services) {
             snackbar: snackbar(),
             discussion: dataEvents(services),
             dirty: dirty(),
+            viz: viz(),
+            exploreView: exploreView(),
         },
         // This was causing a call stack error (_traverse)
         strict: process.env.NODE_ENV !== "production",

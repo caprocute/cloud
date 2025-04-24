@@ -34,7 +34,11 @@ export * from "./common";
 
 type SensorReadAtType = string;
 
-const localeKey = (localStorage.getItem("locale") as Locales)?.replace("-", "");
+function getLocaleKey(): string {
+    return (localStorage.getItem("locale") as Locales)?.replace("-", "");
+}
+
+let localeKey = getLocaleKey();
 
 function getString(d) {
     return d[localeKey] || d["enUS"] || d["enUs"] || d["en-US"]; // HACK
@@ -947,6 +951,7 @@ export class Workspace implements VizInfoFactory {
 
         // console.log(`viz:vizInfo:sensor`, details);
 
+        localeKey = getLocaleKey(); // retrieve it again in case it was changed
         const strings = getString(details.strings);
         const chartLabel = strings.chartLabel ? strings.chartLabel : strings.label;
         const axisLabel = strings.axisLabel ? strings.axisLabel : strings.label;

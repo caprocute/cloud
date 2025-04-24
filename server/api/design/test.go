@@ -5,41 +5,9 @@ import (
 )
 
 var _ = Service("test", func() {
-	Method("get", func() {
-		Payload(func() {
-			Attribute("id", Int64)
-		})
-
+	Method("noop", func() {
 		HTTP(func() {
-			GET("test/{id}")
-		})
-	})
-
-	Method("error", func() {
-		HTTP(func() {
-			GET("test/error")
-		})
-	})
-
-	Method("email", func() {
-		Security(JWTAuth, func() {
-			Scope("api:access")
-		})
-
-		Payload(func() {
-			Token("auth")
-			Attribute("address")
-			Required("auth", "address")
-		})
-
-		Result(Empty)
-
-		HTTP(func() {
-			GET("test/email")
-			Param("address")
-			Header("auth:Authorization", String, "authentication token", func() {
-				Pattern("^Bearer [^ ]+$")
-			})
+			GET("test/noop")
 		})
 	})
 

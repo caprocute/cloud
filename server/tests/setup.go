@@ -78,6 +78,19 @@ func NewTestEnv() (e *TestEnv, err error) {
 			return nil, err
 		}
 
+		if _, err := originalDb.ExecContext(ctx, fmt.Sprintf("ALTER DATABASE %s SET search_path TO \"$user\", fieldkit, public", databaseName)); err != nil {
+			return nil, err
+		}
+
+		newDb, err := sqlxcache.Open(ctx, "postgres", testUrl)
+		if err != nil {
+			return nil, err
+		}
+
+		if _, err := newDb.ExecContext(ctx, "CREATE EXTENSION postgis WITH SCHEMA public"); err != nil {
+			return nil, err
+		}
+
 		if err := tryMigrate(testUrl); err != nil {
 			return nil, err
 		}

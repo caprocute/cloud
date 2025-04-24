@@ -109,6 +109,9 @@ Allow: /
 `))
 		} else {
 			w.Write([]byte(`
+User-agent: Twitterbot
+Allow: /
+
 User-agent: *
 Disallow: /
 `))

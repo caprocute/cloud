@@ -75,18 +75,20 @@ export default {
         getImageUrl(this: any, project) {
             return this.$config.baseUrl + project.photo;
         },
-        onAccept(this: any, ev: any) {
+        async onAccept(this: any, ev: any) {
             console.log("accept", ev);
-            return this.$store.dispatch(ActionTypes.ACCEPT_PROJECT, { projectId: this.project.id }).then(() => {
+            const success = await this.$store.dispatch(ActionTypes.ACCEPT_PROJECT, { projectId: this.project.id });
+            if (success) {
                 this.accepted = true;
                 this.visible = false;
-            });
+            }
         },
-        onDecline(this: any, ev: any) {
+        async onDecline(this: any, ev: any) {
             console.log("decline", ev);
-            return this.$store.dispatch(ActionTypes.DECLINE_PROJECT, { projectId: this.project.id }).then(() => {
+            const success = await this.$store.dispatch(ActionTypes.DECLINE_PROJECT, { projectId: this.project.id });
+            if (success) {
                 this.visible = false;
-            });
+            }
         },
     },
 };
@@ -198,6 +200,7 @@ export default {
     border: solid 1px #cccdcf;
     white-space: nowrap;
     flex-grow: 1;
+    cursor: pointer;
     @include flex(center);
 }
 .invited-container .reject {
@@ -206,6 +209,7 @@ export default {
     color: #2c3e50;
     white-space: nowrap;
     flex-grow: 1;
+    cursor: pointer;
     @include flex(center);
 
     span {
