@@ -29,14 +29,14 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "../../scss/mixins";
+@use "src/scss/mixins";
 
 .vue-sound-wrapper {
     flex: 1;
 }
 
 ::v-deep .vue-sound__player {
-    @include flex(center);
+    @include mixins.flex(center);
 }
 
 ::v-deep .vue-sound__playback-time-wrapper {

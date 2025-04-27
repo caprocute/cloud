@@ -10,7 +10,6 @@ import { toSingleValue } from "@/utilities";
 
 export default Vue.extend({
     async mounted(): Promise<void> {
-        const p = this.$route.query;
         if (this.$route.params.token) {
             await this.$store.dispatch(new ResumeAction(this.$route.params.token));
             await this.leaveAfterAuth();

@@ -71,6 +71,24 @@ func sensorDataBatch(ctx context.Context, j *gue.Job, services *BackgroundServic
 	return handler.Handle(ctx, message, j, mc)
 }
 
+func popMergeQueue(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage, mc *jobs.MessageContext) error {
+	message := &messages.PopMergeQueue{}
+	if err := json.Unmarshal(*tm.Body, message); err != nil {
+		return err
+	}
+	handler := NewMergeModulesHandler(services.database, services.metrics, services.publisher, services.timeScaleConfig)
+	return handler.PopQueue(ctx, message, j, mc)
+}
+
+func mergeModules(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage, mc *jobs.MessageContext) error {
+	message := &messages.MergeModules{}
+	if err := json.Unmarshal(*tm.Body, message); err != nil {
+		return err
+	}
+	handler := NewMergeModulesHandler(services.database, services.metrics, services.publisher, services.timeScaleConfig)
+	return handler.Merge(ctx, message, j, mc)
+}
+
 func sensorDataModified(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage, mc *jobs.MessageContext) error {
 	message := &messages.SensorDataModified{}
 	if err := json.Unmarshal(*tm.Body, message); err != nil {
@@ -94,13 +112,6 @@ func Register(ctx context.Context, services *BackgroundServices, work map[string
 	name := messageType.Name()
 
 	work[name] = wrapTransportMessage(services, wrapTransactionScope(func(ctx context.Context, j *gue.Job, services *BackgroundServices, tm *jobs.TransportMessage, mc *jobs.MessageContext) error {
-		/*
-			v := reflect.New(messageType)
-			m := v.Interface()
-			if err := json.Unmarshal(tm.Body, m); err != nil {
-				return err
-			}
-		*/
 		return handler(ctx, j, services, tm, mc)
 	}))
 
@@ -220,6 +231,8 @@ func CreateMap(ctx context.Context, services *BackgroundServices) gue.WorkMap {
 	Register(ctx, services, work, messages.RefreshStation{}, refreshStation)
 	Register(ctx, services, work, messages.ExportData{}, exportData)
 	Register(ctx, services, work, messages.SensorDataBatch{}, sensorDataBatch)
+	Register(ctx, services, work, messages.MergeModules{}, mergeModules)
+	Register(ctx, services, work, messages.PopMergeQueue{}, popMergeQueue)
 	Register(ctx, services, work, messages.SensorDataModified{}, sensorDataModified)
 	Register(ctx, services, work, messages.StationLocationUpdated{}, describeStationLocation)
 

@@ -2,9 +2,9 @@ import _ from "lodash";
 import { ChartSettings, SeriesData } from "./SpecFactory";
 import { TimeRange, addGaps, addMinimumGap } from "../common";
 import { VisualizationSpec } from "vega-embed";
-import {Spec, Mark, Locale} from "vega";
-import {vegaEsLocale} from '@/locales/es/vega';
-import {Locales} from '@/views/shared/LanguageSelector.vue';
+import { Mark, Locale } from "vega";
+import { vegaEsLocale } from "@/locales/es/vega";
+import { Locales } from "@/views/shared/LanguageSelector.vue";
 
 export { ChartSettings };
 
@@ -17,7 +17,7 @@ export class ScrubberSpecFactory {
     ) {}
 
     private getLocaleConfig(): Locale | undefined {
-        const localeKey = localStorage.getItem('locale');
+        const localeKey = localStorage.getItem("locale");
         if (localeKey === Locales.esEs) {
             return vegaEsLocale as Locale;
         }
@@ -147,13 +147,6 @@ export class ScrubberSpecFactory {
                 },
             ];
         };
-
-        const localeKey = localStorage.getItem('locale');
-        let localeConfig: Locale | undefined;
-
-        if (localeKey === Locales.esEs) {
-            localeConfig = vegaEsLocale as Locale;
-        }
 
         return {
             $schema: "https://vega.github.io/schema/vega/v5.json",

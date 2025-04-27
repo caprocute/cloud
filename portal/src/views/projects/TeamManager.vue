@@ -239,18 +239,19 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "../../scss/mixins";
+@use "src/scss/mixins";
+@use "src/scss/variables";
 
 .manage-team-container {
     margin-top: 25px;
     display: flex;
     flex-direction: column;
-    border: 1px solid $color-border;
+    border: 1px solid variables.$color-border;
     border-radius: 1px;
     background: white;
     padding: 25px 20px;
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         padding: 15px 10px 40px;
     }
 }
@@ -260,12 +261,12 @@ export default Vue.extend({
     font-weight: 500;
     margin-bottom: 20px;
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         margin-bottom: 5px;
     }
 
     body.floodnet & {
-        font-family: $font-family-floodnet-bold;
+        font-family: variables.$font-family-floodnet-bold;
     }
 }
 .invite-button {
@@ -279,7 +280,7 @@ export default Vue.extend({
     cursor: pointer;
 
     body.floodnet & {
-        font-family: $font-family-floodnet-button;
+        font-family: variables.$font-family-floodnet-button;
     }
 }
 
@@ -298,25 +299,25 @@ export default Vue.extend({
         .cell {
             &:nth-of-type(1),
             &:nth-of-type(2) {
-                @include bp-down($sm) {
+                @include mixins.bp-down(variables.$sm) {
                     padding-right: 85px;
                 }
             }
 
             &:nth-of-type(3) {
-                @include bp-down($sm) {
-                    @include position(absolute, 50% 0 null null);
+                @include mixins.bp-down(variables.$sm) {
+                    @include mixins.position(absolute, 50% 0 null null);
                     transform: translateY(-50%);
                 }
             }
         }
     }
 
-    @include bp-down($lg) {
+    @include mixins.bp-down(variables.$lg) {
         grid-template-columns: 2fr 1fr 1fr 0.5fr;
     }
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         grid-template-columns: repeat(auto-fit, 100%);
         padding: 3px 0 8px;
     }
@@ -332,9 +333,9 @@ export default Vue.extend({
             justify-content: flex-end;
             padding: 0 20px;
 
-            @include bp-down($sm) {
+            @include mixins.bp-down(variables.$sm) {
                 padding: 0;
-                @include position(absolute, 14px 0 null null);
+                @include mixins.position(absolute, 14px 0 null null);
             }
         }
     }
@@ -345,23 +346,23 @@ export default Vue.extend({
     font-family: var(--font-family-bold);
 
     &:nth-of-type(2) {
-        @include bp-down($sm) {
+        @include mixins.bp-down(variables.$sm) {
             display: none;
         }
     }
 
     body.floodnet & {
-        font-family: $font-family-floodnet-bold;
+        font-family: variables.$font-family-floodnet-bold;
     }
 }
 
 .user-row .cell {
-    @include flex(center);
+    @include mixins.flex(center);
     line-height: 1.23;
 
     &:nth-of-type(2),
     &:nth-of-type(3) {
-        @include bp-down($sm) {
+        @include mixins.bp-down(variables.$sm) {
             padding-left: 41px;
         }
     }
@@ -387,7 +388,7 @@ export default Vue.extend({
     color: #c42c44;
     display: block;
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         padding: 0 0 8px 42px;
     }
 }

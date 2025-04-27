@@ -314,20 +314,18 @@ import _ from "lodash";
 import Vue, { PropType } from "vue";
 import CommonComponents from "@/views/shared";
 import moment from "moment";
-import { DataEventsErrorsEnum, NewComment, NewDataEvent } from "@/views/comments/model";
+import { NewComment, NewDataEvent } from "@/views/comments/model";
 import { Comment, DataEvent, DiscussionBase } from "@/views/comments/model";
 import { CurrentUser, ProjectUser } from "@/api";
-import { CommentsErrorsEnum } from "@/views/comments/model";
 import ListItemOptions from "@/views/shared/ListItemOptions.vue";
 import Tiptap from "@/views/shared/Tiptap.vue";
 import { deserializeBookmark, Workspace } from "../viz/viz";
 import SectionToggle from "@/views/shared/SectionToggle.vue";
 import { Bookmark } from "@/views/viz/viz";
 import { TimeRange } from "@/views/viz/common";
-import { ActionTypes, DisplayProject } from "@/store";
-import { interpolatePartner, isCustomisationEnabled } from "@/views/shared/partners";
+import { ActionTypes } from "@/store";
+import { interpolatePartner } from "@/views/shared/partners";
 import InfoTooltip from "@/views/shared/InfoTooltip.vue";
-import { PortalStationFieldNotes } from "@/views/fieldNotes/model";
 import { SnackbarStyle } from "@/store/modules/snackbar";
 
 export default Vue.extend({
@@ -896,7 +894,9 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
-@import "../../scss/global";
+@use "src/scss/global";
+@use "src/scss/mixins";
+@use "src/scss/variables";
 
 button {
     padding: 0;
@@ -921,10 +921,10 @@ button {
     padding: 0 0 30px 0;
     background: #fff;
     border-radius: 1px;
-    border: 1px solid $color-border;
+    border: 1px solid variables.$color-border;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.05);
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         margin: 20px -10px 0;
         padding: 0 0 30px 0;
     }
@@ -938,13 +938,13 @@ button {
 }
 
 header {
-    @include flex(center, space-between);
+    @include mixins.flex(center, space-between);
     padding: 13px 20px;
-    border-bottom: 1px solid $color-border;
+    border-bottom: 1px solid variables.$color-border;
     font-size: 20px;
     font-weight: 500;
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         padding: 13px 10px;
     }
 
@@ -955,17 +955,17 @@ header {
     }
 
     body.floodnet & {
-        font-family: $font-family-floodnet-bold;
+        font-family: variables.$font-family-floodnet-bold;
     }
 }
 
 .subheader {
-    @include flex(center, space-between);
-    border-top: 1px solid $color-border;
-    border-bottom: 1px solid $color-border;
+    @include mixins.flex(center, space-between);
+    border-top: 1px solid variables.$color-border;
+    border-bottom: 1px solid variables.$color-border;
     padding: 15px 20px;
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         padding: 15px 10px;
     }
 
@@ -980,20 +980,20 @@ header {
 
     .data-view & {
         margin-top: 30px;
-        @include bp-down($xs) {
+        @include mixins.bp-down(variables.$xs) {
             margin-top: 10px;
         }
     }
 }
 
 ::v-deep .new-comment {
-    @include flex(flex-start);
+    @include mixins.flex(flex-start);
     padding: 22px 20px;
     position: relative;
     margin-left: 20px;
     margin-right: 20px;
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         margin: 0 -10px;
         padding: 15px 10px;
     }
@@ -1038,7 +1038,7 @@ header {
             width: 46px;
             height: 46px;
 
-            @include bp-down($xs) {
+            @include mixins.bp-down(variables.$xs) {
                 width: 42px;
                 height: 42px;
             }
@@ -1075,7 +1075,7 @@ header {
 // }
 
 .comments-counter {
-    font-family: $font-family-light;
+    font-family: variables.$font-family-light;
 }
 
 .author {
@@ -1086,9 +1086,9 @@ header {
 
 .body {
     max-width: unset;
-    font-family: $font-family-light;
+    font-family: variables.$font-family-light;
     outline: none;
-    border: solid 1px $color-border;
+    border: solid 1px variables.$color-border;
     width: calc(100% - 40px);
     overflow-wrap: break-word;
 
@@ -1100,19 +1100,19 @@ header {
 }
 
 .comment {
-    @include flex(flex-start);
+    @include mixins.flex(flex-start);
     flex: 100%;
     padding: 15px 20px 0 20px;
     position: relative;
     flex-wrap: wrap;
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         padding: 15px 10px 0 10px;
         scroll-margin-top: 50px;
     }
 
     &-first-level {
-        border-bottom: 1px solid $color-border;
+        border-bottom: 1px solid variables.$color-border;
     }
 
     &::v-deep .default-user-icon {
@@ -1147,7 +1147,7 @@ header {
 }
 
 .column {
-    @include flex(flex-start);
+    @include mixins.flex(flex-start);
     width: 100%;
     flex-direction: column;
     position: relative;
@@ -1160,12 +1160,12 @@ header {
 .actions {
     margin: 15px 0;
     user-select: none;
-    @include flex();
+    @include mixins.flex();
 
     button {
         font-weight: 500;
         margin-right: 20px;
-        @include flex(center);
+        @include mixins.flex(center);
     }
 
     .icon {
@@ -1184,7 +1184,7 @@ header {
 }
 
 .timestamp {
-    font-family: $font-family-light;
+    font-family: variables.$font-family-light;
     flex-shrink: 0;
     margin-left: auto;
     line-height: 1.5;
@@ -1213,7 +1213,7 @@ header {
         font-size: 12px;
         margin-left: 5px;
 
-        @include bp-up($md) {
+        @include mixins.bp-up(variables.$md) {
             margin-top: -2px;
         }
     }
@@ -1224,7 +1224,7 @@ header {
     margin-left: 8px;
     margin-right: 10px;
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         margin-left: 0;
     }
 
@@ -1251,7 +1251,7 @@ header {
         margin-top: 5px;
     }
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         margin-left: 10px;
     }
 }
@@ -1266,7 +1266,7 @@ header {
         display: none;
     }
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         flex-direction: column;
 
         label {
@@ -1294,7 +1294,7 @@ header {
     border-radius: 3px;
     flex: 1;
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         width: calc(100% - 20px);
         height: auto;
         margin-right: 10px;
@@ -1304,7 +1304,7 @@ header {
     p {
         margin-left: 30px;
 
-        @include bp-down($xs) {
+        @include mixins.bp-down(variables.$xs) {
             display: none;
         }
     }
@@ -1350,7 +1350,7 @@ header {
 .icon-view-data {
     &::before {
         body.floodnet & {
-            color: $color-floodnet-dark;
+            color: variables.$color-floodnet-dark;
         }
     }
 }

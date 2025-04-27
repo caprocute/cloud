@@ -4,7 +4,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import {  default as vegaEmbed, VisualizationSpec } from "vega-embed";
+import { default as vegaEmbed, VisualizationSpec } from "vega-embed";
 
 import { SeriesData } from "../viz";
 import { ChartSettings } from "./SpecFactory";
