@@ -3198,8 +3198,8 @@ func EncodeProjectsStationRequest(encoder func(*http.Request) goahttp.Encoder) f
 		if !ok {
 			return goahttp.ErrInvalidType("project", "projects station", "*project.ProjectsStationPayload", v)
 		}
-		{
-			head := p.Auth
+		if p.Auth != nil {
+			head := *p.Auth
 			if !strings.Contains(head, " ") {
 				req.Header.Set("Authorization", "Bearer "+head)
 			} else {
@@ -3243,13 +3243,13 @@ func DecodeProjectsStationResponse(decoder func(*http.Response) goahttp.Decoder,
 			if err != nil {
 				return nil, goahttp.ErrDecodingError("project", "projects station", err)
 			}
-			p := NewProjectsStationProjectsOK(&body)
+			p := NewProjectsStationProjectsBasicOK(&body)
 			view := "default"
-			vres := &projectviews.Projects{Projected: p, View: view}
-			if err = projectviews.ValidateProjects(vres); err != nil {
+			vres := &projectviews.ProjectsBasic{Projected: p, View: view}
+			if err = projectviews.ValidateProjectsBasic(vres); err != nil {
 				return nil, goahttp.ErrValidationError("project", "projects station", err)
 			}
-			res := project.NewProjects(vres)
+			res := project.NewProjectsBasic(vres)
 			return res, nil
 		case http.StatusUnauthorized:
 			var (
@@ -3435,6 +3435,18 @@ func marshalProjectBoundsRequestBodyRequestBodyToProjectProjectBounds(v *Project
 		for i, val := range v.Max {
 			res.Max[i] = val
 		}
+	}
+
+	return res
+}
+
+// unmarshalProjectBasicResponseBodyToProjectviewsProjectBasicView builds a
+// value of type *projectviews.ProjectBasicView from a value of type
+// *ProjectBasicResponseBody.
+func unmarshalProjectBasicResponseBodyToProjectviewsProjectBasicView(v *ProjectBasicResponseBody) *projectviews.ProjectBasicView {
+	res := &projectviews.ProjectBasicView{
+		ID:   v.ID,
+		Name: v.Name,
 	}
 
 	return res

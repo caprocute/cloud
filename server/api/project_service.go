@@ -1024,18 +1024,11 @@ func ProjectsType(signer *Signer, projects []*data.Project, followers []*data.Fo
 	}, nil
 }
 
-func (c *ProjectService) ProjectsStation(ctx context.Context, payload *project.ProjectsStationPayload) (*project.Projects, error) {
-	relationships := make(map[int32]*data.UserProjectRelationship)
 
-	p, err := NewPermissions(ctx, c.options).Unwrap()
+func (c *ProjectService) ProjectsStation(ctx context.Context, payload *project.ProjectsStationPayload) (*project.ProjectsBasic, error) {
+	_, err := NewPermissions(ctx, c.options).Unwrap()
 	if err != nil {
 		return nil, err
-	}
-	if !p.Anonymous() {
-		relationships, err = c.projects.QueryUserProjectRelationships(ctx, p.UserID())
-		if err != nil {
-			return nil, err
-		}
 	}
 
 	projects, err := c.projects.QueryProjectsByStationIDForPermissions(ctx, payload.ID)
@@ -1056,14 +1049,16 @@ func (c *ProjectService) ProjectsStation(ctx context.Context, payload *project.P
 		}
 	}
 
-	followers := []*data.FollowersSummary{}
-	if err := c.options.Database.SelectContext(ctx, &followers, `
-		SELECT f.project_id, COUNT(f.*) AS followers FROM fieldkit.project_follower AS f WHERE f.project_id IN (
-			SELECT id FROM fieldkit.project WHERE privacy = $1 ORDER BY community_ranking DESC LIMIT 10
-		) GROUP BY f.project_id
-		`, data.Public); err != nil {
-		return nil, err
+	basicProjects := make([]*project.ProjectBasic, 0)
+	for _, proj := range filteredProjects {
+		basicProject := &project.ProjectBasic{
+			ID:   proj.ID,
+			Name: proj.Name,
+		}
+		basicProjects = append(basicProjects, basicProject)
 	}
 
-	return ProjectsType(c.options.signer, filteredProjects, followers, relationships)
+	return &project.ProjectsBasic{
+		Projects: basicProjects,
+	}, nil
 }

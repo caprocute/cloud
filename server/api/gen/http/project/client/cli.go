@@ -711,9 +711,11 @@ func BuildProjectsStationPayload(projectProjectsStationID string, projectProject
 			return nil, fmt.Errorf("invalid value for id, must be INT32")
 		}
 	}
-	var auth string
+	var auth *string
 	{
-		auth = projectProjectsStationAuth
+		if projectProjectsStationAuth != "" {
+			auth = &projectProjectsStationAuth
+		}
 	}
 	v := &project.ProjectsStationPayload{}
 	v.ID = id

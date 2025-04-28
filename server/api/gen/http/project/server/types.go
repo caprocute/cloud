@@ -184,7 +184,7 @@ type DownloadPhotoResponseBody struct {
 // ProjectsStationResponseBody is the type of the "project" service "projects
 // station" endpoint HTTP response body.
 type ProjectsStationResponseBody struct {
-	Projects ProjectResponseBodyCollection `form:"projects" json:"projects" xml:"projects"`
+	Projects ProjectBasicResponseBodyCollection `form:"projects" json:"projects" xml:"projects"`
 }
 
 // AddUpdateUnauthorizedResponseBody is the type of the "project" service "add
@@ -1899,6 +1899,16 @@ type ProjectFollowingResponseBody struct {
 	Following bool  `form:"following" json:"following" xml:"following"`
 }
 
+// ProjectBasicResponseBodyCollection is used to define fields on response body
+// types.
+type ProjectBasicResponseBodyCollection []*ProjectBasicResponseBody
+
+// ProjectBasicResponseBody is used to define fields on response body types.
+type ProjectBasicResponseBody struct {
+	ID   int32  `form:"id" json:"id" xml:"id"`
+	Name string `form:"name" json:"name" xml:"name"`
+}
+
 // ProjectBoundsRequestBodyRequestBody is used to define fields on request body
 // types.
 type ProjectBoundsRequestBodyRequestBody struct {
@@ -2082,12 +2092,12 @@ func NewDownloadPhotoResponseBody(res *projectviews.DownloadedPhotoView) *Downlo
 
 // NewProjectsStationResponseBody builds the HTTP response body from the result
 // of the "projects station" endpoint of the "project" service.
-func NewProjectsStationResponseBody(res *projectviews.ProjectsView) *ProjectsStationResponseBody {
+func NewProjectsStationResponseBody(res *projectviews.ProjectsBasicView) *ProjectsStationResponseBody {
 	body := &ProjectsStationResponseBody{}
 	if res.Projects != nil {
-		body.Projects = make([]*ProjectResponseBody, len(res.Projects))
+		body.Projects = make([]*ProjectBasicResponseBody, len(res.Projects))
 		for i, val := range res.Projects {
-			body.Projects[i] = marshalProjectviewsProjectViewToProjectResponseBody(val)
+			body.Projects[i] = marshalProjectviewsProjectBasicViewToProjectBasicResponseBody(val)
 		}
 	}
 	return body
@@ -3658,7 +3668,7 @@ func NewDownloadPhotoPayload(projectID int32, size *int32, ifNoneMatch *string, 
 
 // NewProjectsStationPayload builds a project service projects station endpoint
 // payload.
-func NewProjectsStationPayload(id int32, auth string) *project.ProjectsStationPayload {
+func NewProjectsStationPayload(id int32, auth *string) *project.ProjectsStationPayload {
 	v := &project.ProjectsStationPayload{}
 	v.ID = id
 	v.Auth = auth
