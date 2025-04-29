@@ -325,7 +325,7 @@ func (r *StationRepository) queryModuleByHardwareID(ctx context.Context, configu
 	if len(modules) == 1 {
 		return modules[0], nil
 	}
-	return nil, fmt.Errorf("duplicate hardware id in station_modules")
+	return nil, fmt.Errorf("duplicate hardware id in station_modules: %v", hex.EncodeToString(hardwareID))
 }
 
 func (r *StationRepository) UpsertStationModule(ctx context.Context, module *data.StationModule) (*data.StationModule, error) {
@@ -350,9 +350,9 @@ func (r *StationRepository) UpsertStationModule(ctx context.Context, module *dat
 
 		returning = module
 
-		log.Infow("module:inserted", "name", module.Name, "module_id", module.ID, "verbose", true)
+		log.Infow("module:inserted", "name", module.Name, "module_id", module.ID, "hardware_id", hex.EncodeToString(module.HardwareID), "verbose", true)
 	} else {
-		log.Infow("module:existing", "name", returning.Name, "module_id", returning.ID, "verbose", true)
+		log.Infow("module:existing", "name", returning.Name, "module_id", returning.ID, "hardware_id", hex.EncodeToString(module.HardwareID), "verbose", true)
 	}
 
 	if _, err := r.InsertConfigurationModule(ctx, &data.ConfigurationModule{
