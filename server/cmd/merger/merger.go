@@ -213,13 +213,6 @@ func (s *StationMerger) ProcessAllStations(outerCtx context.Context, options *Op
 					if empty {
 						log.Infow("config:empty, deleting", "configuration_id", config.ID)
 
-						/*
-							_, err = tx.ExecContext(ctx, "DELETE FROM visible_configuration WHERE configuration_id = $1", config.ID)
-							if err != nil {
-								return err
-							}
-						*/
-
 						_, err := tx.ExecContext(ctx, "DELETE FROM station_configuration WHERE id = $1", config.ID)
 						if err != nil {
 							return err
@@ -269,40 +262,6 @@ func (s *StationMerger) ProcessAllStations(outerCtx context.Context, options *Op
 	}
 
 	log.Infow("modules", "unique_modules", len(byHardwareID), "deleting", len(deletingModules))
-
-	if false {
-		failed := make([]int64, 0)
-		done := make([]int64, 0)
-		for deletingID, keepingID := range deletingModules {
-			err = s.tsDb.WithNewOwnedTransaction(outerCtx, func(ctx context.Context, tx *sqlx.Tx) error {
-				progress := float64(len(failed)+len(done)) / float64(len(deletingModules))
-				log.Infow("merging", "module_id", deletingID, "keeping_id", keepingID, "progress", progress)
-
-				if false {
-					if err := s.MergeSensorData(ctx, tx, keepingID, deletingID); err != nil {
-						log.Warnf("failed: %v", err)
-						log.Infof("rollback: %v", tx.Rollback())
-						failed = append(failed, deletingID)
-						return nil
-					}
-				}
-
-				done = append(done, deletingID)
-
-				if options.Commit {
-					return tx.Commit()
-				} else {
-					return tx.Rollback()
-				}
-
-			})
-		}
-		if err != nil {
-			return err
-		}
-
-		log.Infow("failed %v", failed)
-	}
 
 	_ = log
 
