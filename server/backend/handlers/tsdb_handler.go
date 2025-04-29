@@ -147,7 +147,7 @@ func (v *TsDBHandler) OnData(ctx context.Context, provision *data.Provision, raw
 					ModuleID:  sm.ID,
 				}
 
-				if !math.IsNaN(value.Value) {
+				if !math.IsNaN(value.Value) && !math.IsInf(value.Value, 0) {
 					if err := v.saveStorage(ctx, db.Time, filtered.Record.Location, &ask, value.Value); err != nil {
 						return fmt.Errorf("error saving: %w", err)
 					}
