@@ -37,7 +37,6 @@
 import Vue from "vue";
 import CommonComponents from "@/views/shared";
 import AudioPlayer from "./AudioPlayer.vue";
-import i18n from "@/i18n";
 
 export default Vue.extend({
     model: {

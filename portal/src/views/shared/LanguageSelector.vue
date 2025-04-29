@@ -47,6 +47,7 @@ export default Vue.extend({
             this.$store.dispatch(ActionTypes.REFRESH_WORKSPACE);
             updateDocumentTitle();
             moment.locale(locale);
+            this.$root.$emit("language-changed");
         },
         onMouseOver(): void {
             if (!isSmallScreen()) {
