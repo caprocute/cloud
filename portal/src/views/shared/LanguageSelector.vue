@@ -81,7 +81,7 @@ export default Vue.extend({
     margin-left: auto;
     user-select: none;
 
-    @include mixins.bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         display: block;
     }
 }
@@ -96,8 +96,8 @@ export default Vue.extend({
     align-items: center;
     box-sizing: border-box;
 
-    @include mixins.mixins.bp-down(variables.variables.$sm) {
-          margin-right: 5px;
+    @include mixins.bp-down(variables.$sm) {
+        margin-right: 5px;
         flex-direction: column;
         height: auto;
         padding: 7px 19px 0;
