@@ -36,8 +36,8 @@ export interface GlobalState {
     readonly snackbar: SnackbarState;
     readonly discussion: DiscussionState;
     readonly dirty: DirtyState;
-    readonly exploreView: ExploreViewState;
     readonly viz: VizState;
+    readonly exploreView: ExploreViewState;
 }
 
 export interface GlobalGetters {

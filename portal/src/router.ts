@@ -658,17 +658,16 @@ export default function routerFactory(store) {
             return { x: 0, y: 0 };
         },
     });
-    
+
     vueRouter = router;
 
     const vueBodyClass = new VueBodyClass(routes);
     router.beforeEach((to, from, next) => {
         vueBodyClass.guard(to, next);
     });
-    
+
     // Global navigation guard to set the page title
-    router.afterEach((to) => {
-        const routeName = to.name;
+    router.afterEach((_to) => {
         updateDocumentTitle();
     });
 
@@ -738,12 +737,10 @@ export default function routerFactory(store) {
 
 export function updateDocumentTitle(): void {
     const routeName = vueRouter ? vueRouter.currentRoute.name : null;
-    
+
     if (routeName) {
         const partnerName = isCustomisationEnabled() ? "FloodNet" : "FieldKit";
-        
         const titleText = i18n.t(`pageTitles.${routeName}`, "", { fallbackWarn: false });
-        
         if (String(titleText) !== `pageTitles.${routeName}`) {
             document.title = `${titleText} - ${partnerName}`;
         } else {

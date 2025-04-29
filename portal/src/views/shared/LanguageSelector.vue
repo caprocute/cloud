@@ -15,9 +15,9 @@
 <script lang="ts">
 import Vue from "vue";
 import { ActionTypes } from "@/store";
-import { isSmallScreen } from "@/utilities";
 import { updateDocumentTitle } from "@/router";
 import moment from "moment";
+import { isSmallScreen } from "@/utilities";
 
 export enum Locales {
     enUS = "en-US",
@@ -44,9 +44,9 @@ export default Vue.extend({
         changeLang(locale: Locales) {
             this.$i18n.locale = locale;
             localStorage.setItem("locale", locale);
-            moment.locale(locale);
-            this.$root.$emit("language-changed");
+            this.$store.dispatch(ActionTypes.REFRESH_WORKSPACE);
             updateDocumentTitle();
+            moment.locale(locale);
         },
         onMouseOver(): void {
             if (!isSmallScreen()) {
@@ -95,8 +95,8 @@ export default Vue.extend({
     align-items: center;
     box-sizing: border-box;
 
-    @include mixins.bp-down(variables.$sm) {
-        margin-right: 0;
+    @include mixins.mixins.bp-down(variables.variables.$sm) {
+          margin-right: 5px;
         flex-direction: column;
         height: auto;
         padding: 7px 19px 0;
@@ -109,7 +109,7 @@ export default Vue.extend({
         bottom: -2px;
     }
 
-    @include attention() {
+    @include mixins.attention() {
         .language-list,
         .triangle {
             visibility: visible;
@@ -126,7 +126,7 @@ export default Vue.extend({
         transition: all 0.33s;
         transform: translateY(-50%);
         cursor: pointer;
-        @include position(absolute, 50% null null calc(100% - 5px));
+        @include mixins.position(absolute, 50% null null calc(100% - 5px));
 
         @include mixins.bp-down(variables.$lg) {
             top: 26px;

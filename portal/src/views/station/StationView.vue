@@ -116,7 +116,7 @@
                 </div>
                 <div>
                     <StationProjects :stationId="station.id"></StationProjects>
-                    <div v-if="photos" class="station-photos">
+                    <div v-if="photos" class="station-photos" :class="{ 'single-photo': photos && photos.length == 1 }">
                         <div class="photo-container" v-for="(n, index) in 4" v-bind:key="index" @click="navigateToPhotos()">
                             <AuthenticatedPhoto v-if="photos[index]" :url="photos[index].url" />
                             <div v-else class="photo-placeholder">

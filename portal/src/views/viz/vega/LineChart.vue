@@ -19,6 +19,7 @@ import { SeriesData, TimeZoom } from "../viz";
 import { ChartSettings } from "./SpecFactory";
 import chartStyles from "./chartStyles";
 import { TimeSeriesSpecFactory } from "./TimeSeriesSpecFactory";
+import Spinner from "@/views/shared/Spinner.vue";
 import ExportChartButton from "@/views/viz/vega/ExportChartButton.vue";
 
 type DragTimeSignal = [number, number] | null;
@@ -82,7 +83,6 @@ export default Vue.extend({
 
             const spec = factory.create();
             const vegaContainer = this.$refs.vegaContainer as HTMLElement;
-
             const vegaInfo = await vegaEmbed(vegaContainer as HTMLElement, spec as VisualizationSpec, {
                 renderer: "svg",
                 tooltip: {
@@ -104,6 +104,30 @@ export default Vue.extend({
             });
 
             this.vega = vegaInfo;
+
+            // Replace vega-embed save as icon with custom button
+            if (!this.settings.tiny) {
+                const saveButtons = document.querySelectorAll("summary");
+
+                saveButtons.forEach((button) => {
+                    if (button.querySelectorAll("span").length === 0) {
+                        const svg = button.querySelector("svg");
+                        if (svg) {
+                            svg.setAttribute("viewBox", "0 0 20 20");
+                            svg.innerHTML =
+                                '<g id="icon_SaveAs" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linecap="round">' +
+                                '<line x1="7.96030045" y1="1" x2="7.96030045" y2="11" id="Path-2" stroke="#2C3E50" stroke-width="1.5" stroke-linejoin="round"></line>' +
+                                '<polyline id="Path-9" stroke="#2C3E50" stroke-width="1.5" stroke-linejoin="bevel" points="12.8961983 6.50366211 8.05585126 11 2.92245537 6.50366211"></polyline>' +
+                                '<polyline id="Path-10" stroke="#2C3E50" stroke-width="1.5" stroke-linejoin="round" points="1 12.5363846 1 16.5 15.1181831 16.5 15.1181831 12.5363846"></polyline>' +
+                                "</g>";
+                            const saveLabel = document.createElement("span");
+                            saveLabel.setAttribute("class", "save-label");
+                            saveLabel.innerHTML = this.$tc("dataView.saveAs");
+                            button.appendChild(saveLabel);
+                        }
+                    }
+                });
+            }
 
             if (!this.settings.tiny) {
                 if (brushable) {

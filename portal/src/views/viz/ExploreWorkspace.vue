@@ -268,11 +268,11 @@ export default Vue.extend({
         await this.$store.dispatch(ActionTypes.SET_REFRESH_WORKSPACE_FN, this.refreshWorkspace);
     },
     methods: {
+        isCustomisationEnabled,
         refreshWorkspace() {
             this.workspace = null;
             this.createWorkspaceIfNecessary();
         },
-        isCustomisationEnabled,
         async onBack() {
             if (this.bookmark.c) {
                 if (this.bookmark.c.map) {

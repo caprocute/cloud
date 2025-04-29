@@ -3,6 +3,7 @@ import Vue from "vue";
 import * as MutationTypes from "../mutations";
 import * as ActionTypes from "../actions";
 import { BoundingRectangle, LngLat, Location } from "../map-types";
+import { SnackbarStyle } from "./snackbar";
 
 import {
     Activity,
@@ -775,10 +776,7 @@ const actions = (services: Services) => {
             const usersReply = await services.api.getUsersByProject(payload.projectId);
             commit(PROJECT_USERS, { projectId: payload.projectId, users: usersReply.users });
         },
-        [ActionTypes.ACCEPT_PROJECT]: async (
-            { commit, dispatch: _dispatch }: { commit: any; dispatch: any },
-            payload: { projectId: number }
-        ) => {
+        [ActionTypes.ACCEPT_PROJECT]: async ({ commit, dispatch }: { commit: any; dispatch: any }, payload: { projectId: number }) => {
             try {
                 await services.api.acceptProjectInvite(payload);
                 commit(PROJECT_INVITATION_ACCEPTED, payload.projectId);
@@ -794,10 +792,7 @@ const actions = (services: Services) => {
                 return false;
             }
         },
-        [ActionTypes.DECLINE_PROJECT]: async (
-            { commit: _commit, dispatch: _dispatch }: { commit: any; dispatch: any },
-            payload: { projectId: number }
-        ) => {
+        [ActionTypes.DECLINE_PROJECT]: async ({ commit, dispatch }: { commit: any; dispatch: any }, payload: { projectId: number }) => {
             try {
                 await services.api.declineProjectInvite(payload);
                 commit(PROJECT_INVITATION_DECLINED, payload.projectId);

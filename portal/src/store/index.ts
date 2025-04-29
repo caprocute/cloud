@@ -58,8 +58,8 @@ export default function (services: Services) {
             snackbar: snackbar(),
             discussion: dataEvents(services),
             dirty: dirty(),
-            exploreView: exploreView(),
             viz: viz(),
+            exploreView: exploreView(),
         },
         // This was causing a call stack error (_traverse)
         strict: process.env.NODE_ENV !== "production",

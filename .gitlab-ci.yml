@@ -185,8 +185,6 @@ build:migrations:
 db:primary:prod:clone:
   stage: db
   image: docker:28.0.2
-  when: manual
-  image: docker:24.0.5
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule"
     - if: $CI_COMMIT_BRANCH  == $CI_DEFAULT_BRANCH
@@ -224,7 +222,7 @@ db:primary:prod:clone-all:
 
 db:ts:prod:clone:
   stage: db
-  image: docker:24.0.5
+  image: docker:28.0.2
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule"
     - if: $CI_COMMIT_BRANCH  == $CI_DEFAULT_BRANCH
