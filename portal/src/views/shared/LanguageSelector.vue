@@ -81,7 +81,7 @@ export default Vue.extend({
     margin-left: auto;
     user-select: none;
 
-    @include bp-down($sm) {
+    @include mixins.bp-down($sm) {
         display: block;
     }
 }
