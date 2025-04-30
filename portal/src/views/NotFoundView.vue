@@ -24,7 +24,8 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "src/scss/mixins";
+@use "src/scss/mixins";
+@use "src/scss/variables";
 
 .not-found {
     &-container {
@@ -56,7 +57,7 @@ export default Vue.extend({
         align-items: center;
         justify-content: center;
 
-        @include bp-down($sm) {
+        @include mixins.bp-down(variables.$sm) {
             width: 100%;
             margin-top: 20px;
         }
@@ -68,7 +69,7 @@ h1 {
     margin-bottom: 20px;
     color: var(--color-dark);
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         font-size: 28px;
     }
 }
@@ -79,7 +80,7 @@ p {
     margin-bottom: 30px;
     color: var(--color-dark);
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         font-size: 16px;
         margin-bottom: 20px;
     }
