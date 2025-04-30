@@ -96,6 +96,7 @@ import {
     ActionTypes,
     BoundingRectangle,
     DisplayStation,
+    DisplayProject,
     GlobalState,
     MappedStations,
     Project,
@@ -154,10 +155,10 @@ export default Vue.extend({
         ...mapState({
             user: (s: GlobalState) => s.user.user,
             userStations: (s: GlobalState) => Object.values(s.stations.user.stations),
-            displayProject() {
-                return this.$getters.projectsById[this.id];
-            },
         }),
+        displayProject(): DisplayProject {
+            return this.$getters.projectsById[this.id];
+        },
         visibleReadings(): VisibleReadings {
             return this.recentMapMode ? VisibleReadings.Last72h : VisibleReadings.Current;
         },
@@ -285,17 +286,19 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "../../scss/project";
-@import "../../scss/global";
+@use "src/scss/project";
+@use "src/scss/global";
+@use "src/scss/mixins";
+@use "src/scss/variables";
 
 .container-map {
     width: 100%;
     height: calc(100% - 157px);
     margin-top: 0;
     overflow: hidden;
-    @include position(absolute, 157px null null 0);
+    @include mixins.position(absolute, 157px null null 0);
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         top: 54px;
         height: calc(100% - 54px);
     }
@@ -309,19 +312,19 @@ export default Vue.extend({
     flex-direction: column;
     border: 1px solid #f4f5f7;
     border-radius: 3px;
-    z-index: $z-index-top;
+    z-index: variables.$z-index-top;
     position: absolute;
     bottom: 80px;
     right: 0;
     box-sizing: border-box;
     background-color: #fcfcfc;
     text-align: left;
-    font-family: $font-family-medium;
+    font-family: variables.$font-family-medium;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.13);
 
     h4 {
         margin: 0 0 0.5em 0;
-        font-family: $font-family-bold;
+        font-family: variables.$font-family-bold;
     }
 
     &.collapsed {
@@ -354,8 +357,8 @@ export default Vue.extend({
     }
 
     .legend-toggle {
-        @include position(absolute, 11px null null -24px);
-        @include flex(center, center);
+        @include mixins.position(absolute, 11px null null -24px);
+        @include mixins.flex(center, center);
         height: 35px;
         width: 24px;
         font-size: 22px;
@@ -385,22 +388,22 @@ export default Vue.extend({
 }
 
 .stations-list {
-    @include flex();
+    @include mixins.flex();
     flex-wrap: wrap;
     padding: 160px 40px;
     width: 100%;
     box-sizing: border-box;
 
-    @include bp-down($md) {
+    @include mixins.bp-down(variables.$md) {
         padding: 100px 20px;
         margin: 30px -20px -20px;
     }
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         justify-content: center;
     }
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         padding: 80px 0px;
         margin: 55px 0 -5px 0;
         transform: translateX(10px);
@@ -420,19 +423,19 @@ export default Vue.extend({
         box-sizing: border-box;
         box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.07);
 
-        @include bp-down($md) {
+        @include mixins.bp-down(variables.$md) {
             padding: 19px 11px;
             flex-basis: calc(50% - 40px);
         }
 
-        @include bp-down($sm) {
+        @include mixins.bp-down(variables.$sm) {
             justify-self: center;
             flex: 1 1 389px;
             max-width: 389px;
             margin: 10px 0;
         }
 
-        @include bp-down($xs) {
+        @include mixins.bp-down(variables.$xs) {
             margin: 5px 0;
             width: auto;
         }
@@ -450,7 +453,7 @@ export default Vue.extend({
 ::v-deep .mapboxgl-ctrl-geocoder {
     margin: 30px 0 0 30px;
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         margin: 61px 0 0 10px;
     }
 }

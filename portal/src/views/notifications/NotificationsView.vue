@@ -14,7 +14,7 @@
                     </span>
                     <span :class="{ active: this.filter === 'mention' }" v-on:click="viewKind('mention')">
                         {{ $t("notifications.filters.mention") }}
-                    </span><!---->
+                    </span>
                 </div>
                 <NotificationsList
                     v-on:notification-click="notificationNavigate"
@@ -29,7 +29,7 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+import Vue from "vue";
 import { mapState, mapGetters } from "vuex";
 import StandardLayout from "../StandardLayout.vue";
 import { GlobalState } from "@/store/modules/global";
@@ -72,6 +72,7 @@ export default Vue.extend({
                         hash: `#comment-id-${notification.postId}`,
                     })
                     .catch((err) => {
+                        console.log(err);
                         return;
                     });
             }
@@ -83,6 +84,7 @@ export default Vue.extend({
                         hash: `#comment-id-${notification.postId}`,
                     })
                     .catch((err) => {
+                        console.log(err);
                         return;
                     });
             }
@@ -92,8 +94,9 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "../../scss/layout";
-@import "../../scss/variables";
+@use "src/scss/layout";
+@use "src/scss/variables";
+@use "src/scss/mixins";
 
 .main-panel h1 {
     font-size: 36px;
@@ -106,9 +109,9 @@ export default Vue.extend({
         background: #fff;
         padding: 24px 24px 112.5px 23px;
         border-radius: 1px;
-        border: solid 1px $color-border;
+        border: solid 1px variables.$color-border;
 
-        @include bp-down($xs) {
+        @include mixins.bp-down(variables.$xs) {
             margin-top: 20px;
             padding: 24px 10px 24px 10px;
         }
@@ -144,7 +147,7 @@ export default Vue.extend({
                     height: 2px;
                     background: #2c3e50;
                     width: 100%;
-                    @include position(absolute, null null -2px 0);
+                    @include mixins.position(absolute, null null -2px 0);
                 }
             }
         }

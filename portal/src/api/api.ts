@@ -933,7 +933,7 @@ class FKApi {
         });
     }
 
-    addStation(data: { name: string; deviceId: string; locationName?: string; statusPb: string; description: string }) {
+    addStation(_data: { name: string; deviceId: string; locationName?: string; statusPb: string; description: string }) {
         return this.invoke({
             auth: Auth.Required,
             method: "POST",
@@ -1694,7 +1694,7 @@ class FKApi {
                 maxDelay: 1000 * 60,
             });
 
-            this.wsBackoff.on("ready", async (number: number, delay: number) => {
+            this.wsBackoff.on("ready", async (_number: number, _delay: number) => {
                 // console.log("ws: ready", number, delay);
 
                 await this.establish(callback, status);

@@ -4,7 +4,7 @@ export class MapState {}
 
 const getters = {};
 
-const actions = (services: Services) => {
+const actions = (_services: Services) => {
     return {};
 };
 

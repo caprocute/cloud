@@ -5,12 +5,11 @@ import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 
 import { TimeRange, VizSensor } from "./common";
-import { Graph, StationTreeOption, SensorTreeOption, Workspace, FastTime, TimeZoom, ChartType, DataSetSeries, NewParams } from "./viz";
+import { Graph, StationTreeOption, SensorTreeOption, Workspace, FastTime, TimeZoom, ChartType, DataSetSeries } from "./viz";
 import { vueTickHack } from "@/utilities";
 import chartStyles from "./vega/chartStyles";
 import { getPartnerCustomization } from "@/views/shared/partners";
 import * as ActionTypes from "@/store/actions";
-import { UPDATE_VIZ_STATION } from "@/store/actions";
 
 interface VueDatepickerStyles {
     // This type might be extended with other customizations, it was found at https://github.com/nathanreyes/v-calendar/issues/531
@@ -458,7 +457,7 @@ export const ViewingControls = Vue.extend({
                 <SelectionControls :viz="viz" :workspace="workspace" @viz-change-sensors="raiseChangeSensors" />
 
 				<div class="right half" v-if="chartTypes.length > 1">
-                    <div class="chart-type">
+                    <div class="chart-type" :class="{ disabled: viz.isDataSetEmpty() }">
                         <treeselect :disabled="viz.busy" :options="chartTypes" :value="selectedChartType" open-direction="bottom" @select="raiseChangeChartType" :clearable="false" />
                     </div>
 				</div>

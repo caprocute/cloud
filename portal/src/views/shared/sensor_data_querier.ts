@@ -1,12 +1,5 @@
-import type { QueryRecentlyResponse, RecentlyAggregatedWindows, ModuleSensorMeta } from "@/api"
-import {
-    FKApi,
-    VizSensor,
-    StationInfoResponse,
-    SensorInfoResponse,
-    SensorsResponse,
-    TailSensorDataResponse,
-} from "@/api";
+import type { QueryRecentlyResponse, RecentlyAggregatedWindows, ModuleSensorMeta } from "@/api";
+import { FKApi, StationInfoResponse, SensorInfoResponse, TailSensorDataResponse } from "@/api";
 
 import { SensorMeta } from "@/store";
 import { promiseAfter } from "@/utilities";

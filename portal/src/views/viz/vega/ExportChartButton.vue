@@ -41,10 +41,9 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+import Vue from "vue";
 import { View } from "vega";
 import html2canvas from "html2canvas";
-import { HTMLElement } from "@tiptap/vue-2";
 
 export default Vue.extend({
     name: "ExportChartButton",

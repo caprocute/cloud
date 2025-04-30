@@ -52,7 +52,7 @@ function makeDefaultRouteForProject(projectId: number) {
         path: "/",
         name: "root",
         component: ProjectBigMap,
-        props: (route) => {
+        props: (_route) => {
             return {
                 id: projectId,
                 forcePublic: false,
@@ -125,7 +125,7 @@ const routes = [
         path: "/spoof",
         name: "spoof",
         component: LoginView,
-        props: (route) => {
+        props: (_route) => {
             return {
                 spoofing: true,
             };
@@ -562,7 +562,7 @@ const routes = [
         path: "/notes",
         name: "viewMyNotes",
         component: NotesView,
-        props: (route) => {
+        props: (_route) => {
             return {};
         },
         meta: {
@@ -594,7 +594,7 @@ const routes = [
         path: "/admin/playground",
         name: "adminPlayground",
         component: Playground,
-        props: (route) => {
+        props: (_route) => {
             return {};
         },
         meta: {
@@ -606,7 +606,7 @@ const routes = [
         path: "/admin",
         name: "adminMain",
         component: AdminMain,
-        props: (route) => {
+        props: (_route) => {
             return {};
         },
         meta: {
@@ -618,7 +618,7 @@ const routes = [
         path: "/admin/users",
         name: "adminUsers",
         component: AdminUsers,
-        props: (route) => {
+        props: (_route) => {
             return {};
         },
         meta: {
@@ -659,7 +659,7 @@ export default function routerFactory(store) {
         mode: "history",
         base: process.env.BASE_URL,
         routes: routes,
-        scrollBehavior(to, from, savedPosition) {
+        scrollBehavior(to, from, _savedPosition) {
             if (to.name == from.name) {
                 return null;
             }
@@ -676,8 +676,7 @@ export default function routerFactory(store) {
     });
 
     // Global navigation guard to set the page title
-    router.afterEach((to) => {
-        const routeName = to.name;
+    router.afterEach((_to) => {
         updateDocumentTitle();
     });
 
@@ -750,9 +749,7 @@ export function updateDocumentTitle(): void {
 
     if (routeName) {
         const partnerName = isCustomisationEnabled() ? "FloodNet" : "FieldKit";
-
         const titleText = i18n.t(`pageTitles.${routeName}`, "", { fallbackWarn: false });
-
         if (String(titleText) !== `pageTitles.${routeName}`) {
             document.title = `${titleText} - ${partnerName}`;
         } else {

@@ -65,7 +65,9 @@ for a in *.xz; do
     echo $a
     xz -dc $a >> restore.sql
 done
-echo 'DELETE FROM fieldkit.gue_jobs;' >> restore.sql
+if [ "${DATABASE}" = "primary" ]; then
+  echo 'DELETE FROM fieldkit.gue_jobs;' >> restore.sql
+fi
 echo 'SET session_replication_role TO default;' >> restore.sql
 
 cat restore.sql | psql ${TEMPORARY_URL} < restore.sql

@@ -37,7 +37,6 @@
 import Vue from "vue";
 import CommonComponents from "@/views/shared";
 import AudioPlayer from "./AudioPlayer.vue";
-import i18n from "@/i18n";
 
 export default Vue.extend({
     model: {
@@ -112,7 +111,8 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "../../scss/mixins";
+@use "src/scss/mixins";
+@use "src/scss/variables";
 
 .attached-audio {
     display: flex;
@@ -130,7 +130,7 @@ export default Vue.extend({
     font-weight: 500;
     margin-right: auto;
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         flex-basis: 100%;
     }
 }
@@ -141,7 +141,7 @@ export default Vue.extend({
     display: flex;
     align-items: center;
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         font-size: 14px;
     }
 }

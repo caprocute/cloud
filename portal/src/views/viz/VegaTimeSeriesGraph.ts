@@ -1,11 +1,10 @@
 import _ from "lodash";
 import Vue from "vue";
 
-import { Graph, Workspace, FastTime, TimeZoom, VizInfo, SeriesData } from "./viz";
+import { Graph, Workspace, FastTime, TimeZoom, SeriesData } from "./viz";
 
 import LineChart from "./vega/LineChart.vue";
 import InfoTooltip from "@/views/shared/InfoTooltip.vue";
-import { ActionTypes } from "@/store";
 
 export const VegaTimeSeriesGraph = Vue.extend({
     name: "VegaTimeSeriesGraph",

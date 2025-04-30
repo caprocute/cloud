@@ -50,8 +50,6 @@
 import Vue from "vue";
 import CommonComponents from "@/views/shared";
 import { required, email, minLength, sameAs } from "vuelidate/lib/validators";
-import { mapState, mapGetters } from "vuex";
-import * as ActionTypes from "@/store/actions";
 import { DisplayStation } from "@/store";
 
 export default Vue.extend({
@@ -157,13 +155,15 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "../../scss/forms";
-@import "../../scss/global";
+@use "src/scss/forms";
+@use "src/scss/global";
+@use "src/scss/mixins";
+@use "src/scss/variables";
 
 .image-container {
     margin-bottom: 33px;
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         margin-bottom: 40px;
     }
 }
@@ -188,7 +188,7 @@ form > div {
 .button-solid {
     margin-top: 25px;
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         width: 100%;
     }
 }

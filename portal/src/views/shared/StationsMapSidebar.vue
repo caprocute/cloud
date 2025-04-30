@@ -115,8 +115,8 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "src/scss/variables";
-@import "src/scss/mixins";
+@use "src/scss/variables";
+@use "src/scss/mixins";
 
 .sidebar {
     height: calc(100% - 88px);
@@ -124,7 +124,7 @@ export default Vue.extend({
     transform: translateX(-100%);
     border: solid 1px #f4f5f7;
     background-color: #fff;
-    z-index: $z-index-top;
+    z-index: variables.$z-index-top;
     text-align: left;
     display: flex;
     flex-direction: column;
@@ -132,7 +132,7 @@ export default Vue.extend({
     margin-top: 1px;
     margin-left: 1px;
 
-    @include bp-down($lg) {
+    @include mixins.bp-down(variables.$lg) {
         border: 0;
     }
 }
@@ -141,7 +141,7 @@ export default Vue.extend({
     position: absolute;
     left: 0;
     top: 140px;
-    z-index: $z-index-top;
+    z-index: variables.$z-index-top;
     padding: 9px 8px;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.13);
     border: solid 1px #f4f5f7;
@@ -158,7 +158,7 @@ export default Vue.extend({
     margin-bottom: 7px;
     color: var(--color-dark);
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         font-size: 16px;
         text-align: center;
     }
@@ -170,7 +170,7 @@ export default Vue.extend({
     max-width: 100%;
     padding: 20px 10px 20px 20px;
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         padding-top: 10px;
     }
 
@@ -190,7 +190,7 @@ export default Vue.extend({
 .button {
     font-weight: 900;
     font-size: 14px;
-    font-family: $font-family-fieldkit-medium;
+    font-family: variables.$font-family-fieldkit-medium;
 }
 
 .station-list-item {
@@ -201,7 +201,7 @@ export default Vue.extend({
     background-color: #fff;
     margin-bottom: 16px;
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         padding: 17px 15px 10px 15px;
     }
 
@@ -236,7 +236,7 @@ export default Vue.extend({
     font-size: 14px;
     color: #000;
     display: flex;
-    align-items: end;
+    align-items: flex-end;
     margin-bottom: 23px;
     user-select: none;
 

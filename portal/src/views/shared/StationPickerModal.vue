@@ -45,7 +45,7 @@ export default Vue.extend({
         },
         filter: {
             type: Function as PropType<(station: DisplayStation) => boolean>,
-            default: (station) => true,
+            default: (_station) => true,
         },
     },
     methods: {
@@ -57,7 +57,8 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "../../scss/mixins";
+@use "src/scss/mixins";
+@use "src/scss/variables";
 
 .modal-mask {
     position: fixed;
@@ -89,16 +90,16 @@ export default Vue.extend({
     transition: all 0.3s ease;
     font-family: Helvetica, Arial, sans-serif;
 
-    @include bp-down($md) {
+    @include mixins.bp-down(variables.$md) {
         width: unset;
     }
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         width: unset;
         padding: 60px 30px 35px;
     }
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         max-width: 100%;
         padding: 40px 15px 35px;
     }

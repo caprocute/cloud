@@ -13,10 +13,7 @@ import { isMobile } from "@/utilities";
 import { TimeRange } from "../common";
 import { TimeZoom, SeriesData } from "../viz";
 import { ScrubberSpecFactory, ChartSettings } from "./ScrubberSpecFactory";
-import { DiscussionState } from "@/store/modules/discussion";
-import { ActionTypes } from "@/store";
 import { DataEvent } from "@/views/comments/model";
-import moment from "moment";
 
 export default Vue.extend({
     name: "Scrubber",
@@ -75,7 +72,7 @@ export default Vue.extend({
         window.removeEventListener("mouseup", this.mouseUp);
     },
     methods: {
-        mouseUp(event: Event) {
+        mouseUp(_event: Event) {
             // Only refresh zoomed area if we're scrubbing. Otherwise, spurious
             // brush signals, say from manually updating the initial brush area,
             // will cause scrubbing to contain values and we end up emitting the
@@ -209,7 +206,7 @@ export default Vue.extend({
 </script>
 
 <style lang="scss">
-@import "src/scss/variables";
+@use "src/scss/variables";
 .viz {
     width: 100%;
 }

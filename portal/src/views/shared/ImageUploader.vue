@@ -112,10 +112,10 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "../../scss/mixins";
+@use "src/scss/mixins";
 
 .image-container {
-    @include flex(baseline);
+    @include mixins.flex(baseline);
     flex-wrap: wrap;
 
     label {
@@ -134,10 +134,10 @@ input {
 .upload-trigger {
     margin: 14px 0 0;
     font-size: 14px;
-    @include flex(flex-end);
+    @include mixins.flex(flex-end);
 
     label {
-        @include flex(center, center);
+        @include mixins.flex(center, center);
         padding: 0 17px;
         height: 30px;
         border-radius: 2px;
