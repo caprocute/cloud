@@ -98,6 +98,7 @@ export default Vue.extend({
 
     @include mixins.bp-down(variables.$sm) {
         margin-right: 5px;
+        margin-bottom: 20px;
         flex-direction: column;
         height: auto;
         padding: 7px 19px 0;
@@ -107,7 +108,7 @@ export default Vue.extend({
     .triangle {
         opacity: 0;
         visibility: hidden;
-        bottom: -2px;
+        bottom: -3px;
     }
 
     @include mixins.attention() {
@@ -115,32 +116,6 @@ export default Vue.extend({
         .triangle {
             visibility: visible;
             opacity: 1;
-        }
-    }
-
-    &:after {
-        content: "";
-        background: url("../../assets/icon-chevron-dropdown.svg") no-repeat center center;
-        background-size: 12px;
-        width: 10px;
-        height: 10px;
-        transition: all 0.33s;
-        transform: translateY(-50%);
-        cursor: pointer;
-        @include mixins.position(absolute, 50% null null calc(100% - 5px));
-
-        @include mixins.bp-down(variables.$lg) {
-            top: 26px;
-            right: 15px;
-            left: unset;
-        }
-    }
-
-    @include mixins.bp-up(variables.$sm) {
-        &:hover {
-            &:after {
-                transform: rotate(180deg) translateY(50%);
-            }
         }
     }
 
@@ -154,7 +129,7 @@ export default Vue.extend({
 .language-list {
     position: absolute;
     right: -10px;
-    top: 66px;
+    top: 67px;
     box-shadow: 2px 2.3px 4px 1px rgba(0, 0, 0, 0.04);
     border: solid 1px #d8dce0;
     background-color: #fff;
@@ -208,5 +183,31 @@ export default Vue.extend({
     justify-content: space-between;
     width: 100%;
     height: 40px;
+
+    &:after {
+        content: "";
+        background: url("../../assets/icon-chevron-dropdown.svg") no-repeat center center;
+        background-size: 12px;
+        width: 10px;
+        height: 10px;
+        transition: all 0.33s;
+        transform: translateY(-50%);
+        cursor: pointer;
+        @include mixins.position(absolute, 50% null null calc(100% - 5px));
+
+        @include mixins.bp-down(variables.$lg) {
+            top: 26px;
+            right: 15px;
+            left: unset;
+        }
+    }
+
+    @include mixins.bp-up(variables.$sm) {
+        &:hover {
+            &:after {
+                transform: rotate(180deg) translateY(50%);
+            }
+        }
+    }
 }
 </style>

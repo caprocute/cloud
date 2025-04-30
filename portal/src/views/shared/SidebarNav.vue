@@ -251,12 +251,22 @@ export default Vue.extend({
 
     @at-root .container-side.active & {
         opacity: 1;
+        padding: 20px 15px;
         visibility: visible;
-        width: 210px;
+        width: 240px;
+
+        @include mixins.bp-down(variables.$sm) {
+            padding: 0;
+        }
     }
 }
 .nav-section {
     margin-bottom: 40px;
+
+    @include mixins.bp-down(variables.$sm) {
+        padding: 0 15px;
+        margin-bottom: 20px;
+    }
 
     > div {
         padding: 4px 0;
