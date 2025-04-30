@@ -198,4 +198,7 @@ sanitize: sanitizer
 	docker exec fksanitize-pg pg_dump 'postgres://fieldkit:password@127.0.0.1/fieldkit?sslmode=disable' | bzip2 > db-sanitized.sql.bz2
 	docker stop fksanitize-pg
 
+reset-passwords:
+	cd tools/passwords && go run passwords.go -password asdfasdfasdf -set-all
+	
 .PHONY: schema-production sanitize
