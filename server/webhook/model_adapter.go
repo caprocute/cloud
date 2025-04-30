@@ -89,11 +89,11 @@ func (m *ModelAdapter) findStationModule(ctx context.Context, pm *ParsedMessage,
 			Version:         0,
 		}
 
-		if _, err := m.sr.UpsertStationModule(ctx, module); err != nil {
+		if updated, err := m.sr.UpsertStationModule(ctx, module); err != nil {
 			return nil, err
+		} else {
+			return updated, nil
 		}
-
-		return module, nil
 	} else {
 		modules, err := m.sr.QueryStationModulesByConfigurationID(ctx, configuration.ID)
 		if err != nil {
