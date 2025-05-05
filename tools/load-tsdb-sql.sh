@@ -20,7 +20,7 @@ if [ -z "$DB_HOST" ]; then
 fi
 
 DB_USER=$FIELDKIT_TSDB_USER
-if [ -z "$DB_HOST" ]; then
+if [ -z "$DB_USER" ]; then
 	DB_USER=fieldkit
 fi
 
