@@ -9,6 +9,7 @@
             <img alt="Menu icon" src="@/assets/icon-menu.svg" width="32" height="22" />
         </a>
         <div id="inner-nav">
+            <LanguageSelector class="hide-desktop"></LanguageSelector>
             <div v-if="!isPartnerCustomisationEnabled()" class="nav-section">
                 <router-link :to="{ name: 'projects' }">
                     <div class="nav-label">
@@ -69,10 +70,12 @@ import {
     PartnerCustomization,
 } from "./partners";
 import { DisplayProject, DisplayStation } from "@/store";
+import LanguageSelector from "@/views/shared/LanguageSelector.vue";
 
 export default Vue.extend({
     name: "SidebarNav",
     components: {
+        LanguageSelector,
         Logo,
         StationOrSensor,
     },
@@ -248,12 +251,22 @@ export default Vue.extend({
 
     @at-root .container-side.active & {
         opacity: 1;
+        padding: 20px 15px;
         visibility: visible;
-        width: 210px;
+        width: 240px;
+
+        @include mixins.bp-down(variables.$sm) {
+            padding: 0;
+        }
     }
 }
 .nav-section {
     margin-bottom: 40px;
+
+    @include mixins.bp-down(variables.$sm) {
+        padding: 0 15px;
+        margin-bottom: 20px;
+    }
 
     > div {
         padding: 4px 0;

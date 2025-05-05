@@ -212,6 +212,18 @@ a {
     cursor: pointer;
 }
 
+.hide-mob {
+    @include mixins.bp-down(variables.$sm) {
+        display: none !important;
+    }
+}
+
+.hide-desktop {
+    @include mixins.bp-up(variables.$sm) {
+        display: none !important;
+    }
+}
+
 .hoverable-item {
     position: relative;
 

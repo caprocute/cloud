@@ -3,7 +3,7 @@
         <router-link :to="{ name: 'root' }">
             <Logo />
         </router-link>
-        <LanguageSelector></LanguageSelector>
+        <LanguageSelector class="hide-mob"></LanguageSelector>
         <div
             class="header-account"
             :class="isAuthenticated ? 'loggedin' : ''"
