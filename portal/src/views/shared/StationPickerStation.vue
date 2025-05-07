@@ -68,7 +68,6 @@ export default Vue.extend({
     flex: 0 0 calc(33% - 16px);
     box-sizing: border-box;
     cursor: pointer;
-    box-shadow: 0px 0px 4px 1px rgba(0, 0, 0, 0.1);
 
     @include mixins.bp-down(variables.$sm) {
         flex: 0 0 calc(50% - 18px);
