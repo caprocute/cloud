@@ -12,8 +12,9 @@ import (
 )
 
 type DescribeLocations struct {
-	MapboxToken string
-	metrics     *logging.Metrics
+	MapboxToken      string
+	NativeLandsToken string
+	metrics          *logging.Metrics
 }
 
 type LocationDescription struct {
@@ -21,10 +22,11 @@ type LocationDescription struct {
 	NativeLandName *string
 }
 
-func NewDescribeLocations(mapboxToken string, metrics *logging.Metrics) (ls *DescribeLocations) {
+func NewDescribeLocations(mapboxToken string, nativeLandsToken string, metrics *logging.Metrics) (ls *DescribeLocations) {
 	return &DescribeLocations{
-		MapboxToken: mapboxToken,
-		metrics:     metrics,
+		MapboxToken:      mapboxToken,
+		NativeLandsToken: nativeLandsToken,
+		metrics:          metrics,
 	}
 }
 
@@ -87,7 +89,7 @@ func (ls *DescribeLocations) queryNative(ctx context.Context, l *Location) (name
 	defer timing.Send()
 
 	query := fmt.Sprintf("%f,%f", l.Latitude(), l.Longitude())
-	url := "https://native-land.ca/api/index.php?maps=territories&position=" + query
+	url := "https://native-land.ca/api/index.php?maps=territories&position=" + query + "&key=" + ls.NativeLandsToken
 	response, err := http.Get(url)
 	if err != nil {
 		return nil, err
@@ -118,7 +120,7 @@ func (ls *DescribeLocations) queryNative(ctx context.Context, l *Location) (name
 }
 
 func (ls *DescribeLocations) IsEnabled() bool {
-	return ls.MapboxToken != ""
+	return ls.MapboxToken != "" && ls.NativeLandsToken != ""
 }
 
 func (ls *DescribeLocations) Describe(ctx context.Context, l *Location) (ld *LocationDescription, err error) {
