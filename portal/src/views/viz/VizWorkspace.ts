@@ -1,7 +1,7 @@
 import _ from "lodash";
 import Vue from "vue";
 
-import { Workspace, Group, Viz, HasSensorParams, FastTime, ChartType, TimeZoom, GeoZoom, Bookmark } from "./viz";
+import { Workspace, Group, Viz, HasSensorParams, ChartType, TimeZoom, GeoZoom } from "./viz";
 import { VizGroup } from "./VizGroup";
 
 export const VizWorkspace = Vue.extend({

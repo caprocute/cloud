@@ -1,7 +1,8 @@
 import _ from "lodash";
 import { ChartSettings, DataRow, SeriesData, getSeriesThresholds, getAxisLabel } from "./SpecFactory";
 import chartStyles from "./chartStyles";
-import { makeRange, truncateTime, addDays, addSeconds } from "../common";
+import { makeRange, truncateTime, addDays, addSeconds, addGaps, addMinimumGap } from "../common";
+import i18n from "../i18n-charts";
 
 export interface TimeSeriesDataRow extends DataRow {
     gap: number;
@@ -42,15 +43,28 @@ export class TimeSeriesSpecFactory {
         };
 
         const isBarChart = (series: SeriesData): boolean => {
-            return series.vizInfo.viz.length == 1;
+            const timeSeries = series.vizInfo.viz.filter((v) => v.name == "D3TimeSeriesGraph");
+            if (timeSeries.filter((v) => v.barChart).length > 0) {
+                return true;
+            }
+
+            // The old test just looked for a viz array of length 1, which
+            // confused me when I tried adding other settings and ended up seeing a bar chart.
+            // After looking at the data, there's only one sensor that this would have affected
+            // and it uses this name. So this is here for backwards compatibility and cab be
+            // removed once the data is updated to reflect the above.
+            if (series.vizInfo.viz.filter((v) => v.name == "TimeSeriesChart").length == 1) {
+                return true;
+            }
+
+            return false;
         };
 
         const solidColors = true;
 
         // Always showing hovering state.
-        const alwaysShowHovering = (i: number, hovering: any, otherwise: any) => `${hovering}`;
+        const alwaysShowHovering = (i: number, hovering: any, _otherwise: any) => `${hovering}`;
         // Early hovering behavior.
-        // `hover.name == '${makeHoverName(i)}' ? ${hovering} : ${otherwise}`;
         const ifHovering = alwaysShowHovering;
 
         const makeSeriesThresholds = (series: SeriesData) => {
@@ -94,36 +108,12 @@ export class TimeSeriesSpecFactory {
             const afterProperties = afterCustomFilter.map((datum) => _.extend(datum, properties));
 
             // Add gap information so we can determine where missing data lies.
-            const addGaps = (rows) => {
-                for (let i = 0; i < rows.length; ++i) {
-                    if (i == rows.length - 1) {
-                        rows[i].gap = 0;
-                    } else {
-                        rows[i].gap = (rows[i + 1].time - rows[i].time) / 1000;
-                    }
-                }
-                return rows;
-            };
-
             const afterGapsAdded = addGaps(afterProperties);
 
             // console.log("viz: info", series.vizInfo, "gap", maybeMinimumGap, "bucket-size", series.queried.bucketSize);
 
             const maybeMinimumGap = series.vizInfo.minimumGap;
-
-            const addMinimumGap = (rows) => {
-                if (!maybeMinimumGap || !series.queried.bucketSize) {
-                    return rows;
-                }
-
-                if (series.queried.bucketSize > maybeMinimumGap) {
-                    return rows.map((datum) => _.extend(datum, { minimumGap: series.queried.bucketSize }));
-                }
-
-                return rows.map((datum) => _.extend(datum, { minimumGap: maybeMinimumGap }));
-            };
-
-            const afterMostMinimumGapAdded = addMinimumGap(afterGapsAdded);
+            const afterMostMinimumGapAdded = addMinimumGap(afterGapsAdded, maybeMinimumGap, series.queried.bucketSize);
 
             return afterMostMinimumGapAdded;
         });
@@ -158,8 +148,7 @@ export class TimeSeriesSpecFactory {
         const sameSensorUnits = uniqueSensorUnits.length == 1 && this.allSeries.length > 1;
         const yDomainsAll = this.allSeries.map((series, i: number) => makeSeriesDomain(series, i));
         const dataRangeAll = [_.min(yDomainsAll.map((dr: number[]) => dr[0])), _.max(yDomainsAll.map((dr: number[]) => dr[1]))];
-
-        const timeLabel = "Time (" + Intl.DateTimeFormat().resolvedOptions().timeZone + ")";
+        const timeLabel = i18n.timeSeriesXAxisLabel();
 
         const makeDomainY = _.memoize((i: number, series) => {
             if (sameSensorUnits) {
@@ -169,7 +158,7 @@ export class TimeSeriesSpecFactory {
             return makeSeriesDomain(series, i);
         });
 
-        const getBarConfiguration = (i: number, timeRange: number[] | null): { units: string[]; step: number | undefined } => {
+        const getBarConfiguration = (i: number, _timeRange: number[] | null): { units: string[]; step: number | undefined } => {
             const bucketSize = this.allSeries[i].queried.bucketSize;
             const step = bucketSize > 300 ? bucketSize / 60 : 5;
             return {
@@ -415,8 +404,7 @@ export class TimeSeriesSpecFactory {
                         labels: {
                             update: {
                                 align: {
-                                    signal:
-                                        "item === item.mark.items[0] ? 'left' : item === item.mark.items[item.mark.items.length - 1] ? 'right' : 'center'",
+                                    signal: "item === item.mark.items[0] ? 'left' : item === item.mark.items[item.mark.items.length - 1] ? 'right' : 'center'",
                                 },
                             },
                         },
@@ -1185,8 +1173,7 @@ export class TimeSeriesSpecFactory {
                 on: [
                     {
                         events: { signal: "drag_delta" },
-                        update:
-                            "[ceil(min(xcur[0] + span(xcur) * drag_delta[0] / width, drag_maximum_start)), ceil(min(xcur[1] + span(xcur) * drag_delta[0] / width, drag_maximum_end))]",
+                        update: "[ceil(min(xcur[0] + span(xcur) * drag_delta[0] / width, drag_maximum_start)), ceil(min(xcur[1] + span(xcur) * drag_delta[0] / width, drag_maximum_end))]",
                     },
                 ],
             },

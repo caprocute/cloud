@@ -54,7 +54,7 @@ import Vue from "vue";
 import StandardLayout from "../StandardLayout.vue";
 import CommonComponents from "@/views/shared";
 
-import { required, email, minLength, sameAs } from "vuelidate/lib/validators";
+import { required, email, minLength } from "vuelidate/lib/validators";
 
 export default Vue.extend({
     name: "AdminMain",

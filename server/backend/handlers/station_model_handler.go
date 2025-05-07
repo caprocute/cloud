@@ -33,6 +33,11 @@ func (h *stationModelRecordHandler) OnMeta(ctx context.Context, provision *data.
 
 	sr := repositories.NewStationRepository(h.db)
 
+	if rawMeta.Modules == nil || len(rawMeta.Modules) == 0 {
+		log.Infow("station-model:meta-no-modules", "meta_record_id", db.ID)
+		return nil
+	}
+
 	configuration := &data.StationConfiguration{
 		ProvisionID:  provision.ID,
 		MetaRecordID: &db.ID,
@@ -59,7 +64,8 @@ func (h *stationModelRecordHandler) OnMeta(ctx context.Context, provision *data.
 			Kind:            m.Header.Kind,
 			Version:         m.Header.Version,
 		}
-		if _, err := sr.UpsertStationModule(ctx, module); err != nil {
+		module, err := sr.UpsertStationModule(ctx, module)
+		if err != nil {
 			return err
 		}
 
@@ -67,11 +73,10 @@ func (h *stationModelRecordHandler) OnMeta(ctx context.Context, provision *data.
 
 		for sensorIndex, s := range m.Sensors {
 			sensor := &data.ModuleSensor{
-				ModuleID:        module.ID,
-				ConfigurationID: configuration.ID,
-				Index:           uint32(sensorIndex),
-				UnitOfMeasure:   s.UnitOfMeasure,
-				Name:            s.Name,
+				ModuleID:      module.ID,
+				Index:         uint32(sensorIndex),
+				UnitOfMeasure: s.UnitOfMeasure,
+				Name:          s.Name,
 			}
 			if _, err := sr.UpsertModuleSensor(ctx, sensor); err != nil {
 				return err
@@ -119,13 +124,14 @@ func (h *stationModelRecordHandler) OnDone(ctx context.Context) error {
 		SELECT
              c.id AS configuration_id,
 			 s.id AS sensor_id,
-			 m.module_index AS module_index,
+			 cm.module_index AS module_index,
 			 s.sensor_index AS sensor_index
 		FROM fieldkit.module_sensor AS s JOIN
 			 fieldkit.station_module AS m ON (s.module_id = m.id) JOIN
-			 fieldkit.station_configuration AS c ON (m.configuration_id = c.id)
+			 fieldkit.configuration_module AS cm ON (m.id = cm.module_id) JOIN
+			 fieldkit.station_configuration AS c ON (cm.configuration_id = c.id)
 		WHERE c.provision_id = $1 AND c.meta_record_id = $2
-		ORDER BY m.module_index, s.sensor_index
+		ORDER BY cm.module_index, s.sensor_index
 		`, h.provision.ID, h.dbMeta.ID); err != nil {
 		return err
 	}

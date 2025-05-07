@@ -30,7 +30,7 @@ function deepCopy(obj, cache) {
     }
 
     // if obj is hit, it is in circular structure
-    const hit = find(cache, function(c) {
+    const hit = find(cache, function (c) {
         return c.original === obj;
     });
     if (hit) {
@@ -45,7 +45,7 @@ function deepCopy(obj, cache) {
         copy: copy,
     });
 
-    Object.keys(obj).forEach(function(key) {
+    Object.keys(obj).forEach(function (key) {
         copy[key] = deepCopy(obj[key], cache);
     });
 
@@ -79,27 +79,27 @@ function createLogger(ref) {
     if (collapsed === void 0) collapsed = true;
     let filter = ref.filter;
     if (filter === void 0)
-        filter = function(_mutation, _stateBefore, _stateAfter) {
+        filter = function (_mutation, _stateBefore, _stateAfter) {
             return true;
         };
     let transformer = ref.transformer;
     if (transformer === void 0)
-        transformer = function(state) {
+        transformer = function (state) {
             return state;
         };
     let mutationTransformer = ref.mutationTransformer;
     if (mutationTransformer === void 0)
-        mutationTransformer = function(mut) {
+        mutationTransformer = function (mut) {
             return mut;
         };
     let actionFilter = ref.actionFilter;
     if (actionFilter === void 0)
-        actionFilter = function(action, state) {
+        actionFilter = function (_action, _state) {
             return true;
         };
     let actionTransformer = ref.actionTransformer;
     if (actionTransformer === void 0)
-        actionTransformer = function(act) {
+        actionTransformer = function (act) {
             return act;
         };
     let logMutations = ref.logMutations;
@@ -109,7 +109,7 @@ function createLogger(ref) {
     let logger = ref.logger;
     if (logger === void 0) logger = console;
 
-    return function(store) {
+    return function (store) {
         let prevState = deepCopy(store.state);
 
         if (typeof logger === "undefined") {
@@ -117,7 +117,7 @@ function createLogger(ref) {
         }
 
         if (logMutations) {
-            store.subscribe(function(mutation, state) {
+            store.subscribe(function (mutation, state) {
                 const nextState = deepCopy(state);
 
                 if (filter(mutation, prevState, nextState)) {
@@ -136,7 +136,7 @@ function createLogger(ref) {
         }
 
         if (logActions) {
-            store.subscribeAction(function(action, state) {
+            store.subscribeAction(function (action, state) {
                 if (actionFilter(action, state)) {
                     const formattedAction = actionTransformer(action);
                     const message = "store: action " + action.type;

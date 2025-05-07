@@ -4,7 +4,9 @@
             <div class="name">{{ $t("notes.title") }}</div>
             <div class="completed">{{ completed }}% {{ $t("notes.complete") }}</div>
             <div class="buttons" v-if="isAuthenticated">
-                <button type="submit" class="button" @click="onSave" data-cy="saveNotes">{{ $t("notes.btn.save") }}</button>
+                <button type="submit" :class="{ disabled: readonly }" class="button" @click="onSave" data-cy="saveNotes">
+                    {{ $t("notes.btn.save") }}
+                </button>
             </div>
         </div>
         <div class="site-notes">
@@ -16,8 +18,20 @@
                     :dataCy="'studyObjectiveBody'"
                     @change="onChange('studyObjective')"
                 />
-                <NoteEditor v-model="form.sitePurpose" :v="$v.form.sitePurpose" :readonly="readonly" :dataCy="'sitePurposeBody'" @change="onChange('sitePurpose')" />
-                <NoteEditor v-model="form.siteCriteria" :v="$v.form.siteCriteria" :readonly="readonly" :dataCy="'siteCriteriaBody'" @change="onChange('siteCriteria')" />
+                <NoteEditor
+                    v-model="form.sitePurpose"
+                    :v="$v.form.sitePurpose"
+                    :readonly="readonly"
+                    :dataCy="'sitePurposeBody'"
+                    @change="onChange('sitePurpose')"
+                />
+                <NoteEditor
+                    v-model="form.siteCriteria"
+                    :v="$v.form.siteCriteria"
+                    :readonly="readonly"
+                    :dataCy="'siteCriteriaBody'"
+                    @change="onChange('siteCriteria')"
+                />
                 <NoteEditor
                     v-model="form.siteDescription"
                     :v="$v.form.siteDescription"
@@ -138,6 +152,6 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "../../scss/global";
-@import "../../scss/notes";
+@use "src/scss/global";
+@use "src/scss/notes";
 </style>

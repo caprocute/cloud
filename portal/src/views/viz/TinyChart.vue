@@ -152,7 +152,7 @@ export default Vue.extend({
                             stationId: row.stationId,
                             moduleId: row.moduleId,
                             sensorId: row.sensorId,
-                            value: row.max !== undefined ? row.max : null, // TODO
+                            value: row.min !== undefined ? row.min : null,
                             avg: row.avg,
                             min: row.min,
                             max: row.max,

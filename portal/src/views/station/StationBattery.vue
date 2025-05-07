@@ -45,22 +45,22 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "src/scss/variables";
-@import "src/scss/mixins";
+@use "src/scss/variables";
+@use "src/scss/mixins";
 
 .station-seen {
     font-size: 14px;
-    font-family: $font-family-bold;
+    font-family: variables.$font-family-bold;
     align-self: flex-start;
     margin-right: 5px;
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         font-size: 12px;
     }
 }
 
 .small-light {
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         font-size: 12px;
     }
 }

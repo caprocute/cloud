@@ -8,9 +8,9 @@
                     <div class="uom">{{ sensor.unitOfMeasure }}</div>
                 </div>
             </div>
-            <div v-if="sensors.length == 0">{{ $t('station.readings.none') }}</div>
+            <div v-if="sensors.length == 0" class="no-readings-text">{{ $t("station.readings.none") }}</div>
         </template>
-        <div class="loading" v-if="loading">{{ $t('station.readings.loading') }}</div>
+        <div class="loading" v-if="loading">{{ $t("station.readings.loading") }}</div>
     </div>
 </template>
 
@@ -84,7 +84,7 @@ export default Vue.extend({
 
             return this.querier
                 .queryTinyChartData(this.id)
-                .then(([data, quickSensors, meta]) => {
+                .then(([data, _quickSensors, meta]) => {
                     const sensorsToModule = _.fromPairs(
                         _.flatten(
                             meta.modules.map((module) => {
@@ -163,7 +163,8 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "../../scss/mixins";
+@use "src/scss/mixins";
+@use "src/scss/variables";
 
 .readings-simple {
     display: flex;
@@ -179,7 +180,7 @@ export default Vue.extend({
     flex: 0 0 calc(50% - 5px);
     margin-bottom: 10px;
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         flex-basis: 100%;
     }
 }

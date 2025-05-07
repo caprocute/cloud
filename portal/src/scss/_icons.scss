@@ -1,4 +1,4 @@
-@import "variables";
+@use "variables";
 
 .icon {
     &-heart {
@@ -6,7 +6,7 @@
         font-weight: 600;
 
         &:before {
-            color: $color-fieldkit-secondary;
+            color: variables.$color-fieldkit-secondary;
         }
 
         &.gray {

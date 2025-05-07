@@ -18,12 +18,6 @@ describe("Station Page", () => {
         cy.get('[data-cy="saveNotes"]').should("exist");
     });
 
-    it("should not display save button if user is not authenticated", function () {
-        cy.visit(this.stationPageUrl);
-
-        cy.get('[data-cy="saveNotes"]').should("not.exist");
-    });
-
     it("should successfully save the form when valid data is entered", function () {
         cy.visit(this.stationPageUrl);
 

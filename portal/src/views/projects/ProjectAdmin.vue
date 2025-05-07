@@ -52,25 +52,21 @@
                     <div class="details-team">
                         <div class="title">{{ $t("project.team") }}</div>
                         <div
-                            class="team-member"
+                            class="hoverable-item"
                             v-for="(projectUser, index) in displayProject.users"
                             v-bind:key="projectUser.user.email"
                             @mouseover="showTooltip('member-tooltip-' + index)"
                         >
-                            <span :ref="'member-tooltip-' + index" class="member-name">{{ projectUser.user.name }}</span>
+                            <span :ref="'member-tooltip-' + index" class="tooltip-text">{{ projectUser.user.name }}</span>
                             <UserPhoto :user="projectUser.user" v-if="!projectUser.invited" />
                         </div>
                     </div>
                     <div class="details-modules">
                         <div class="title">{{ $t("project.modules") }}</div>
-
-                        <img
-                            v-for="module in projectModules"
-                            v-bind:key="module.name"
-                            alt="Module icon"
-                            class="module-icon"
-                            :src="module.url"
-                        />
+                        <div class="hoverable-item" v-for="(module, index) in projectModules" :key="module.name">
+                            <img alt="Module icon" class="module-icon" :src="module.url" />
+                            <span :ref="'module-tooltip-' + index" class="tooltip-text">{{ $t(module.name) }}</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -214,8 +210,9 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "../../scss/mixins";
-@import "../../scss/project";
+@use "src/scss/mixins";
+@use "src/scss/project";
+@use "src/scss/variables";
 
 .project-admin {
     display: flex;
@@ -262,13 +259,13 @@ export default Vue.extend({
     padding: 25px;
     flex-direction: column;
     justify-content: space-evenly;
-    @include flex();
+    @include mixins.flex();
 
-    @include bp-down($md) {
+    @include mixins.bp-down(variables.$md) {
         max-width: unset;
     }
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         flex: 1;
         margin: 0;
         padding: 15px 10px;
@@ -286,11 +283,11 @@ export default Vue.extend({
     height: 100%;
     align-self: center;
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         max-height: 150px;
     }
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         max-height: 150px;
     }
 }
@@ -301,17 +298,17 @@ export default Vue.extend({
     background-color: white;
     padding: 20px 30px;
 
-    @include bp-down($md) {
+    @include mixins.bp-down(variables.$md) {
         flex-basis: 100%;
         margin-top: 25px;
     }
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         flex-basis: 100%;
         padding: 20px 20px;
     }
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         padding: 14px 10px 20px;
     }
 }
@@ -330,12 +327,12 @@ export default Vue.extend({
     font-size: 20px;
     font-weight: 500;
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         padding-boottom: 25px;
     }
 
     body.floodnet & {
-        font-family: $font-family-floodnet-bold;
+        font-family: variables.$font-family-floodnet-bold;
     }
 }
 .details .details-heading .link {
@@ -347,7 +344,7 @@ export default Vue.extend({
     cursor: pointer;
 
     body.floodnet & {
-        font-family: $font-family-floodnet-button;
+        font-family: variables.$font-family-floodnet-button;
     }
 }
 
@@ -357,64 +354,28 @@ export default Vue.extend({
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
+    align-items: baseline;
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         padding-top: 15px;
     }
 }
+
 .details-bottom .details-team {
-    display: flex;
-    flex-wrap: wrap;
-    flex: 1;
     padding-right: 15px;
 
-    @include bp-down($xs) {
-        flex-basis: 100%;
+    @include mixins.bp-down(variables.$xs) {
         margin-bottom: 15px;
     }
-
-    .member-name {
-        visibility: hidden;
-        opacity: 0;
-        transition: opacity 0.25s;
-        padding: 8px 16px;
-        border-radius: 2px;
-        box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.24);
-        border: solid 1px #f4f5f7;
-        background-color: #fff;
-        font-size: 14px;
-        white-space: nowrap;
-        transform: translateX(-50%);
-        z-index: $z-index-top;
-        @include position(absolute, null null calc(-100% + 10px) 50%);
-
-        @include bp-down($sm) {
-            bottom: calc(-100% + 15px);
-        }
-    }
 }
 
-.team-member {
-    position: relative;
-
-    @include attention() {
-        .member-name {
-            visibility: visible;
-            opacity: 1;
-        }
-    }
-}
-
-.details-bottom .details-modules {
-    flex: 1;
-}
 .details-bottom .title {
     font-weight: 500;
     font-size: 14px;
     flex-basis: 100%;
 
     body.floodnet & {
-        font-family: $font-family-floodnet-bold;
+        font-family: variables.$font-family-floodnet-bold;
     }
 }
 .details-icon-container {
@@ -438,7 +399,7 @@ export default Vue.extend({
     display: flex;
     flex-direction: column;
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         padding: 15px 10px 2px;
     }
 }
@@ -448,7 +409,7 @@ export default Vue.extend({
     flex: 2;
     padding: 20px 25px;
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         flex-basis: 100%;
         margin: 0 0 25px;
     }
@@ -457,7 +418,7 @@ export default Vue.extend({
     flex: 1;
     min-width: 360px;
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         min-width: unset;
     }
 }
@@ -475,7 +436,7 @@ export default Vue.extend({
     margin: 6px 7px 0 0;
 }
 .project-detail {
-    font-family: $font-family-light;
+    font-family: variables.$font-family-light;
     overflow-wrap: anywhere;
 
     &:not(:last-of-type) {

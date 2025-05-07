@@ -2,7 +2,6 @@ import _ from "lodash";
 import moment from "moment";
 import Vue from "vue";
 import VueI18n, { LocaleMessages } from "vue-i18n";
-import Messages from "@messageformat/runtime/messages";
 import MessageFormat from "@messageformat/core";
 
 class MessageFormatFormatter {

@@ -9,7 +9,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import {getPartnerCustomizationWithDefault} from '@/views/shared/partners';
+import { getPartnerCustomizationWithDefault } from "@/views/shared/partners";
 
 export default Vue.extend({
     name: "ValueMarker",

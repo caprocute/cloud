@@ -2,7 +2,10 @@
     <div class="note-editor">
         <div class="title">
             <TextAreaField v-if="editingTitle" v-model="title" :data-cy="'customKeyTitle'" />
-            <template v-else>{{ $t(title) }}</template>
+            <template v-else>
+                <template v-if="isTranslationKey(title)">{{ $t(title) }}</template>
+                <template v-else>{{ title }}</template>
+            </template>
             <a
                 class="edit-btn"
                 v-if="editableTitle && !editingTitle && !readonly"
@@ -93,11 +96,23 @@ export default Vue.extend({
             },
         },
     },
+    methods: {
+        isTranslationKey(text: string | undefined): boolean {
+            return Boolean(text && typeof text === "string" && text.startsWith("notes.fields."));
+        },
+    },
+    mounted() {
+        this.$root.$on("language-changed", this.$forceUpdate);
+    },
+    beforeDestroy() {
+        this.$root.$off("language-changed", this.$forceUpdate);
+    },
 });
 </script>
 
 <style scoped lang="scss">
-@import "../../scss/mixins";
+@use "src/scss/mixins";
+@use "src/scss/variables";
 
 .attached-audio {
     display: flex;
@@ -115,7 +130,7 @@ export default Vue.extend({
     font-weight: 500;
     margin-right: auto;
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         flex-basis: 100%;
     }
 }
@@ -126,7 +141,7 @@ export default Vue.extend({
     display: flex;
     align-items: center;
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         font-size: 14px;
     }
 }

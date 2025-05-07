@@ -5,16 +5,16 @@
         </div>
         <div class="pages" v-if="!textual">
             <div
-                v-for="page in pages"
-                v-bind:key="page.number"
+                v-for="pageNumber in displayedPages"
+                :key="pageNumber"
                 class="page"
-                v-bind:class="{ selected: page.selected }"
-                v-on:click="onPage(page.number)"
+                :class="{ selected: pageNumber === page }"
+                @click="onPage(pageNumber)"
             >
-                ●
+                {{ pageNumber === -1 ? "..." : "●" }}
             </div>
         </div>
-        <div v-if="textual">{{ page + 1 }} {{ $t('pagination.of') }} {{ totalPages }}</div>
+        <div v-if="textual">{{ page + 1 }} {{ $t("pagination.of") }} {{ totalPages }}</div>
         <div class="button next" v-on:click="onNext" v-bind:class="{ enabled: canPageNext }">
             <span class="arrow"></span>
         </div>
@@ -58,6 +58,37 @@ export default Vue.extend({
                 };
             });
         },
+        displayedPages(this: any): number[] {
+            const maxPages = this.maximumPages;
+            const half = Math.floor(maxPages / 2);
+            const total = this.totalPages;
+
+            if (total <= maxPages) {
+                return _.range(0, total);
+            }
+
+            let start = Math.max(0, this.page - half);
+            let end = Math.min(total - 1, this.page + half);
+
+            if (start === 0) {
+                end = maxPages - 1;
+            } else if (end === total - 1) {
+                start = total - maxPages;
+            }
+
+            const pages: number[] = [];
+            if (start > 0) pages.push(0);
+            if (start > 1) pages.push(-1); // -1 represents '...'
+
+            for (let i = start; i <= end; i++) {
+                pages.push(i);
+            }
+
+            if (end < total - 2) pages.push(-1);
+            if (end < total - 1) pages.push(total - 1);
+
+            return pages;
+        },
         canPageNext(this: any) {
             if (this.wrap) {
                 return true;
@@ -98,8 +129,8 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
-@import "src/scss/variables";
-@import "src/scss/mixins";
+@use "src/scss/variables";
+@use "src/scss/mixins";
 
 .pagination .button {
     color: #d8d8d8;
@@ -118,9 +149,9 @@ export default Vue.extend({
     &.next {
         .arrow {
             border-width: 8px 0 8px 15px;
-            border-color: transparent transparent transparent $color-dark;
+            border-color: transparent transparent transparent variables.$color-dark;
 
-            @include bp-down($sm) {
+            @include mixins.bp-down(variables.$sm) {
                 border-width: 6px 0 6px 12px;
             }
         }
@@ -129,9 +160,9 @@ export default Vue.extend({
     &.prev {
         .arrow {
             border-width: 8px 15px 8px 0;
-            border-color: transparent $color-dark transparent transparent;
+            border-color: transparent variables.$color-dark transparent transparent;
 
-            @include bp-down($sm) {
+            @include mixins.bp-down(variables.$sm) {
                 border-width: 6px 12px 6px 0;
             }
         }

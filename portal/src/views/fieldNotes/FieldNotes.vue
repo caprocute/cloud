@@ -1,9 +1,9 @@
 <template>
     <div class="field-notes-wrap" data-cy="fieldNotes">
-        <header class="header">
+        <header class="header" :class="{ 'no-border': !user }">
             <div class="name">{{ $t("fieldNotes.title") }}</div>
             <div class="buttons" v-if="isAuthenticated">
-                <button class="button" @click="generatePDF">
+                <button :class="{ disabled: isLoading || !groupedFieldNotes }" class="button" @click="generatePDF">
                     <i class="icon icon-export"></i>
                     {{ $t("fieldNotes.btnExport") }}
                 </button>
@@ -45,7 +45,7 @@
 
         <div v-if="errorMessage" class="error">{{ errorMessage }}</div>
 
-        <div v-if="!isLoading && !groupedFieldNotes">{{ $tc("fieldNotes.noData") }}</div>
+        <div v-if="!isLoading && !groupedFieldNotes" class="no-field-notes-msg">{{ $tc("fieldNotes.noData") }}</div>
         <div v-if="isLoading">{{ $tc("fieldNotes.loading") }}</div>
 
         <div class="field-note-list" v-if="groupedFieldNotes" ref="pdfContent">
@@ -57,8 +57,8 @@
             >
                 <div class="month-row" @click="toggleFieldNoteGroup('field-note-group-' + index)">
                     <i class="icon icon-chevron-right"></i>
-                    <div class="month-name">{{ getMonthName(month) }} {{$tc('fieldNotes.monthRow.entries')}}</div>
-                    <div class="month-last-updated">{{$tc('fieldNotes.monthRow.lastUpdated')}} {{ getMonthLastUpdated(monthItems) }}</div>
+                    <div class="month-name">{{ getMonthName(month) }} {{ $tc("fieldNotes.monthRow.entries") }}</div>
+                    <div class="month-last-updated">{{ $tc("fieldNotes.monthRow.lastUpdated") }} {{ getMonthLastUpdated(monthItems) }}</div>
                 </div>
 
                 <transition-group name="fade">
@@ -121,7 +121,6 @@ import _ from "lodash";
 import { PortalStationFieldNotes } from "@/views/fieldNotes/model";
 import { jsPDF } from "jspdf";
 import { SnackbarStyle } from "@/store/modules/snackbar";
-import { field } from "vega";
 
 interface GroupedFieldNotes {
     [date: string]: PortalStationFieldNotes[];
@@ -151,7 +150,7 @@ export default Vue.extend({
             return this.$state.fieldNotes.fieldNotes;
         },
         stationId(): number {
-            return parseInt(this.$route.params.stationId, 10);
+            return parseInt(this.$route.params.stationId ?? this.$route.params.id, 10);
         },
     },
     data(): {
@@ -179,6 +178,9 @@ export default Vue.extend({
     watch: {
         fieldNotes() {
             this.groupByMonth();
+        },
+        stationName(_newStationName) {
+            this.$store.dispatch(ActionTypes.NEED_FIELD_NOTES, { id: this.stationId });
         },
     },
     methods: {
@@ -409,8 +411,10 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "src/scss/global";
-@import "src/scss/notes";
+@use "src/scss/global";
+@use "src/scss/notes";
+@use "src/scss/mixins";
+@use "src/scss/variables";
 
 .new-field-note {
     display: flex;
@@ -418,7 +422,7 @@ export default Vue.extend({
     padding: 25px 0;
     position: relative;
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         padding: 20px 0;
     }
 
@@ -444,7 +448,7 @@ export default Vue.extend({
 }
 
 .button {
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         transform: none;
         margin-right: 0;
     }
@@ -472,7 +476,7 @@ export default Vue.extend({
     margin-left: -20px;
     border-top: solid 1px #d8dce0;
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         padding: 20px 10px;
         margin-left: -10px;
     }
@@ -530,7 +534,7 @@ button {
     margin-top: 12px;
 
     button:nth-of-type(2) {
-        color: $color-fieldkit-primary;
+        color: variables.$color-fieldkit-primary;
         font-weight: 900;
     }
 }
@@ -546,7 +550,7 @@ button {
     border-top: solid 1px #d8dce0;
     cursor: pointer;
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         margin-left: -10px;
         padding: 0 10px;
         height: 68px;
@@ -582,7 +586,7 @@ button {
 }
 
 .field-notes-wrap {
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         padding: 20px 10px 20px;
     }
 }
@@ -598,5 +602,9 @@ button {
 .icon-export:before {
     color: var(--color-dark);
     margin-right: 8px;
+}
+
+.header.no-border {
+    border-bottom: 0;
 }
 </style>

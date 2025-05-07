@@ -25,7 +25,8 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@import "src/scss/mixins";
+@use "src/scss/mixins";
+@use "src/scss/variables";
 
 .message {
     &-container {
@@ -44,7 +45,7 @@ export default {
             margin-right: 10px;
         }
 
-        @include bp-down($xs) {
+        @include mixins.bp-down(variables.$xs) {
             width: 330px;
         }
     }

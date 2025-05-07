@@ -1,7 +1,7 @@
 <template>
     <StandardLayout :viewingProjects="true">
         <div class="projects-view">
-            <div class="container mine" v-if="userProjects.length > 0">
+            <div v-if="isAuthenticated" class="container mine">
                 <div class="header">
                     <h1 v-if="isAuthenticated">{{ $t("projects.title.mine") }}</h1>
                     <h1 v-if="!isAuthenticated">{{ $t("projects.title.anonymous") }}</h1>
@@ -11,8 +11,15 @@
                     </div>
                 </div>
 
-                <ProjectThumbnails :projects="userProjects" />
-                <ProjectThumbnails :projects="invites.projects" :invited="true" v-if="invites" />
+                <template v-if="userProjects.length > 0 || pendingProjectInvites.length > 0">
+                    <ProjectThumbnails :projects="userProjects" />
+                    <ProjectThumbnails :projects="pendingProjectInvites" :invited="true" v-if="pendingProjectInvites.length > 0" />
+                </template>
+                <template v-else>
+                    <div class="no-projects-message">
+                        {{ $t("projects.noUserProjects") }}
+                    </div>
+                </template>
             </div>
             <div class="container community">
                 <div class="header">
@@ -29,8 +36,8 @@ import Vue from "vue";
 import { mapState, mapGetters } from "vuex";
 import StandardLayout from "../StandardLayout.vue";
 import ProjectThumbnails from "./ProjectThumbnails.vue";
-import { PendingInvites } from "@/api";
 import { StationsState } from "@/store/modules/stations";
+import * as ActionTypes from "@/store/actions";
 
 export default Vue.extend({
     name: "ProjectsView",
@@ -38,16 +45,11 @@ export default Vue.extend({
         StandardLayout,
         ProjectThumbnails,
     },
-    data(): {
-        invites: PendingInvites | null;
-    }
-     {
-        return {
-            invites: null,
-        };
-    },
     computed: {
-        ...mapGetters({ isAuthenticated: "isAuthenticated" }),
+        ...mapGetters({
+            isAuthenticated: "isAuthenticated",
+            pendingProjectInvites: "pendingProjectInvites",
+        }),
         ...mapState({
             userProjects: (s: { stations: StationsState }) => Object.values(s.stations.user.projects),
             publicProjects: (s: { stations: StationsState }) => Object.values(s.stations.community.projects),
@@ -55,7 +57,7 @@ export default Vue.extend({
     },
     async mounted(): Promise<void> {
         if (this.isAuthenticated) {
-            this.invites = await this.$services.api.getInvitesByUser();
+            await this.$store.dispatch(ActionTypes.NEED_PROJECT_INVITES);
         }
     },
     methods: {
@@ -74,29 +76,32 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "../../scss/mixins";
+@use "src/scss/mixins";
+@use "src/scss/variables";
+
 .projects-view {
     display: flex;
     flex-direction: column;
     padding: 10px 72px 60px;
     text-align: left;
 
-    @include bp-down($lg) {
+    @include mixins.bp-down(variables.$lg) {
         padding: 10px 45px 60px;
     }
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         padding: 0 20px 30px;
     }
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         padding: 0 10px 30px;
     }
 }
 
-.container.community {
-    border-top: 1px solid var(--color-border);
+.container.mine {
+    border-bottom: 1px solid var(--color-border);
 }
+
 .container .header {
     display: flex;
     flex-direction: row;
@@ -104,12 +109,12 @@ export default Vue.extend({
     margin-bottom: 30px;
     margin-top: 40px;
 
-    @include bp-down($lg) {
+    @include mixins.bp-down(variables.$lg) {
         margin-bottom: 20px;
         margin-top: 30px;
     }
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         margin-bottom: 25px;
         margin-top: 20px;
     }
@@ -118,11 +123,11 @@ export default Vue.extend({
         font-size: 36px;
         margin: 0;
 
-        @include bp-down($lg) {
+        @include mixins.bp-down(variables.$lg) {
             font-size: 32px;
         }
 
-        @include bp-down($xs) {
+        @include mixins.bp-down(variables.$xs) {
             font-size: 24px;
         }
     }
@@ -145,11 +150,15 @@ export default Vue.extend({
     margin-left: auto;
     cursor: pointer;
     font-size: 16px;
-    @include flex(center);
+    @include mixins.flex(center);
 
     i {
         margin-right: 7px;
         margin-top: -3px;
     }
+}
+.no-projects-message {
+    font-size: 18px;
+    margin-bottom: 20px;
 }
 </style>

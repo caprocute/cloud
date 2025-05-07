@@ -1,7 +1,7 @@
 <template>
     <div class="datafiles-container">
         <div class="heading">{{ $t("project.dataFiles") }}</div>
-        <div class="message"> {{ $t("project.noDataFiles") }} </div>
+        <div class="message">{{ $t("project.noDataFiles") }}</div>
     </div>
 </template>
 
@@ -20,7 +20,8 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@import "../../scss/mixins";
+@use "src/scss/mixins";
+@use "src/scss/variables";
 
 .datafiles-container {
 }
@@ -30,6 +31,6 @@ export default {
 }
 .message {
     margin-top: 10px;
-    font-family: $font-family-light;
+    font-family: variables.$font-family-light;
 }
 </style>

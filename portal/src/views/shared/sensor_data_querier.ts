@@ -1,12 +1,5 @@
-import type { QueryRecentlyResponse, RecentlyAggregatedWindows, ModuleSensorMeta } from "@/api"
-import {
-    FKApi,
-    VizSensor,
-    StationInfoResponse,
-    SensorInfoResponse,
-    SensorsResponse,
-    TailSensorDataResponse,
-} from "@/api";
+import type { QueryRecentlyResponse, RecentlyAggregatedWindows, ModuleSensorMeta } from "@/api";
+import { FKApi, StationInfoResponse, SensorInfoResponse, TailSensorDataResponse } from "@/api";
 
 import { SensorMeta } from "@/store";
 import { promiseAfter } from "@/utilities";
@@ -27,7 +20,9 @@ class Batcher<T> {
     constructor(private readonly handler: HandlerType<T>) {}
 
     public async query(id: number): Promise<T> {
-        this.queued.push(id);
+        if (!this.queued.includes(id)) {
+            this.queued.push(id);
+        }
 
         if (this.queue == null) {
             this.queue = promiseAfter(50).then(() => {

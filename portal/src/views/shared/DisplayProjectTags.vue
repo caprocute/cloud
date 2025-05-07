@@ -8,7 +8,7 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+import Vue from "vue";
 import { tryParseTags } from "@/utilities";
 
 export default Vue.extend({

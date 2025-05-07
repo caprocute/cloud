@@ -39,13 +39,15 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "../../scss/notes";
+@use "src/scss/notes";
+@use "src/scss/mixins";
+@use "src/scss/variables";
 
 .title {
     font-size: 16px;
     font-weight: 500;
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         font-size: 14px;
     }
 }

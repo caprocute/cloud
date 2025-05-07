@@ -49,7 +49,7 @@ func BuildAddNotePayload(stationNoteAddNoteBody string, stationNoteAddNoteStatio
 	{
 		err = json.Unmarshal([]byte(stationNoteAddNoteBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Recusandae occaecati qui.\",\n      \"userId\": 1028756493\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Est eos dolores quibusdam.\",\n      \"userId\": 1544099171\n   }'")
 		}
 	}
 	var stationID int32
@@ -83,7 +83,7 @@ func BuildUpdateNotePayload(stationNoteUpdateNoteBody string, stationNoteUpdateN
 	{
 		err = json.Unmarshal([]byte(stationNoteUpdateNoteBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Cumque quibusdam similique et.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Sit ut quis qui ad molestiae facilis.\"\n   }'")
 		}
 	}
 	var stationID int32
