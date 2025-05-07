@@ -286,6 +286,12 @@ input[type="file"] {
     height: 300px;
     min-width: 100px;
 
+    /* Safari-specific fix */
+    @supports (-webkit-hyphens: none) {
+        flex: 0 0 calc(50% - 5px);
+        width: calc(50% - 5px);
+    }
+
     &:has(.spinner) {
         min-width: 250px;
         min-height: 250px;
@@ -295,6 +301,12 @@ input[type="file"] {
         height: auto;
         max-height: 80vh;
         flex: 1 1 auto;
+
+        /* Safari-specific fix for mobile */
+        @supports (-webkit-hyphens: none) {
+            flex: 1 1 100%;
+            width: 100%;
+        }
 
         &:nth-of-type(even) {
             .options-btns {
