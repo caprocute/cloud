@@ -19,8 +19,8 @@
             </DoubleHeader>
 
             <silent-box
-                v-if="photos && photos.length > 0"
-                :gallery="gallery"
+                v-if="photos && photos.length > 0 && gallery.some((item) => item && item.src)"
+                :gallery="gallery.filter((item) => item && item.src)"
                 @silentbox-overlay-opened="togglePageScroll()"
                 @silentbox-overlay-hidden="togglePageScroll()"
             >
@@ -36,6 +36,7 @@
                         v-if="silentboxItem.photo"
                         :url="silentboxItem.photo.url"
                         :loading="silentboxItem.photo.id === loadingPhotoId"
+                        @loading-change="silentboxItem.loading = $event"
                     />
                 </template>
             </silent-box>
@@ -88,7 +89,7 @@ export default Vue.extend({
     data: (): {
         photoOptions: ListItemOption[];
         loadingPhotoId: number | null;
-        gallery: { src: string; photo: NoteMedia }[];
+        gallery: { src: string; photo: NoteMedia; loading: boolean }[];
     } => {
         return {
             photoOptions: [],
@@ -169,12 +170,17 @@ export default Vue.extend({
             reader.readAsDataURL(image);
         },
         initGallery(): void {
-            this.gallery = new Array(this.photos.length);
+            this.gallery = this.photos.map((photo) => ({
+                src: "",
+                photo: photo,
+                loading: true,
+            }));
             this.photos.forEach((photo, index) => {
                 this.$services.api.loadMedia(photo["url"]).then((src) => {
                     this.$set(this.gallery, index, {
                         src: src,
                         photo: photo,
+                        loading: false,
                     });
                 });
             });
@@ -279,6 +285,11 @@ input[type="file"] {
     background-color: #e2e4e6;
     height: 300px;
     min-width: 100px;
+
+    &:has(.spinner) {
+        min-width: 250px;
+        min-height: 250px;
+    }
 
     @include mixins.bp-down(variables.$xs) {
         height: auto;

@@ -31,6 +31,9 @@ export default Vue.extend({
         url(this: any) {
             return this.refresh();
         },
+        processing(newVal) {
+            this.$emit("loading-change", newVal);
+        },
     },
     created(this: any) {
         return this.refresh();
