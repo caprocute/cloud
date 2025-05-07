@@ -45,8 +45,14 @@
                         :narrow="true"
                         @selected="showSummary(station)"
                     >
-                        <div class="station-links" @click="openNotes(station)" :title="$tc('station.navigateToStation')">
-                            <i class="icon icon-arrow"></i>
+                        <div class="station-links" @click="openStationPage(station)" :title="$tc('station.navigateToStation')">
+                            <img
+                                :alt="$tc('station.navigateToStation')"
+                                class="navigate-button"
+                                :src="$loadAsset(interpolatePartner('tooltip-') + '.svg')"
+                                width="24px"
+                                height="24px"
+                            />
                         </div>
                     </TinyStation>
                 </div>
@@ -251,14 +257,16 @@ export default Vue.extend({
             };
             return this.$store.dispatch(ActionTypes.STATION_PROJECT_REMOVE, payload);
         },
-        openNotes(this: any, station: DisplayStation): Promise<any> {
-            return this.$router.push({
+        openStationPage(this: any, station: DisplayStation): Promise<any> {
+            const routeData = this.$router.resolve({
                 name: "viewStation",
                 params: {
                     projectId: this.project.id,
                     stationId: station.id,
                 },
             });
+            window.open(routeData.href, "_blank");
+            return Promise.resolve();
         },
         onCloseSummary(): void {
             this.activeStationId = null;
