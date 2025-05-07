@@ -40,6 +40,13 @@ type OtherLandResponse struct {
 }
 
 func (ls *DescribeLocations) queryOther(ctx context.Context, l *Location) (name *string, err error) {
+	log := Logger(ctx).Sugar()
+
+	if ls.MapboxToken == "" {
+		log.Warnw("location-other-no-token")
+		return nil, nil
+	}
+
 	timing := ls.metrics.ThirdPartyLocation("mapbox")
 
 	defer timing.Send()
@@ -84,6 +91,13 @@ type NativeLandInfo struct {
 type NativeLandResponse = []*NativeLandInfo
 
 func (ls *DescribeLocations) queryNative(ctx context.Context, l *Location) (name *string, err error) {
+	log := Logger(ctx).Sugar()
+
+	if ls.NativeLandsToken == "" {
+		log.Warnw("location-native-no-token")
+		return nil, nil
+	}
+
 	timing := ls.metrics.ThirdPartyLocation("nativeland")
 
 	defer timing.Send()
@@ -119,20 +133,12 @@ func (ls *DescribeLocations) queryNative(ctx context.Context, l *Location) (name
 	return nil, nil
 }
 
-func (ls *DescribeLocations) IsEnabled() bool {
-	return ls.MapboxToken != "" && ls.NativeLandsToken != ""
-}
-
 func (ls *DescribeLocations) Describe(ctx context.Context, l *Location) (ld *LocationDescription, err error) {
 	log := Logger(ctx).Sugar()
 
 	timing := ls.metrics.ThirdPartyLocationDescribe()
 
 	defer timing.Send()
-
-	if !ls.IsEnabled() {
-		return nil, fmt.Errorf("location description disabled")
-	}
 
 	other, err := ls.queryOther(ctx, l)
 	if err != nil {

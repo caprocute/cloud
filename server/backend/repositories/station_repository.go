@@ -97,6 +97,19 @@ func (r *StationRepository) UpdateStation(ctx context.Context, station *data.Sta
 	return nil
 }
 
+func (r *StationRepository) UpdateStationPlaces(ctx context.Context, station *data.Station) (err error) {
+	if _, err := r.db.NamedExecContext(ctx, `
+		UPDATE fieldkit.station SET
+               place_other = :place_other,
+               place_native = :place_native,
+		WHERE id = :id
+		`, station); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (r *StationRepository) UpdateOwner(ctx context.Context, station *data.Station) (err error) {
 	// TODO Insert ownership transfer record. For data permission mapping.
 	if _, err := r.db.NamedExecContext(ctx, `UPDATE fieldkit.station SET owner_id = :owner_id, updated_at = :updated_at WHERE id = :id`, station); err != nil {
