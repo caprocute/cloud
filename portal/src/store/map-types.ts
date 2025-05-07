@@ -80,7 +80,7 @@ export class BoundingRectangle {
         return [this.min, this.max];
     }
 
-    private calculateMargin(margin: number | null): number {
+    private calculateMargin(_margin: number | null): number {
         if (this.isSingleCoordinate()) {
             return 1000;
         }

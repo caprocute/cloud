@@ -73,7 +73,7 @@ export default Vue.extend({
         },
         filter: {
             type: Function as PropType<(station: DisplayStation) => boolean>,
-            default: (station) => true,
+            default: () => (_station) => true,
         },
     },
     data(): {
@@ -141,8 +141,9 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "../../scss/mixins";
-@import "../../scss/global";
+@use "src/scss/mixins";
+@use "src/scss/global";
+@use "src/scss/variables";
 
 .station-picker {
     display: flex;
@@ -151,10 +152,10 @@ export default Vue.extend({
 }
 .station-picker .dialog {
     display: flex;
-    @include position(absolute, -48px -1px null null);
+    @include mixins.position(absolute, -48px -1px null null);
 
-    @include bp-down($xs) {
-        @include position(absolute, -25px -1px null null);
+    @include mixins.bp-down(variables.$xs) {
+        @include mixins.position(absolute, -25px -1px null null);
     }
 }
 .dialog .close-button {
@@ -168,22 +169,22 @@ export default Vue.extend({
 .station-picker .header {
     margin-bottom: 1em;
     flex-wrap: wrap;
-    @include flex(center, space-between);
+    @include mixins.flex(center, space-between);
 }
 .header .title {
     font-weight: 500;
     font-size: 20px;
     color: #2c3e50;
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         flex-basis: 100%;
         margin-bottom: 10px;
     }
 
     ~ div {
-        @include bp-down($xs) {
+        @include mixins.bp-down(variables.$xs) {
             width: 100%;
-            @include flex(center);
+            @include mixins.flex(center);
         }
     }
 }
@@ -193,7 +194,7 @@ export default Vue.extend({
     padding: 7px 10px;
     border: solid 1px #cccdcf;
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         width: unset;
         flex: 1;
     }
@@ -205,7 +206,7 @@ export default Vue.extend({
     margin: 0 -8px;
     width: calc(100% + 19px);
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         width: 100%;
         margin: 0;
     }
@@ -214,12 +215,12 @@ export default Vue.extend({
     display: flex;
     margin-top: 40px;
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         margin-top: 0;
     }
 }
 .station-picker .footer {
-    @include flex(center, center);
+    @include mixins.flex(center, center);
     margin-top: 35px;
 }
 .footer .button {

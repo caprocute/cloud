@@ -40,15 +40,15 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "src/scss/variables";
-@import "src/scss/mixins";
+@use "src/scss/variables";
+@use "src/scss/mixins";
 
 .station-projects {
     font-size: 16px;
     color: #6a6d71;
     margin: 30px 0;
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         margin: 20px 0;
     }
 }

@@ -65,11 +65,11 @@ export default Vue.extend({
         },
     },
     watch: {
-        async token(newValue: Bookmark, oldValue: Bookmark): Promise<void> {
+        async token(newValue: Bookmark, _oldValue: Bookmark): Promise<void> {
             console.log(`viz: bookmark-route(token):`, newValue);
             await this.refreshBookmarkFromToken();
         },
-        async bookmark(newValue: Bookmark, oldValue: Bookmark): Promise<void> {
+        async bookmark(newValue: Bookmark, _oldValue: Bookmark): Promise<void> {
             console.log(`viz: bookmark-route(bookmark):`, newValue);
         },
     },

@@ -1,11 +1,9 @@
 import _ from "lodash";
 import Vue from "vue";
 
-import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 
-import { TimeRange } from "./common";
-import { Graph, QueriedData, Workspace, FastTime, ChartType } from "./viz";
+import { Graph, Workspace } from "./viz";
 
 export const DebuggingPanel = Vue.extend({
     name: "DebuggingPanel",

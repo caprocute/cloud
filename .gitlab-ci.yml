@@ -5,7 +5,7 @@ stages:
   - db
 
 variables:
-  VERSION: 0.3.67
+  VERSION: 0.4.0
 
 test:go:
   stage: test
@@ -106,6 +106,7 @@ build:tools-amd64:
     - (cd server/cmd/fkdata && go build -o ../../../build/fkdata *.go)
     - (cd server/cmd/sanitizer && go build -o ../../../build/sanitizer *.go)
     - (cd server/cmd/scratch && go build -o ../../../build/scratch *.go)
+    - (cd server/cmd/merger && go build -o ../../../build/merger *.go)
   artifacts:
     name: "cloud-tools-amd64-${CI_COMMIT_REF_NAME}"
     paths:
@@ -113,6 +114,7 @@ build:tools-amd64:
       - build/fkdata
       - build/sanitizer
       - build/scratch
+      - build/merger
 
 build:compile:
   stage: build
@@ -137,9 +139,9 @@ build:images:
     - if: $CI_COMMIT_TAG
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
     - if: $CI_COMMIT_BRANCH == "main"
-  image: docker:24.0.5
+  image: docker:28.0.2
   services:
-    - name: docker:24.0.5-dind
+    - name: docker:28.0.2-dind
       alias: docker
   variables:
     DOCKER_HOST: tcp://docker:2375/
@@ -182,7 +184,7 @@ build:migrations:
 
 db:primary:prod:clone:
   stage: db
-  image: docker:24.0.5
+  image: docker:28.0.2
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule"
     - if: $CI_COMMIT_BRANCH  == $CI_DEFAULT_BRANCH
@@ -190,7 +192,7 @@ db:primary:prod:clone:
       allow_failure: true
   timeout: 3h
   services:
-    - name: docker:24.0.5-dind
+    - name: docker:28.0.2-dind
       alias: docker
   variables:
     DOCKER_HOST: tcp://docker:2375/
@@ -203,11 +205,11 @@ db:primary:prod:clone:
 
 db:primary:prod:clone-all:
   stage: db
-  image: docker:24.0.5
+  image: docker:28.0.2
   when: manual
   timeout: 3h
   services:
-    - name: docker:24.0.5-dind
+    - name: docker:28.0.2-dind
       alias: docker
   variables:
     DOCKER_HOST: tcp://docker:2375/
@@ -220,7 +222,7 @@ db:primary:prod:clone-all:
 
 db:ts:prod:clone:
   stage: db
-  image: docker:24.0.5
+  image: docker:28.0.2
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule"
     - if: $CI_COMMIT_BRANCH  == $CI_DEFAULT_BRANCH
@@ -228,7 +230,7 @@ db:ts:prod:clone:
       allow_failure: true
   timeout: 6h
   services:
-    - name: docker:24.0.5-dind
+    - name: docker:28.0.2-dind
       alias: docker
   variables:
     DOCKER_HOST: tcp://docker:2375/
@@ -241,11 +243,11 @@ db:ts:prod:clone:
 
 db:primary:dev:restore:
   stage: db
-  image: docker:24.0.5
+  image: docker:28.0.2
   when: manual
   timeout: 3h
   services:
-    - name: docker:24.0.5-dind
+    - name: docker:28.0.2-dind
       alias: docker
   variables:
     DOCKER_HOST: tcp://docker:2375/
@@ -258,11 +260,11 @@ db:primary:dev:restore:
 
 db:ts:dev:restore:
   stage: db
-  image: docker:24.0.5
+  image: docker:28.0.2
   when: manual
   timeout: 3h
   services:
-    - name: docker:24.0.5-dind
+    - name: docker:28.0.2-dind
       alias: docker
   variables:
     DOCKER_HOST: tcp://docker:2375/
@@ -276,7 +278,7 @@ db:ts:dev:restore:
 deploy:staging:
   stage: deploy
   needs: ["build:images"]
-  image: docker:24.0.5
+  image: docker:28.0.2
   timeout: 1h
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
@@ -286,7 +288,7 @@ deploy:staging:
       when: manual
       allow_failure: true
   services:
-    - name: docker:24.0.5-dind
+    - name: docker:28.0.2-dind
       alias: docker
   variables:
     DOCKER_HOST: tcp://docker:2375/
@@ -299,7 +301,7 @@ deploy:staging:
     ENV: dev
     POLL_URL: https://api.fkdev.org/status
   script:
-    - apk add wget curl unzip bash jq
+    - apk add wget curl unzip bash jq go musl-dev make
     - curl --silent "https://gitlab.com/gitlab-org/incubation-engineering/mobile-devops/download-secure-files/-/raw/main/installer" | bash
     - chmod 0600 "${SSH_KEY}"
     - (cd migrations && docker build --progress=plain -t conservify/fk-cloud-migrations:latest .)
@@ -309,6 +311,8 @@ deploy:staging:
     - MIGRATE_DATABASE_URL=`jq -r .timescaledb_url.value ${TERRAFORM_ENV}`
     - docker run -e MIGRATE_PATH=/migrations -e MIGRATE_DATABASE_URL=${MIGRATE_DATABASE_URL} -v `pwd`/${TSDB_MIGRATIONS_PATH}:/migrations conservify/fk-cloud-migrations migrate
     - docker run -v $(pwd)/.secure_files:/work/.secure_files -v $(pwd)/dev-ops-main:/work/dev-ops-main conservify/fk-cloud-tools /work/deployer deploy --cert ${SSH_KEY} --terraform ${TERRAFORM_ENV} --archive ${ARCHIVE} --poll ${POLL_URL}
+    - export FIELDKIT_POSTGRES_URL=`jq -r .database_url.value ${TERRAFORM_ENV}`
+    - export FIELDKIT_TIME_SCALE_URL=`jq -r .timescaledb_url.value ${TERRAFORM_ENV}`
   environment:
     name: staging
     url: https://portal.fkdev.org
@@ -316,14 +320,14 @@ deploy:staging:
 deploy:prod:
   stage: deploy
   needs: ["build:images"]
-  image: docker:24.0.5
+  image: docker:28.0.2
   timeout: 1h
   rules:
     - if: $CI_COMMIT_BRANCH == "main"
       when: manual
       allow_failure: true
   services:
-    - name: docker:24.0.5-dind
+    - name: docker:28.0.2-dind
       alias: docker
   variables:
     DOCKER_HOST: tcp://docker:2375/

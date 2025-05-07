@@ -233,7 +233,7 @@ export default Vue.extend({
         },
     },
     watch: {
-        async bookmark(newValue: Bookmark, oldValue: Bookmark): Promise<void> {
+        async bookmark(newValue: Bookmark, _oldValue: Bookmark): Promise<void> {
             console.log(`viz: bookmark-route(ew):`, newValue);
             if (this.workspace) {
                 await this.workspace.updateFromBookmark(newValue);
@@ -241,7 +241,7 @@ export default Vue.extend({
                 await this.createWorkspaceIfNecessary();
             }
         },
-        async selectedId(newValue: number, oldValue: number): Promise<void> {
+        async selectedId(newValue: number, _oldValue: number): Promise<void> {
             console.log("viz: selected-changed-associated", newValue);
         },
     },
@@ -455,7 +455,9 @@ export default Vue.extend({
 </script>
 
 <style lang="scss">
-@import "../../scss/layout";
+@use "src/scss/layout";
+@use "src/scss/mixins";
+@use "src/scss/variables";
 
 #vg-tooltip-element {
     background-color: #f4f5f7;
@@ -511,15 +513,15 @@ export default Vue.extend({
     padding: 40px;
     flex-grow: 1;
 
-    @include bp-down($lg) {
+    @include mixins.bp-down(variables.$lg) {
         padding: 30px 45px 60px;
     }
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         padding: 30px 20px 30px;
     }
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         padding: 20px 10px 10px;
     }
 }
@@ -538,17 +540,17 @@ export default Vue.extend({
 }
 
 .explore-links {
-    @include position(absolute, 0 0 null null);
+    @include mixins.position(absolute, 0 0 null null);
 
     .link {
-        color: $color-primary;
+        color: variables.$color-primary;
         font-size: 12px;
         letter-spacing: 0.07px;
         text-decoration: initial;
         display: block;
 
         body.floodnet & {
-            color: $color-dark;
+            color: variables.$color-dark;
         }
     }
 }
@@ -561,7 +563,7 @@ export default Vue.extend({
     border: solid 1px #f4f5f7;
     min-height: 70vh;
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         border: 0;
         box-shadow: unset;
     }
@@ -638,7 +640,7 @@ export default Vue.extend({
     }
 
     details {
-        @include bp-down($sm) {
+        @include mixins.bp-down(variables.$sm) {
             bottom: -360px;
             position: absolute;
             left: 50%;
@@ -650,7 +652,7 @@ export default Vue.extend({
 }
 .graph .vega-embed--dummy {
     overflow: visible;
-    z-index: $z-index-top;
+    z-index: variables.$z-index-top;
 }
 .scrubber .vega-embed {
     height: 40px;
@@ -702,7 +704,7 @@ export default Vue.extend({
     margin-right: 40px;
     margin-bottom: 10px;
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         margin: 0 0 28px;
     }
 }
@@ -718,7 +720,7 @@ export default Vue.extend({
     align-items: center;
     min-height: 60px;
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         min-height: unset;
         padding: 0;
         border: 0;
@@ -740,7 +742,7 @@ export default Vue.extend({
     align-items: center;
     display: flex;
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         align-items: flex-start;
     }
 
@@ -753,7 +755,7 @@ export default Vue.extend({
         display: flex;
         align-items: center;
 
-        @include bp-down($sm) {
+        @include mixins.bp-down(variables.$sm) {
             display: none;
         }
 
@@ -769,7 +771,7 @@ export default Vue.extend({
     width: 100%;
     flex: 0 0 500px;
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         flex: 1 1 auto;
         flex-wrap: wrap;
     }
@@ -779,7 +781,7 @@ export default Vue.extend({
     flex: 0 1 auto;
 
     &:first-of-type {
-        @include bp-down($sm) {
+        @include mixins.bp-down(variables.$sm) {
             margin-bottom: 12px;
         }
     }
@@ -791,7 +793,7 @@ export default Vue.extend({
     line-height: 35px;
     font-size: 40px;
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         margin-right: 7px;
     }
 
@@ -818,7 +820,7 @@ export default Vue.extend({
     align-items: flex-start;
     flex: 0 0 140px;
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         display: none;
     }
 }
@@ -835,7 +837,7 @@ export default Vue.extend({
 .controls-container .fast-time-container {
     display: flex;
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         display: none;
     }
 }
@@ -843,7 +845,7 @@ export default Vue.extend({
 .controls-container .date-picker {
     margin-left: 20px;
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         position: absolute;
         bottom: 70px;
         width: 100%;
@@ -940,7 +942,7 @@ export default Vue.extend({
     overflow-y: scroll;
     width: 30em;
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         width: 100%;
         top: 0;
         left: 0;
@@ -956,7 +958,7 @@ export default Vue.extend({
     display: flex;
     align-items: center;
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         display: none;
     }
 
@@ -992,7 +994,7 @@ export default Vue.extend({
     display: flex;
     flex-direction: row;
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         color: #979797;
         font-size: 14px;
         letter-spacing: 0.06px;
@@ -1005,18 +1007,18 @@ export default Vue.extend({
     &:nth-child(n + 1) {
         margin-left: 20px;
 
-        @include bp-down($sm) {
+        @include mixins.bp-down(variables.$sm) {
             margin-left: 5px;
         }
     }
 
-    @include bp-down($lg) {
+    @include mixins.bp-down(variables.$lg) {
         padding: 0 14px;
         height: 40px;
         font-size: 16px;
     }
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         height: 30px;
         width: 30px;
         padding: 0;
@@ -1032,7 +1034,7 @@ export default Vue.extend({
     }
 
     &-text {
-        @include bp-down($sm) {
+        @include mixins.bp-down(variables.$sm) {
             display: none;
         }
     }
@@ -1044,7 +1046,7 @@ export default Vue.extend({
     display: flex;
     justify-content: space-between;
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         flex-direction: column;
         background: transparent;
         padding: 0 0 10px;
@@ -1084,7 +1086,7 @@ export default Vue.extend({
     margin-right: 13px;
     justify-content: center;
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         margin-left: auto;
         margin-right: 0;
     }
@@ -1092,10 +1094,11 @@ export default Vue.extend({
 </style>
 
 <style scoped lang="scss">
-@import "src/scss/mixins";
+@use "src/scss/mixins";
+@use "src/scss/variables";
 
 ::v-deep .double-header {
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         .actions {
             position: absolute;
             right: 0;
@@ -1114,7 +1117,7 @@ export default Vue.extend({
 }
 
 ::v-deep .scrubber {
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         padding-bottom: 120px;
     }
 }
@@ -1127,7 +1130,7 @@ export default Vue.extend({
     position: relative;
 
     .info {
-        z-index: $z-index-top;
+        z-index: variables.$z-index-top;
         position: absolute;
         top: 17px;
         left: 20px;
@@ -1150,7 +1153,7 @@ export default Vue.extend({
     left: 50%;
     transform: translate(-50%, -50%);
     font-size: 24px;
-    z-index: $z-index-top;
+    z-index: variables.$z-index-top;
     background: #ffff;
     padding: 10px;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.07);

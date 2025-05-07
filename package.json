@@ -1,7 +1,0 @@
-{
-  "dependencies": {
-    "@johmun/vue-tags-input": "^2.1.0",
-    "redux": "4.0.1"
-  },
-  "version": "0.0.0"
-}

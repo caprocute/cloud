@@ -210,8 +210,9 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "../../scss/mixins";
-@import "../../scss/project";
+@use "src/scss/mixins";
+@use "src/scss/project";
+@use "src/scss/variables";
 
 .project-admin {
     display: flex;
@@ -258,13 +259,13 @@ export default Vue.extend({
     padding: 25px;
     flex-direction: column;
     justify-content: space-evenly;
-    @include flex();
+    @include mixins.flex();
 
-    @include bp-down($md) {
+    @include mixins.bp-down(variables.$md) {
         max-width: unset;
     }
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         flex: 1;
         margin: 0;
         padding: 15px 10px;
@@ -282,11 +283,11 @@ export default Vue.extend({
     height: 100%;
     align-self: center;
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         max-height: 150px;
     }
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         max-height: 150px;
     }
 }
@@ -297,17 +298,17 @@ export default Vue.extend({
     background-color: white;
     padding: 20px 30px;
 
-    @include bp-down($md) {
+    @include mixins.bp-down(variables.$md) {
         flex-basis: 100%;
         margin-top: 25px;
     }
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         flex-basis: 100%;
         padding: 20px 20px;
     }
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         padding: 14px 10px 20px;
     }
 }
@@ -326,12 +327,12 @@ export default Vue.extend({
     font-size: 20px;
     font-weight: 500;
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         padding-boottom: 25px;
     }
 
     body.floodnet & {
-        font-family: $font-family-floodnet-bold;
+        font-family: variables.$font-family-floodnet-bold;
     }
 }
 .details .details-heading .link {
@@ -343,7 +344,7 @@ export default Vue.extend({
     cursor: pointer;
 
     body.floodnet & {
-        font-family: $font-family-floodnet-button;
+        font-family: variables.$font-family-floodnet-button;
     }
 }
 
@@ -355,7 +356,7 @@ export default Vue.extend({
     flex-wrap: wrap;
     align-items: baseline;
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         padding-top: 15px;
     }
 }
@@ -363,7 +364,7 @@ export default Vue.extend({
 .details-bottom .details-team {
     padding-right: 15px;
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         margin-bottom: 15px;
     }
 }
@@ -374,7 +375,7 @@ export default Vue.extend({
     flex-basis: 100%;
 
     body.floodnet & {
-        font-family: $font-family-floodnet-bold;
+        font-family: variables.$font-family-floodnet-bold;
     }
 }
 .details-icon-container {
@@ -398,7 +399,7 @@ export default Vue.extend({
     display: flex;
     flex-direction: column;
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         padding: 15px 10px 2px;
     }
 }
@@ -408,7 +409,7 @@ export default Vue.extend({
     flex: 2;
     padding: 20px 25px;
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         flex-basis: 100%;
         margin: 0 0 25px;
     }
@@ -417,7 +418,7 @@ export default Vue.extend({
     flex: 1;
     min-width: 360px;
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         min-width: unset;
     }
 }
@@ -435,7 +436,7 @@ export default Vue.extend({
     margin: 6px 7px 0 0;
 }
 .project-detail {
-    font-family: $font-family-light;
+    font-family: variables.$font-family-light;
     overflow-wrap: anywhere;
 
     &:not(:last-of-type) {

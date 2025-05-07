@@ -1,7 +1,7 @@
 import _ from "lodash";
 import Vue from "vue";
 
-import { Graph, QueriedData, Workspace, FastTime, TimeZoom, SeriesData } from "./viz";
+import { Graph, Workspace, FastTime, TimeZoom, SeriesData } from "./viz";
 
 import RangeChart from "./vega/RangeChart.vue";
 
