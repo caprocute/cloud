@@ -78,10 +78,9 @@ func (ls *DescribeLocations) queryOther(ctx context.Context, l *Location) (name 
 }
 
 type NativeLandProperties struct {
-	Name        string `json:"name"`
-	FrenchName  string `json:"french_name"`
-	Slug        string `json:"slug"`
-	Description string `json:"description"`
+	Name        string `json:"Name"`
+	Slug        string `json:"Slug"`
+	Description string `json:"Description"`
 }
 
 type NativeLandInfo struct {
