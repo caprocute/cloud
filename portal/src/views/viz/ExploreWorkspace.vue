@@ -347,7 +347,13 @@ export default Vue.extend({
                         const vizSensor: VizSensor = [stationId, [sensorModuleId, sensorId]];
 
                         const associated = await this.$services.api.getAssociatedStations(stationId);
-                        const stationIds = associated.stations.map((associatedStation) => associatedStation.station.id);
+                        // First station ID should be the station we're opening.
+                        const stationIds = _.sortBy(associated.stations.map((associatedStation) => associatedStation.station.id), (id) => {
+                            if (id == stationId) {
+                                return 0;
+                            }
+                            return id;
+                        });
                         console.log(`viz: show-station-associated`, { associated, stationIds });
 
                         const getInitialBookmark = () => {
