@@ -1421,10 +1421,6 @@ func (sr *StationRepository) Search(ctx context.Context, query string) (*Queried
 }
 
 func (sr *StationRepository) DeleteStationModule(ctx context.Context, moduleID int64) error {
-	if _, err := sr.db.ExecContext(ctx, `DELETE FROM fieldkit.aggregated_sensor_updated WHERE module_id = $1`, moduleID); err != nil {
-		return err
-	}
-
 	if _, err := sr.db.ExecContext(ctx, `DELETE FROM fieldkit.module_sensor WHERE module_id = $1`, moduleID); err != nil {
 		return err
 	}

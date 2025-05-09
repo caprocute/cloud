@@ -767,8 +767,6 @@ func (s *UserService) deleteUser(ctx context.Context, userID int32) error {
 
 		`UPDATE fieldkit.station SET photo_id = NULL WHERE owner_id = $1`,
 
-		`DELETE FROM fieldkit.aggregated_sensor_updated WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1)`,
-
 		`DELETE FROM fieldkit.notes_media_link WHERE note_id IN (SELECT id FROM fieldkit.notes WHERE station_id IN (SELECT id FROM fieldkit.station WHERE owner_id = $1))`,
 		`DELETE FROM fieldkit.notes_media_link WHERE note_id IN (SELECT id FROM fieldkit.notes WHERE author_id = $1)`,
 		`DELETE FROM fieldkit.notes_media_link WHERE media_id IN (SELECT id FROM fieldkit.notes_media WHERE user_id = $1)`,
