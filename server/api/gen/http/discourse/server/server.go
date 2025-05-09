@@ -170,7 +170,7 @@ func handleDiscourseOrigin(h http.Handler) http.Handler {
 			w.Header().Set("Access-Control-Allow-Origin", origin)
 			w.Header().Set("Vary", "Origin")
 			w.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
-			w.Header().Set("Access-Control-Max-Age", "600")
+			w.Header().Set("Access-Control-Max-Age", "86400")
 			w.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := r.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
@@ -184,7 +184,7 @@ func handleDiscourseOrigin(h http.Handler) http.Handler {
 			w.Header().Set("Access-Control-Allow-Origin", origin)
 			w.Header().Set("Vary", "Origin")
 			w.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
-			w.Header().Set("Access-Control-Max-Age", "600")
+			w.Header().Set("Access-Control-Max-Age", "86400")
 			w.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := r.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
@@ -198,7 +198,7 @@ func handleDiscourseOrigin(h http.Handler) http.Handler {
 			w.Header().Set("Access-Control-Allow-Origin", origin)
 			w.Header().Set("Vary", "Origin")
 			w.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
-			w.Header().Set("Access-Control-Max-Age", "600")
+			w.Header().Set("Access-Control-Max-Age", "86400")
 			w.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := r.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
@@ -212,7 +212,7 @@ func handleDiscourseOrigin(h http.Handler) http.Handler {
 			w.Header().Set("Access-Control-Allow-Origin", origin)
 			w.Header().Set("Vary", "Origin")
 			w.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
-			w.Header().Set("Access-Control-Max-Age", "600")
+			w.Header().Set("Access-Control-Max-Age", "86400")
 			w.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := r.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
@@ -226,7 +226,7 @@ func handleDiscourseOrigin(h http.Handler) http.Handler {
 			w.Header().Set("Access-Control-Allow-Origin", origin)
 			w.Header().Set("Vary", "Origin")
 			w.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
-			w.Header().Set("Access-Control-Max-Age", "600")
+			w.Header().Set("Access-Control-Max-Age", "86400")
 			w.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := r.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
@@ -240,7 +240,7 @@ func handleDiscourseOrigin(h http.Handler) http.Handler {
 			w.Header().Set("Access-Control-Allow-Origin", origin)
 			w.Header().Set("Vary", "Origin")
 			w.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
-			w.Header().Set("Access-Control-Max-Age", "600")
+			w.Header().Set("Access-Control-Max-Age", "86400")
 			w.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := r.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
@@ -254,7 +254,7 @@ func handleDiscourseOrigin(h http.Handler) http.Handler {
 			w.Header().Set("Access-Control-Allow-Origin", origin)
 			w.Header().Set("Vary", "Origin")
 			w.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
-			w.Header().Set("Access-Control-Max-Age", "600")
+			w.Header().Set("Access-Control-Max-Age", "86400")
 			w.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := r.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
@@ -268,7 +268,7 @@ func handleDiscourseOrigin(h http.Handler) http.Handler {
 			w.Header().Set("Access-Control-Allow-Origin", origin)
 			w.Header().Set("Vary", "Origin")
 			w.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
-			w.Header().Set("Access-Control-Max-Age", "600")
+			w.Header().Set("Access-Control-Max-Age", "86400")
 			w.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := r.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request

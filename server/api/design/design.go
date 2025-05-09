@@ -33,7 +33,7 @@ func commonOptions() {
 		cors.Headers("Authorization", "Content-Type")
 		cors.Expose("Authorization", "Content-Type")
 		cors.Methods("GET", "OPTIONS", "POST", "DELETE", "PATCH", "PUT")
-		cors.MaxAge(600)
+		cors.MaxAge(86400)
 	}
 
 	for _, origin := range Origins {
