@@ -34,6 +34,7 @@ import AdminStations from "./views/admin/AdminStations.vue";
 import Playground from "./views/admin/Playground.vue";
 
 import StationView from "./views/station/StationView.vue";
+import NotFoundView from "./views/NotFoundView.vue";
 
 import { deserializeBookmark } from "./views/viz/viz";
 import TermsView from "@/views/auth/TermsView.vue";
@@ -643,6 +644,14 @@ const routes = [
         },
     },
     getRoot(),
+    {
+        path: "*",
+        name: "notFound",
+        component: NotFoundView,
+        meta: {
+            secured: false,
+        },
+    },
 ];
 
 export default function routerFactory(store) {
