@@ -11,6 +11,13 @@ import (
 var (
 	MaterializedViews = []*MaterializedView{
 		{
+			Name:              "fieldkit.sensor_data_1m",
+			ShortName:         "1m",
+			BucketWidth:       time.Minute,
+			EndOffsetSQL:      "3 minutes",
+			EndOffsetDuration: time.Minute * 3,
+		},
+		{
 			Name:              "fieldkit.sensor_data_10m",
 			ShortName:         "10m",
 			BucketWidth:       time.Minute * 10,
