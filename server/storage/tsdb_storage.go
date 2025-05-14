@@ -21,8 +21,8 @@ var (
 			Name:              "fieldkit.sensor_data_10m",
 			ShortName:         "10m",
 			BucketWidth:       time.Minute * 10,
-			EndOffsetSQL:      "20 minutes",
-			EndOffsetDuration: time.Minute * 20,
+			EndOffsetSQL:      "30 minutes",
+			EndOffsetDuration: time.Minute * 30,
 		},
 		{
 			Name:              "fieldkit.sensor_data_1h",
@@ -35,8 +35,8 @@ var (
 			Name:              "fieldkit.sensor_data_6h",
 			ShortName:         "6h",
 			BucketWidth:       time.Hour * 6,
-			EndOffsetSQL:      "21 hours",
-			EndOffsetDuration: time.Hour * 21,
+			EndOffsetSQL:      "18 hours",
+			EndOffsetDuration: time.Hour * 18,
 		},
 		{
 			Name:              "fieldkit.sensor_data_24h",
