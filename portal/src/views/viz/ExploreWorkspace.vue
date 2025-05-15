@@ -348,12 +348,15 @@ export default Vue.extend({
 
                         const associated = await this.$services.api.getAssociatedStations(stationId);
                         // First station ID should be the station we're opening.
-                        const stationIds = _.sortBy(associated.stations.map((associatedStation) => associatedStation.station.id), (id) => {
-                            if (id == stationId) {
-                                return 0;
+                        const stationIds = _.sortBy(
+                            associated.stations.map((associatedStation) => associatedStation.station.id),
+                            (id) => {
+                                if (id == stationId) {
+                                    return 0;
+                                }
+                                return id;
                             }
-                            return id;
-                        });
+                        );
                         console.log(`viz: show-station-associated`, { associated, stationIds });
 
                         const getInitialBookmark = () => {

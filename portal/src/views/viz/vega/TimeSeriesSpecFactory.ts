@@ -98,7 +98,11 @@ export class TimeSeriesSpecFactory {
         const filteredData = this.allSeries.map((series, i): TimeSeriesDataRow[] => {
             // TODO We can eventually remove hoverName here
             const hoverName = makeHoverName(i);
-            const properties = { name: hoverName, vizInfo: series.vizInfo, series: i };
+            const properties = {
+                name: hoverName,
+                vizInfo: { label: series.vizInfo.label, unitOfMeasure: series.vizInfo.unitOfMeasure },
+                series: i,
+            };
             const original = series.queried.data;
 
             // If a sensor has a custom filter, that information will be in the vizInfo object.
