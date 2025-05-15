@@ -1536,39 +1536,50 @@ func (sr *StationRepository) QueryStationSensors(ctx context.Context, stations [
 	}
 
 	metaRepository := NewModuleMetaRepository(sr.db)
+	brokenSensors := make([]*StationSensorRow, 0)
 
 	for _, row := range rows {
-		var moduleKey *string
-		moduleOrder := 0
-		if row.ModuleKey != nil {
-			if !strings.HasPrefix(*row.ModuleKey, "fk.") && !strings.HasPrefix(*row.ModuleKey, "wh.") {
-				newKey := "fk." + strings.TrimPrefix(*row.ModuleKey, "modules.")
-				moduleKey = &newKey
-			} else {
-				moduleKey = row.ModuleKey
+		if row.SensorID == nil {
+			brokenSensors = append(brokenSensors, row)
+		} else {
+			var moduleKey *string
+			moduleOrder := 0
+			if row.ModuleKey != nil {
+				if !strings.HasPrefix(*row.ModuleKey, "fk.") && !strings.HasPrefix(*row.ModuleKey, "wh.") {
+					newKey := "fk." + strings.TrimPrefix(*row.ModuleKey, "modules.")
+					moduleKey = &newKey
+				} else {
+					moduleKey = row.ModuleKey
+				}
 			}
-		}
-		order := 0
-		if row.SensorKey != nil {
-			moduleAndSensor, _ := metaRepository.FindByFullKey(ctx, *row.SensorKey)
-			if moduleAndSensor != nil {
-				order = moduleAndSensor.Sensor.Order
-				moduleOrder = moduleAndSensor.Module.Order
+			order := 0
+			if row.SensorKey != nil {
+				moduleAndSensor, _ := metaRepository.FindByFullKey(ctx, *row.SensorKey)
+				if moduleAndSensor != nil {
+					order = moduleAndSensor.Sensor.Order
+					moduleOrder = moduleAndSensor.Module.Order
+				}
 			}
+			byStation[row.StationID] = append(byStation[row.StationID], &StationSensor{
+				StationID:       row.StationID,
+				StationName:     row.StationName,
+				StationLocation: row.StationLocation,
+				ModulePrimaryID: row.ModulePrimaryID,
+				ModuleID:        row.ModuleID,
+				ModuleKey:       moduleKey,
+				SensorID:        row.SensorID,
+				SensorKey:       row.SensorKey,
+				SensorReadAt:    row.SensorReadAt,
+				Order:           int32(order),
+				ModuleOrder:     int32(moduleOrder),
+			})
 		}
-		byStation[row.StationID] = append(byStation[row.StationID], &StationSensor{
-			StationID:       row.StationID,
-			StationName:     row.StationName,
-			StationLocation: row.StationLocation,
-			ModulePrimaryID: row.ModulePrimaryID,
-			ModuleID:        row.ModuleID,
-			ModuleKey:       moduleKey,
-			SensorID:        row.SensorID,
-			SensorKey:       row.SensorKey,
-			SensorReadAt:    row.SensorReadAt,
-			Order:           int32(order),
-			ModuleOrder:     int32(moduleOrder),
-		})
+	}
+
+	log := Logger(ctx).Sugar()
+
+	if len(brokenSensors) > 0 {
+		log.Infow("station-meta", "station_ids", stations, "broken_sensors", len(brokenSensors))
 	}
 
 	for _, sensors := range byStation {
