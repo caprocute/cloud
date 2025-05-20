@@ -120,7 +120,7 @@ func (c *SensorService) Data(ctx context.Context, payload *sensor.DataPayload) (
 
 	log := Logger(ctx).Sugar()
 
-	log.Infow("parameters", "start", qp.Start, "end", qp.End, "sensor_ids", qp.SensorIDs(), "module_ids", qp.ModuleIDs(), "stations", qp.Stations, "resolution", qp.Resolution, "aggregate", qp.Aggregate, "tail", qp.Tail)
+	log.Infow("parameters", "start", qp.Start, "end", qp.End, "sensor_ids", qp.SensorIDs(), "module_hw_ids", qp.ModuleIDs(), "stations", qp.Stations, "resolution", qp.Resolution, "aggregate", qp.Aggregate, "tail", qp.Tail)
 
 	if qp.Tail > 0 {
 		return c.tail(ctx, be, qp.Stations)
