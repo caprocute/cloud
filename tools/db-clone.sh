@@ -95,7 +95,7 @@ fi
 ls -alh
 echo compressing...
 
-xz -T2 ${FILE}
+xz -4 -T2 ${FILE}
 ls -alh
 
 scp -o StrictHostKeyChecking=no -i ${SSH_KEY} ${FILE}.xz ${SYNC_COPY_TARGET_DBS}
