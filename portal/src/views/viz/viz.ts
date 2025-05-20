@@ -820,16 +820,21 @@ export class Workspace implements VizInfoFactory {
         const meta = await this.metaQuerier.query(this.stationIds);
 
         // TODO Map and assign.
-        const _ignored = _.map(meta.stationSensors.stations, (info, stationId) => {
+        const _ignored = _.flatMap(meta.stationSensors.stations, (info, stationId) => {
             const associated = meta.associated.stations.find((s) => s.station.id == Number(stationId));
-            const stationName = info[0].stationName;
-            const stationLocation = info[0].stationLocation;
-            const sensors = info
-                .filter((row) => row.moduleId != null)
-                .map((row) => new SensorMeta(row.moduleId, row.moduleKey, row.sensorId, row.sensorKey, row.sensorReadAt));
-            const station = new StationMeta(Number(stationId), stationName, stationLocation, sensors, !associated || associated.hidden);
-            this.stations[station.id] = station;
-            return station;
+            if (info.length > 0) {
+                const stationName = info[0].stationName;
+                const stationLocation = info[0].stationLocation;
+                const sensors = info
+                    .filter((row) => row.moduleId != null)
+                    .map((row) => new SensorMeta(row.moduleId, row.moduleKey, row.sensorId, row.sensorKey, row.sensorReadAt));
+                const station = new StationMeta(Number(stationId), stationName, stationLocation, sensors, !associated || associated.hidden);
+                this.stations[station.id] = station;
+                return [station];
+            } else {
+                console.log(`viz:`, info, stationId);
+                return [];
+            }
         });
 
         this.associated = meta.associated.stations;
