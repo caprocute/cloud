@@ -99,7 +99,7 @@ func (v *TsDBHandler) OnData(ctx context.Context, provision *data.Provision, raw
 			return err
 		}
 
-		log.Infow("station-modules", "meta_record_id", meta.ID, "provision_id", provision.ID, "modules", modules)
+		log.Infow("station-modules", "meta_record_id", meta.ID, "provision_id", provision.ID, "number_modules", len(modules))
 
 		v.stationModules = make(map[uint32]*data.StationModule)
 		for _, sm := range modules {
