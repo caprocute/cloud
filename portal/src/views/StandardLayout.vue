@@ -119,8 +119,9 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "src/scss/variables";
-@import "src/scss/mixins";
+@use "sass:color";
+@use "src/scss/variables";
+@use "src/scss/mixins";
 
 .container-ignored {
     height: 100%;
@@ -141,7 +142,7 @@ export default Vue.extend({
     min-width: 0; // makes sure this flex item doesn't allow content overflow on x axis
 
     body.floodnet & {
-        background: #{lighten($color-floodnet-border, 5%)};
+        background: #{color.adjust(variables.$color-floodnet-border, $lightness: 5%)};
     }
 }
 .scrolling-disabled {
@@ -155,15 +156,15 @@ export default Vue.extend({
     bottom: 8px;
     left: 6px;
     text-align: left;
-    z-index: $z-index-menu;
+    z-index: variables.$z-index-menu;
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         position: initial;
         z-index: initial;
         padding: 30px;
     }
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         padding: 10px;
     }
 

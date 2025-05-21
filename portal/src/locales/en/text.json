@@ -1,5 +1,35 @@
 {
     "hello": "Hello from i18n!",
+    "pageTitles": {
+        "login": "Login",
+        "register": "Create Account",
+        "recover": "Recover Account",
+        "reset": "Reset Password",
+        "terms": "Terms and Conditions",
+        "projects": "Projects",
+        "viewProject": "Project Details",
+        "viewProjectActivity": "Project Activity",
+        "viewProjectBigMap": "Project Map",
+        "viewProjectBigMapList": "Project Stations",
+        "addProject": "Create Project",
+        "editProject": "Edit Project",
+        "mapAllStations": "Stations Map",
+        "listAllStations": "Stations List",
+        "viewStation": "Station Details",
+        "viewStationFromMap": "Station Details",
+        "viewStationPhotos": "Station Photos",
+        "mapStation":"Station Details",
+        "mapAllStationsBounds":"Station Details",
+        "exploreBookmark": "Data Dashboard",
+        "exploreShortBookmark": "Data Dashboard",
+        "viewProjectNotes": "Project Notes",
+        "viewMyNotes": "My Notes",
+        "notifications": "Notifications",
+        "user": "User Profile",
+        "adminMain": "Admin Dashboard",
+        "adminUsers": "Admin Users",
+        "adminStations": "Admin Stations"
+    },
     "water.ec.name": "Water Conductivity",
     "water.ph.name": "Water pH",
     "water.do.name": "Water Dissolved Oxygen",
@@ -107,7 +137,8 @@
             "community": "Community Projects",
             "anonymous": "Projects"
         },
-        "add": "Add Project"
+        "add": "Add Project",
+        "noUserProjects": "You're not a member of any projects yet. Create one to get started!"
     },
     "project": {
         "details": {
@@ -742,7 +773,8 @@
     },
     "languageSelector": {
         "english": "English",
-        "spanish": "Español"
+        "spanish": "Español",
+        "toggleText": "Language"
     },
     "iconAlts": {
         "close": "Close"

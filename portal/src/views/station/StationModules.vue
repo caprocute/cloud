@@ -18,7 +18,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import { DisplayModule, DisplayStation, StationStatus } from "@/store";
+import { DisplayModule, DisplayStation } from "@/store";
 import * as utils from "@/utilities";
 import TinyChart from "@/views/viz/TinyChart.vue";
 import { BookmarkFactory, serializeBookmark } from "@/views/viz/viz";
@@ -69,13 +69,13 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "src/scss/variables";
-@import "src/scss/mixins";
+@use "src/scss/variables";
+@use "src/scss/mixins";
 
 .module-data-container {
     gap: 20px;
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         gap: 10px;
     }
 }
@@ -83,15 +83,15 @@ export default Vue.extend({
 .module-data-item {
     flex: 1 1 calc(50% - 10px);
     min-width: 0;
-    z-index: $z-index-top;
+    z-index: variables.$z-index-top;
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         flex: 0 0 100%;
     }
 }
 
 .module-data-title {
-    color: $color-primary;
+    color: variables.$color-primary;
     font-size: 12px;
     margin-bottom: 10px;
     cursor: pointer;

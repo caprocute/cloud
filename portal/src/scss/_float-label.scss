@@ -1,4 +1,5 @@
-@import "mixins";
+@use "mixins";
+@use "variables";
 
 .has-float-label input {
     width: 100%;
@@ -33,7 +34,7 @@
     top: -4px;
     cursor: text;
     font-size: 75%;
-    font-family: $font-family-light;
+    font-family: variables.$font-family-light;
     opacity: 1;
     -webkit-transition: all 0.2s;
     transition: all 0.2s;
