@@ -2610,7 +2610,7 @@ func EncodeDownloadPhotoError(encoder func(context.Context, http.ResponseWriter)
 // the project projects station endpoint.
 func EncodeProjectsStationResponse(encoder func(context.Context, http.ResponseWriter) goahttp.Encoder) func(context.Context, http.ResponseWriter, interface{}) error {
 	return func(ctx context.Context, w http.ResponseWriter, v interface{}) error {
-		res := v.(*projectviews.Projects)
+		res := v.(*projectviews.ProjectsBasic)
 		enc := encoder(ctx, w)
 		body := NewProjectsStationResponseBody(res.Projected)
 		w.WriteHeader(http.StatusOK)
@@ -2624,7 +2624,7 @@ func DecodeProjectsStationRequest(mux goahttp.Muxer, decoder func(*http.Request)
 	return func(r *http.Request) (interface{}, error) {
 		var (
 			id   int32
-			auth string
+			auth *string
 			err  error
 
 			params = mux.Vars(r)
@@ -2637,18 +2637,20 @@ func DecodeProjectsStationRequest(mux goahttp.Muxer, decoder func(*http.Request)
 			}
 			id = int32(v)
 		}
-		auth = r.Header.Get("Authorization")
-		if auth == "" {
-			err = goa.MergeErrors(err, goa.MissingFieldError("Authorization", "header"))
+		authRaw := r.Header.Get("Authorization")
+		if authRaw != "" {
+			auth = &authRaw
 		}
 		if err != nil {
 			return nil, err
 		}
 		payload := NewProjectsStationPayload(id, auth)
-		if strings.Contains(payload.Auth, " ") {
-			// Remove authorization scheme prefix (e.g. "Bearer")
-			cred := strings.SplitN(payload.Auth, " ", 2)[1]
-			payload.Auth = cred
+		if payload.Auth != nil {
+			if strings.Contains(*payload.Auth, " ") {
+				// Remove authorization scheme prefix (e.g. "Bearer")
+				cred := strings.SplitN(*payload.Auth, " ", 2)[1]
+				payload.Auth = &cred
+			}
 		}
 
 		return payload, nil
@@ -2822,6 +2824,18 @@ func unmarshalProjectBoundsRequestBodyRequestBodyToProjectProjectBounds(v *Proje
 	res.Max = make([]float64, len(v.Max))
 	for i, val := range v.Max {
 		res.Max[i] = val
+	}
+
+	return res
+}
+
+// marshalProjectviewsProjectBasicViewToProjectBasicResponseBody builds a value
+// of type *ProjectBasicResponseBody from a value of type
+// *projectviews.ProjectBasicView.
+func marshalProjectviewsProjectBasicViewToProjectBasicResponseBody(v *projectviews.ProjectBasicView) *ProjectBasicResponseBody {
+	res := &ProjectBasicResponseBody{
+		ID:   *v.ID,
+		Name: *v.Name,
 	}
 
 	return res

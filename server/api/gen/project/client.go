@@ -246,11 +246,11 @@ func (c *Client) DownloadPhoto(ctx context.Context, p *DownloadPhotoPayload) (re
 
 // ProjectsStation calls the "projects station" endpoint of the "project"
 // service.
-func (c *Client) ProjectsStation(ctx context.Context, p *ProjectsStationPayload) (res *Projects, err error) {
+func (c *Client) ProjectsStation(ctx context.Context, p *ProjectsStationPayload) (res *ProjectsBasic, err error) {
 	var ires interface{}
 	ires, err = c.ProjectsStationEndpoint(ctx, p)
 	if err != nil {
 		return
 	}
-	return ires.(*Projects), nil
+	return ires.(*ProjectsBasic), nil
 }

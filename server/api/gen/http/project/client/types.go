@@ -186,7 +186,7 @@ type DownloadPhotoResponseBody struct {
 // ProjectsStationResponseBody is the type of the "project" service "projects
 // station" endpoint HTTP response body.
 type ProjectsStationResponseBody struct {
-	Projects ProjectCollectionResponseBody `form:"projects,omitempty" json:"projects,omitempty" xml:"projects,omitempty"`
+	Projects ProjectBasicCollectionResponseBody `form:"projects,omitempty" json:"projects,omitempty" xml:"projects,omitempty"`
 }
 
 // AddUpdateUnauthorizedResponseBody is the type of the "project" service "add
@@ -1908,6 +1908,16 @@ type ProjectBoundsRequestBodyRequestBody struct {
 	Max []float64 `form:"max" json:"max" xml:"max"`
 }
 
+// ProjectBasicCollectionResponseBody is used to define fields on response body
+// types.
+type ProjectBasicCollectionResponseBody []*ProjectBasicResponseBody
+
+// ProjectBasicResponseBody is used to define fields on response body types.
+type ProjectBasicResponseBody struct {
+	ID   *int32  `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	Name *string `form:"name,omitempty" json:"name,omitempty" xml:"name,omitempty"`
+}
+
 // NewAddUpdateRequestBody builds the HTTP request body from the payload of the
 // "add update" endpoint of the "project" service.
 func NewAddUpdateRequestBody(p *project.AddUpdatePayload) *AddUpdateRequestBody {
@@ -3462,13 +3472,13 @@ func NewDownloadPhotoBadRequest(body *DownloadPhotoBadRequestResponseBody) *goa.
 	return v
 }
 
-// NewProjectsStationProjectsOK builds a "project" service "projects station"
-// endpoint result from a HTTP "OK" response.
-func NewProjectsStationProjectsOK(body *ProjectsStationResponseBody) *projectviews.ProjectsView {
-	v := &projectviews.ProjectsView{}
-	v.Projects = make([]*projectviews.ProjectView, len(body.Projects))
+// NewProjectsStationProjectsBasicOK builds a "project" service "projects
+// station" endpoint result from a HTTP "OK" response.
+func NewProjectsStationProjectsBasicOK(body *ProjectsStationResponseBody) *projectviews.ProjectsBasicView {
+	v := &projectviews.ProjectsBasicView{}
+	v.Projects = make([]*projectviews.ProjectBasicView, len(body.Projects))
 	for i, val := range body.Projects {
-		v.Projects[i] = unmarshalProjectResponseBodyToProjectviewsProjectView(val)
+		v.Projects[i] = unmarshalProjectBasicResponseBodyToProjectviewsProjectBasicView(val)
 	}
 
 	return v
@@ -5871,6 +5881,31 @@ func ValidateProjectBoundsRequestBodyRequestBody(body *ProjectBoundsRequestBodyR
 	}
 	if body.Max == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("max", "body"))
+	}
+	return
+}
+
+// ValidateProjectBasicCollectionResponseBody runs the validations defined on
+// ProjectBasicCollectionResponseBody
+func ValidateProjectBasicCollectionResponseBody(body ProjectBasicCollectionResponseBody) (err error) {
+	for _, e := range body {
+		if e != nil {
+			if err2 := ValidateProjectBasicResponseBody(e); err2 != nil {
+				err = goa.MergeErrors(err, err2)
+			}
+		}
+	}
+	return
+}
+
+// ValidateProjectBasicResponseBody runs the validations defined on
+// ProjectBasicResponseBody
+func ValidateProjectBasicResponseBody(body *ProjectBasicResponseBody) (err error) {
+	if body.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "body"))
+	}
+	if body.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "body"))
 	}
 	return
 }
