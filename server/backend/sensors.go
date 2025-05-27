@@ -57,6 +57,26 @@ type QueryParams struct {
 	EndOfTime       bool              `json:"end_of_time"`
 }
 
+func (qp *QueryParams) SensorIDs() []int64 {
+	ids := make([]int64, 0)
+
+	for _, s := range qp.Sensors {
+		ids = append(ids, s.SensorID)
+	}
+
+	return ids
+}
+
+func (qp *QueryParams) ModuleIDs() []string {
+	ids := make([]string, 0)
+
+	for _, s := range qp.Sensors {
+		ids = append(ids, s.ModuleID)
+	}
+
+	return ids
+}
+
 func ParseStationIDs(raw *string) []int32 {
 	stations := make([]int32, 0)
 	if raw != nil {
@@ -267,7 +287,8 @@ func (dq *DataQuerier) GetStationIDs(ctx context.Context, stationIDs []int32) (*
 		FROM fieldkit.station AS s
 		RIGHT JOIN fieldkit.provision AS p ON (s.device_id = p.device_id)
 		RIGHT JOIN fieldkit.station_configuration AS c ON (c.provision_id = p.id)
-		RIGHT JOIN fieldkit.station_module AS m ON (c.id = m.configuration_id)
+		RIGHT JOIN fieldkit.configuration_module AS config_module ON (config_module.configuration_id = c.id)
+		RIGHT JOIN fieldkit.station_module AS m ON (config_module.module_id = m.id)
 		WHERE s.id IN (?)
 	`, stationIDs)
 	if err != nil {
@@ -325,7 +346,8 @@ func (dq *DataQuerier) GetIDs(ctx context.Context, mas []ModuleAndSensor) (*Sens
 		)
 		SELECT s.station_id, m.id AS module_id, m.hardware_id
 		FROM fieldkit.station_module AS m
-		LEFT JOIN fieldkit.station_configuration AS c ON (c.id = m.configuration_id)
+		LEFT JOIN fieldkit.configuration_module AS cm ON (cm.module_id = m.id)
+		LEFT JOIN fieldkit.station_configuration AS c ON (c.id = cm.configuration_id)
 		LEFT JOIN fieldkit.provision AS p ON (c.provision_id = p.id)
 		LEFT JOIN station_ids AS s ON (p.device_id = s.device_id)
 		WHERE m.hardware_id IN (?)

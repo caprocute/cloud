@@ -1,4 +1,4 @@
-FROM node:18.17.0 AS node
+FROM node:20.9.0 AS node
 ENV PUBLIC_PATH /
 WORKDIR /app
 

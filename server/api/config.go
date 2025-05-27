@@ -15,14 +15,15 @@ type BucketNames struct {
 }
 
 type ApiConfiguration struct {
-	ApiHost       string
-	SessionKey    string
-	MapboxToken   string
-	Emailer       string
-	Domain        string
-	PortalDomain  string
-	EmailOverride string
-	Buckets       *BucketNames
+	ApiHost          string
+	SessionKey       string
+	MapboxToken      string
+	NativeLandsToken string
+	Emailer          string
+	Domain           string
+	PortalDomain     string
+	EmailOverride    string
+	Buckets          *BucketNames
 }
 
 func (ac *ApiConfiguration) MakeApiUrl(f string, args ...interface{}) string {

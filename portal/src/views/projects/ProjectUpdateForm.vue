@@ -6,7 +6,7 @@
         <h2>{{ this.formHeading }}</h2>
         <div class="outer-input-container">
             <div class="input-container">
-                <span class="floating-label">{{ $t('project.update.label') }}</span>
+                <span class="floating-label">{{ $t("project.update.label") }}</span>
                 <textarea v-model="body" class="inputText" required="" />
             </div>
         </div>
@@ -16,7 +16,7 @@
             <button class="save-btn" v-if="formType == 'update'" v-on:click="updateProjectUpdate">Update</button>
             <div v-if="formType == 'update'" class="delete-container" v-on:click="deleteProjectUpdate">
                 <img alt="Delete" src="@/assets/icon-close-bold.svg" />
-              {{ $t('project.update.delete') }}
+                {{ $t("project.update.delete") }}
             </div>
         </div>
     </div>

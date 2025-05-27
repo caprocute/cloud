@@ -1,5 +1,5 @@
 import { ActionContext } from "vuex";
-import { Services, SendFunction, SimpleUser } from "@/api";
+import { Services, SendFunction } from "@/api";
 import * as ActionTypes from "../actions";
 import { MarkNotificationsSeen } from "../typed-actions";
 import { promiseAfter } from "@/utilities";

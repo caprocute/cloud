@@ -2,7 +2,7 @@ import _ from "lodash";
 import { ChartSettings, DataRow, SeriesData, getSeriesThresholds, getAxisLabel } from "./SpecFactory";
 import chartStyles from "./chartStyles";
 import { makeRange, truncateTime, addDays, addSeconds, addGaps, addMinimumGap } from "../common";
-import i18n from '../i18n-charts';
+import i18n from "../i18n-charts";
 
 export interface TimeSeriesDataRow extends DataRow {
     gap: number;
@@ -63,9 +63,8 @@ export class TimeSeriesSpecFactory {
         const solidColors = true;
 
         // Always showing hovering state.
-        const alwaysShowHovering = (i: number, hovering: any, otherwise: any) => `${hovering}`;
+        const alwaysShowHovering = (i: number, hovering: any, _otherwise: any) => `${hovering}`;
         // Early hovering behavior.
-        // `hover.name == '${makeHoverName(i)}' ? ${hovering} : ${otherwise}`;
         const ifHovering = alwaysShowHovering;
 
         const makeSeriesThresholds = (series: SeriesData) => {
@@ -99,7 +98,11 @@ export class TimeSeriesSpecFactory {
         const filteredData = this.allSeries.map((series, i): TimeSeriesDataRow[] => {
             // TODO We can eventually remove hoverName here
             const hoverName = makeHoverName(i);
-            const properties = { name: hoverName, vizInfo: series.vizInfo, series: i };
+            const properties = {
+                name: hoverName,
+                vizInfo: { label: series.vizInfo.label, unitOfMeasure: series.vizInfo.unitOfMeasure },
+                series: i,
+            };
             const original = series.queried.data;
 
             // If a sensor has a custom filter, that information will be in the vizInfo object.
@@ -159,7 +162,7 @@ export class TimeSeriesSpecFactory {
             return makeSeriesDomain(series, i);
         });
 
-        const getBarConfiguration = (i: number, timeRange: number[] | null): { units: string[]; step: number | undefined } => {
+        const getBarConfiguration = (i: number, _timeRange: number[] | null): { units: string[]; step: number | undefined } => {
             const bucketSize = this.allSeries[i].queried.bucketSize;
             const step = bucketSize > 300 ? bucketSize / 60 : 5;
             return {

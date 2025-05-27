@@ -51,5 +51,5 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "src/scss/project-detail-card";
+@use "src/scss/project-detail-card";
 </style>

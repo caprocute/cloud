@@ -77,7 +77,8 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "src/scss/project-detail-card.scss";
+@use "src/scss/project-detail-card.scss";
+@use "src/scss/variables";
 
 .export-chart-content {
     position: absolute;
@@ -125,7 +126,7 @@ export default Vue.extend({
 
 .viz-stations {
     padding: 32px 48px 16px;
-    border-bottom: 1px solid $color-border;
+    border-bottom: 1px solid variables.$color-border;
     position: relative;
 
     .icon-logo-fieldkit {
@@ -144,7 +145,7 @@ export default Vue.extend({
     align-items: center;
 
     span:nth-of-type(1) {
-        font-family: $font-family-bold;
+        font-family: variables.$font-family-bold;
         margin-right: 5px;
     }
 }

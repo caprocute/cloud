@@ -1,4 +1,3 @@
-import { Services } from "@/api";
 import * as ActionTypes from "@/store/actions";
 import * as MutationTypes from "@/store/mutations";
 
@@ -11,12 +10,20 @@ const getters = {};
 const actions = () => {
     return {
         [ActionTypes.SET_REFRESH_WORKSPACE_FN]: (
-            { commit, dispatch, state }: { commit: any; dispatch: any; state: ExploreViewState },
+            { commit, dispatch: _dispatch, state: _state }: { commit: any; dispatch: any; state: ExploreViewState },
             fn: () => void
         ) => {
             commit(MutationTypes.SET_REFRESH_WORKSPACE_FN, fn);
         },
-        [ActionTypes.REFRESH_WORKSPACE]: ({ commit, dispatch, state }: { commit: any; dispatch: any; state: ExploreViewState }) => {
+        [ActionTypes.REFRESH_WORKSPACE]: ({
+            commit: _commit,
+            dispatch: _dispatch,
+            state,
+        }: {
+            commit: any;
+            dispatch: any;
+            state: ExploreViewState;
+        }) => {
             if (state.refreshLineChartFn) {
                 state.refreshLineChartFn();
             }

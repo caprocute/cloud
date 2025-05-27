@@ -51,10 +51,11 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "../../scss/float-label";
+@use "src/scss/float-label";
+@use "src/scss/mixins";
 
 .icon-calendar {
-    @include position(absolute, null 0 10px null);
+    @include mixins.position(absolute, null 0 10px null);
 
     &:before {
         color: var(--color-dark);

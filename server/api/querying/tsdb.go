@@ -142,7 +142,7 @@ func (tsdb *TimeScaleDBBackend) queryRanges(ctx context.Context, qp *backend.Que
 
 	defer queryMetrics.Send()
 
-	log.Infow("tsdb:query-ranges", "stations", qp.Stations, "modules", ids.ModuleIDs, "sensors", ids.SensorIDs)
+	log.Infow("tsdb:query-ranges", "stations", qp.Stations, "modules", ids.ModuleIDs, "sensor_ids", ids.SensorIDs)
 
 	pgRows, err := tsdb.pool.Query(ctx, `
 		SELECT
@@ -346,7 +346,7 @@ func (tsdb *TimeScaleDBBackend) QueryData(ctx context.Context, qp *backend.Query
 		return nil, err
 	}
 
-	log.Infow("tsdb:query:prepare", "start", qp.Start, "end", qp.End, "stations", qp.Stations, "sensors", qp.Sensors)
+	log.Infow("tsdb:query:prepare", "start", qp.Start, "end", qp.End, "stations", qp.Stations)
 
 	// Determine the query we'll use to get the actual data we'll be returning.
 	dataQuerySql, dataQueryArgs, aggregate, err := tsdb.getDataQuery(ctx, qp, ids)
@@ -377,7 +377,7 @@ func (tsdb *TimeScaleDBBackend) QueryData(ctx context.Context, qp *backend.Query
 		return nil, err
 	}
 
-	log.Infow("tsdb:done", "start", qp.Start, "end", qp.End, "stations", qp.Stations, "sensors", qp.Sensors, "rows", len(dataRows), "aggregate", aggregate.Specifier)
+	log.Infow("tsdb:done", "start", qp.Start, "end", qp.End, "stations", qp.Stations, "rows", len(dataRows), "aggregate", aggregate.Specifier)
 
 	backendRows := make([]*backend.DataRow, 0)
 	for _, row := range dataRows {

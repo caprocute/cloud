@@ -15,7 +15,7 @@ const getters = {
     },
 };
 
-const actions = (services: Services) => {
+const actions = (_services: Services) => {
     return {};
 };
 

@@ -81,14 +81,15 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
-@import "../../scss/mixins";
+@use "src/scss/mixins";
+@use "src/scss/variables";
 
 .notifications {
     &-item {
-        @include flex(center);
+        @include mixins.flex(center);
         color: #6a6d71;
         font-size: 14px;
-        font-family: $font-family-light;
+        font-family: variables.$font-family-light;
         margin-bottom: 10px;
         line-height: 1.4em;
         padding: 0 10px;
@@ -98,7 +99,7 @@ export default Vue.extend({
         }
 
         &-icon {
-            @include position(absolute, 24px 0 null 18px);
+            @include mixins.position(absolute, 24px 0 null 18px);
             display: block;
             border-radius: 50%;
             width: 17px;
@@ -106,8 +107,8 @@ export default Vue.extend({
             font-size: 10px;
             line-height: 18px;
 
-            @include bp-down($md) {
-                @include position(absolute, 26px 0 null 20px);
+            @include mixins.bp-down(variables.$md) {
+                @include mixins.position(absolute, 26px 0 null 20px);
                 width: 15px;
                 height: 15px;
                 font-size: 8px;
@@ -163,12 +164,12 @@ export default Vue.extend({
     margin-left: auto;
 
     &:after {
-        @include flex(flex-end);
+        @include mixins.flex(flex-end);
         content: "...";
         color: #2c3e50;
         height: 17px;
         font-size: 32px;
-        font-family: $font-family-bold;
+        font-family: variables.$font-family-bold;
         letter-spacing: -1.5px;
     }
 }
@@ -181,7 +182,7 @@ export default Vue.extend({
     .icon-icon-mention {
         font-size: 10px;
         line-height: 18px;
-        @include bp-down($md) {
+        @include mixins.bp-down(variables.$md) {
             font-size: 8px;
             line-height: 16px;
         }

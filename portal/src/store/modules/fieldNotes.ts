@@ -17,14 +17,14 @@ const getters = {
 const actions = (services: Services) => {
     return {
         [ActionTypes.NEED_FIELD_NOTES]: async (
-            { commit, dispatch, state }: { commit: any; dispatch: any; state: FieldNotesState },
+            { commit, dispatch: _dispatch, state: _state }: { commit: any; dispatch: any; state: FieldNotesState },
             payload: { id: number }
         ) => {
             const notes = await services.api.getStationFieldNotes(payload.id);
             commit(MutationTypes.FIELD_NOTES_UPDATE, notes.notes);
         },
         [ActionTypes.ADD_FIELD_NOTE]: async (
-            { commit, dispatch, state }: { commit: any; dispatch: any; state: FieldNotesState },
+            { commit, dispatch: _dispatch, state }: { commit: any; dispatch: any; state: FieldNotesState },
             payload: { stationId: number; note: PortalStationFieldNotes }
         ) => {
             const response = await services.api.addStationFieldNote(payload.stationId, payload.note);
@@ -32,27 +32,24 @@ const actions = (services: Services) => {
             commit(MutationTypes.FIELD_NOTES_UPDATE, combined);
         },
         [ActionTypes.UPDATE_FIELD_NOTE]: async (
-            { commit, dispatch, state }: { commit: any; dispatch: any; state: FieldNotesState },
+            { commit: _commit, dispatch: _dispatch, state: _state }: { commit: any; dispatch: any; state: FieldNotesState },
             payload: { stationId: number; note: PortalStationFieldNotes }
         ) => {
             await services.api.updateStationFieldNote(payload.stationId, payload.note);
         },
         [ActionTypes.DELETE_FIELD_NOTE]: async (
-            { commit, dispatch, state }: { commit: any; dispatch: any; state: FieldNotesState },
+            { commit, dispatch: _dispatch, state }: { commit: any; dispatch: any; state: FieldNotesState },
             payload: { stationId: number; noteId: number }
         ) => {
             await services.api.deleteStationFieldNote(payload.stationId, payload.noteId);
-            const newNotes = state.fieldNotes.filter(note => note.id !== payload.noteId);
+            const newNotes = state.fieldNotes.filter((note) => note.id !== payload.noteId);
             commit(MutationTypes.FIELD_NOTES_UPDATE, newNotes);
         },
     };
 };
 
 const mutations = {
-    [MutationTypes.FIELD_NOTES_UPDATE]: (
-        state: FieldNotesState,
-        payload: PortalStationFieldNotes,
-    ) => {
+    [MutationTypes.FIELD_NOTES_UPDATE]: (state: FieldNotesState, payload: PortalStationFieldNotes) => {
         Vue.set(state, "fieldNotes", payload);
     },
 };

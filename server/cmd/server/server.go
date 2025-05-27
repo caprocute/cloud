@@ -64,8 +64,10 @@ type Config struct {
 	PostgresURL  string `split_words:"true" default:"postgres://localhost/fieldkit?sslmode=disable" required:"true"`
 	TimeScaleURL string `split_words:"true"`
 
-	SessionKey  string `split_words:"true"`
-	MapboxToken string `split_words:"true"`
+	SessionKey string `split_words:"true"`
+
+	MapboxToken      string `split_words:"true"`
+	NativeLandsToken string `split_words:"true"`
 
 	PortalRoot    string `split_words:"true"`
 	WellKnownRoot string `split_words:"true"`
@@ -324,14 +326,15 @@ func createApi(ctx context.Context, config *Config) (*Api, error) {
 	}
 
 	apiConfig := &api.ApiConfiguration{
-		ApiHost:       config.ApiHost,
-		SessionKey:    config.SessionKey,
-		MapboxToken:   config.MapboxToken,
-		Emailer:       config.Emailer,
-		Domain:        config.Domain,
-		PortalDomain:  config.PortalDomain,
-		EmailOverride: config.EmailOverride,
-		Buckets:       bucketNames,
+		ApiHost:          config.ApiHost,
+		SessionKey:       config.SessionKey,
+		MapboxToken:      config.MapboxToken,
+		NativeLandsToken: config.NativeLandsToken,
+		Emailer:          config.Emailer,
+		Domain:           config.Domain,
+		PortalDomain:     config.PortalDomain,
+		EmailOverride:    config.EmailOverride,
+		Buckets:          bucketNames,
 	}
 
 	pgxcfg, err := pgxpool.ParseConfig(config.PostgresURL)
@@ -366,7 +369,7 @@ func createApi(ctx context.Context, config *Config) (*Api, error) {
 		return nil, err
 	}
 
-	locations := data.NewDescribeLocations(config.MapboxToken, metrics)
+	locations := data.NewDescribeLocations(config.MapboxToken, config.NativeLandsToken, metrics)
 	backgroundServices := backend.NewBackgroundServices(database, pgxpool, metrics, &backend.FileArchives{
 		Ingestion: ingestionFiles,
 		Media:     mediaFiles,

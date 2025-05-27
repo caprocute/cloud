@@ -63,7 +63,7 @@ type Service interface {
 	// DownloadPhoto implements download photo.
 	DownloadPhoto(context.Context, *DownloadPhotoPayload) (res *DownloadedPhoto, err error)
 	// ProjectsStation implements projects station.
-	ProjectsStation(context.Context, *ProjectsStationPayload) (res *Projects, err error)
+	ProjectsStation(context.Context, *ProjectsStationPayload) (res *ProjectsBasic, err error)
 }
 
 // Auther defines the authorization functions to be implemented by the service.
@@ -289,8 +289,14 @@ type DownloadedPhoto struct {
 // ProjectsStationPayload is the payload type of the project service projects
 // station method.
 type ProjectsStationPayload struct {
-	Auth string
+	Auth *string
 	ID   int32
+}
+
+// ProjectsBasic is the result type of the project service projects station
+// method.
+type ProjectsBasic struct {
+	Projects ProjectBasicCollection
 }
 
 type PendingInvite struct {
@@ -342,6 +348,13 @@ type EditUserFields struct {
 
 type RemoveUserFields struct {
 	Email string
+}
+
+type ProjectBasicCollection []*ProjectBasic
+
+type ProjectBasic struct {
+	ID   int32
+	Name string
 }
 
 // MakeUnauthorized builds a goa.ServiceError from an error.
@@ -442,6 +455,19 @@ func NewDownloadedPhoto(vres *projectviews.DownloadedPhoto) *DownloadedPhoto {
 func NewViewedDownloadedPhoto(res *DownloadedPhoto, view string) *projectviews.DownloadedPhoto {
 	p := newDownloadedPhotoView(res)
 	return &projectviews.DownloadedPhoto{Projected: p, View: "default"}
+}
+
+// NewProjectsBasic initializes result type ProjectsBasic from viewed result
+// type ProjectsBasic.
+func NewProjectsBasic(vres *projectviews.ProjectsBasic) *ProjectsBasic {
+	return newProjectsBasic(vres.Projected)
+}
+
+// NewViewedProjectsBasic initializes viewed result type ProjectsBasic from
+// result type ProjectsBasic using the given view.
+func NewViewedProjectsBasic(res *ProjectsBasic, view string) *projectviews.ProjectsBasic {
+	p := newProjectsBasicView(res)
+	return &projectviews.ProjectsBasic{Projected: p, View: "default"}
 }
 
 // newProjectUpdate converts projected type ProjectUpdate to service type
@@ -633,6 +659,69 @@ func newDownloadedPhotoView(res *DownloadedPhoto) *projectviews.DownloadedPhotoV
 		ContentType: &res.ContentType,
 		Etag:        &res.Etag,
 		Body:        res.Body,
+	}
+	return vres
+}
+
+// newProjectsBasic converts projected type ProjectsBasic to service type
+// ProjectsBasic.
+func newProjectsBasic(vres *projectviews.ProjectsBasicView) *ProjectsBasic {
+	res := &ProjectsBasic{}
+	if vres.Projects != nil {
+		res.Projects = newProjectBasicCollection(vres.Projects)
+	}
+	return res
+}
+
+// newProjectsBasicView projects result type ProjectsBasic to projected type
+// ProjectsBasicView using the "default" view.
+func newProjectsBasicView(res *ProjectsBasic) *projectviews.ProjectsBasicView {
+	vres := &projectviews.ProjectsBasicView{}
+	if res.Projects != nil {
+		vres.Projects = newProjectBasicCollectionView(res.Projects)
+	}
+	return vres
+}
+
+// newProjectBasicCollection converts projected type ProjectBasicCollection to
+// service type ProjectBasicCollection.
+func newProjectBasicCollection(vres projectviews.ProjectBasicCollectionView) ProjectBasicCollection {
+	res := make(ProjectBasicCollection, len(vres))
+	for i, n := range vres {
+		res[i] = newProjectBasic(n)
+	}
+	return res
+}
+
+// newProjectBasicCollectionView projects result type ProjectBasicCollection to
+// projected type ProjectBasicCollectionView using the "default" view.
+func newProjectBasicCollectionView(res ProjectBasicCollection) projectviews.ProjectBasicCollectionView {
+	vres := make(projectviews.ProjectBasicCollectionView, len(res))
+	for i, n := range res {
+		vres[i] = newProjectBasicView(n)
+	}
+	return vres
+}
+
+// newProjectBasic converts projected type ProjectBasic to service type
+// ProjectBasic.
+func newProjectBasic(vres *projectviews.ProjectBasicView) *ProjectBasic {
+	res := &ProjectBasic{}
+	if vres.ID != nil {
+		res.ID = *vres.ID
+	}
+	if vres.Name != nil {
+		res.Name = *vres.Name
+	}
+	return res
+}
+
+// newProjectBasicView projects result type ProjectBasic to projected type
+// ProjectBasicView using the "default" view.
+func newProjectBasicView(res *ProjectBasic) *projectviews.ProjectBasicView {
+	vres := &projectviews.ProjectBasicView{
+		ID:   &res.ID,
+		Name: &res.Name,
 	}
 	return vres
 }

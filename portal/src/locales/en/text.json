@@ -18,8 +18,8 @@
         "viewStation": "Station Details",
         "viewStationFromMap": "Station Details",
         "viewStationPhotos": "Station Photos",
-        "mapStation":"Station Details",
-        "mapAllStationsBounds":"Station Details",
+        "mapStation": "Station Details",
+        "mapAllStationsBounds": "Station Details",
         "exploreBookmark": "Data Dashboard",
         "exploreShortBookmark": "Data Dashboard",
         "viewProjectNotes": "Project Notes",
@@ -28,7 +28,13 @@
         "user": "User Profile",
         "adminMain": "Admin Dashboard",
         "adminUsers": "Admin Users",
-        "adminStations": "Admin Stations"
+        "adminStations": "Admin Stations",
+        "notFound": "Page Not Found"
+    },
+    "notFound": {
+        "title": "Page Not Found",
+        "message": "The page you are looking for doesn't exist or has been moved.",
+        "toDashboard": "Go to Dashboard"
     },
     "water.ec.name": "Water Conductivity",
     "water.ph.name": "Water pH",
@@ -137,7 +143,8 @@
             "community": "Community Projects",
             "anonymous": "Projects"
         },
-        "add": "Add Project"
+        "add": "Add Project",
+        "noUserProjects": "You're not a member of any projects yet. Create one to get started!"
     },
     "project": {
         "details": {
@@ -772,7 +779,8 @@
     },
     "languageSelector": {
         "english": "English",
-        "spanish": "Español"
+        "spanish": "Español",
+        "toggleText": "Language"
     },
     "iconAlts": {
         "close": "Close"

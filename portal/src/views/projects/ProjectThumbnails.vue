@@ -26,14 +26,16 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@import "../../scss/mixins";
+@use "src/scss/mixins";
+@use "src/scss/variables";
+
 .project-thumbnails {
     display: flex;
     flex-wrap: wrap;
     text-align: left;
     margin: 0 -12px;
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         margin: 0;
     }
 

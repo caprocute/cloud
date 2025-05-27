@@ -50,7 +50,7 @@
 <script lang="ts">
 import Vue from "vue";
 import CommonComponents from "@/views/shared";
-import { required, email, minLength, sameAs } from "vuelidate/lib/validators";
+import { required, minLength, sameAs } from "vuelidate/lib/validators";
 import Logo from "@/views/shared/Logo.vue";
 
 export default Vue.extend({
@@ -108,14 +108,16 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "../../scss/forms.scss";
+@use "src/scss/forms.scss";
+@use "src/scss/mixins";
+@use "src/scss/variables";
 
 .contact-link {
     cursor: pointer;
     font-weight: 500;
     text-decoration: underline;
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         font-size: 14px;
     }
 }

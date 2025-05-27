@@ -442,7 +442,7 @@ func ParseEndpoint(
 
 		projectProjectsStationFlags    = flag.NewFlagSet("projects- station", flag.ExitOnError)
 		projectProjectsStationIDFlag   = projectProjectsStationFlags.String("id", "REQUIRED", "")
-		projectProjectsStationAuthFlag = projectProjectsStationFlags.String("auth", "REQUIRED", "")
+		projectProjectsStationAuthFlag = projectProjectsStationFlags.String("auth", "", "")
 
 		recordsFlags = flag.NewFlagSet("records", flag.ContinueOnError)
 
@@ -3293,7 +3293,7 @@ Data implements data.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` records data --record-id 2440054884033974540 --auth "Molestias praesentium voluptatem qui iusto modi."
+    `+os.Args[0]+` records data --record-id 9028477251112131771 --auth "Modi ut."
 `, os.Args[0])
 }
 
@@ -3305,7 +3305,7 @@ Meta implements meta.
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` records meta --record-id 3667452994509757932 --auth "Et soluta unde eum."
+    `+os.Args[0]+` records meta --record-id 8358301137096080430 --auth "Eum molestiae aliquid."
 `, os.Args[0])
 }
 
