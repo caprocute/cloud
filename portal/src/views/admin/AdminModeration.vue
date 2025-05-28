@@ -161,7 +161,7 @@ export default Vue.extend({
         },
     },
     mounted() {
-        // If no page parameter is present, add it
+        // add page param if not present
         if (this.$route.query.page === undefined) {
             this.$router
                 .replace({
@@ -173,19 +173,10 @@ export default Vue.extend({
                         throw err;
                     }
                 });
+            this.loadModerationRequests();
         } else {
-            // If page parameter exists, just load the data
             this.loadModerationRequests();
         }
-    },
-    watch: {
-        // This watcher might not be reliable for all navigation cases
-        // We're now explicitly loading data after navigation in onNewPage
-        "$route.query.page": {
-            handler() {
-                this.loadModerationRequests();
-            },
-        },
     },
 });
 </script>
@@ -264,7 +255,6 @@ export default Vue.extend({
     justify-content: center;
 }
 
-/* Mobile responsive styles */
 @media (max-width: 768px) {
     .moderation-table {
         display: block;

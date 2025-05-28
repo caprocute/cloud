@@ -463,7 +463,7 @@ export enum MapViewType {
     list = "list",
 }
 
-export enum PostType {
+export enum PostType { // backend types
     DISCUSSION_POST = "discussion_post",
     DATA_EVENT = "data_event",
 }
@@ -1783,18 +1783,11 @@ class FKApi {
         qp.append("page", page.toString());
         qp.append("pageSize", pageSize.toString());
 
-        try {
-            const response = await this.invoke({
-                auth: Auth.Required,
-                method: "GET",
-                url: this.baseUrl + `/moderation/requests?${qp.toString()}`,
-            });
-            console.log("Moderation response:", response); // Add this for debugging
-            return response;
-        } catch (error) {
-            console.error("Moderation request error:", error); // Add this for debugging
-            throw error;
-        }
+        return await this.invoke({
+            auth: Auth.Required,
+            method: "GET",
+            url: this.baseUrl + `/moderation/requests?${qp.toString()}`,
+        });
     }
 
     public async getModerationContent(postType: PostType, postId: number): Promise<string> {

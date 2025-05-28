@@ -837,22 +837,15 @@ export default Vue.extend({
                             message: this.$tc("comments.reportSuccess"),
                             type: SnackbarStyle.success,
                         });
-                        // Close the menu by removing the visible class
-                        const optionsRef = this.$refs["options-" + item.id];
-                        if (Array.isArray(optionsRef) && optionsRef[0] && "querySelector" in (optionsRef[0] as Vue).$el) {
-                            const menuEl = ((optionsRef[0] as Vue).$el as HTMLElement).querySelector(".options-btns");
-                            if (menuEl) {
-                                menuEl.classList.remove("visible");
-                            }
-                        }
-                        // Update the userHasReported status immediately
                         item.userHasReported = true;
+                        this.closeOptionsMenu(item.id);
                     })
                     .catch(() => {
                         this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
                             message: this.$tc("comments.reportError"),
                             type: SnackbarStyle.fail,
                         });
+                        this.closeOptionsMenu(item.id);
                     });
             }
         },
@@ -939,9 +932,17 @@ export default Vue.extend({
             };
         },
         onReportCanceled(item: any) {
-            // Update the item's userHasReported status
             if (item) {
                 item.userHasReported = false;
+            }
+        },
+        closeOptionsMenu(id: number) {
+            const optionsRef = this.$refs["options-" + id];
+            if (Array.isArray(optionsRef) && optionsRef[0] && "querySelector" in (optionsRef[0] as Vue).$el) {
+                const menuEl = ((optionsRef[0] as Vue).$el as HTMLElement).querySelector(".options-btns");
+                if (menuEl) {
+                    menuEl.classList.remove("visible");
+                }
             }
         },
     },
