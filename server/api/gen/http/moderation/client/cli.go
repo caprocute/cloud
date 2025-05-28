@@ -24,7 +24,7 @@ func BuildAddPayload(moderationAddBody string, moderationAddAuth string) (*moder
 	{
 		err = json.Unmarshal([]byte(moderationAddBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"postId\": 540864754,\n      \"postType\": \"Vitae quis reiciendis quidem consequuntur.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"postId\": 436784313,\n      \"postType\": \"Similique excepturi.\"\n   }'")
 		}
 	}
 	var auth *string
