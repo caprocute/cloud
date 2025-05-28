@@ -19,6 +19,10 @@ import (
 type Service interface {
 	// Add implements add.
 	Add(context.Context, *ModerationAddPayload) (res *ModerationRequest, err error)
+	// Cancel a moderation request
+	Cancel(context.Context, *CancelPayload) (err error)
+	// Check if user has reported a specific post
+	CheckUserReport(context.Context, *CheckUserReportPayload) (res *CheckUserReportResult, err error)
 	// Acknowledge a moderation request with action
 	Acknowledge(context.Context, *AcknowledgePayload) (res *ModerationRequest, err error)
 	// List moderation requests
@@ -41,7 +45,7 @@ const ServiceName = "moderation"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [4]string{"add", "acknowledge", "listRequests", "getContent"}
+var MethodNames = [6]string{"add", "cancel", "checkUserReport", "acknowledge", "listRequests", "getContent"}
 
 // ModerationAddPayload is the payload type of the moderation service add
 // method.
@@ -62,6 +66,34 @@ type ModerationRequest struct {
 	AcknowledgedBy     *int32
 	AcknowledgedByUser *UserInfo
 	AcknowledgedAt     *string
+}
+
+// CancelPayload is the payload type of the moderation service cancel method.
+type CancelPayload struct {
+	// JWT token
+	Auth string
+	// Post ID
+	PostID int32
+	// Post type
+	PostType string
+}
+
+// CheckUserReportPayload is the payload type of the moderation service
+// checkUserReport method.
+type CheckUserReportPayload struct {
+	// JWT token
+	Auth string
+	// Post ID
+	PostID int32
+	// Post type
+	PostType string
+}
+
+// CheckUserReportResult is the result type of the moderation service
+// checkUserReport method.
+type CheckUserReportResult struct {
+	HasReported bool
+	CanWithdraw bool
 }
 
 // AcknowledgePayload is the payload type of the moderation service acknowledge

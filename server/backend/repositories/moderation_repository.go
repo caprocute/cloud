@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 
+	"github.com/lib/pq"
 	"gitlab.com/fieldkit/cloud/server/common/sqlxcache"
 	"gitlab.com/fieldkit/cloud/server/data"
 )
@@ -21,7 +22,7 @@ func (r *ModerationRepository) GetAllModerators(ctx context.Context) ([]data.Mod
 	var moderators []data.Moderator
 	query := `
 		SELECT id, user_id, created_at
-		FROM fieldkit.moderators
+		FROM fieldkit.moderator
 	`
 
 	err := r.db.SelectContext(ctx, &moderators, query)
@@ -268,4 +269,81 @@ func (r *ModerationRepository) GetContent(ctx context.Context, postType data.Pos
 	}
 
 	return content, nil
+}
+
+func (r *ModerationRepository) CancelModerationRequest(ctx context.Context, postID int32, postType data.PostTypeEnum, userID int32) error {
+	query := `
+		DELETE FROM fieldkit.moderation_request
+		WHERE post_id = $1 AND post_type = $2 AND reported_by = $3 AND acknowledged_at IS NULL
+	`
+
+	result, err := r.db.ExecContext(ctx, query, postID, postType, userID)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected == 0 {
+		return fmt.Errorf("no unacknowledged moderation request found for user %d on post %d", userID, postID)
+	}
+
+	return nil
+}
+
+func (r *ModerationRepository) CheckUserReport(ctx context.Context, postID int32, postType data.PostTypeEnum, userID int32) (bool, bool, error) {
+	query := `
+		SELECT acknowledged_at IS NULL as can_withdraw
+		FROM fieldkit.moderation_request
+		WHERE post_id = $1 AND post_type = $2 AND reported_by = $3
+	`
+
+	var canWithdraw bool
+	err := r.db.GetContext(ctx, &canWithdraw, query, postID, postType, userID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return false, false, nil // User has not reported this post
+		}
+		return false, false, err
+	}
+
+	return true, canWithdraw, nil
+}
+
+func (r *ModerationRepository) CheckUserReportsForPosts(ctx context.Context, userID int32, postIDs []int32, postType data.PostTypeEnum) (map[int32]bool, error) {
+	if len(postIDs) == 0 {
+		return make(map[int32]bool), nil
+	}
+
+	query := `
+		SELECT post_id, COUNT(*) > 0 as has_reported
+		FROM fieldkit.moderation_request 
+		WHERE reported_by = $1 AND post_type = $2 AND post_id = ANY($3) AND acknowledged_at IS NULL
+		GROUP BY post_id
+	`
+
+	type result struct {
+		PostID      int32 `db:"post_id"`
+		HasReported bool  `db:"has_reported"`
+	}
+
+	var results []result
+	if err := r.db.SelectContext(ctx, &results, query, userID, postType, pq.Array(postIDs)); err != nil {
+		return nil, err
+	}
+
+	reportMap := make(map[int32]bool)
+	// Initialize all posts as not reported
+	for _, postID := range postIDs {
+		reportMap[postID] = false
+	}
+	// Set reported posts to true
+	for _, res := range results {
+		reportMap[res.PostID] = res.HasReported
+	}
+
+	return reportMap, nil
 }

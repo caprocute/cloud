@@ -51,6 +51,12 @@ var UserInfo = Type("UserInfo", func() {
 	Required("name")
 })
 
+var CheckUserReportResult = Type("CheckUserReportResult", func() {
+	Attribute("hasReported", Boolean)
+	Attribute("canWithdraw", Boolean)
+	Required("hasReported", "canWithdraw")
+})
+
 var _ = Service("moderation", func() {
 	Method("add", func() {
 		Security(JWTAuth, func() {
@@ -64,6 +70,56 @@ var _ = Service("moderation", func() {
 		HTTP(func() {
 			POST("moderation")
 			httpAuthentication()
+		})
+	})
+
+	Method("cancel", func() {
+		Description("Cancel a moderation request")
+		Security(JWTAuth)
+
+		Payload(func() {
+			TokenField(1, "auth", String, "JWT token", func() {
+				Pattern("^Bearer [^ ]+$")
+			})
+			Field(2, "postId", Int32, "Post ID")
+			Field(3, "postType", String, "Post type")
+			Required("auth", "postId", "postType")
+		})
+
+		Result(Empty)
+
+		HTTP(func() {
+			DELETE("/moderation/cancel")
+			Param("postId")
+			Param("postType")
+			Response(StatusOK)
+			Response(StatusNotFound)
+			Response(StatusUnauthorized)
+			Response(StatusForbidden)
+		})
+	})
+
+	Method("checkUserReport", func() {
+		Description("Check if user has reported a specific post")
+		Security(JWTAuth)
+
+		Payload(func() {
+			TokenField(1, "auth", String, "JWT token", func() {
+				Pattern("^Bearer [^ ]+$")
+			})
+			Field(2, "postId", Int32, "Post ID")
+			Field(3, "postType", String, "Post type")
+			Required("auth", "postId", "postType")
+		})
+
+		Result(CheckUserReportResult)
+
+		HTTP(func() {
+			GET("/moderation/check")
+			Param("postId")
+			Param("postType")
+			Response(StatusOK)
+			Response(StatusUnauthorized)
 		})
 	})
 

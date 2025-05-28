@@ -873,7 +873,22 @@
             "exploreData": "Explore Data",
             "transfer": "Transfer"
         },
-        "moderation": "Moderation"
+        "moderation": "Moderation",
+        "moderationReview": {
+            "title": "Review Content",
+            "postType": "Post Type",
+            "reportedBy": "Reported By",
+            "content": "Content",
+            "actions": {
+                "delete": "Delete Content",
+                "keep": "Keep Content",
+                "cancel": "Cancel"
+            },
+            "postTypes": {
+                "discussionPost": "Discussion Post",
+                "dataEvent": "Data Event"
+            }
+        }
     },
     "pagination": {
         "of": "of"
@@ -893,5 +908,11 @@
             "details": "Station Details"
         }
     },
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "cancelReport": {
+        "canceling": "Canceling...",
+        "label": "Cancel Report",
+        "success": "Report canceled successfully.",
+        "error": "Failed to cancel report."
+    }
 }

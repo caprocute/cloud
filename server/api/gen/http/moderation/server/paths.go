@@ -16,6 +16,16 @@ func AddModerationPath() string {
 	return "/moderation"
 }
 
+// CancelModerationPath returns the URL path to the moderation service cancel HTTP endpoint.
+func CancelModerationPath() string {
+	return "/moderation/cancel"
+}
+
+// CheckUserReportModerationPath returns the URL path to the moderation service checkUserReport HTTP endpoint.
+func CheckUserReportModerationPath() string {
+	return "/moderation/check"
+}
+
 // AcknowledgeModerationPath returns the URL path to the moderation service acknowledge HTTP endpoint.
 func AcknowledgeModerationPath(id int32) string {
 	return fmt.Sprintf("/moderation/requests/%v/acknowledge", id)

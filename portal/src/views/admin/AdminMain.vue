@@ -43,7 +43,6 @@
                         {{ uploaded.records }}
                     </div>
                 </div>
-                <router-link :to="{ name: 'adminModeration' }" class="link">{{ $t("admin.moderation") }}</router-link>
             </div>
 
             <div class="status" v-if="status">

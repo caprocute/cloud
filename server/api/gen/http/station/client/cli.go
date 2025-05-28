@@ -23,7 +23,7 @@ func BuildAddPayload(stationAddBody string, stationAddAuth string) (*station.Add
 	{
 		err = json.Unmarshal([]byte(stationAddBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"description\": \"Quasi non quia quo illum repellat.\",\n      \"deviceId\": \"Nobis aut.\",\n      \"locationName\": \"Tenetur et.\",\n      \"name\": \"Non rerum dolor sed enim.\",\n      \"statusPb\": \"Sunt distinctio distinctio.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"description\": \"Dignissimos est nemo quas voluptas labore.\",\n      \"deviceId\": \"Occaecati suscipit consequuntur sequi consequuntur iusto.\",\n      \"locationName\": \"Amet nemo ab et consectetur sit provident.\",\n      \"name\": \"Dolorum perferendis vero officiis aut.\",\n      \"statusPb\": \"Sed cupiditate voluptas architecto sit.\"\n   }'")
 		}
 	}
 	var auth string
@@ -146,7 +146,7 @@ func BuildUpdatePayload(stationUpdateBody string, stationUpdateID string, statio
 	{
 		err = json.Unmarshal([]byte(stationUpdateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"description\": \"Nihil et.\",\n      \"locationName\": \"Cum assumenda maxime.\",\n      \"name\": \"Nostrum culpa atque dolor autem reiciendis ipsum.\",\n      \"statusPb\": \"Sint quas dolores commodi.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"description\": \"Est ut rem.\",\n      \"locationName\": \"Iusto aut quas amet.\",\n      \"name\": \"Asperiores explicabo officiis quia ad.\",\n      \"statusPb\": \"Sit consequuntur delectus eius labore.\"\n   }'")
 		}
 	}
 	var id int32
@@ -464,7 +464,7 @@ func BuildUpdateModulePayload(stationUpdateModuleBody string, stationUpdateModul
 	{
 		err = json.Unmarshal([]byte(stationUpdateModuleBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"label\": \"Laboriosam rerum recusandae vero.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"label\": \"Voluptatibus nihil nemo adipisci voluptates.\"\n   }'")
 		}
 	}
 	var id int32

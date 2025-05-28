@@ -26,13 +26,14 @@ type DiscussionView struct {
 
 // ThreadedPostView is a type that runs validations on a projected type.
 type ThreadedPostView struct {
-	ID        *int64
-	CreatedAt *int64
-	UpdatedAt *int64
-	Author    *PostAuthorView
-	Replies   []*ThreadedPostView
-	Body      *string
-	Bookmark  *string
+	ID              *int64
+	CreatedAt       *int64
+	UpdatedAt       *int64
+	Author          *PostAuthorView
+	Replies         []*ThreadedPostView
+	Body            *string
+	Bookmark        *string
+	UserHasReported *bool
 }
 
 // PostAuthorView is a type that runs validations on a projected type.
@@ -66,6 +67,7 @@ var (
 			"replies",
 			"body",
 			"bookmark",
+			"userHasReported",
 		},
 	}
 )

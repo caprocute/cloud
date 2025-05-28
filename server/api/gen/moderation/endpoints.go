@@ -16,10 +16,12 @@ import (
 
 // Endpoints wraps the "moderation" service endpoints.
 type Endpoints struct {
-	Add          goa.Endpoint
-	Acknowledge  goa.Endpoint
-	ListRequests goa.Endpoint
-	GetContent   goa.Endpoint
+	Add             goa.Endpoint
+	Cancel          goa.Endpoint
+	CheckUserReport goa.Endpoint
+	Acknowledge     goa.Endpoint
+	ListRequests    goa.Endpoint
+	GetContent      goa.Endpoint
 }
 
 // NewEndpoints wraps the methods of the "moderation" service with endpoints.
@@ -27,16 +29,20 @@ func NewEndpoints(s Service) *Endpoints {
 	// Casting service to Auther interface
 	a := s.(Auther)
 	return &Endpoints{
-		Add:          NewAddEndpoint(s, a.JWTAuth),
-		Acknowledge:  NewAcknowledgeEndpoint(s, a.JWTAuth),
-		ListRequests: NewListRequestsEndpoint(s, a.JWTAuth),
-		GetContent:   NewGetContentEndpoint(s, a.JWTAuth),
+		Add:             NewAddEndpoint(s, a.JWTAuth),
+		Cancel:          NewCancelEndpoint(s, a.JWTAuth),
+		CheckUserReport: NewCheckUserReportEndpoint(s, a.JWTAuth),
+		Acknowledge:     NewAcknowledgeEndpoint(s, a.JWTAuth),
+		ListRequests:    NewListRequestsEndpoint(s, a.JWTAuth),
+		GetContent:      NewGetContentEndpoint(s, a.JWTAuth),
 	}
 }
 
 // Use applies the given middleware to all the "moderation" service endpoints.
 func (e *Endpoints) Use(m func(goa.Endpoint) goa.Endpoint) {
 	e.Add = m(e.Add)
+	e.Cancel = m(e.Cancel)
+	e.CheckUserReport = m(e.CheckUserReport)
 	e.Acknowledge = m(e.Acknowledge)
 	e.ListRequests = m(e.ListRequests)
 	e.GetContent = m(e.GetContent)
@@ -62,6 +68,44 @@ func NewAddEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
 			return nil, err
 		}
 		return s.Add(ctx, p)
+	}
+}
+
+// NewCancelEndpoint returns an endpoint function that calls the method
+// "cancel" of service "moderation".
+func NewCancelEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*CancelPayload)
+		var err error
+		sc := security.JWTScheme{
+			Name:           "jwt",
+			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
+			RequiredScopes: []string{},
+		}
+		ctx, err = authJWTFn(ctx, p.Auth, &sc)
+		if err != nil {
+			return nil, err
+		}
+		return nil, s.Cancel(ctx, p)
+	}
+}
+
+// NewCheckUserReportEndpoint returns an endpoint function that calls the
+// method "checkUserReport" of service "moderation".
+func NewCheckUserReportEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint {
+	return func(ctx context.Context, req interface{}) (interface{}, error) {
+		p := req.(*CheckUserReportPayload)
+		var err error
+		sc := security.JWTScheme{
+			Name:           "jwt",
+			Scopes:         []string{"api:access", "api:admin", "api:ingestion"},
+			RequiredScopes: []string{},
+		}
+		ctx, err = authJWTFn(ctx, p.Auth, &sc)
+		if err != nil {
+			return nil, err
+		}
+		return s.CheckUserReport(ctx, p)
 	}
 }
 

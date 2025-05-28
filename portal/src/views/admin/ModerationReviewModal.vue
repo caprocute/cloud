@@ -1,28 +1,32 @@
 <template>
     <div class="modal-overlay" v-if="show" @click.self="close">
         <div class="modal-content">
-            <h3>Review Reported Content</h3>
+            <h3>{{ $t("admin.moderationReview.title") }}</h3>
             <div class="content-details">
-                <p><strong>Post Type:</strong> {{ request.postType }}</p>
-                <p><strong>Reported By:</strong> {{ request.reportedByName || request.reportedBy }}</p>
-                <p><strong>Content:</strong></p>
+                <p>
+                    <strong>{{ $t("admin.moderationReview.postType") }}:</strong>
+                    {{ getPostTypeLabel(request.postType) }}
+                </p>
+                <p>
+                    <strong>{{ $t("admin.moderationReview.reportedBy") }}:</strong>
+                    {{ request.reportedByName || request.reportedBy }}
+                </p>
+                <p>
+                    <strong>{{ $t("admin.moderationReview.content") }}:</strong>
+                </p>
                 <div class="content-box">
-                    <TipTap 
-                        :value="content"
-                        :readonly="true"
-                        :showSaveButton="false"
-                    />
+                    <TipTap :value="processedContent" :readonly="true" :showSaveButton="false" />
                 </div>
             </div>
             <div class="actions">
                 <button class="button delete-btn" @click="handleAction('delete')">
-                    Delete Content
+                    {{ $t("admin.moderationReview.actions.delete") }}
                 </button>
                 <button class="button keep-btn" @click="handleAction('keep')">
-                    Keep Content
+                    {{ $t("admin.moderationReview.actions.keep") }}
                 </button>
                 <button class="button cancel-btn" @click="close">
-                    Cancel
+                    {{ $t("admin.moderationReview.actions.cancel") }}
                 </button>
             </div>
         </div>
@@ -32,6 +36,14 @@
 <script lang="ts">
 import Vue from "vue";
 import TipTap from "@/views/shared/Tiptap.vue";
+import { PostType } from "@/api/api";
+
+interface ModerationRequest {
+    id: number;
+    postType: PostType;
+    reportedBy: string;
+    reportedByName?: string;
+}
 
 export default Vue.extend({
     name: "ModerationReviewModal",
@@ -44,7 +56,7 @@ export default Vue.extend({
             required: true,
         },
         request: {
-            type: Object,
+            type: Object as () => ModerationRequest,
             required: true,
         },
         content: {
@@ -52,20 +64,55 @@ export default Vue.extend({
             required: true,
         },
     },
+    computed: {
+        processedContent(): any {
+            if (!this.content) {
+                return null;
+            }
+
+            // Try to parse as JSON first
+            try {
+                return JSON.parse(this.content);
+            } catch (error) {
+                // If it's not JSON, create a TipTap document structure for plain text
+                return {
+                    type: "doc",
+                    content: [
+                        {
+                            type: "paragraph",
+                            content: [
+                                {
+                                    type: "text",
+                                    text: this.content,
+                                },
+                            ],
+                        },
+                    ],
+                };
+            }
+        },
+    },
     methods: {
-        close() {
+        close(): void {
             this.$emit("close");
         },
-        async handleAction(action: 'delete' | 'keep') {
+        async handleAction(action: "delete" | "keep"): Promise<void> {
             try {
-                await this.$services.api.acknowledgeModerationRequest(
-                    this.request.id,
-                    action
-                );
+                await this.$services.api.acknowledgeModerationRequest(this.request.id, action);
                 this.$emit("action-complete");
                 this.close();
             } catch (error) {
                 console.error("Error handling moderation action:", error);
+            }
+        },
+        getPostTypeLabel(postType: PostType): string {
+            switch (postType) {
+                case PostType.DISCUSSION_POST:
+                    return this.$t("admin.moderationReview.postTypes.discussionPost") as string;
+                case PostType.DATA_EVENT:
+                    return this.$t("admin.moderationReview.postTypes.dataEvent") as string;
+                default:
+                    return postType;
             }
         },
     },
@@ -125,4 +172,4 @@ export default Vue.extend({
     background: #6c757d;
     color: white;
 }
-</style> 
+</style>

@@ -234,3 +234,44 @@ func (s *ModerationService) GetContent(ctx context.Context, payload *moderation.
 
 	return content, nil
 }
+
+func (s *ModerationService) Cancel(ctx context.Context, payload *moderation.CancelPayload) error {
+	p, err := NewPermissions(ctx, s.options).Unwrap()
+	if err != nil {
+		return err
+	}
+
+	if payload.PostType != string(data.ModerationDiscussionPost) && payload.PostType != string(data.ModerationDataEvent) {
+		return fmt.Errorf("invalid post type")
+	}
+
+	mrRepo := repositories.NewModerationRepository(s.options.Database)
+	err = mrRepo.CancelModerationRequest(ctx, payload.PostID, data.PostTypeEnum(payload.PostType), p.UserID())
+	if err != nil {
+		return moderation.MakeNotFound(err)
+	}
+
+	return nil
+}
+
+func (s *ModerationService) CheckUserReport(ctx context.Context, payload *moderation.CheckUserReportPayload) (*moderation.CheckUserReportResult, error) {
+	p, err := NewPermissions(ctx, s.options).Unwrap()
+	if err != nil {
+		return nil, err
+	}
+
+	if payload.PostType != string(data.ModerationDiscussionPost) && payload.PostType != string(data.ModerationDataEvent) {
+		return nil, fmt.Errorf("invalid post type")
+	}
+
+	mrRepo := repositories.NewModerationRepository(s.options.Database)
+	hasReported, canWithdraw, err := mrRepo.CheckUserReport(ctx, payload.PostID, data.PostTypeEnum(payload.PostType), p.UserID())
+	if err != nil {
+		return nil, err
+	}
+
+	return &moderation.CheckUserReportResult{
+		HasReported: hasReported,
+		CanWithdraw: canWithdraw,
+	}, nil
+}

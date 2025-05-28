@@ -343,15 +343,16 @@ type DeleteDataEventBadRequestResponseBody struct {
 
 // DataEventResponseBody is used to define fields on response body types.
 type DataEventResponseBody struct {
-	ID          *int64                  `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
-	CreatedAt   *int64                  `form:"createdAt,omitempty" json:"createdAt,omitempty" xml:"createdAt,omitempty"`
-	UpdatedAt   *int64                  `form:"updatedAt,omitempty" json:"updatedAt,omitempty" xml:"updatedAt,omitempty"`
-	Author      *PostAuthorResponseBody `form:"author,omitempty" json:"author,omitempty" xml:"author,omitempty"`
-	Title       *string                 `form:"title,omitempty" json:"title,omitempty" xml:"title,omitempty"`
-	Description *string                 `form:"description,omitempty" json:"description,omitempty" xml:"description,omitempty"`
-	Bookmark    *string                 `form:"bookmark,omitempty" json:"bookmark,omitempty" xml:"bookmark,omitempty"`
-	Start       *int64                  `form:"start,omitempty" json:"start,omitempty" xml:"start,omitempty"`
-	End         *int64                  `form:"end,omitempty" json:"end,omitempty" xml:"end,omitempty"`
+	ID              *int64                  `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	CreatedAt       *int64                  `form:"createdAt,omitempty" json:"createdAt,omitempty" xml:"createdAt,omitempty"`
+	UpdatedAt       *int64                  `form:"updatedAt,omitempty" json:"updatedAt,omitempty" xml:"updatedAt,omitempty"`
+	Author          *PostAuthorResponseBody `form:"author,omitempty" json:"author,omitempty" xml:"author,omitempty"`
+	Title           *string                 `form:"title,omitempty" json:"title,omitempty" xml:"title,omitempty"`
+	Description     *string                 `form:"description,omitempty" json:"description,omitempty" xml:"description,omitempty"`
+	Bookmark        *string                 `form:"bookmark,omitempty" json:"bookmark,omitempty" xml:"bookmark,omitempty"`
+	Start           *int64                  `form:"start,omitempty" json:"start,omitempty" xml:"start,omitempty"`
+	End             *int64                  `form:"end,omitempty" json:"end,omitempty" xml:"end,omitempty"`
+	UserHasReported *bool                   `form:"userHasReported,omitempty" json:"userHasReported,omitempty" xml:"userHasReported,omitempty"`
 }
 
 // PostAuthorResponseBody is used to define fields on response body types.

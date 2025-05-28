@@ -24,7 +24,7 @@ func BuildAddPayload(moderationAddBody string, moderationAddAuth string) (*moder
 	{
 		err = json.Unmarshal([]byte(moderationAddBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"postId\": 436784313,\n      \"postType\": \"Similique excepturi.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"postId\": 1028002822,\n      \"postType\": \"Nobis nesciunt iusto rerum omnis.\"\n   }'")
 		}
 	}
 	var auth *string
@@ -37,6 +37,72 @@ func BuildAddPayload(moderationAddBody string, moderationAddAuth string) (*moder
 		PostID:   body.PostID,
 		PostType: body.PostType,
 	}
+	v.Auth = auth
+
+	return v, nil
+}
+
+// BuildCancelPayload builds the payload for the moderation cancel endpoint
+// from CLI flags.
+func BuildCancelPayload(moderationCancelPostID string, moderationCancelPostType string, moderationCancelAuth string) (*moderation.CancelPayload, error) {
+	var err error
+	var postID int32
+	{
+		var v int64
+		v, err = strconv.ParseInt(moderationCancelPostID, 10, 32)
+		postID = int32(v)
+		if err != nil {
+			return nil, fmt.Errorf("invalid value for postID, must be INT32")
+		}
+	}
+	var postType string
+	{
+		postType = moderationCancelPostType
+	}
+	var auth string
+	{
+		auth = moderationCancelAuth
+		err = goa.MergeErrors(err, goa.ValidatePattern("auth", auth, "^Bearer [^ ]+$"))
+		if err != nil {
+			return nil, err
+		}
+	}
+	v := &moderation.CancelPayload{}
+	v.PostID = postID
+	v.PostType = postType
+	v.Auth = auth
+
+	return v, nil
+}
+
+// BuildCheckUserReportPayload builds the payload for the moderation
+// checkUserReport endpoint from CLI flags.
+func BuildCheckUserReportPayload(moderationCheckUserReportPostID string, moderationCheckUserReportPostType string, moderationCheckUserReportAuth string) (*moderation.CheckUserReportPayload, error) {
+	var err error
+	var postID int32
+	{
+		var v int64
+		v, err = strconv.ParseInt(moderationCheckUserReportPostID, 10, 32)
+		postID = int32(v)
+		if err != nil {
+			return nil, fmt.Errorf("invalid value for postID, must be INT32")
+		}
+	}
+	var postType string
+	{
+		postType = moderationCheckUserReportPostType
+	}
+	var auth string
+	{
+		auth = moderationCheckUserReportAuth
+		err = goa.MergeErrors(err, goa.ValidatePattern("auth", auth, "^Bearer [^ ]+$"))
+		if err != nil {
+			return nil, err
+		}
+	}
+	v := &moderation.CheckUserReportPayload{}
+	v.PostID = postID
+	v.PostType = postType
 	v.Auth = auth
 
 	return v, nil

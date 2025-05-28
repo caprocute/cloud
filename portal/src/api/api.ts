@@ -463,22 +463,25 @@ export enum MapViewType {
     list = "list",
 }
 
-interface ModerationRequestResponse {
-    requests: {
-        id: number;
-        postId: number;
-        postType: string;
-        reportedBy: number;
-        reportedByUser?: {
-            name: string;
-        };
-        reportedAt: string;
-        acknowledgedBy?: number;
-        acknowledgedByUser?: {
-            name: string;
-        };
-        acknowledgedAt?: string;
-    }[];
+export enum PostType {
+    DISCUSSION_POST = "discussion_post",
+    DATA_EVENT = "data_event",
+}
+
+export interface ModerationRequest {
+    id: number;
+    postId: number;
+    postType: PostType;
+    reportedBy: number;
+    reportedByName?: string;
+    reportedAt: string;
+    acknowledgedBy?: number;
+    acknowledgedByName?: string;
+    acknowledgedAt?: string;
+}
+
+export interface ModerationRequestResponse {
+    requests: ModerationRequest[];
     totalPages: number;
 }
 
@@ -1507,6 +1510,7 @@ class FKApi {
             return _.extend(post, {
                 body: JSON.parse(post.body),
                 replies: this.parseBodies(post.replies),
+                userHasReported: post.userHasReported,
             });
         } catch (error) {
             return _.extend(post, {
@@ -1515,6 +1519,7 @@ class FKApi {
                     content: [{ type: "paragraph", content: [{ type: "text", text: post.body }] }],
                 },
                 replies: this.parseBodies(post.replies),
+                userHasReported: post.userHasReported,
             });
         }
     }
@@ -1755,9 +1760,9 @@ class FKApi {
     }
 
     public async reportPost(post: Comment | DataEvent): Promise<{ post: Comment }> {
-        const postTypeMap: { [key: string]: string } = {
-            comment: "discussion_post",
-            event: "data_event",
+        const postTypeMap: { [key: string]: PostType } = {
+            comment: PostType.DISCUSSION_POST,
+            event: PostType.DATA_EVENT,
         };
 
         const postType = post.type as "comment" | "event";
@@ -1792,7 +1797,7 @@ class FKApi {
         }
     }
 
-    public async getModerationContent(postType: string, postId: number): Promise<string> {
+    public async getModerationContent(postType: PostType, postId: number): Promise<string> {
         return await this.invoke({
             auth: Auth.Required,
             method: "GET",
@@ -1805,6 +1810,30 @@ class FKApi {
             auth: Auth.Required,
             method: "POST",
             url: this.baseUrl + `/moderation/requests/${id}/acknowledge?action=${action}`,
+        });
+    }
+
+    public async cancelModerationRequest(postId: number, postType: PostType): Promise<void> {
+        const qp = new URLSearchParams();
+        qp.append("postId", postId.toString());
+        qp.append("postType", postType);
+
+        return await this.invoke({
+            auth: Auth.Required,
+            method: "DELETE",
+            url: this.baseUrl + `/moderation/cancel?${qp.toString()}`,
+        });
+    }
+
+    public async checkUserReport(postId: number, postType: PostType): Promise<{ hasReported: boolean; canWithdraw: boolean }> {
+        const qp = new URLSearchParams();
+        qp.append("postId", postId.toString());
+        qp.append("postType", postType);
+
+        return await this.invoke({
+            auth: Auth.Required,
+            method: "GET",
+            url: this.baseUrl + `/moderation/check?${qp.toString()}`,
         });
     }
 }

@@ -207,6 +207,14 @@
                                     :options="getCommentOptions(item)"
                                     :ref="'options-' + item.id"
                                 />
+                                <CancelReportLink
+                                    v-if="user"
+                                    :postId="item.id"
+                                    :postType="item.body ? PostType.DISCUSSION_POST : PostType.DATA_EVENT"
+                                    :userHasReported="item.userHasReported || false"
+                                    @report-canceled="onReportCanceled(item)"
+                                    :ref="'cancel-report-' + item.id"
+                                />
                                 <span class="timestamp">{{ formatTimestamp(item.createdAt) }}</span>
                             </div>
                             <Tiptap
@@ -317,7 +325,7 @@ import CommonComponents from "@/views/shared";
 import moment from "moment";
 import { NewComment, NewDataEvent } from "@/views/comments/model";
 import { Comment, DataEvent, DiscussionBase } from "@/views/comments/model";
-import { CurrentUser, ProjectUser } from "@/api";
+import { CurrentUser, ProjectUser, PostType } from "@/api";
 import ListItemOptions from "@/views/shared/ListItemOptions.vue";
 import Tiptap from "@/views/shared/Tiptap.vue";
 import { deserializeBookmark, Workspace } from "../viz/viz";
@@ -328,6 +336,7 @@ import { ActionTypes } from "@/store";
 import { interpolatePartner } from "@/views/shared/partners";
 import InfoTooltip from "@/views/shared/InfoTooltip.vue";
 import { SnackbarStyle } from "@/store/modules/snackbar";
+import CancelReportLink from "@/views/shared/CancelReportLink.vue";
 
 export default Vue.extend({
     name: "Comments",
@@ -337,6 +346,7 @@ export default Vue.extend({
         Tiptap,
         SectionToggle,
         InfoTooltip,
+        CancelReportLink,
     },
     props: {
         user: {
@@ -406,6 +416,9 @@ export default Vue.extend({
     computed: {
         ActionTypes() {
             return ActionTypes;
+        },
+        PostType() {
+            return PostType;
         },
         projectId(): number {
             if (this.parentData instanceof Bookmark) {
@@ -562,7 +575,8 @@ export default Vue.extend({
                                         response.post.bookmark,
                                         response.post.body,
                                         response.post.createdAt,
-                                        response.post.updatedAt
+                                        response.post.updatedAt,
+                                        response.post.userHasReported
                                     )
                                 );
                             this.resetNewReply();
@@ -579,7 +593,8 @@ export default Vue.extend({
                                     response.post.bookmark,
                                     response.post.body,
                                     response.post.createdAt,
-                                    response.post.updatedAt
+                                    response.post.updatedAt,
+                                    response.post.userHasReported
                                 )
                             );
                             this.newComment.body = "";
@@ -621,11 +636,29 @@ export default Vue.extend({
                 .then((data) => {
                     this.posts = [];
                     data.posts.forEach((post) => {
-                        this.posts.push(new Comment(post.id, post.author, post.bookmark, post.body, post.createdAt, post.updatedAt));
+                        this.posts.push(
+                            new Comment(
+                                post.id,
+                                post.author,
+                                post.bookmark,
+                                post.body,
+                                post.createdAt,
+                                post.updatedAt,
+                                post.userHasReported
+                            )
+                        );
 
                         post.replies.forEach((reply) => {
                             this.posts[this.posts.length - 1].replies.push(
-                                new Comment(reply.id, reply.author, reply.bookmark, reply.body, reply.createdAt, reply.updatedAt)
+                                new Comment(
+                                    reply.id,
+                                    reply.author,
+                                    reply.bookmark,
+                                    reply.body,
+                                    reply.createdAt,
+                                    reply.updatedAt,
+                                    reply.userHasReported
+                                )
                             );
                         });
                     });
@@ -731,7 +764,8 @@ export default Vue.extend({
                         event.title ? JSON.parse(event.title) : event.title,
                         event.description ? JSON.parse(event.description) : event.description,
                         event.start,
-                        event.end
+                        event.end,
+                        event.userHasReported
                     )
                 );
             });
@@ -796,20 +830,23 @@ export default Vue.extend({
                 }
             }
             if (event === "report") {
-                this.$services.api.reportPost(item)
+                this.$services.api
+                    .reportPost(item)
                     .then(() => {
                         this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
                             message: this.$tc("comments.reportSuccess"),
                             type: SnackbarStyle.success,
                         });
                         // Close the menu by removing the visible class
-                        const optionsRef = this.$refs['options-' + item.id];
-                        if (Array.isArray(optionsRef) && optionsRef[0] && 'querySelector' in (optionsRef[0] as Vue).$el) {
-                            const menuEl = ((optionsRef[0] as Vue).$el as HTMLElement).querySelector('.options-btns');
+                        const optionsRef = this.$refs["options-" + item.id];
+                        if (Array.isArray(optionsRef) && optionsRef[0] && "querySelector" in (optionsRef[0] as Vue).$el) {
+                            const menuEl = ((optionsRef[0] as Vue).$el as HTMLElement).querySelector(".options-btns");
                             if (menuEl) {
-                                menuEl.classList.remove('visible');
+                                menuEl.classList.remove("visible");
                             }
                         }
+                        // Update the userHasReported status immediately
+                        item.userHasReported = true;
                     })
                     .catch(() => {
                         this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
@@ -900,6 +937,12 @@ export default Vue.extend({
                 body: null,
                 threadId: null,
             };
+        },
+        onReportCanceled(item: any) {
+            // Update the item's userHasReported status
+            if (item) {
+                item.userHasReported = false;
+            }
         },
     },
 });

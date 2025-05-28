@@ -2,15 +2,13 @@
     <StandardLayout>
         <div class="admin-moderation">
             <h1>Moderation Requests</h1>
-            
-            <div v-if="busy" class="loading-container">
-               Loading...
-            </div>
-            
+
+            <div v-if="busy" class="loading-container">Loading...</div>
+
             <div v-else-if="moderationRequests.length === 0" class="empty-state">
                 <p>No moderation requests found.</p>
             </div>
-            
+
             <div v-else class="table-responsive">
                 <table class="moderation-table">
                     <thead>
@@ -33,23 +31,21 @@
                             <td data-label="Reported By">{{ request.reportedByName || request.reportedBy }}</td>
                             <td data-label="Reported At">{{ formatDate(request.reportedAt) }}</td>
                             <td data-label="Status">
-                                <span :class="{ 
-                                    'status': true, 
-                                    'pending': !request.acknowledgedAt,
-                                    'acknowledged': request.acknowledgedAt 
-                                }">
-                                    {{ request.acknowledgedAt ? 'Acknowledged' : 'Pending' }}
+                                <span
+                                    :class="{
+                                        status: true,
+                                        pending: !request.acknowledgedAt,
+                                        acknowledged: request.acknowledgedAt,
+                                    }"
+                                >
+                                    {{ request.acknowledgedAt ? "Acknowledged" : "Pending" }}
                                 </span>
                             </td>
                             <td data-label="Acknowledged By">
-                                {{ request.acknowledgedByUser ? request.acknowledgedByUser.name : '-' }}
+                                {{ request.acknowledgedByName || "-" }}
                             </td>
                             <td data-label="Actions">
-                                <button 
-                                    class="button review-btn" 
-                                    @click="reviewRequest(request)"
-                                    :disabled="request.acknowledgedAt"
-                                >
+                                <button class="button review-btn" @click="reviewRequest(request)" :disabled="!!request.acknowledgedAt">
                                     Review
                                 </button>
                             </td>
@@ -57,15 +53,11 @@
                     </tbody>
                 </table>
             </div>
-            
+
             <div class="pagination-container" v-if="totalPages > 1">
-                <PaginationControls
-                    :page="page"
-                    :totalPages="totalPages"
-                    @new-page="onNewPage"
-                />
+                <PaginationControls :page="page" :totalPages="totalPages" @new-page="onNewPage" />
             </div>
-            
+
             <ModerationReviewModal
                 :show="selectedRequest !== null"
                 :request="selectedRequest || {}"
@@ -83,18 +75,7 @@ import StandardLayout from "../StandardLayout.vue";
 import CommonComponents from "@/views/shared";
 import PaginationControls from "@/views/shared/PaginationControls.vue";
 import ModerationReviewModal from "./ModerationReviewModal.vue";
-
-interface ModerationRequest {
-    id: number;
-    postId: number;
-    postType: string;
-    reportedBy: number;
-    reportedByName?: string;
-    reportedAt: string;
-    acknowledgedBy?: number;
-    acknowledgedByUser?: { name: string };
-    acknowledgedAt?: string;
-}
+import { PostType, ModerationRequest } from "@/api/api";
 
 export default Vue.extend({
     name: "AdminModeration",
@@ -118,29 +99,26 @@ export default Vue.extend({
         page(): number {
             const pageQuery = this.$route.query.page;
             return pageQuery ? parseInt(pageQuery as string, 10) : 0;
-        }
+        },
     },
     methods: {
         formatDate(date: string | undefined): string {
-            if (!date) return '-';
+            if (!date) return "-";
             return new Date(date).toLocaleString(undefined, {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
             });
         },
         formatPostType(type: string): string {
-            return type === 'discussion_post' ? 'Discussion Post' : 'Data Event';
+            return type === "discussion_post" ? "Discussion Post" : "Data Event";
         },
         async reviewRequest(request: ModerationRequest) {
             this.selectedRequest = request;
             try {
-                const content = await this.$services.api.getModerationContent(
-                    request.postType,
-                    request.postId
-                );
+                const content = await this.$services.api.getModerationContent(request.postType as PostType, request.postId);
                 this.requestContent = content;
             } catch (error) {
                 console.error("Error loading content:", error);
@@ -157,23 +135,22 @@ export default Vue.extend({
         },
         onNewPage(page: number) {
             window.scrollTo(0, 0);
-            
+
             this.$nextTick(() => {
-                this.$router.push({
-                    path: this.$route.path,
-                    query: { page: page.toString() }
-                }).then(() => {
-                    this.loadModerationRequests();
-                })
+                this.$router
+                    .push({
+                        path: this.$route.path,
+                        query: { page: page.toString() },
+                    })
+                    .then(() => {
+                        this.loadModerationRequests();
+                    });
             });
         },
         async loadModerationRequests() {
             this.busy = true;
             try {
-                const response = await this.$services.api.getModerationRequests(
-                    this.page,
-                    this.pageSize
-                );
+                const response = await this.$services.api.getModerationRequests(this.page, this.pageSize);
                 this.moderationRequests = response.requests;
                 this.totalPages = response.totalPages;
             } catch (error) {
@@ -186,14 +163,16 @@ export default Vue.extend({
     mounted() {
         // If no page parameter is present, add it
         if (this.$route.query.page === undefined) {
-            this.$router.replace({
-                name: "adminModeration",
-                query: { page: "0" }
-            }).catch(err => {
-                if (err.name !== 'NavigationDuplicated') {
-                    throw err;
-                }
-            });
+            this.$router
+                .replace({
+                    name: "adminModeration",
+                    query: { page: "0" },
+                })
+                .catch((err) => {
+                    if (err.name !== "NavigationDuplicated") {
+                        throw err;
+                    }
+                });
         } else {
             // If page parameter exists, just load the data
             this.loadModerationRequests();
@@ -202,7 +181,7 @@ export default Vue.extend({
     watch: {
         // This watcher might not be reliable for all navigation cases
         // We're now explicitly loading data after navigation in onNewPage
-        '$route.query.page': {
+        "$route.query.page": {
             handler() {
                 this.loadModerationRequests();
             },
@@ -216,7 +195,8 @@ export default Vue.extend({
     padding: 20px;
 }
 
-.loading-container, .empty-state {
+.loading-container,
+.empty-state {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -230,13 +210,14 @@ export default Vue.extend({
 .moderation-table {
     width: 100%;
     border-collapse: collapse;
-    
-    th, td {
+
+    th,
+    td {
         padding: 12px 16px;
         text-align: left;
         border-bottom: 1px solid #eee;
     }
-    
+
     th {
         background-color: #f8f9fa;
         font-weight: 600;
@@ -247,12 +228,12 @@ export default Vue.extend({
     padding: 4px 8px;
     border-radius: 4px;
     font-size: 13px;
-    
+
     &.pending {
         background-color: #fff3cd;
         color: #856404;
     }
-    
+
     &.acknowledged {
         background-color: #d4edda;
         color: #155724;
@@ -266,11 +247,11 @@ export default Vue.extend({
     border-radius: 4px;
     padding: 6px 12px;
     cursor: pointer;
-    
+
     &:hover {
         background-color: #0069d9;
     }
-    
+
     &:disabled {
         background-color: #6c757d;
         cursor: not-allowed;
@@ -287,37 +268,38 @@ export default Vue.extend({
 @media (max-width: 768px) {
     .moderation-table {
         display: block;
-        
+
         thead {
             display: none;
         }
-        
-        tbody, tr {
+
+        tbody,
+        tr {
             display: block;
         }
-        
+
         tr {
             margin-bottom: 16px;
             border: 1px solid #ddd;
             border-radius: 6px;
         }
-        
+
         td {
             display: flex;
             justify-content: space-between;
             padding: 10px 16px;
             border-bottom: 1px solid #eee;
-            
+
             &:before {
                 content: attr(data-label);
                 font-weight: 600;
                 margin-right: 10px;
             }
-            
+
             &:last-child {
                 border-bottom: none;
                 justify-content: flex-end;
-                
+
                 &:before {
                     content: "";
                 }

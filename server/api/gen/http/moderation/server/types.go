@@ -34,6 +34,13 @@ type AddResponseBody struct {
 	AcknowledgedAt     *string               `form:"acknowledgedAt,omitempty" json:"acknowledgedAt,omitempty" xml:"acknowledgedAt,omitempty"`
 }
 
+// CheckUserReportOKResponseBody is the type of the "moderation" service
+// "checkUserReport" endpoint HTTP response body.
+type CheckUserReportOKResponseBody struct {
+	HasReported bool `form:"hasReported" json:"hasReported" xml:"hasReported"`
+	CanWithdraw bool `form:"canWithdraw" json:"canWithdraw" xml:"canWithdraw"`
+}
+
 // AcknowledgeOKResponseBody is the type of the "moderation" service
 // "acknowledge" endpoint HTTP response body.
 type AcknowledgeOKResponseBody struct {
@@ -112,6 +119,152 @@ type AddNotFoundResponseBody struct {
 // AddBadRequestResponseBody is the type of the "moderation" service "add"
 // endpoint HTTP response body for the "bad-request" error.
 type AddBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// CancelUnauthorizedResponseBody is the type of the "moderation" service
+// "cancel" endpoint HTTP response body for the "unauthorized" error.
+type CancelUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// CancelForbiddenResponseBody is the type of the "moderation" service "cancel"
+// endpoint HTTP response body for the "forbidden" error.
+type CancelForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// CancelNotFoundResponseBody is the type of the "moderation" service "cancel"
+// endpoint HTTP response body for the "not-found" error.
+type CancelNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// CancelBadRequestResponseBody is the type of the "moderation" service
+// "cancel" endpoint HTTP response body for the "bad-request" error.
+type CancelBadRequestResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// CheckUserReportUnauthorizedResponseBody is the type of the "moderation"
+// service "checkUserReport" endpoint HTTP response body for the "unauthorized"
+// error.
+type CheckUserReportUnauthorizedResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// CheckUserReportForbiddenResponseBody is the type of the "moderation" service
+// "checkUserReport" endpoint HTTP response body for the "forbidden" error.
+type CheckUserReportForbiddenResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// CheckUserReportNotFoundResponseBody is the type of the "moderation" service
+// "checkUserReport" endpoint HTTP response body for the "not-found" error.
+type CheckUserReportNotFoundResponseBody struct {
+	// Name is the name of this class of errors.
+	Name string `form:"name" json:"name" xml:"name"`
+	// ID is a unique identifier for this particular occurrence of the problem.
+	ID string `form:"id" json:"id" xml:"id"`
+	// Message is a human-readable explanation specific to this occurrence of the
+	// problem.
+	Message string `form:"message" json:"message" xml:"message"`
+	// Is the error temporary?
+	Temporary bool `form:"temporary" json:"temporary" xml:"temporary"`
+	// Is the error a timeout?
+	Timeout bool `form:"timeout" json:"timeout" xml:"timeout"`
+	// Is the error a server-side fault?
+	Fault bool `form:"fault" json:"fault" xml:"fault"`
+}
+
+// CheckUserReportBadRequestResponseBody is the type of the "moderation"
+// service "checkUserReport" endpoint HTTP response body for the "bad-request"
+// error.
+type CheckUserReportBadRequestResponseBody struct {
 	// Name is the name of this class of errors.
 	Name string `form:"name" json:"name" xml:"name"`
 	// ID is a unique identifier for this particular occurrence of the problem.
@@ -381,6 +534,16 @@ func NewAddResponseBody(res *moderation.ModerationRequest) *AddResponseBody {
 	return body
 }
 
+// NewCheckUserReportOKResponseBody builds the HTTP response body from the
+// result of the "checkUserReport" endpoint of the "moderation" service.
+func NewCheckUserReportOKResponseBody(res *moderation.CheckUserReportResult) *CheckUserReportOKResponseBody {
+	body := &CheckUserReportOKResponseBody{
+		HasReported: res.HasReported,
+		CanWithdraw: res.CanWithdraw,
+	}
+	return body
+}
+
 // NewAcknowledgeOKResponseBody builds the HTTP response body from the result
 // of the "acknowledge" endpoint of the "moderation" service.
 func NewAcknowledgeOKResponseBody(res *moderation.ModerationRequest) *AcknowledgeOKResponseBody {
@@ -461,6 +624,119 @@ func NewAddNotFoundResponseBody(res *goa.ServiceError) *AddNotFoundResponseBody 
 // of the "add" endpoint of the "moderation" service.
 func NewAddBadRequestResponseBody(res *goa.ServiceError) *AddBadRequestResponseBody {
 	body := &AddBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewCancelUnauthorizedResponseBody builds the HTTP response body from the
+// result of the "cancel" endpoint of the "moderation" service.
+func NewCancelUnauthorizedResponseBody(res *goa.ServiceError) *CancelUnauthorizedResponseBody {
+	body := &CancelUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewCancelForbiddenResponseBody builds the HTTP response body from the result
+// of the "cancel" endpoint of the "moderation" service.
+func NewCancelForbiddenResponseBody(res *goa.ServiceError) *CancelForbiddenResponseBody {
+	body := &CancelForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewCancelNotFoundResponseBody builds the HTTP response body from the result
+// of the "cancel" endpoint of the "moderation" service.
+func NewCancelNotFoundResponseBody(res *goa.ServiceError) *CancelNotFoundResponseBody {
+	body := &CancelNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewCancelBadRequestResponseBody builds the HTTP response body from the
+// result of the "cancel" endpoint of the "moderation" service.
+func NewCancelBadRequestResponseBody(res *goa.ServiceError) *CancelBadRequestResponseBody {
+	body := &CancelBadRequestResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewCheckUserReportUnauthorizedResponseBody builds the HTTP response body
+// from the result of the "checkUserReport" endpoint of the "moderation"
+// service.
+func NewCheckUserReportUnauthorizedResponseBody(res *goa.ServiceError) *CheckUserReportUnauthorizedResponseBody {
+	body := &CheckUserReportUnauthorizedResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewCheckUserReportForbiddenResponseBody builds the HTTP response body from
+// the result of the "checkUserReport" endpoint of the "moderation" service.
+func NewCheckUserReportForbiddenResponseBody(res *goa.ServiceError) *CheckUserReportForbiddenResponseBody {
+	body := &CheckUserReportForbiddenResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewCheckUserReportNotFoundResponseBody builds the HTTP response body from
+// the result of the "checkUserReport" endpoint of the "moderation" service.
+func NewCheckUserReportNotFoundResponseBody(res *goa.ServiceError) *CheckUserReportNotFoundResponseBody {
+	body := &CheckUserReportNotFoundResponseBody{
+		Name:      res.Name,
+		ID:        res.ID,
+		Message:   res.Message,
+		Temporary: res.Temporary,
+		Timeout:   res.Timeout,
+		Fault:     res.Fault,
+	}
+	return body
+}
+
+// NewCheckUserReportBadRequestResponseBody builds the HTTP response body from
+// the result of the "checkUserReport" endpoint of the "moderation" service.
+func NewCheckUserReportBadRequestResponseBody(res *goa.ServiceError) *CheckUserReportBadRequestResponseBody {
+	body := &CheckUserReportBadRequestResponseBody{
 		Name:      res.Name,
 		ID:        res.ID,
 		Message:   res.Message,
@@ -645,6 +921,27 @@ func NewAddModerationAddPayload(body *AddRequestBody, auth *string) *moderation.
 		PostID:   *body.PostID,
 		PostType: *body.PostType,
 	}
+	v.Auth = auth
+
+	return v
+}
+
+// NewCancelPayload builds a moderation service cancel endpoint payload.
+func NewCancelPayload(postID int32, postType string, auth string) *moderation.CancelPayload {
+	v := &moderation.CancelPayload{}
+	v.PostID = postID
+	v.PostType = postType
+	v.Auth = auth
+
+	return v
+}
+
+// NewCheckUserReportPayload builds a moderation service checkUserReport
+// endpoint payload.
+func NewCheckUserReportPayload(postID int32, postType string, auth string) *moderation.CheckUserReportPayload {
+	v := &moderation.CheckUserReportPayload{}
+	v.PostID = postID
+	v.PostType = postType
 	v.Auth = auth
 
 	return v

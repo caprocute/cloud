@@ -15,19 +15,23 @@ import (
 
 // Client is the "moderation" service client.
 type Client struct {
-	AddEndpoint          goa.Endpoint
-	AcknowledgeEndpoint  goa.Endpoint
-	ListRequestsEndpoint goa.Endpoint
-	GetContentEndpoint   goa.Endpoint
+	AddEndpoint             goa.Endpoint
+	CancelEndpoint          goa.Endpoint
+	CheckUserReportEndpoint goa.Endpoint
+	AcknowledgeEndpoint     goa.Endpoint
+	ListRequestsEndpoint    goa.Endpoint
+	GetContentEndpoint      goa.Endpoint
 }
 
 // NewClient initializes a "moderation" service client given the endpoints.
-func NewClient(add, acknowledge, listRequests, getContent goa.Endpoint) *Client {
+func NewClient(add, cancel, checkUserReport, acknowledge, listRequests, getContent goa.Endpoint) *Client {
 	return &Client{
-		AddEndpoint:          add,
-		AcknowledgeEndpoint:  acknowledge,
-		ListRequestsEndpoint: listRequests,
-		GetContentEndpoint:   getContent,
+		AddEndpoint:             add,
+		CancelEndpoint:          cancel,
+		CheckUserReportEndpoint: checkUserReport,
+		AcknowledgeEndpoint:     acknowledge,
+		ListRequestsEndpoint:    listRequests,
+		GetContentEndpoint:      getContent,
 	}
 }
 
@@ -39,6 +43,23 @@ func (c *Client) Add(ctx context.Context, p *ModerationAddPayload) (res *Moderat
 		return
 	}
 	return ires.(*ModerationRequest), nil
+}
+
+// Cancel calls the "cancel" endpoint of the "moderation" service.
+func (c *Client) Cancel(ctx context.Context, p *CancelPayload) (err error) {
+	_, err = c.CancelEndpoint(ctx, p)
+	return
+}
+
+// CheckUserReport calls the "checkUserReport" endpoint of the "moderation"
+// service.
+func (c *Client) CheckUserReport(ctx context.Context, p *CheckUserReportPayload) (res *CheckUserReportResult, err error) {
+	var ires interface{}
+	ires, err = c.CheckUserReportEndpoint(ctx, p)
+	if err != nil {
+		return
+	}
+	return ires.(*CheckUserReportResult), nil
 }
 
 // Acknowledge calls the "acknowledge" endpoint of the "moderation" service.

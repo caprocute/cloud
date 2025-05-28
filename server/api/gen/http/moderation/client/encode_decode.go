@@ -162,6 +162,275 @@ func DecodeAddResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody
 	}
 }
 
+// BuildCancelRequest instantiates a HTTP request object with method and path
+// set to call the "moderation" service "cancel" endpoint
+func (c *Client) BuildCancelRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: CancelModerationPath()}
+	req, err := http.NewRequest("DELETE", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("moderation", "cancel", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeCancelRequest returns an encoder for requests sent to the moderation
+// cancel server.
+func EncodeCancelRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*moderation.CancelPayload)
+		if !ok {
+			return goahttp.ErrInvalidType("moderation", "cancel", "*moderation.CancelPayload", v)
+		}
+		{
+			head := p.Auth
+			if !strings.Contains(head, " ") {
+				req.Header.Set("Authorization", "Bearer "+head)
+			} else {
+				req.Header.Set("Authorization", head)
+			}
+		}
+		values := req.URL.Query()
+		values.Add("postId", fmt.Sprintf("%v", p.PostID))
+		values.Add("postType", p.PostType)
+		req.URL.RawQuery = values.Encode()
+		return nil
+	}
+}
+
+// DecodeCancelResponse returns a decoder for responses returned by the
+// moderation cancel endpoint. restoreBody controls whether the response body
+// should be restored after having been read.
+// DecodeCancelResponse may return the following errors:
+//   - "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//   - "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//   - "not-found" (type *goa.ServiceError): http.StatusNotFound
+//   - "bad-request" (type *goa.ServiceError): http.StatusBadRequest
+//   - error: internal error
+func DecodeCancelResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			return nil, nil
+		case http.StatusUnauthorized:
+			var (
+				body CancelUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("moderation", "cancel", err)
+			}
+			err = ValidateCancelUnauthorizedResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("moderation", "cancel", err)
+			}
+			return nil, NewCancelUnauthorized(&body)
+		case http.StatusForbidden:
+			var (
+				body CancelForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("moderation", "cancel", err)
+			}
+			err = ValidateCancelForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("moderation", "cancel", err)
+			}
+			return nil, NewCancelForbidden(&body)
+		case http.StatusNotFound:
+			var (
+				body CancelNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("moderation", "cancel", err)
+			}
+			err = ValidateCancelNotFoundResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("moderation", "cancel", err)
+			}
+			return nil, NewCancelNotFound(&body)
+		case http.StatusBadRequest:
+			var (
+				body CancelBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("moderation", "cancel", err)
+			}
+			err = ValidateCancelBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("moderation", "cancel", err)
+			}
+			return nil, NewCancelBadRequest(&body)
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("moderation", "cancel", resp.StatusCode, string(body))
+		}
+	}
+}
+
+// BuildCheckUserReportRequest instantiates a HTTP request object with method
+// and path set to call the "moderation" service "checkUserReport" endpoint
+func (c *Client) BuildCheckUserReportRequest(ctx context.Context, v interface{}) (*http.Request, error) {
+	u := &url.URL{Scheme: c.scheme, Host: c.host, Path: CheckUserReportModerationPath()}
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, goahttp.ErrInvalidURL("moderation", "checkUserReport", u.String(), err)
+	}
+	if ctx != nil {
+		req = req.WithContext(ctx)
+	}
+
+	return req, nil
+}
+
+// EncodeCheckUserReportRequest returns an encoder for requests sent to the
+// moderation checkUserReport server.
+func EncodeCheckUserReportRequest(encoder func(*http.Request) goahttp.Encoder) func(*http.Request, interface{}) error {
+	return func(req *http.Request, v interface{}) error {
+		p, ok := v.(*moderation.CheckUserReportPayload)
+		if !ok {
+			return goahttp.ErrInvalidType("moderation", "checkUserReport", "*moderation.CheckUserReportPayload", v)
+		}
+		{
+			head := p.Auth
+			if !strings.Contains(head, " ") {
+				req.Header.Set("Authorization", "Bearer "+head)
+			} else {
+				req.Header.Set("Authorization", head)
+			}
+		}
+		values := req.URL.Query()
+		values.Add("postId", fmt.Sprintf("%v", p.PostID))
+		values.Add("postType", p.PostType)
+		req.URL.RawQuery = values.Encode()
+		return nil
+	}
+}
+
+// DecodeCheckUserReportResponse returns a decoder for responses returned by
+// the moderation checkUserReport endpoint. restoreBody controls whether the
+// response body should be restored after having been read.
+// DecodeCheckUserReportResponse may return the following errors:
+//   - "unauthorized" (type *goa.ServiceError): http.StatusUnauthorized
+//   - "forbidden" (type *goa.ServiceError): http.StatusForbidden
+//   - "not-found" (type *goa.ServiceError): http.StatusNotFound
+//   - "bad-request" (type *goa.ServiceError): http.StatusBadRequest
+//   - error: internal error
+func DecodeCheckUserReportResponse(decoder func(*http.Response) goahttp.Decoder, restoreBody bool) func(*http.Response) (interface{}, error) {
+	return func(resp *http.Response) (interface{}, error) {
+		if restoreBody {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				return nil, err
+			}
+			resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			defer func() {
+				resp.Body = ioutil.NopCloser(bytes.NewBuffer(b))
+			}()
+		} else {
+			defer resp.Body.Close()
+		}
+		switch resp.StatusCode {
+		case http.StatusOK:
+			var (
+				body CheckUserReportOKResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("moderation", "checkUserReport", err)
+			}
+			err = ValidateCheckUserReportOKResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("moderation", "checkUserReport", err)
+			}
+			res := NewCheckUserReportResultOK(&body)
+			return res, nil
+		case http.StatusUnauthorized:
+			var (
+				body CheckUserReportUnauthorizedResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("moderation", "checkUserReport", err)
+			}
+			err = ValidateCheckUserReportUnauthorizedResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("moderation", "checkUserReport", err)
+			}
+			return nil, NewCheckUserReportUnauthorized(&body)
+		case http.StatusForbidden:
+			var (
+				body CheckUserReportForbiddenResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("moderation", "checkUserReport", err)
+			}
+			err = ValidateCheckUserReportForbiddenResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("moderation", "checkUserReport", err)
+			}
+			return nil, NewCheckUserReportForbidden(&body)
+		case http.StatusNotFound:
+			var (
+				body CheckUserReportNotFoundResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("moderation", "checkUserReport", err)
+			}
+			err = ValidateCheckUserReportNotFoundResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("moderation", "checkUserReport", err)
+			}
+			return nil, NewCheckUserReportNotFound(&body)
+		case http.StatusBadRequest:
+			var (
+				body CheckUserReportBadRequestResponseBody
+				err  error
+			)
+			err = decoder(resp).Decode(&body)
+			if err != nil {
+				return nil, goahttp.ErrDecodingError("moderation", "checkUserReport", err)
+			}
+			err = ValidateCheckUserReportBadRequestResponseBody(&body)
+			if err != nil {
+				return nil, goahttp.ErrValidationError("moderation", "checkUserReport", err)
+			}
+			return nil, NewCheckUserReportBadRequest(&body)
+		default:
+			body, _ := ioutil.ReadAll(resp.Body)
+			return nil, goahttp.ErrInvalidResponse("moderation", "checkUserReport", resp.StatusCode, string(body))
+		}
+	}
+}
+
 // BuildAcknowledgeRequest instantiates a HTTP request object with method and
 // path set to call the "moderation" service "acknowledge" endpoint
 func (c *Client) BuildAcknowledgeRequest(ctx context.Context, v interface{}) (*http.Request, error) {

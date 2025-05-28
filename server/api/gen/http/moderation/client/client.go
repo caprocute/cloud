@@ -20,6 +20,13 @@ type Client struct {
 	// Add Doer is the HTTP client used to make requests to the add endpoint.
 	AddDoer goahttp.Doer
 
+	// Cancel Doer is the HTTP client used to make requests to the cancel endpoint.
+	CancelDoer goahttp.Doer
+
+	// CheckUserReport Doer is the HTTP client used to make requests to the
+	// checkUserReport endpoint.
+	CheckUserReportDoer goahttp.Doer
+
 	// Acknowledge Doer is the HTTP client used to make requests to the acknowledge
 	// endpoint.
 	AcknowledgeDoer goahttp.Doer
@@ -56,6 +63,8 @@ func NewClient(
 ) *Client {
 	return &Client{
 		AddDoer:             doer,
+		CancelDoer:          doer,
+		CheckUserReportDoer: doer,
 		AcknowledgeDoer:     doer,
 		ListRequestsDoer:    doer,
 		GetContentDoer:      doer,
@@ -87,6 +96,54 @@ func (c *Client) Add() goa.Endpoint {
 		resp, err := c.AddDoer.Do(req)
 		if err != nil {
 			return nil, goahttp.ErrRequestError("moderation", "add", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// Cancel returns an endpoint that makes HTTP requests to the moderation
+// service cancel server.
+func (c *Client) Cancel() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeCancelRequest(c.encoder)
+		decodeResponse = DecodeCancelResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildCancelRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.CancelDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("moderation", "cancel", err)
+		}
+		return decodeResponse(resp)
+	}
+}
+
+// CheckUserReport returns an endpoint that makes HTTP requests to the
+// moderation service checkUserReport server.
+func (c *Client) CheckUserReport() goa.Endpoint {
+	var (
+		encodeRequest  = EncodeCheckUserReportRequest(c.encoder)
+		decodeResponse = DecodeCheckUserReportResponse(c.decoder, c.RestoreResponseBody)
+	)
+	return func(ctx context.Context, v interface{}) (interface{}, error) {
+		req, err := c.BuildCheckUserReportRequest(ctx, v)
+		if err != nil {
+			return nil, err
+		}
+		err = encodeRequest(req, v)
+		if err != nil {
+			return nil, err
+		}
+		resp, err := c.CheckUserReportDoer.Do(req)
+		if err != nil {
+			return nil, goahttp.ErrRequestError("moderation", "checkUserReport", err)
 		}
 		return decodeResponse(resp)
 	}

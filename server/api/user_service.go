@@ -318,7 +318,7 @@ func (s *UserService) GetCurrent(ctx context.Context, payload *user.GetCurrentPa
 
 	isModerator := false
 	if err := s.options.Database.GetContext(ctx, &isModerator, `
-		SELECT 1 FROM fieldkit.moderators WHERE user_id = $1 LIMIT 1
+		SELECT 1 FROM fieldkit.moderator WHERE user_id = $1 LIMIT 1
 		`, p.UserID()); err != nil {
 		log := Logger(ctx).Sugar()
 		log.Errorw("query user is moderator failed", err)
