@@ -1,26 +1,26 @@
 <template>
     <StandardLayout>
         <div class="admin-moderation">
-            <h1>Moderation Requests</h1>
+            <h1>{{ $t("admin.moderationList.title") }}</h1>
 
-            <div v-if="busy" class="loading-container">Loading...</div>
+            <div v-if="busy" class="loading-container">{{ $t("admin.moderationList.loading") }}</div>
 
             <div v-else-if="moderationRequests.length === 0" class="empty-state">
-                <p>No moderation requests found.</p>
+                <p>{{ $t("admin.moderationList.noModerationRequests") }}</p>
             </div>
 
             <div v-else class="table-responsive">
                 <table class="moderation-table">
                     <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Post ID</th>
-                            <th>Type</th>
-                            <th>Reported By</th>
-                            <th>Reported At</th>
-                            <th>Status</th>
-                            <th>Acknowledged By</th>
-                            <th>Actions</th>
+                            <th>{{ $t("admin.moderationList.id") }}</th>
+                            <th>{{ $t("admin.moderationList.postId") }}</th>
+                            <th>{{ $t("admin.moderationList.type") }}</th>
+                            <th>{{ $t("admin.moderationList.reportedBy") }}</th>
+                            <th>{{ $t("admin.moderationList.reportedAt") }}</th>
+                            <th>{{ $t("admin.moderationList.status") }}</th>
+                            <th>{{ $t("admin.moderationList.acknowledgedBy") }}</th>
+                            <th>{{ $t("admin.moderationList.actions") }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -46,7 +46,7 @@
                             </td>
                             <td data-label="Actions">
                                 <button class="button review-btn" @click="reviewRequest(request)" :disabled="!!request.acknowledgedAt">
-                                    Review
+                                    {{ $t("admin.moderationList.review") }}
                                 </button>
                             </td>
                         </tr>

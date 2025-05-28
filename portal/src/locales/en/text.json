@@ -874,6 +874,22 @@
             "transfer": "Transfer"
         },
         "moderation": "Moderation",
+        "moderationList": {
+            "title": "Moderation Requests",
+            "id": "ID",
+            "postId": "Post ID",
+            "type": "Type",
+            "reportedBy": "Reported By",
+            "reportedAt": "Reported At",
+            "acknowledgedBy": "Acknowledged By",
+            "status": "Status",
+            "actions": "Actions",
+            "review": "Review",
+            "pending": "Pending",
+            "acknowledged": "Acknowledged",
+            "noModerationRequests": "No moderation requests found.",
+            "loading": "Loading moderation requests..."
+        },
         "moderationReview": {
             "title": "Review Content",
             "postType": "Post Type",
