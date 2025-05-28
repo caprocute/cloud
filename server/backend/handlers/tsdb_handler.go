@@ -99,10 +99,13 @@ func (v *TsDBHandler) OnData(ctx context.Context, provision *data.Provision, raw
 			return err
 		}
 
-		log.Infow("station-modules", "meta_record_id", meta.ID, "provision_id", provision.ID, "modules", modules)
+		log.Infow("station-modules", "meta_record_id", meta.ID, "provision_id", provision.ID, "number_modules", len(modules))
 
 		v.stationModules = make(map[uint32]*data.StationModule)
 		for _, sm := range modules {
+			if v.stationModules[sm.Index] != nil {
+				return fmt.Errorf("duplicate module indices")
+			}
 			v.stationModules[sm.Index] = sm
 		}
 
@@ -144,7 +147,7 @@ func (v *TsDBHandler) OnData(ctx context.Context, provision *data.Provision, raw
 					ModuleID:  sm.ID,
 				}
 
-				if !math.IsNaN(value.Value) {
+				if !math.IsNaN(value.Value) && !math.IsInf(value.Value, 0) {
 					if err := v.saveStorage(ctx, db.Time, filtered.Record.Location, &ask, value.Value); err != nil {
 						return fmt.Errorf("error saving: %w", err)
 					}

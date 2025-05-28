@@ -1,6 +1,8 @@
 import Vue from "vue";
-import Router from "vue-router";
+import Router, { Route } from "vue-router";
 import VueBodyClass from "vue-body-class";
+import i18n from "./i18n";
+import { getPartnerCustomization, isCustomisationEnabled } from "@/views/shared/partners";
 
 import LoginView from "./views/auth/LoginView.vue";
 import DeleteAccountView from "./views/auth/DeleteAccountView.vue";
@@ -33,14 +35,16 @@ import AdminModeration from "./views/admin/AdminModeration.vue";
 import Playground from "./views/admin/Playground.vue";
 
 import StationView from "./views/station/StationView.vue";
+import NotFoundView from "./views/NotFoundView.vue";
 
 import { deserializeBookmark } from "./views/viz/viz";
 import TermsView from "@/views/auth/TermsView.vue";
 import { ActionTypes } from "@/store";
 
-import { getPartnerCustomization } from "@/views/shared/partners";
 import StationPhotosView from "@/views/station/StationPhotosView.vue";
 import { MapViewType } from "@/api/api";
+
+let vueRouter: Router;
 
 Vue.use(Router);
 
@@ -49,7 +53,7 @@ function makeDefaultRouteForProject(projectId: number) {
         path: "/",
         name: "root",
         component: ProjectBigMap,
-        props: (route) => {
+        props: (_route) => {
             return {
                 id: projectId,
                 forcePublic: false,
@@ -57,7 +61,7 @@ function makeDefaultRouteForProject(projectId: number) {
             };
         },
         meta: {
-            secured: true,
+            secured: false,
             viewType: MapViewType.map,
         },
     };
@@ -71,11 +75,15 @@ function getRoot() {
             name: "root",
             component: ProjectsView,
             meta: {
-                secured: true,
+                secured: false,
             },
         };
     }
     return makeDefaultRouteForProject(partnerCustomization.projectId);
+}
+
+function isAdminRoute(route: Route): boolean {
+    return route.matched.some((record) => record.meta.admin);
 }
 
 const routes = [
@@ -118,7 +126,7 @@ const routes = [
         path: "/spoof",
         name: "spoof",
         component: LoginView,
-        props: (route) => {
+        props: (_route) => {
             return {
                 spoofing: true,
             };
@@ -185,7 +193,7 @@ const routes = [
         name: "viewInvites",
         component: ProjectsView,
         meta: {
-            secured: true,
+            secured: false,
         },
     },
     {
@@ -209,7 +217,7 @@ const routes = [
         name: "projects",
         component: ProjectsView,
         meta: {
-            secured: true,
+            secured: false,
         },
     },
     {
@@ -223,7 +231,7 @@ const routes = [
             };
         },
         meta: {
-            secured: true,
+            secured: false,
         },
     },
     {
@@ -239,7 +247,7 @@ const routes = [
         },
         meta: {
             bodyClass: "disable-scrolling",
-            secured: true,
+            secured: false,
         },
     },
     {
@@ -253,7 +261,7 @@ const routes = [
             };
         },
         meta: {
-            secured: true,
+            secured: false,
         },
     },
     {
@@ -268,7 +276,7 @@ const routes = [
             };
         },
         meta: {
-            secured: true,
+            secured: false,
             viewType: MapViewType.map,
         },
     },
@@ -284,7 +292,7 @@ const routes = [
             };
         },
         meta: {
-            secured: true,
+            secured: false,
             viewType: MapViewType.list,
         },
     },
@@ -293,7 +301,7 @@ const routes = [
         name: "addProject",
         component: ProjectEditView,
         meta: {
-            secured: true,
+            secured: false,
         },
     },
     {
@@ -306,7 +314,7 @@ const routes = [
             };
         },
         meta: {
-            secured: true,
+            secured: false,
         },
     },
     {
@@ -315,7 +323,7 @@ const routes = [
         component: ProjectUpdateEditView,
         props: true,
         meta: {
-            secured: true,
+            secured: false,
         },
     },
     {
@@ -328,7 +336,7 @@ const routes = [
             };
         },
         meta: {
-            secured: true,
+            secured: false,
         },
     },
     {
@@ -338,7 +346,7 @@ const routes = [
         props: true,
         meta: {
             bodyClass: "map-view",
-            secured: true,
+            secured: false,
             viewType: MapViewType.map,
         },
     },
@@ -349,7 +357,7 @@ const routes = [
         props: true,
         meta: {
             bodyClass: "map-view",
-            secured: true,
+            secured: false,
             viewType: MapViewType.list,
         },
     },
@@ -364,7 +372,7 @@ const routes = [
         },
         meta: {
             bodyClass: "map-view",
-            secured: true,
+            secured: false,
         },
     },
     {
@@ -378,7 +386,7 @@ const routes = [
         },
         meta: {
             bodyClass: "map-view",
-            secured: true,
+            secured: false,
         },
     },
     {
@@ -393,7 +401,7 @@ const routes = [
         },
         meta: {
             bodyClass: "map-view",
-            secured: true,
+            secured: false,
         },
     },
     {
@@ -407,7 +415,7 @@ const routes = [
             };
         },
         meta: {
-            secured: true,
+            secured: false,
         },
     },
     {
@@ -422,7 +430,7 @@ const routes = [
             };
         },
         meta: {
-            secured: true,
+            secured: false,
         },
     },
     {
@@ -436,7 +444,7 @@ const routes = [
             };
         },
         meta: {
-            secured: true,
+            secured: false,
             bodyClass: "disable-scrolling",
         },
     },
@@ -452,7 +460,7 @@ const routes = [
             };
         },
         meta: {
-            secured: true,
+            secured: false,
         },
     },
     {
@@ -521,7 +529,7 @@ const routes = [
         },
         meta: {
             bodyClass: "disable-scrolling",
-            secured: true,
+            secured: false,
         },
     },
     {
@@ -534,7 +542,7 @@ const routes = [
             };
         },
         meta: {
-            secured: true,
+            secured: false,
         },
     },
     {
@@ -548,14 +556,14 @@ const routes = [
             };
         },
         meta: {
-            secured: true,
+            secured: false,
         },
     },
     {
         path: "/notes",
         name: "viewMyNotes",
         component: NotesView,
-        props: (route) => {
+        props: (_route) => {
             return {};
         },
         meta: {
@@ -572,7 +580,7 @@ const routes = [
             };
         },
         meta: {
-            secured: true,
+            secured: false,
         },
     },
     {
@@ -587,7 +595,7 @@ const routes = [
         path: "/admin/playground",
         name: "adminPlayground",
         component: Playground,
-        props: (route) => {
+        props: (_route) => {
             return {};
         },
         meta: {
@@ -599,7 +607,7 @@ const routes = [
         path: "/admin",
         name: "adminMain",
         component: AdminMain,
-        props: (route) => {
+        props: (_route) => {
             return {};
         },
         meta: {
@@ -611,7 +619,7 @@ const routes = [
         path: "/admin/users",
         name: "adminUsers",
         component: AdminUsers,
-        props: (route) => {
+        props: (_route) => {
             return {};
         },
         meta: {
@@ -646,6 +654,14 @@ const routes = [
         },
     },
     getRoot(),
+    {
+        path: "*",
+        name: "notFound",
+        component: NotFoundView,
+        meta: {
+            secured: false,
+        },
+    },
 ];
 
 export default function routerFactory(store) {
@@ -653,7 +669,7 @@ export default function routerFactory(store) {
         mode: "history",
         base: process.env.BASE_URL,
         routes: routes,
-        scrollBehavior(to, from, savedPosition) {
+        scrollBehavior(to, from, _savedPosition) {
             if (to.name == from.name) {
                 return null;
             }
@@ -662,9 +678,16 @@ export default function routerFactory(store) {
         },
     });
 
+    vueRouter = router;
+
     const vueBodyClass = new VueBodyClass(routes);
     router.beforeEach((to, from, next) => {
         vueBodyClass.guard(to, next);
+    });
+
+    // Global navigation guard to set the page title
+    router.afterEach((_to) => {
+        updateDocumentTitle();
     });
 
     router.beforeEach(async (to, from, next) => {
@@ -698,6 +721,10 @@ export default function routerFactory(store) {
                 if (!store.getters.isTncValid && to.name != "login") {
                     await store.dispatch(ActionTypes.REFRESH_CURRENT_USER);
 
+                    if (isAdminRoute(to) && !store.getters.isAdmin) {
+                        next("/dashboard");
+                    }
+
                     if (!store.getters.isTncValid) {
                         next("/terms");
                     } else {
@@ -707,10 +734,9 @@ export default function routerFactory(store) {
                     next();
                 }
             } else {
-                // const queryParams = new URLSearchParams();
-                // queryParams.append("after", to.fullPath);
-                // next("/login?" + queryParams.toString());
-                next();
+                const queryParams = new URLSearchParams();
+                queryParams.append("after", to.fullPath);
+                next("/login?" + queryParams.toString());
             }
         } else {
             if (to.name === null) {
@@ -726,4 +752,18 @@ export default function routerFactory(store) {
     });
 
     return router;
+}
+
+export function updateDocumentTitle(): void {
+    const routeName = vueRouter ? vueRouter.currentRoute.name : null;
+
+    if (routeName) {
+        const partnerName = isCustomisationEnabled() ? "FloodNet" : "FieldKit";
+        const titleText = i18n.t(`pageTitles.${routeName}`, "", { fallbackWarn: false });
+        if (String(titleText) !== `pageTitles.${routeName}`) {
+            document.title = `${titleText} - ${partnerName}`;
+        } else {
+            document.title = partnerName;
+        }
+    }
 }

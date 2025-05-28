@@ -22,6 +22,7 @@ import (
 type Server struct {
 	Mounts         []*MountPoint
 	HealthEndpoint http.Handler
+	UploadBackup   http.Handler
 	CORS           http.Handler
 }
 
@@ -59,9 +60,12 @@ func New(
 	return &Server{
 		Mounts: []*MountPoint{
 			{"HealthEndpoint", "GET", "/admin/health"},
+			{"UploadBackup", "POST", "/admin/backup"},
 			{"CORS", "OPTIONS", "/admin/health"},
+			{"CORS", "OPTIONS", "/admin/backup"},
 		},
 		HealthEndpoint: NewHealthEndpointHandler(e.HealthEndpoint, mux, decoder, encoder, errhandler, formatter),
+		UploadBackup:   NewUploadBackupHandler(e.UploadBackup, mux, decoder, encoder, errhandler, formatter),
 		CORS:           NewCORSHandler(),
 	}
 }
@@ -72,12 +76,14 @@ func (s *Server) Service() string { return "admin" }
 // Use wraps the server handlers with the given middleware.
 func (s *Server) Use(m func(http.Handler) http.Handler) {
 	s.HealthEndpoint = m(s.HealthEndpoint)
+	s.UploadBackup = m(s.UploadBackup)
 	s.CORS = m(s.CORS)
 }
 
 // Mount configures the mux to serve the admin endpoints.
 func Mount(mux goahttp.Muxer, h *Server) {
 	MountHealthEndpointHandler(mux, h.HealthEndpoint)
+	MountUploadBackupHandler(mux, h.UploadBackup)
 	MountCORSHandler(mux, h.CORS)
 }
 
@@ -132,6 +138,58 @@ func NewHealthEndpointHandler(
 	})
 }
 
+// MountUploadBackupHandler configures the mux to serve the "admin" service
+// "upload backup" endpoint.
+func MountUploadBackupHandler(mux goahttp.Muxer, h http.Handler) {
+	f, ok := handleAdminOrigin(h).(http.HandlerFunc)
+	if !ok {
+		f = func(w http.ResponseWriter, r *http.Request) {
+			h.ServeHTTP(w, r)
+		}
+	}
+	mux.Handle("POST", "/admin/backup", f)
+}
+
+// NewUploadBackupHandler creates a HTTP handler which loads the HTTP request
+// and calls the "admin" service "upload backup" endpoint.
+func NewUploadBackupHandler(
+	endpoint goa.Endpoint,
+	mux goahttp.Muxer,
+	decoder func(*http.Request) goahttp.Decoder,
+	encoder func(context.Context, http.ResponseWriter) goahttp.Encoder,
+	errhandler func(context.Context, http.ResponseWriter, error),
+	formatter func(err error) goahttp.Statuser,
+) http.Handler {
+	var (
+		decodeRequest  = DecodeUploadBackupRequest(mux, decoder)
+		encodeResponse = EncodeUploadBackupResponse(encoder)
+		encodeError    = EncodeUploadBackupError(encoder, formatter)
+	)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ctx := context.WithValue(r.Context(), goahttp.AcceptTypeKey, r.Header.Get("Accept"))
+		ctx = context.WithValue(ctx, goa.MethodKey, "upload backup")
+		ctx = context.WithValue(ctx, goa.ServiceKey, "admin")
+		payload, err := decodeRequest(r)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		data := &admin.UploadBackupRequestData{Payload: payload.(*admin.UploadBackupPayload), Body: r.Body}
+		res, err := endpoint(ctx, data)
+		if err != nil {
+			if err := encodeError(ctx, w, err); err != nil {
+				errhandler(ctx, w, err)
+			}
+			return
+		}
+		if err := encodeResponse(ctx, w, res); err != nil {
+			errhandler(ctx, w, err)
+		}
+	})
+}
+
 // MountCORSHandler configures the mux to serve the CORS endpoints for the
 // service admin.
 func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
@@ -143,6 +201,7 @@ func MountCORSHandler(mux goahttp.Muxer, h http.Handler) {
 		}
 	}
 	mux.Handle("OPTIONS", "/admin/health", f)
+	mux.Handle("OPTIONS", "/admin/backup", f)
 }
 
 // NewCORSHandler creates a HTTP handler which returns a simple 200 response.
@@ -170,6 +229,7 @@ func handleAdminOrigin(h http.Handler) http.Handler {
 			w.Header().Set("Access-Control-Allow-Origin", origin)
 			w.Header().Set("Vary", "Origin")
 			w.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
+			w.Header().Set("Access-Control-Max-Age", "86400")
 			w.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := r.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
@@ -183,6 +243,7 @@ func handleAdminOrigin(h http.Handler) http.Handler {
 			w.Header().Set("Access-Control-Allow-Origin", origin)
 			w.Header().Set("Vary", "Origin")
 			w.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
+			w.Header().Set("Access-Control-Max-Age", "86400")
 			w.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := r.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
@@ -196,6 +257,7 @@ func handleAdminOrigin(h http.Handler) http.Handler {
 			w.Header().Set("Access-Control-Allow-Origin", origin)
 			w.Header().Set("Vary", "Origin")
 			w.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
+			w.Header().Set("Access-Control-Max-Age", "86400")
 			w.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := r.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
@@ -209,6 +271,7 @@ func handleAdminOrigin(h http.Handler) http.Handler {
 			w.Header().Set("Access-Control-Allow-Origin", origin)
 			w.Header().Set("Vary", "Origin")
 			w.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
+			w.Header().Set("Access-Control-Max-Age", "86400")
 			w.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := r.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
@@ -222,6 +285,7 @@ func handleAdminOrigin(h http.Handler) http.Handler {
 			w.Header().Set("Access-Control-Allow-Origin", origin)
 			w.Header().Set("Vary", "Origin")
 			w.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
+			w.Header().Set("Access-Control-Max-Age", "86400")
 			w.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := r.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
@@ -235,6 +299,7 @@ func handleAdminOrigin(h http.Handler) http.Handler {
 			w.Header().Set("Access-Control-Allow-Origin", origin)
 			w.Header().Set("Vary", "Origin")
 			w.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
+			w.Header().Set("Access-Control-Max-Age", "86400")
 			w.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := r.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
@@ -248,6 +313,7 @@ func handleAdminOrigin(h http.Handler) http.Handler {
 			w.Header().Set("Access-Control-Allow-Origin", origin)
 			w.Header().Set("Vary", "Origin")
 			w.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
+			w.Header().Set("Access-Control-Max-Age", "86400")
 			w.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := r.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request
@@ -261,6 +327,7 @@ func handleAdminOrigin(h http.Handler) http.Handler {
 			w.Header().Set("Access-Control-Allow-Origin", origin)
 			w.Header().Set("Vary", "Origin")
 			w.Header().Set("Access-Control-Expose-Headers", "Authorization, Content-Type")
+			w.Header().Set("Access-Control-Max-Age", "86400")
 			w.Header().Set("Access-Control-Allow-Credentials", "false")
 			if acrm := r.Header.Get("Access-Control-Request-Method"); acrm != "" {
 				// We are handling a preflight request

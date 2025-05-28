@@ -24,7 +24,7 @@
                 <img alt="Success" src="@/assets/icon-success.svg" width="57px" class="form-header-icon" />
                 <h1 class="form-title">{{ $t("recover.form.sentTitle") }}</h1>
                 <div class="form-subtitle">{{ $t("recover.form.sentSubtitle") }}</div>
-                <button class="form-submit" v-on:click="resend">{{ $t('recover.form.resendButton') }}</button>
+                <button class="form-submit" v-on:click="resend">{{ $t("recover.form.resendButton") }}</button>
                 <router-link :to="{ name: 'login' }" class="form-link">{{ $t("recover.form.backButton") }}</router-link>
             </div>
             <div v-if="resending">
@@ -39,7 +39,7 @@
 import Vue from "vue";
 import CommonComponents from "@/views/shared";
 
-import { required, email, minLength, sameAs } from "vuelidate/lib/validators";
+import { required, email } from "vuelidate/lib/validators";
 import Logo from "@/views/shared/Logo.vue";
 
 export default Vue.extend({
@@ -94,7 +94,9 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "../../scss/forms";
+@use "src/scss/forms";
+@use "src/scss/mixins";
+@use "src/scss/variables";
 
 .reset-instructions {
     margin-bottom: 50px;
@@ -103,7 +105,7 @@ export default Vue.extend({
 .form-submit {
     margin-top: 80px;
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         margin-top: 70px;
     }
 }

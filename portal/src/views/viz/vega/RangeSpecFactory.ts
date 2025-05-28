@@ -1,5 +1,4 @@
 import _ from "lodash";
-import { MapFunction, ChartSettings, SeriesData, getString, getSeriesThresholds } from "./SpecFactory";
 
 export class RangeSpecFactory {
     constructor(private readonly allSeries, private readonly settings) {}

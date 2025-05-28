@@ -44,7 +44,7 @@ func BuildAddDataEventPayload(dataEventsAddDataEventBody string, dataEventsAddDa
 	{
 		err = json.Unmarshal([]byte(dataEventsAddDataEventBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"event\": {\n         \"allProjectSensors\": false,\n         \"bookmark\": \"Est hic et.\",\n         \"description\": \"Quisquam ea quidem a asperiores consequatur architecto.\",\n         \"end\": 6433030965608229216,\n         \"start\": 3072237865390360984,\n         \"title\": \"Dolorem placeat earum odio iusto est reiciendis.\"\n      }\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"event\": {\n         \"allProjectSensors\": true,\n         \"bookmark\": \"Dolor consequatur aliquam dignissimos quia nobis.\",\n         \"description\": \"Facere facere repellat.\",\n         \"end\": 7577586275964425592,\n         \"start\": 7816285458348604520,\n         \"title\": \"Quia omnis fugiat.\"\n      }\n   }'")
 		}
 		if body.Event == nil {
 			err = goa.MergeErrors(err, goa.MissingFieldError("event", "body"))
@@ -74,7 +74,11 @@ func BuildUpdateDataEventPayload(dataEventsUpdateDataEventBody string, dataEvent
 	{
 		err = json.Unmarshal([]byte(dataEventsUpdateDataEventBody), &body)
 		if err != nil {
+<<<<<<< HEAD
 			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"description\": \"Quaerat sit.\",\n      \"end\": 505970632345613340,\n      \"start\": 4534775901646415309,\n      \"title\": \"Earum ut.\"\n   }'")
+=======
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"description\": \"Asperiores eum sapiente et sit sit cumque.\",\n      \"end\": 6494622086745639040,\n      \"start\": 139102868287262130,\n      \"title\": \"Ea recusandae voluptatem similique reiciendis sequi eos.\"\n   }'")
+>>>>>>> develop
 		}
 	}
 	var eventID int64

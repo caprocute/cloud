@@ -14,12 +14,10 @@ import Vue from "vue";
 import StandardLayout from "../StandardLayout.vue";
 import CommonComponents from "@/views/shared";
 
-import StationPicker from "@/views/shared/StationPicker.vue";
 import StationPickerModal from "@/views/shared/StationPickerModal.vue";
 import UserPicker from "./UserPicker.vue";
 
-import { mapState, mapGetters } from "vuex";
-import * as ActionTypes from "@/store/actions";
+import { mapState } from "vuex";
 import { GlobalState } from "@/store/modules/global";
 
 export default Vue.extend({

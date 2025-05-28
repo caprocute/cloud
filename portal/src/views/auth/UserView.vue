@@ -116,14 +116,15 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "../../scss/mixins";
-@import "../../scss/forms";
-@import "../../scss/layout";
+@use "src/scss/mixins";
+@use "src/scss/forms";
+@use "src/scss/layout";
+@use "src/scss/variables";
 
 h2 {
     margin-bottom: 0;
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         margin: 40px 0 20px;
     }
 }

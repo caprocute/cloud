@@ -9,6 +9,7 @@ package admin
 
 import (
 	"context"
+	"io"
 
 	adminviews "gitlab.com/fieldkit/cloud/server/api/gen/admin/views"
 	goa "goa.design/goa/v3/pkg"
@@ -19,6 +20,8 @@ import (
 type Service interface {
 	// Health implements health.
 	HealthEndpoint(context.Context, *HealthPayload) (res *Health, err error)
+	// UploadBackup implements upload backup.
+	UploadBackup(context.Context, *UploadBackupPayload, io.ReadCloser) (res *BackupCheck, err error)
 }
 
 // Auther defines the authorization functions to be implemented by the service.
@@ -35,7 +38,7 @@ const ServiceName = "admin"
 // MethodNames lists the service method names as defined in the design. These
 // are the same values that are set in the endpoint request contexts under the
 // MethodKey key.
-var MethodNames = [1]string{"health"}
+var MethodNames = [2]string{"health", "upload backup"}
 
 // HealthPayload is the payload type of the admin service health method.
 type HealthPayload struct {
@@ -45,6 +48,23 @@ type HealthPayload struct {
 // Health is the result type of the admin service health method.
 type Health struct {
 	Queue *QueueHealth
+}
+
+// UploadBackupPayload is the payload type of the admin service upload backup
+// method.
+type UploadBackupPayload struct {
+	Auth          string
+	ContentLength int64
+	ContentType   string
+}
+
+// BackupCheck is the result type of the admin service upload backup method.
+type BackupCheck struct {
+	DeviceName   *string
+	DeviceID     *string
+	GenerationID *string
+	Records      []int32
+	Errors       []string
 }
 
 type QueueHealth struct {
@@ -100,6 +120,19 @@ func NewViewedHealth(res *Health, view string) *adminviews.Health {
 	return &adminviews.Health{Projected: p, View: "default"}
 }
 
+// NewBackupCheck initializes result type BackupCheck from viewed result type
+// BackupCheck.
+func NewBackupCheck(vres *adminviews.BackupCheck) *BackupCheck {
+	return newBackupCheck(vres.Projected)
+}
+
+// NewViewedBackupCheck initializes viewed result type BackupCheck from result
+// type BackupCheck using the given view.
+func NewViewedBackupCheck(res *BackupCheck, view string) *adminviews.BackupCheck {
+	p := newBackupCheckView(res)
+	return &adminviews.BackupCheck{Projected: p, View: "default"}
+}
+
 // newHealth converts projected type Health to service type Health.
 func newHealth(vres *adminviews.HealthView) *Health {
 	res := &Health{}
@@ -115,6 +148,52 @@ func newHealthView(res *Health) *adminviews.HealthView {
 	vres := &adminviews.HealthView{}
 	if res.Queue != nil {
 		vres.Queue = transformQueueHealthToAdminviewsQueueHealthView(res.Queue)
+	}
+	return vres
+}
+
+// newBackupCheck converts projected type BackupCheck to service type
+// BackupCheck.
+func newBackupCheck(vres *adminviews.BackupCheckView) *BackupCheck {
+	res := &BackupCheck{
+		DeviceName:   vres.DeviceName,
+		DeviceID:     vres.DeviceID,
+		GenerationID: vres.GenerationID,
+	}
+	if vres.Records != nil {
+		res.Records = make([]int32, len(vres.Records))
+		for i, val := range vres.Records {
+			res.Records[i] = val
+		}
+	}
+	if vres.Errors != nil {
+		res.Errors = make([]string, len(vres.Errors))
+		for i, val := range vres.Errors {
+			res.Errors[i] = val
+		}
+	}
+	return res
+}
+
+// newBackupCheckView projects result type BackupCheck to projected type
+// BackupCheckView using the "default" view.
+func newBackupCheckView(res *BackupCheck) *adminviews.BackupCheckView {
+	vres := &adminviews.BackupCheckView{
+		DeviceName:   res.DeviceName,
+		DeviceID:     res.DeviceID,
+		GenerationID: res.GenerationID,
+	}
+	if res.Records != nil {
+		vres.Records = make([]int32, len(res.Records))
+		for i, val := range res.Records {
+			vres.Records[i] = val
+		}
+	}
+	if res.Errors != nil {
+		vres.Errors = make([]string, len(res.Errors))
+		for i, val := range res.Errors {
+			vres.Errors[i] = val
+		}
 	}
 	return vres
 }

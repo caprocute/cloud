@@ -65,11 +65,11 @@ export default Vue.extend({
         },
     },
     watch: {
-        async token(newValue: Bookmark, oldValue: Bookmark): Promise<void> {
+        async token(newValue: Bookmark, _oldValue: Bookmark): Promise<void> {
             console.log(`viz: bookmark-route(token):`, newValue);
             await this.refreshBookmarkFromToken();
         },
-        async bookmark(newValue: Bookmark, oldValue: Bookmark): Promise<void> {
+        async bookmark(newValue: Bookmark, _oldValue: Bookmark): Promise<void> {
             console.log(`viz: bookmark-route(bookmark):`, newValue);
         },
     },
@@ -112,10 +112,18 @@ export default Vue.extend({
             await this.$router.push({ name: "exploreShortBookmark", query: { v: this.bookmarkToToken[encoded] } });
         },
         async exportWorkspace(): Promise<void> {
-            await this.$router.push({ name: "exportWorkspace", query: { v: this.token } });
+            try {
+                await this.$router.push({ name: "exportWorkspace", query: { v: this.token } });
+            } catch (error) {
+                // Navigation was aborted, likely due to auth guard redirect
+            }
         },
         async shareWorkspace(): Promise<void> {
-            await this.$router.push({ name: "shareWorkspace", query: { v: this.token } });
+            try {
+                await this.$router.push({ name: "shareWorkspace", query: { v: this.token } });
+            } catch (error) {
+                // Navigation was aborted, likely due to auth guard redirect
+            }
         },
         async eventClicked(id: number): Promise<void> {
             if (this.token) {

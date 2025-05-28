@@ -12,7 +12,7 @@
 
 <script lang="ts">
 import _ from "lodash";
-import Vue, { PropType } from "vue";
+import Vue from "vue";
 
 export default Vue.extend({
     name: "StationPickerStation",
@@ -37,15 +37,13 @@ export default Vue.extend({
                 .map((v) => v.toFixed(3))
                 .join(", ");
             const locations = [gps, "Unknown"];
-            return _(locations)
-                .compact()
-                .first();
+            return _(locations).compact().first();
         },
         status(this: any) {
             if (this.station.deployedAt) {
-                return this.$t('station.deployed');
+                return this.$t("station.deployed");
             }
-          return this.$t('station.readyToDeploy');
+            return this.$t("station.readyToDeploy");
         },
     },
     methods: {
@@ -57,7 +55,8 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "../../scss/mixins";
+@use "src/scss/mixins";
+@use "src/scss/variables";
 
 .sps {
     display: flex;
@@ -70,11 +69,11 @@ export default Vue.extend({
     box-sizing: border-box;
     cursor: pointer;
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         flex: 0 0 calc(50% - 18px);
     }
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         flex: 0 0 100%;
         margin: 0 0 10px;
     }
@@ -84,7 +83,7 @@ export default Vue.extend({
     padding: 0;
 
     &:after {
-        @include position(absolute, -6px -6px null null);
+        @include mixins.position(absolute, -6px -6px null null);
         content: "";
         background: url("../../assets/icon-success-blue.svg") no-repeat center center;
         background-size: contain;

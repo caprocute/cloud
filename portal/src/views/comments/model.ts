@@ -54,7 +54,7 @@ export class Comment extends DiscussionBase {
         this.body = body;
         this.replies = [];
         this.readonly = true;
-        this.type = 'comment';
+        this.type = "comment";
     }
 }
 
@@ -99,7 +99,7 @@ export class DataEvent extends DiscussionBase {
         this.start = start;
         this.end = end;
         this.readonly = true;
-        this.type = 'event';
+        this.type = "event";
     }
 }
 

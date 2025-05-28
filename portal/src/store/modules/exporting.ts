@@ -3,10 +3,10 @@ import Vue from "vue";
 import Promise from "bluebird";
 import * as ActionTypes from "../actions";
 
-import { ExportDataAction, ExportParams } from "../typed-actions";
+import { ExportDataAction } from "../typed-actions";
 import { Bookmark } from "@/views/viz/viz";
 
-import { Services, OnNoReject, UserExports, ExportStatus } from "@/api";
+import { Services, UserExports, ExportStatus } from "@/api";
 
 const EXPORT_START = "EXPORT_START";
 const EXPORT_PROGRESS = "EXPORT_PROGRESS";
@@ -53,7 +53,7 @@ const actions = (services: Services) => {
                 }
             });
         },
-        [ActionTypes.NEED_EXPORTS]: async ({ dispatch, commit }: ActionParameters, payload: ExportDataAction) => {
+        [ActionTypes.NEED_EXPORTS]: async ({ dispatch, commit }: ActionParameters, _payload: ExportDataAction) => {
             return services.api.getUserExports().then((exports) => {
                 commit(USER_EXPORTS, exports);
 

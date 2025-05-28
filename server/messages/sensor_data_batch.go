@@ -35,3 +35,15 @@ type IngestAll struct {
 type Wakeup struct {
 	Counter int `json:"counter"`
 }
+
+type PopMergeQueue struct {
+	Stations *int `json:"stations"`
+	Rows     *int `json:"rows"`
+}
+
+type MergeModules struct {
+	StationID       int32 `json:"station_id"`
+	ConfigurationID int64 `json:"configuration_id"`
+	DeletingID      int64 `json:"deleting_id"`
+	KeepingID       int64 `json:"keeping_id"`
+}

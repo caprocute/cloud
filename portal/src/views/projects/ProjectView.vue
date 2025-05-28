@@ -44,7 +44,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "@/store/strong-vue";
+import Vue from "vue";
 import CommonComponents from "@/views/shared";
 import StandardLayout from "../StandardLayout.vue";
 import ProjectPublic from "./ProjectPublic.vue";
@@ -52,9 +52,10 @@ import ProjectAdmin from "./ProjectAdmin.vue";
 import ProjectActivity from "./ProjectActivity.vue";
 import { mapState, mapGetters } from "vuex";
 import * as ActionTypes from "@/store/actions";
+import { DisplayProject } from "@/store";
 import { GlobalState } from "@/store/modules/global";
-import { AuthenticationRequiredError, ForbiddenError } from "@/api";
-import { getPartnerCustomizationWithDefault, isCustomisationEnabled, PartnerCustomization } from "@/views/shared/partners";
+import { ForbiddenError } from "@/api";
+import { getPartnerCustomizationWithDefault, PartnerCustomization } from "@/views/shared/partners";
 import { confirmLeaveWithDirtyCheck } from "@/store/modules/dirty";
 import ForbiddenBanner from "@/views/shared/ForbiddenBanner.vue";
 
@@ -95,21 +96,21 @@ export default Vue.extend({
             user: (s: GlobalState) => s.user.user,
             stations: (s: GlobalState) => Object.values(s.stations.user.stations),
             userProjects: (s: GlobalState) => Object.values(s.stations.user.projects),
-            displayProject() {
-                return this.$getters.projectsById[this.id];
-            },
-            isAdministrator() {
-                if (!this.forcePublic) {
-                    const p = this.$getters.projectsById[this.id];
-                    if (p) {
-                        return !p.project.readOnly;
-                    }
-                }
-                return false;
-            },
         }),
         partnerCustomization(): PartnerCustomization {
             return getPartnerCustomizationWithDefault();
+        },
+        displayProject(): DisplayProject {
+            return this.$getters.projectsById[this.id];
+        },
+        isAdministrator(): boolean {
+            if (!this.forcePublic) {
+                const p = this.$getters.projectsById[this.id];
+                if (p) {
+                    return !p.project.readOnly;
+                }
+            }
+            return false;
         },
     },
     watch: {
@@ -167,7 +168,9 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "../../scss/layout";
+@use "src/scss/layout";
+@use "src/scss/mixins";
+@use "src/scss/variables";
 
 .small-arrow {
     font-size: 11px;
@@ -212,10 +215,10 @@ export default Vue.extend({
     cursor: pointer;
     font-family: var(--font-family-bold);
     padding: 10px 22px;
-    @include flex(center, center);
+    @include mixins.flex(center, center);
 
     body.floodnet & {
-        font-family: $font-family-floodnet-button;
+        font-family: variables.$font-family-floodnet-button;
     }
 
     .icon {
@@ -241,8 +244,8 @@ export default Vue.extend({
     width: 30em;
     paddinig: 1em;
 
-    @include bp-down($sm) {
-        @include position(fixed, 55px null null 0);
+    @include mixins.bp-down(variables.$sm) {
+        @include mixins.position(fixed, 55px null null 0);
         border: 0;
         width: 100%;
         padding: 20px 0;
@@ -254,7 +257,7 @@ export default Vue.extend({
 
 ::v-deep .pagination {
     > div {
-        @include flex(center, ceenter);
+        @include mixins.flex(center, ceenter);
     }
 
     .button {

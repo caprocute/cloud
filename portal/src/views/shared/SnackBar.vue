@@ -25,17 +25,17 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "src/scss/variables";
+@use "src/scss/variables";
 .snackbar {
     visibility: hidden;
     min-width: 250px;
     background-color: #333;
-    color: $color-dark;
+    color: variables.$color-dark;
     text-align: center;
     border-radius: 4px;
     padding: 15px 20px;
     position: fixed;
-    z-index: $z-index-top;
+    z-index: variables.$z-index-top;
     left: 50%;
     transform: translateX(-50%);
     bottom: 30px;

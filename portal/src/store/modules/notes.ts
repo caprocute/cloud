@@ -1,6 +1,6 @@
 import Vue from "vue";
-import {Services} from "@/api";
-import {PortalNoteMedia, PortalStationNotes} from "@/views/notes/model";
+import { Services } from "@/api";
+import { PortalNoteMedia, PortalStationNotes } from "@/views/notes/model";
 import * as ActionTypes from "@/store/actions";
 import * as MutationTypes from "@/store/mutations";
 
@@ -22,7 +22,7 @@ const getters = {
 const actions = (services: Services) => {
     return {
         [ActionTypes.NEED_NOTES]: async (
-            { commit, dispatch, state }: { commit: any; dispatch: any; state: NotesState },
+            { commit, dispatch: _dispatch, state: _state }: { commit: any; dispatch: any; state: NotesState },
             payload: { id: number }
         ) => {
             commit(MutationTypes.NOTES_CLEAR);
@@ -46,9 +46,7 @@ const mutations = {
         Vue.set(state, "readOnly", payload.station.readOnly);
     },
 
-    [MutationTypes.NOTES_CLEAR]: (
-        state: NotesState,
-    ) => {
+    [MutationTypes.NOTES_CLEAR]: (state: NotesState) => {
         Vue.set(state, "notes", null);
         Vue.set(state, "media", null);
         Vue.set(state, "readOnly", true);

@@ -45,14 +45,13 @@
                         :narrow="true"
                         @selected="showSummary(station)"
                     >
-                        <div class="station-links">
+                        <div class="station-links" @click="openStationPage(station)" :title="$tc('station.navigateToStation')">
                             <img
                                 :alt="$tc('station.navigateToStation')"
                                 class="navigate-button"
                                 :src="$loadAsset(interpolatePartner('tooltip-') + '.svg')"
                                 width="24px"
                                 height="24px"
-                                @click="openNotes(station)"
                             />
                         </div>
                     </TinyStation>
@@ -258,14 +257,16 @@ export default Vue.extend({
             };
             return this.$store.dispatch(ActionTypes.STATION_PROJECT_REMOVE, payload);
         },
-        openNotes(this: any, station: DisplayStation): Promise<any> {
-            return this.$router.push({
+        openStationPage(this: any, station: DisplayStation): Promise<any> {
+            const routeData = this.$router.resolve({
                 name: "viewStation",
                 params: {
                     projectId: this.project.id,
                     stationId: station.id,
                 },
             });
+            window.open(routeData.href, "_blank");
+            return Promise.resolve();
         },
         onCloseSummary(): void {
             this.activeStationId = null;
@@ -286,7 +287,8 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "../../scss/mixins";
+@use "src/scss/mixins";
+@use "src/scss/variables";
 
 .toggle-icon-container {
     float: right;
@@ -311,7 +313,7 @@ export default Vue.extend({
     border-bottom: 1px solid var(--color-border);
 
     body.floodnet & {
-        font-family: $font-family-floodnet-bold;
+        font-family: variables.$font-family-floodnet-bold;
     }
 }
 .stations-heading {
@@ -335,22 +337,22 @@ export default Vue.extend({
     margin-left: auto;
     font-size: 14px;
     margin-right: 1em;
-    @include flex(center);
+    @include mixins.flex(center);
 }
 .stations-cta {
     cursor: pointer;
-    @include flex(center);
+    @include mixins.flex(center);
 
     &:not(:last-of-type) {
         margin-right: 35px;
 
-        @include bp-down($xs) {
+        @include mixins.bp-down(variables.$xs) {
             margin-right: 15px;
         }
     }
 
     body.floodnet & {
-        font-family: $font-family-floodnet-bold;
+        font-family: variables.$font-family-floodnet-bold;
     }
 
     .icon {
@@ -372,11 +374,11 @@ export default Vue.extend({
 }
 .stations-panel {
     transition: width 0.5s;
-    flex: 1;
+    flex: 0 1 38%;
     display: flex;
     flex-direction: column;
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         flex-basis: 85%;
     }
 }
@@ -384,7 +386,7 @@ export default Vue.extend({
     padding: 20px 25px 0;
     min-width: 280px;
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         padding: 20px 10px;
         min-width: 75vw;
     }
@@ -418,7 +420,7 @@ export default Vue.extend({
 }
 
 .project-stations-no-stations p {
-    font-family: $font-family-light;
+    font-family: variables.$font-family-light;
 }
 
 .station-links {
@@ -430,11 +432,8 @@ export default Vue.extend({
     align-items: center;
     border-left: 1px solid var(--color-border);
     text-align: center;
-    cursor: initial;
-
-    img {
-        cursor: pointer;
-    }
+    cursor: pointer;
+    font-size: 14px;
 }
 
 .station-links .remove {
@@ -444,7 +443,16 @@ export default Vue.extend({
 
 .pagination {
     margin-top: auto;
+    margin-right: 0;
     padding-bottom: 1em;
+
+    @include mixins.bp-down(variables.$xs) {
+        margin-left: unset !important;
+    }
+
+    ::v-deep .pages {
+        margin-top: 4px;
+    }
 }
 
 ::v-deep .station-hover-summary {
@@ -455,7 +463,7 @@ export default Vue.extend({
 
 .map-expand {
     background-color: #ffffff;
-    z-index: #{$z-index-top} + 1;
+    z-index: #{variables.$z-index-top} + 1;
     position: absolute;
     right: 10px;
     top: 10px;

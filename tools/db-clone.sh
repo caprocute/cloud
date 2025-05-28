@@ -95,10 +95,11 @@ fi
 ls -alh
 echo compressing...
 
-xz -T2 ${FILE}
+time xz -4 -T2 ${FILE}
+
 ls -alh
 
 scp -o StrictHostKeyChecking=no -i ${SSH_KEY} ${FILE}.xz ${SYNC_COPY_TARGET_DBS}
-ssh -o StrictHostKeyChecking=no -i ${SSH_KEY} ${DEPLOY_HOST} ln -sf ${SYNC_COPY_TARGET_DBS_PATH}/${FILE}.xz ${SYNC_COPY_TARGET_DBS_PATH}/db-${DATABASE}-latest.xz
+ssh -o StrictHostKeyChecking=no -i ${SSH_KEY} ${DEPLOY_HOST} ln -sf ${FILE}.xz ${SYNC_COPY_TARGET_DBS_PATH}/db-${DATABASE}-latest.xz
 
 echo done

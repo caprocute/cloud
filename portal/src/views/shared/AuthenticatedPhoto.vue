@@ -1,5 +1,8 @@
 <template>
     <img v-if="photo && !processing" :src="photo" class="authenticated-photo photo" :class="{ processing: processing }" alt="Image" />
+    <div v-else-if="notFound" class="not-found">
+        <i class="fas fa-image"></i>
+    </div>
     <Spinner v-else class="spinner" />
 </template>
 
@@ -25,6 +28,7 @@ export default Vue.extend({
     data() {
         return {
             photo: null,
+            notFound: false,
         };
     },
     watch: {
@@ -39,6 +43,13 @@ export default Vue.extend({
         refresh(this: any) {
             return this.$services.api.loadMedia(this.url).then((photo) => {
                 this.photo = photo;
+            }).catch((error) => {
+                if (error.status === 404) {
+                    // Silently handle 404, let parent component handle visualization
+                    return;
+                }
+                // Let other errors propagate
+                throw error;
             });
         },
     },
@@ -60,5 +71,16 @@ export default Vue.extend({
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+}
+
+.not-found {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    background-color: #f5f5f5;
+    color: #999;
+    font-size: 2em;
 }
 </style>

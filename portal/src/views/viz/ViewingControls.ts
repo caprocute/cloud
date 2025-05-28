@@ -5,10 +5,11 @@ import Treeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 
 import { TimeRange, VizSensor } from "./common";
-import { Graph, StationTreeOption, SensorTreeOption, Workspace, FastTime, TimeZoom, ChartType, DataSetSeries, NewParams } from "./viz";
+import { Graph, StationTreeOption, SensorTreeOption, Workspace, FastTime, TimeZoom, ChartType, DataSetSeries } from "./viz";
 import { vueTickHack } from "@/utilities";
 import chartStyles from "./vega/chartStyles";
 import { getPartnerCustomization } from "@/views/shared/partners";
+import * as ActionTypes from "@/store/actions";
 
 interface VueDatepickerStyles {
     // This type might be extended with other customizations, it was found at https://github.com/nathanreyes/v-calendar/issues/531
@@ -63,6 +64,10 @@ export const SensorSelectionRow = Vue.extend({
             type: Array as PropType<StationTreeOption[]>,
             required: true,
         },
+        index: {
+            type: Number,
+            required: true,
+        },
     },
     computed: {
         selectedStation(): string | null {
@@ -89,12 +94,16 @@ export const SensorSelectionRow = Vue.extend({
             return !(window.screen.availWidth <= 768);
         },
     },
+    mounted() {
+        this.storePreselectedOptions();
+    },
     methods: {
         raiseChangeStation(node: StationTreeOption): void {
             vueTickHack(() => {
                 if (!node.stationId) throw new Error();
                 const newSeries = this.workspace.makeSeries(Number(node.stationId), null);
                 console.log("raising viz-change-series", newSeries);
+                this.$store.dispatch(ActionTypes.UPDATE_VIZ_STATION, { index: this.index, stationName: node.label });
                 this.$emit("viz-change-series", newSeries);
             });
         },
@@ -104,8 +113,25 @@ export const SensorSelectionRow = Vue.extend({
                 if (!node.sensorId) throw new Error();
                 const newSeries = this.workspace.makeSeries(node.stationId || this.ds.stationId, [node.moduleId, node.sensorId]);
                 console.log("raising viz-change-series", newSeries);
+                this.$store.dispatch(ActionTypes.UPDATE_VIZ_SENSOR, { index: this.index, sensorName: node.label });
                 this.$emit("viz-change-series", newSeries);
             });
+        },
+        storePreselectedOptions() {
+            const stationName = this.stationOptions
+                .flatMap((option) => option.children || [])
+                .find((child) => child.id === this.selectedStation)?.label;
+
+            const sensorName = this.sensorOptions
+                .map((option) => (option.id === this.selectedSensor ? option : option.children || []))
+                .flat()
+                .find((child) => child.id === this.selectedSensor)?.label;
+
+            if (stationName && sensorName) {
+                this.$store.dispatch(ActionTypes.UPDATE_VIZ_STATION, { index: this.index, stationName: stationName }).then(() => {
+                    this.$store.dispatch(ActionTypes.UPDATE_VIZ_SENSOR, { index: this.index, sensorName: sensorName });
+                });
+            }
         },
     },
     template: `
@@ -180,6 +206,7 @@ export const SelectionControls = Vue.extend({
             const newParams = this.viz.removeSeries(index);
             this.viz.log("raise viz-change-sensors", newParams);
             this.$emit("viz-change-sensors", newParams);
+            this.$store.dispatch(ActionTypes.RESET_VIZ_STATION_SENSOR_SELECTION);
         },
         getKeyColor(idx) {
             const color = idx === 0 ? chartStyles.primaryLine.stroke : chartStyles.secondaryLine.stroke;
@@ -190,7 +217,7 @@ export const SelectionControls = Vue.extend({
 		<div class="left half">
             <div class="row" v-for="(ds, index) in viz.dataSets" v-bind:key="index">
                 <div class="tree-key" :style="{color: getKeyColor(index)}">&#9632;</div>
-                <SensorSelectionRow :viz="viz" :ds="ds" :workspace="workspace" :stationOptions="stationOptions" :sensorOptions="sensorOptions(ds.vizSensor)" @viz-change-series="(newSeries) => raiseChangeSeries(index, newSeries)"/>
+                <SensorSelectionRow :viz="viz" :ds="ds" :workspace="workspace" :stationOptions="stationOptions" :sensorOptions="sensorOptions(ds.vizSensor)" :index="index" @viz-change-series="(newSeries) => raiseChangeSeries(index, newSeries)"/>
                 <div class="actions" v-if="showAdd || showRemove">
                     <div class="button" :alt="$t('dataView.stationTree.add')" @click="() => addSeries()" v-if="showAdd"> {{ $t('dataView.stationTree.add') }} </div>
                     <div class="button" :alt="$t('dataView.stationTree.remove')" @click="() => removeSeries(index)" v-if="showRemove"> {{ $t('dataView.stationTree.remove') }} </div>
@@ -430,7 +457,7 @@ export const ViewingControls = Vue.extend({
                 <SelectionControls :viz="viz" :workspace="workspace" @viz-change-sensors="raiseChangeSensors" />
 
 				<div class="right half" v-if="chartTypes.length > 1">
-                    <div class="chart-type">
+                    <div class="chart-type" :class="{ disabled: viz.isDataSetEmpty() }">
                         <treeselect :disabled="viz.busy" :options="chartTypes" :value="selectedChartType" open-direction="bottom" @select="raiseChangeChartType" :clearable="false" />
                     </div>
 				</div>

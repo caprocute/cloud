@@ -1,8 +1,10 @@
 import _ from "lodash";
 import { ChartSettings, SeriesData } from "./SpecFactory";
-import { TimeRange } from "../common";
+import { TimeRange, addGaps, addMinimumGap } from "../common";
 import { VisualizationSpec } from "vega-embed";
-import { Spec, Mark } from "vega";
+import { Mark, Locale } from "vega";
+import { vegaEsLocale } from "@/locales/es/vega";
+import { Locales } from "@/views/shared/LanguageSelector.vue";
 
 export { ChartSettings };
 
@@ -14,12 +16,23 @@ export class ScrubberSpecFactory {
         private readonly dataEvents: any[] = []
     ) {}
 
+    private getLocaleConfig(): Locale | undefined {
+        const localeKey = localStorage.getItem("locale");
+        if (localeKey === Locales.esEs) {
+            return vegaEsLocale as Locale;
+        }
+        return undefined;
+    }
+
     create(): VisualizationSpec {
         const first = this.allSeries[0]; // TODO
         const xDomainsAll = this.allSeries.map((series: SeriesData) => series.queried.timeRange);
         const allRanges = [...xDomainsAll, this.settings.timeRange.toArray()];
         // We ignore extreme ranges here because of this.settings.timeRange
         const timeRangeAll = TimeRange.mergeArraysIgnoreExtreme(allRanges).toArray();
+
+        const maybeMinimumGap = first.vizInfo.minimumGap;
+        const preparedData = addMinimumGap(addGaps(first.queried.data), maybeMinimumGap, first.queried.bucketSize);
 
         const interactiveMarks = (): Mark[] => {
             if (this.settings.mobile) {
@@ -146,6 +159,7 @@ export class ScrubberSpecFactory {
             height: 50,
             style: "cell",
             config: {
+                locale: this.getLocaleConfig(),
                 axis: {
                     labelFont: "Avenir Light",
                     labelFontSize: 12,
@@ -176,7 +190,7 @@ export class ScrubberSpecFactory {
                 },
                 {
                     name: "table",
-                    values: first.queried.data,
+                    values: preparedData,
                     transform: [
                         {
                             type: "filter",
@@ -614,7 +628,7 @@ export class ScrubberSpecFactory {
                                 field: "value_start",
                             },
                             defined: {
-                                signal: 'isValid(datum["time"]) && isFinite(+datum["time"]) && isValid(datum["value"]) && isFinite(+datum["value"])',
+                                signal: 'isValid(datum["time"]) && isFinite(+datum["time"]) && isValid(datum["value"]) && isFinite(+datum["value"]) && (!datum.minimumGap || datum.gap <= datum.minimumGap)',
                             },
                         },
                     },
@@ -654,7 +668,7 @@ export class ScrubberSpecFactory {
                                 field: "value_start",
                             },
                             defined: {
-                                signal: 'isValid(datum["time"]) && isFinite(+datum["time"]) && isValid(datum["value"]) && isFinite(+datum["value"])',
+                                signal: 'isValid(datum["time"]) && isFinite(+datum["time"]) && isValid(datum["value"]) && isFinite(+datum["value"]) && (!datum.minimumGap || datum.gap <= datum.minimumGap)',
                             },
                         },
                     },

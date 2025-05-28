@@ -1,7 +1,6 @@
 import _ from "lodash";
 import Config from "@/secrets";
 import Vuex from "vuex";
-import createLogger from "./logger";
 import { clock } from "./modules/clock";
 import { user } from "./modules/user";
 import { stations } from "./modules/stations";
@@ -32,42 +31,15 @@ import * as MutationTypes from "./mutations";
 import * as ActionTypes from "./actions";
 import { notes } from "@/store/modules/notes";
 import { snackbar } from "@/store/modules/snackbar";
-import {fieldNotes} from '@/store/modules/fieldNotes';
-import {dirty} from '@/store/modules/dirty';
+import { fieldNotes } from "@/store/modules/fieldNotes";
+import { dirty } from "@/store/modules/dirty";
+import { viz } from "@/store/modules/viz";
+import { exploreView } from "@/store/modules/exploreView";
 
 export { MutationTypes, ActionTypes };
 
 export * from "./typed-actions";
 export * from "./map-types";
-
-function customizeLogger() {
-    return createLogger({
-        transformer(state) {
-            if (state.user.token) {
-                const copy = _.cloneDeep(state);
-                copy.user.token = "YES";
-                return copy;
-            }
-            return state;
-        },
-        /*
-        filter(mutation, stateBefore, stateAfter) {
-            return true;
-        },
-        actionFilter(action, state) {
-            return true;
-        },
-        mutationTransformer(mutation) {
-            return mutation;
-        },
-        actionTransformer(action) {
-            return action;
-        },
-        logActions: true,
-        logMutations: true,
-		*/
-    });
-}
 
 export default function (services: Services) {
     return new Vuex.Store({
@@ -86,6 +58,8 @@ export default function (services: Services) {
             snackbar: snackbar(),
             discussion: dataEvents(services),
             dirty: dirty(),
+            viz: viz(),
+            exploreView: exploreView(),
         },
         // This was causing a call stack error (_traverse)
         strict: process.env.NODE_ENV !== "production",
