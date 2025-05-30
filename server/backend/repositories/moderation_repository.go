@@ -124,7 +124,7 @@ func (r *ModerationRepository) GetModerationRequest(ctx context.Context, request
 	var moderationRequest data.ModerationRequest
 	query := `
 		SELECT id, post_id, post_type, reported_by, reported_at, acknowledged_by, acknowledged_at
-		FROM fieldkit.moderation_requests
+		FROM fieldkit.moderation_request
 		WHERE id = $1
 	`
 
@@ -138,7 +138,7 @@ func (r *ModerationRepository) GetModerationRequest(ctx context.Context, request
 
 func (r *ModerationRepository) UpdateModerationRequest(ctx context.Context, request *data.ModerationRequest) error {
 	query := `
-		UPDATE fieldkit.moderation_requests
+		UPDATE fieldkit.moderation_request
 		SET acknowledged_by = $1, acknowledged_at = $2
 		WHERE id = $3
 	`
