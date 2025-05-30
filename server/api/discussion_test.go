@@ -183,9 +183,11 @@ func TestDiscussionPostProjectDiscussionReply(t *testing.T) {
 						"name": "<<PRESENCE>>"
 					},
 					"replies": [],
-					"body": "Reply"
+					"body": "Reply",
+					"userHasReported": "<<PRESENCE>>"
 				}],
-				"body": "Message"
+				"body": "Message",
+				"userHasReported": "<<PRESENCE>>"
 			}]
 		}`)
 }
