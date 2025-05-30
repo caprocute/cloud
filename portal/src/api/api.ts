@@ -1817,18 +1817,6 @@ class FKApi {
             url: this.baseUrl + `/moderation/cancel?${qp.toString()}`,
         });
     }
-
-    public async checkUserReport(postId: number, postType: PostType): Promise<{ hasReported: boolean; canWithdraw: boolean }> {
-        const qp = new URLSearchParams();
-        qp.append("postId", postId.toString());
-        qp.append("postType", postType);
-
-        return await this.invoke({
-            auth: Auth.Required,
-            method: "GET",
-            url: this.baseUrl + `/moderation/check?${qp.toString()}`,
-        });
-    }
 }
 
 export default FKApi;

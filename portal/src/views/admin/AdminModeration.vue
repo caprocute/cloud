@@ -29,7 +29,7 @@
                             <td data-label="Post ID">{{ request.postId }}</td>
                             <td data-label="Type">{{ formatPostType(request.postType) }}</td>
                             <td data-label="Reported By">{{ request.reportedByName || request.reportedBy }}</td>
-                            <td data-label="Reported At">{{ formatDate(request.reportedAt) }}</td>
+                            <td data-label="Reported At">{{ request.reportedAt | prettyDateTime }}</td>
                             <td data-label="Status">
                                 <span
                                     :class="{
@@ -102,27 +102,24 @@ export default Vue.extend({
         },
     },
     methods: {
-        formatDate(date: string | undefined): string {
-            if (!date) return "-";
-            return new Date(date).toLocaleString(undefined, {
-                year: "numeric",
-                month: "short",
-                day: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-            });
-        },
-        formatPostType(type: string): string {
-            return type === "discussion_post" ? "Discussion Post" : "Data Event";
+        formatPostType(type: PostType): string {
+            switch (type) {
+                case PostType.DISCUSSION_POST:
+                    return this.$tc("admin.moderationList.postTypes.discussionPost");
+                case PostType.DATA_EVENT:
+                    return this.$tc("admin.moderationList.postTypes.dataEvent");
+                default:
+                    return type;
+            }
         },
         async reviewRequest(request: ModerationRequest) {
             this.selectedRequest = request;
             try {
-                const content = await this.$services.api.getModerationContent(request.postType as PostType, request.postId);
+                const content = await this.$services.api.getModerationContent(request.postType, request.postId);
                 this.requestContent = content;
             } catch (error) {
                 console.error("Error loading content:", error);
-                this.requestContent = "Error loading content";
+                this.requestContent = this.$tc("admin.moderationList.errorLoadingContent");
             }
         },
         closeReviewModal() {

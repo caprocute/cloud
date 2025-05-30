@@ -888,7 +888,12 @@
             "pending": "Pending",
             "acknowledged": "Acknowledged",
             "noModerationRequests": "No moderation requests found.",
-            "loading": "Loading moderation requests..."
+            "loading": "Loading moderation requests...",
+            "errorLoadingContent": "Error loading content",
+            "postTypes": {
+                "discussionPost": "Discussion Post",
+                "dataEvent": "Data Event"
+            }
         },
         "moderationReview": {
             "title": "Review Content",
