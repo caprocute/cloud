@@ -69,12 +69,9 @@ export default Vue.extend({
             if (!this.content) {
                 return null;
             }
-
-            // Try to parse as JSON first
             try {
                 return JSON.parse(this.content);
             } catch (error) {
-                // If it's not JSON, create a TipTap document structure for plain text
                 return {
                     type: "doc",
                     content: [
@@ -108,9 +105,9 @@ export default Vue.extend({
         getPostTypeLabel(postType: PostType): string {
             switch (postType) {
                 case PostType.DISCUSSION_POST:
-                    return this.$t("admin.moderationReview.postTypes.discussionPost") as string;
+                    return this.$tc("admin.moderationReview.postTypes.discussionPost");
                 case PostType.DATA_EVENT:
-                    return this.$t("admin.moderationReview.postTypes.dataEvent") as string;
+                    return this.$tc("admin.moderationReview.postTypes.dataEvent");
                 default:
                     return postType;
             }

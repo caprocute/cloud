@@ -118,7 +118,6 @@ export default Vue.extend({
                 const content = await this.$services.api.getModerationContent(request.postType, request.postId);
                 this.requestContent = content;
             } catch (error) {
-                console.error("Error loading content:", error);
                 this.requestContent = this.$tc("admin.moderationList.errorLoadingContent");
             }
         },
