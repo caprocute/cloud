@@ -1,7 +1,7 @@
 <template>
     <button v-if="canCancel" @click="cancelReport" :disabled="isLoading">
         <i class="icon icon-close"></i>
-        {{ isLoading ? cancelingText || "Canceling..." : labelText || "Cancel report" }}
+        {{ isLoading ? $tc("cancelReport.canceling") : $tc("cancelReport.label") }}
     </button>
 </template>
 
@@ -36,34 +36,6 @@ export default Vue.extend({
         canCancel(): boolean {
             return this.userHasReported;
         },
-        labelText(): string {
-            try {
-                return this.$t("cancelReport.label") as string;
-            } catch {
-                return "Cancel report";
-            }
-        },
-        cancelingText(): string {
-            try {
-                return this.$t("cancelReport.canceling") as string;
-            } catch {
-                return "Canceling...";
-            }
-        },
-        successText(): string {
-            try {
-                return this.$t("cancelReport.success") as string;
-            } catch {
-                return "Report canceled successfully!";
-            }
-        },
-        errorText(): string {
-            try {
-                return this.$t("cancelReport.error") as string;
-            } catch {
-                return "Failed to cancel report. Please try again later.";
-            }
-        },
     },
     methods: {
         async cancelReport() {
@@ -72,13 +44,13 @@ export default Vue.extend({
                 await this.$services.api.cancelModerationRequest(this.postId, this.postType);
                 this.$emit("report-canceled");
                 this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
-                    message: this.successText,
+                    message: this.$tc("cancelReport.success"),
                     type: SnackbarStyle.success,
                 });
             } catch (error) {
                 console.error("Error canceling report:", error);
                 this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
-                    message: this.errorText,
+                    message: this.$tc("cancelReport.error"),
                     type: SnackbarStyle.fail,
                 });
             } finally {

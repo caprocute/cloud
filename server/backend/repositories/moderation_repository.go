@@ -336,11 +336,9 @@ func (r *ModerationRepository) CheckUserReportsForPosts(ctx context.Context, use
 	}
 
 	reportMap := make(map[int32]bool)
-	// Initialize all posts as not reported
 	for _, postID := range postIDs {
 		reportMap[postID] = false
 	}
-	// Set reported posts to true
 	for _, res := range results {
 		reportMap[res.PostID] = res.HasReported
 	}

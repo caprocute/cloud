@@ -64,29 +64,6 @@ func (s *ModerationService) add(ctx context.Context, payload *moderation.Moderat
 		return nil, err
 	}
 
-	modRepo := repositories.NewModerationRepository(s.options.Database)
-	moderators, err := modRepo.GetAllModerators(context.Background())
-	if err != nil {
-		return nil, err
-	}
-
-	// Assuming you have a method or repo to get user info by user_id
-	userRepo := repositories.NewUserRepository(s.options.Database)
-
-	for _, moderator := range moderators {
-		// Fetch user details to get the email
-		user, err := userRepo.QueryByID(context.Background(), moderator.UserID)
-		if err != nil {
-			continue
-		}
-
-		// Simulate email sending (replace with real implementation later)
-		err = sendMockEmail(user.Email, "New Moderation Request", createEmailBody(payload))
-		if err != nil {
-			continue
-		}
-	}
-
 	response := &moderation.ModerationRequest{
 		ID:         created.ID,
 		PostID:     created.PostID,
@@ -96,15 +73,6 @@ func (s *ModerationService) add(ctx context.Context, payload *moderation.Moderat
 	}
 
 	return response, nil
-}
-
-func createEmailBody(payload *moderation.ModerationAddPayload) string {
-	return fmt.Sprintf("A new moderation request has been created for post ID %d and post type %s.", payload.PostID, payload.PostType)
-}
-
-func sendMockEmail(to string, subject string, body string) error {
-	fmt.Printf("Mock sending email to: %s\nSubject: %s\nBody: %s\n", to, subject, body)
-	return nil
 }
 
 func (s *ModerationService) Acknowledge(ctx context.Context, payload *moderation.AcknowledgePayload) (*moderation.ModerationRequest, error) {
@@ -125,7 +93,6 @@ func (s *ModerationService) Acknowledge(ctx context.Context, payload *moderation
 		return nil, err
 	}
 
-	// Format time for acknowledged_at
 	var acknowledgedAt *string
 	if req.AcknowledgedAt != nil {
 		formatted := req.AcknowledgedAt.Format(time.RFC3339)

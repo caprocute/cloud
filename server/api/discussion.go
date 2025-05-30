@@ -375,7 +375,7 @@ func ThreadedPost(dp *data.DiscussionPost, users map[int32]*data.User) (*discSer
 		Replies:         []*discService.ThreadedPost{},
 		Bookmark:        dp.StringBookmark(),
 		Body:            dp.Body,
-		UserHasReported: &defaultReported, // default value, will be set by caller
+		UserHasReported: &defaultReported,
 	}, nil
 }
 
