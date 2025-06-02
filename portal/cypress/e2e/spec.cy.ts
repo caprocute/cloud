@@ -1,3 +1,4 @@
+/// <reference types="cypress" />
 import "cypress/support/commands";
 
 describe("Station Page", () => {
@@ -9,13 +10,16 @@ describe("Station Page", () => {
     it("should create a new station and navigate to its page", function () {
         cy.visit(this.stationPageUrl);
 
+        cy.get('[data-cy="fieldNotes"]').should("exist");
         cy.get('[data-cy="saveNotes"]').should("exist");
     });
 
     it("should display save button if user is authenticated", function () {
         cy.visit(this.stationPageUrl);
 
-        cy.get('[data-cy="saveNotes"]').should("exist");
+        cy.get('[data-cy="fieldNotes"]').should("exist");
+
+        cy.get('[data-cy="saveNotes"]', { timeout: 10000 }).should("exist");
     });
 
     it("should successfully save the form when valid data is entered", function () {
@@ -47,6 +51,6 @@ describe("Station Page", () => {
     it("shows Field Notes Section", function () {
         cy.visit(this.stationPageUrl);
 
-        cy.get('[data-cy="fieldNotes"]');
+        cy.get('[data-cy="fieldNotes"]').should("exist");
     });
 });
