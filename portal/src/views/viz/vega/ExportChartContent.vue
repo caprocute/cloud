@@ -20,8 +20,8 @@
             </div>
         </div>
 
-        <div class="viz-stations">
-            <div class="viz-station-row" v-for="(item, index) in stationSensorPairs" :key="index">
+        <div class="viz-stations" :class="{ 'has-logo': !isCustomisationEnabled() }">
+            <div class="viz-station-row" v-for="(item, index) in typedStationSensorPairs" :key="index">
                 <div class="tree-key" :style="{ color: getKeyColor(index) }">&#9632;</div>
                 <span>{{ item.stationName }}:</span>
                 <span>{{ item.sensorName }}</span>
@@ -37,41 +37,42 @@ import ProjectPhoto from "@/views/shared/ProjectPhoto.vue";
 import { getPartnerCustomization, isCustomisationEnabled } from "@/views/shared/partners";
 import { Project } from "@/api";
 import chartStyles from "@/views/viz/vega/chartStyles";
+import { PropType } from "vue";
 
 export default Vue.extend({
     name: "ExportChartContent",
     components: { ProjectPhoto },
+    props: {
+        stationSensorPairs: {
+            type: Array,
+            default: () => [],
+        },
+        project: {
+            type: Object as PropType<Project>,
+            default: null,
+        },
+    },
     data(): {
-        project: Project | null;
         projectPhoto: string | null;
     } {
         return {
-            project: null,
             projectPhoto: null,
         };
     },
+    computed: {
+        typedStationSensorPairs(): { stationName: string; sensorName: string }[] {
+            return this.stationSensorPairs as { stationName: string; sensorName: string }[];
+        },
+    },
     methods: {
         isCustomisationEnabled,
-        getKeyColor(idx: string | number) {
+        getKeyColor(idx: number): string {
             const color = idx === 0 ? chartStyles.primaryLine.stroke : chartStyles.secondaryLine.stroke;
             return color;
         },
         onProjectPhotoLoaded(photo: string) {
             this.projectPhoto = photo;
         },
-    },
-    computed: {
-        stationSensorPairs() {
-            return this.$store.getters.getAllVizStationsAndSensors;
-        },
-    },
-    mounted() {
-        const partnerCustomization = getPartnerCustomization();
-        if (partnerCustomization && partnerCustomization.projectId === 174) {
-            this.$services.api.getProject(partnerCustomization.projectId).then((project) => {
-                this.project = project;
-            });
-        }
     },
 });
 </script>
@@ -88,6 +89,11 @@ export default Vue.extend({
     text-align: left;
     background: #fff;
 
+    // Use full width for mobile exports
+    @media (max-width: 768px) {
+        width: 100%;
+    }
+
     .project-photo {
         visibility: hidden;
     }
@@ -97,15 +103,25 @@ export default Vue.extend({
         align-items: center;
         border-right: none;
         position: unset;
+
+        // Consistent padding with viz-stations on mobile
+        @media (max-width: 768px) {
+            padding: 20px 20px;
+        }
     }
 
     .detail-title {
         margin-bottom: 5px;
+        font-size: 18px;
+    }
+
+    .detail-description {
+        font-size: 12px;
     }
 
     .photo-container {
-        height: 66px;
-        flex: 0 0 66px;
+        height: 50px;
+        flex: 0 0 50px;
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
@@ -114,32 +130,48 @@ export default Vue.extend({
 
 .project-detail-wrap {
     position: relative;
+    width: 100%;
 
     .icon-logo-fieldkit {
         position: absolute;
         top: 50%;
         transform: translateY(-50%);
         right: 30px;
-        font-size: 26px;
+        font-size: 20px;
     }
 }
 
 .viz-stations {
-    padding: 32px 48px 16px;
+    padding: 20px 44px 6px;
     border-bottom: 1px solid variables.$color-border;
     position: relative;
 
+    // Match project header padding on mobile
+    @media (max-width: 768px) {
+        padding: 20px 20px 6px;
+    }
+
+    // When logo is present (customization disabled), remove bottom padding
+    // so logo centers properly relative to station text
+    &.has-logo {
+        padding-bottom: 0;
+    }
+
     .icon-logo-fieldkit {
-        font-size: 32px;
+        font-size: 24px;
         position: absolute;
         right: 48px;
         top: 50%;
         transform: translateY(-50%);
+
+        @media (max-width: 768px) {
+            right: 20px;
+        }
     }
 }
 
 .viz-station-row {
-    font-size: 16px;
+    font-size: 12px;
     margin-bottom: 16px;
     display: flex;
     align-items: center;
@@ -150,7 +182,7 @@ export default Vue.extend({
     }
 }
 
-.icon-logo-fieldkit {
-    margin-top: -15px;
+.tree-key {
+    margin-top: -4px;
 }
 </style>

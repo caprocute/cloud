@@ -1,6 +1,6 @@
 <template>
     <div class="h-100">
-        <ExportChartButton v-if="!settings.tiny" :vega="vega"></ExportChartButton>
+        <ExportChartButton v-if="!settings.tiny" :vega="vega" :series="series"></ExportChartButton>
         <div ref="vegaContainer" class="viz linechart h-100"></div>
         <div v-if="isLoading" class="loading-container">
             <Spinner class="spinner" />
