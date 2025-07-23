@@ -58,11 +58,11 @@ const EXPORT_CONFIG = {
         },
     },
     SVG: {
-        width: 3840,
-        height: 2160,
+        width: 1920,
+        height: 1080,
         mobile: {
             width: 1800,
-            height: 1200,
+            height: 2500,
         },
     },
 };
@@ -128,6 +128,37 @@ export default Vue.extend({
                 chartScale: 1,
             };
         },
+        calculateChartPosition(headerCanvas: HTMLCanvasElement, chartCanvas: HTMLCanvasElement, config: any) {
+            const headerScale = config.width / headerCanvas.width;
+            const headerHeight = headerCanvas.height * headerScale;
+            const chartAreaY = headerHeight + config.headerChartGap;
+            const chartAreaHeight = config.height - chartAreaY;
+
+            const isMobileDevice = isMobile();
+            const chartPaddingLeft = isMobileDevice ? 40 : 80;
+            const chartPaddingRight = isMobileDevice ? 40 : 20;
+            const chartAreaWidth = config.width - chartPaddingLeft - chartPaddingRight;
+
+            const chartScale = Math.min(chartAreaWidth / chartCanvas.width, chartAreaHeight / chartCanvas.height);
+            const finalChartScale = chartScale * (config.chartScale || 1);
+
+            const chartWidth = chartCanvas.width * finalChartScale;
+            const chartHeight = chartCanvas.height * finalChartScale;
+            const chartX = chartPaddingLeft + (chartAreaWidth - chartWidth) / 2 - 10;
+
+            return {
+                headerScale,
+                headerHeight,
+                chartAreaY,
+                chartPaddingLeft,
+                chartPaddingRight,
+                chartAreaWidth,
+                finalChartScale,
+                chartWidth,
+                chartHeight,
+                chartX,
+            };
+        },
         compositeChartAndHeader(headerCanvas: HTMLCanvasElement, chartCanvas: HTMLCanvasElement, config: any): HTMLCanvasElement {
             const finalCanvas = document.createElement("canvas");
             finalCanvas.width = config.width;
@@ -139,33 +170,11 @@ export default Vue.extend({
             ctx.fillStyle = "white";
             ctx.fillRect(0, 0, config.width, config.height);
 
-            // Use full width scaling for header (both mobile and desktop)
-            const headerScale = config.width / headerCanvas.width;
+            const position = this.calculateChartPosition(headerCanvas, chartCanvas, config);
             const headerWidth = config.width;
-            const headerHeight = headerCanvas.height * headerScale;
 
-            ctx.drawImage(headerCanvas, 0, 0, headerWidth, headerHeight);
-
-            const chartAreaY = headerHeight + config.headerChartGap;
-            const isMobileDevice = isMobile();
-
-            // Desktop uses original padding, mobile uses less
-            const chartPaddingLeft = isMobileDevice ? 40 : 80;
-            const chartPaddingRight = isMobileDevice ? 40 : 20;
-            const chartAreaWidth = config.width - chartPaddingLeft - chartPaddingRight;
-
-            // Original scaling logic that works for desktop
-            const chartScale = Math.min(chartAreaWidth / chartCanvas.width, (config.height - chartAreaY) / chartCanvas.height);
-            const finalChartScale = chartScale * (config.chartScale || 1);
-
-            const chartWidth = chartCanvas.width * finalChartScale;
-            const chartHeight = chartCanvas.height * finalChartScale;
-
-            // Center the chart horizontally in the available area
-            const chartX = chartPaddingLeft + (chartAreaWidth - chartWidth) / 2;
-            const chartY = chartAreaY;
-
-            ctx.drawImage(chartCanvas, chartX, chartY, chartWidth, chartHeight);
+            ctx.drawImage(headerCanvas, 0, 0, headerWidth, position.headerHeight);
+            ctx.drawImage(chartCanvas, position.chartX, position.chartAreaY, position.chartWidth, position.chartHeight);
 
             return finalCanvas;
         },
@@ -214,6 +223,11 @@ export default Vue.extend({
             try {
                 const config = this.getExportConfig("SVG");
 
+                const isMobileDevice = isMobile();
+                if (!isMobileDevice) {
+                    config.chartScale = 1.05;
+                }
+
                 const headerCanvas = await html2canvas(htmlElement, {
                     scale: config.scaleFactor,
                     backgroundColor: "#ffffff",
@@ -223,29 +237,22 @@ export default Vue.extend({
 
                 const vegaInfo = this.vega as { view: any };
                 const chartSVG = await vegaInfo.view.toSVG(config.scaleFactor);
-
-                const headerScale = config.width / headerCanvas.width;
-                const headerWidth = config.width;
-                const headerHeight = headerCanvas.height * headerScale;
-
-                const chartAreaY = headerHeight + config.headerChartGap;
-                const chartAreaHeight = config.height - chartAreaY;
-                const chartPaddingLeft = 80;
-                const chartPaddingRight = 20;
-                const chartAreaWidth = config.width - chartPaddingLeft - chartPaddingRight;
-
                 const chartCanvas = await vegaInfo.view.toCanvas(config.scaleFactor);
-                const chartScale = Math.min(chartAreaWidth / chartCanvas.width, chartAreaHeight / chartCanvas.height);
-                const finalChartScale = chartScale * (config.chartScale || 1);
 
-                const chartWidth = chartCanvas.width * finalChartScale;
-                const chartX = chartPaddingLeft + (chartAreaWidth - chartWidth) / 2;
+                const position = this.calculateChartPosition(headerCanvas, chartCanvas, config);
+                const headerWidth = config.width;
+
+                // Position adjustments to match PNG positioning
+                const leftAdjustment = 0;
+                const topAdjustment = 40;
+                const adjustedChartX = position.chartX - leftAdjustment;
+                const adjustedChartY = position.chartAreaY - topAdjustment;
 
                 const combinedSVG = `
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${config.width} ${config.height}">
                         <rect width="100%" height="100%" fill="white"/>
-                        <image x="0" y="0" width="${headerWidth}" height="${headerHeight}" href="${headerImage}"/>
-                        <g transform="translate(${chartX}, ${chartAreaY}) scale(${finalChartScale})">
+                        <image x="0" y="0" width="${headerWidth}" height="${position.headerHeight}" href="${headerImage}"/>
+                        <g transform="translate(${adjustedChartX}, ${adjustedChartY}) scale(${position.finalChartScale})">
                             ${chartSVG}
                         </g>
                     </svg>
