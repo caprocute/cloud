@@ -89,7 +89,6 @@ export default Vue.extend({
     text-align: left;
     background: #fff;
 
-    // Use full width for mobile exports
     @media (max-width: 768px) {
         width: 100%;
     }
@@ -104,7 +103,6 @@ export default Vue.extend({
         border-right: none;
         position: unset;
 
-        // Consistent padding with viz-stations on mobile
         @media (max-width: 768px) {
             padding: 20px 20px;
         }
@@ -146,13 +144,10 @@ export default Vue.extend({
     border-bottom: 1px solid variables.$color-border;
     position: relative;
 
-    // Match project header padding on mobile
     @media (max-width: 768px) {
         padding: 20px 20px 6px;
     }
 
-    // When logo is present (customization disabled), remove bottom padding
-    // so logo centers properly relative to station text
     &.has-logo {
         padding-bottom: 0;
     }
