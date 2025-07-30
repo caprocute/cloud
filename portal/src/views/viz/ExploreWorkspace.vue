@@ -20,7 +20,12 @@
 
                             <InfoTooltip :message="$tc('dataView.computerTip')"></InfoTooltip>
 
-                            <div class="button compare" :alt="$tc('dataView.buttons.addChart')" @click="addChart">
+                            <div
+                                class="button compare"
+                                :class="{ disabled: addChartDisabled }"
+                                :alt="$tc('dataView.buttons.addChart')"
+                                @click="addChart"
+                            >
                                 <img :src="addIcon" />
                                 <div>{{ $tc("dataView.buttons.addChart") }}</div>
                             </div>
@@ -130,7 +135,7 @@ import { mapGetters, mapState } from "vuex";
 import { ActionTypes, DisplayStation } from "@/store";
 import { GlobalState } from "@/store/modules/global";
 import { SensorsResponse } from "./api";
-import { Bookmark, ChartType, FastTime, Time, VizSensor, VizSettings, Workspace } from "./viz";
+import { Bookmark, ChartType, FastTime, Graph, Time, VizSensor, VizSettings, Workspace } from "./viz";
 import { VizWorkspace } from "./VizWorkspace";
 import { getBatteryIcon, isMobile } from "@/utilities";
 import Comments from "../comments/Comments.vue";
@@ -231,6 +236,16 @@ export default Vue.extend({
         currentStation(): DisplayStation | null {
             return this.bookmark.s.length > 0 ? this.$getters.stationsById[this.bookmark.s[0]] : null;
         },
+        // Disabled button when there's only 1 viz and it has no data
+        addChartDisabled(): boolean {
+            if (!this.workspace) return false;
+
+            const allVizes = this.workspace.groups.flatMap((group) => group.vizes);
+            if (allVizes.length !== 1) return false;
+
+            const viz = allVizes[0];
+            return viz instanceof Graph && viz.isDataSetEmpty();
+        },
     },
     watch: {
         async bookmark(newValue: Bookmark, _oldValue: Bookmark): Promise<void> {
@@ -286,8 +301,11 @@ export default Vue.extend({
         },
         async addChart() {
             console.log("viz: add");
-            if (!this.workspace) throw new Error("viz-add: no workspace");
-            return this.workspace.addChart().query();
+            if (this.addChartDisabled) {
+                throw new Error("viz-add: no workspace");
+                return;
+            }
+            return this.workspace!.addChart().query();
         },
         async onChange(bookmark: Bookmark): Promise<void> {
             if (Bookmark.sameAs(this.bookmark, bookmark)) {
@@ -970,6 +988,12 @@ export default Vue.extend({
 
     @include mixins.bp-down(variables.$sm) {
         display: none;
+    }
+
+    &.disabled {
+        pointer-events: none;
+        opacity: 0.6;
+        cursor: not-allowed;
     }
 
     div {
