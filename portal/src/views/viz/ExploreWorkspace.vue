@@ -20,7 +20,7 @@
 
                             <InfoTooltip :message="$tc('dataView.computerTip')"></InfoTooltip>
 
-                            <div class="button compare" alt="Add Chart" @click="addChart">
+                            <div class="button compare" :alt="$tc('dataView.buttons.addChart')" @click="addChart">
                                 <img :src="addIcon" />
                                 <div>{{ $tc("dataView.buttons.addChart") }}</div>
                             </div>
@@ -966,6 +966,7 @@ export default Vue.extend({
 .button.compare {
     display: flex;
     align-items: center;
+    user-select: none;
 
     @include mixins.bp-down(variables.$sm) {
         display: none;
