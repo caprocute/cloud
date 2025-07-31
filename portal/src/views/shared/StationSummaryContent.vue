@@ -49,18 +49,22 @@
             </template>
 
             <div v-if="!isMobileView && !isCustomisationEnabled()" class="station-modules">
-                <div v-for="(module, index) in station.modules" v-bind:key="index" class="module-icon-container">
-                    <img :alt="$t('station.photo.module.alt')" class="small-space" :src="getModuleIcon(module)" />
-                </div>
+                <ModuleIcon
+                    v-for="(module, index) in station.modules"
+                    v-bind:key="index"
+                    :module="{ url: $loadAsset(getModuleImg(module)), name: module.name }"
+                />
             </div>
 
             <slot name="extra-detail"></slot>
         </div>
 
         <div v-if="isMobileView && !isCustomisationEnabled()" class="station-modules">
-            <div v-for="(module, index) in station.modules" v-bind:key="index" class="module-icon-container">
-                <img :alt="$t('station.photo.module.alt')" class="small-space" :src="getModuleIcon(module)" />
-            </div>
+            <ModuleIcon
+                v-for="(module, index) in station.modules"
+                v-bind:key="index"
+                :module="{ url: $loadAsset(getModuleImg(module)), name: module.name }"
+            />
         </div>
     </div>
 </template>
@@ -68,6 +72,7 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import CommonComponents from "@/views/shared";
+import ModuleIcon from "@/views/shared/ModuleIcon.vue";
 import * as utils from "@/utilities";
 import { DisplayStation } from "@/store";
 import { getPartnerCustomizationWithDefault, isCustomisationEnabled, PartnerCustomization } from "@/views/shared/partners";
@@ -76,6 +81,7 @@ export default Vue.extend({
     name: "StationSummaryContent",
     components: {
         ...CommonComponents,
+        ModuleIcon,
     },
     data: () => {
         return {
@@ -110,8 +116,8 @@ export default Vue.extend({
         getBatteryIcon() {
             return this.$loadAsset(utils.getBatteryIcon(this.station.battery));
         },
-        getModuleIcon(module) {
-            return this.$loadAsset(utils.getModuleImg(module));
+        getModuleImg(module) {
+            return utils.getModuleImg(module);
         },
         partnerCustomization(): PartnerCustomization {
             return getPartnerCustomizationWithDefault();
@@ -165,26 +171,6 @@ export default Vue.extend({
     font-size: 14px;
 }
 
-.module-icon-container {
-    margin-right: 6px;
-    border-radius: 50%;
-    display: flex;
-
-    img {
-        width: 24px;
-        height: 24px;
-    }
-
-    @include mixins.bp-down(variables.$xs) {
-        margin-right: 3px;
-
-        img {
-            width: 18px;
-            height: 18px;
-        }
-    }
-}
-
 .general-row {
     display: flex;
     flex-direction: row;
@@ -232,6 +218,26 @@ export default Vue.extend({
     @include mixins.bp-down(variables.$xs) {
         margin-top: 10px;
         margin-left: 0;
+    }
+
+    ::v-deep .module-icon {
+        width: 24px;
+        height: 24px;
+        margin-right: 6px;
+
+        @include mixins.bp-down(variables.$xs) {
+            width: 18px;
+            height: 18px;
+            margin-right: 3px;
+        }
+    }
+
+    ::v-deep .tooltip-text {
+        bottom: calc(-100% - 6px);
+
+        @include mixins.bp-down(variables.$xs) {
+            bottom: calc(-100% - 3px);
+        }
     }
 }
 
