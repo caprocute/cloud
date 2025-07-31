@@ -109,6 +109,7 @@ type AddResponseBody struct {
 	Bio       *string                `form:"bio,omitempty" json:"bio,omitempty" xml:"bio,omitempty"`
 	Photo     *UserPhotoResponseBody `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
 	Admin     *bool                  `form:"admin,omitempty" json:"admin,omitempty" xml:"admin,omitempty"`
+	Moderator *bool                  `form:"moderator,omitempty" json:"moderator,omitempty" xml:"moderator,omitempty"`
 	UpdatedAt *int64                 `form:"updatedAt,omitempty" json:"updatedAt,omitempty" xml:"updatedAt,omitempty"`
 	TncDate   *int64                 `form:"tncDate,omitempty" json:"tncDate,omitempty" xml:"tncDate,omitempty"`
 }
@@ -122,6 +123,7 @@ type UpdateResponseBody struct {
 	Bio       *string                `form:"bio,omitempty" json:"bio,omitempty" xml:"bio,omitempty"`
 	Photo     *UserPhotoResponseBody `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
 	Admin     *bool                  `form:"admin,omitempty" json:"admin,omitempty" xml:"admin,omitempty"`
+	Moderator *bool                  `form:"moderator,omitempty" json:"moderator,omitempty" xml:"moderator,omitempty"`
 	UpdatedAt *int64                 `form:"updatedAt,omitempty" json:"updatedAt,omitempty" xml:"updatedAt,omitempty"`
 	TncDate   *int64                 `form:"tncDate,omitempty" json:"tncDate,omitempty" xml:"tncDate,omitempty"`
 }
@@ -135,6 +137,7 @@ type ChangePasswordResponseBody struct {
 	Bio       *string                `form:"bio,omitempty" json:"bio,omitempty" xml:"bio,omitempty"`
 	Photo     *UserPhotoResponseBody `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
 	Admin     *bool                  `form:"admin,omitempty" json:"admin,omitempty" xml:"admin,omitempty"`
+	Moderator *bool                  `form:"moderator,omitempty" json:"moderator,omitempty" xml:"moderator,omitempty"`
 	UpdatedAt *int64                 `form:"updatedAt,omitempty" json:"updatedAt,omitempty" xml:"updatedAt,omitempty"`
 	TncDate   *int64                 `form:"tncDate,omitempty" json:"tncDate,omitempty" xml:"tncDate,omitempty"`
 }
@@ -148,6 +151,7 @@ type AcceptTncResponseBody struct {
 	Bio       *string                `form:"bio,omitempty" json:"bio,omitempty" xml:"bio,omitempty"`
 	Photo     *UserPhotoResponseBody `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
 	Admin     *bool                  `form:"admin,omitempty" json:"admin,omitempty" xml:"admin,omitempty"`
+	Moderator *bool                  `form:"moderator,omitempty" json:"moderator,omitempty" xml:"moderator,omitempty"`
 	UpdatedAt *int64                 `form:"updatedAt,omitempty" json:"updatedAt,omitempty" xml:"updatedAt,omitempty"`
 	TncDate   *int64                 `form:"tncDate,omitempty" json:"tncDate,omitempty" xml:"tncDate,omitempty"`
 }
@@ -161,6 +165,7 @@ type GetCurrentResponseBody struct {
 	Bio       *string                `form:"bio,omitempty" json:"bio,omitempty" xml:"bio,omitempty"`
 	Photo     *UserPhotoResponseBody `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
 	Admin     *bool                  `form:"admin,omitempty" json:"admin,omitempty" xml:"admin,omitempty"`
+	Moderator *bool                  `form:"moderator,omitempty" json:"moderator,omitempty" xml:"moderator,omitempty"`
 	UpdatedAt *int64                 `form:"updatedAt,omitempty" json:"updatedAt,omitempty" xml:"updatedAt,omitempty"`
 	TncDate   *int64                 `form:"tncDate,omitempty" json:"tncDate,omitempty" xml:"tncDate,omitempty"`
 }
@@ -1999,6 +2004,7 @@ type UserResponseBody struct {
 	Bio       *string                `form:"bio,omitempty" json:"bio,omitempty" xml:"bio,omitempty"`
 	Photo     *UserPhotoResponseBody `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
 	Admin     *bool                  `form:"admin,omitempty" json:"admin,omitempty" xml:"admin,omitempty"`
+	Moderator *bool                  `form:"moderator,omitempty" json:"moderator,omitempty" xml:"moderator,omitempty"`
 	UpdatedAt *int64                 `form:"updatedAt,omitempty" json:"updatedAt,omitempty" xml:"updatedAt,omitempty"`
 	TncDate   *int64                 `form:"tncDate,omitempty" json:"tncDate,omitempty" xml:"tncDate,omitempty"`
 }
@@ -2849,6 +2855,7 @@ func NewAddUserOK(body *AddResponseBody) *userviews.UserView {
 		Email:     body.Email,
 		Bio:       body.Bio,
 		Admin:     body.Admin,
+		Moderator: body.Moderator,
 		UpdatedAt: body.UpdatedAt,
 		TncDate:   body.TncDate,
 	}
@@ -2939,6 +2946,7 @@ func NewUpdateUserOK(body *UpdateResponseBody) *userviews.UserView {
 		Email:     body.Email,
 		Bio:       body.Bio,
 		Admin:     body.Admin,
+		Moderator: body.Moderator,
 		UpdatedAt: body.UpdatedAt,
 		TncDate:   body.TncDate,
 	}
@@ -3015,6 +3023,7 @@ func NewChangePasswordUserOK(body *ChangePasswordResponseBody) *userviews.UserVi
 		Email:     body.Email,
 		Bio:       body.Bio,
 		Admin:     body.Admin,
+		Moderator: body.Moderator,
 		UpdatedAt: body.UpdatedAt,
 		TncDate:   body.TncDate,
 	}
@@ -3094,6 +3103,7 @@ func NewAcceptTncUserOK(body *AcceptTncResponseBody) *userviews.UserView {
 		Email:     body.Email,
 		Bio:       body.Bio,
 		Admin:     body.Admin,
+		Moderator: body.Moderator,
 		UpdatedAt: body.UpdatedAt,
 		TncDate:   body.TncDate,
 	}
@@ -3173,6 +3183,7 @@ func NewGetCurrentUserOK(body *GetCurrentResponseBody) *userviews.UserView {
 		Email:     body.Email,
 		Bio:       body.Bio,
 		Admin:     body.Admin,
+		Moderator: body.Moderator,
 		UpdatedAt: body.UpdatedAt,
 		TncDate:   body.TncDate,
 	}

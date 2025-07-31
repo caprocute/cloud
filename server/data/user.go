@@ -62,6 +62,7 @@ type User struct {
 	MediaURL         *string   `db:"media_url"`
 	MediaContentType *string   `db:"media_content_type"`
 	Admin            bool      `db:"admin"`
+	Moderator        bool      `json:"moderator"`
 	FirmwareTester   bool      `db:"firmware_tester"`
 	FirmwarePattern  *string   `db:"firmware_pattern"`
 	Taggable         bool      `db:"taggable"`

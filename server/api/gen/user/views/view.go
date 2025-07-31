@@ -99,6 +99,7 @@ type UserView struct {
 	Bio       *string
 	Photo     *UserPhotoView
 	Admin     *bool
+	Moderator *bool
 	UpdatedAt *int64
 	TncDate   *int64
 }
@@ -187,6 +188,7 @@ var (
 			"bio",
 			"photo",
 			"admin",
+			"moderator",
 			"updatedAt",
 			"tncDate",
 		},

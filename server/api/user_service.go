@@ -316,6 +316,18 @@ func (s *UserService) GetCurrent(ctx context.Context, payload *user.GetCurrentPa
 		return nil, err
 	}
 
+	isModerator := false
+	if err := s.options.Database.GetContext(ctx, &isModerator, `
+		SELECT 1 FROM fieldkit.moderator WHERE user_id = $1 LIMIT 1
+		`, p.UserID()); err != nil {
+		log := Logger(ctx).Sugar()
+		log.Errorw("query user is moderator failed", err)
+	}
+
+	currentUser.Moderator = isModerator
+	log := Logger(ctx).Sugar()
+	log.Warnw("user is a moderator:", "user_id", isModerator)
+
 	return UserType(s.options.signer, currentUser)
 }
 
@@ -933,6 +945,7 @@ func UserType(signer *Signer, dm *data.User) (*user.User, error) {
 		Email:     dm.Email,
 		Bio:       dm.Bio,
 		Admin:     dm.Admin,
+		Moderator: &dm.Moderator,
 		UpdatedAt: dm.UpdatedAt.Unix() * 1000,
 		TncDate:   dm.TncDate.Unix() * 1000,
 	}

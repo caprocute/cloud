@@ -593,14 +593,15 @@ func DecodeDeleteDataEventResponse(decoder func(*http.Response) goahttp.Decoder,
 // *DataEventResponseBody.
 func unmarshalDataEventResponseBodyToDataeventsviewsDataEventView(v *DataEventResponseBody) *dataeventsviews.DataEventView {
 	res := &dataeventsviews.DataEventView{
-		ID:          v.ID,
-		CreatedAt:   v.CreatedAt,
-		UpdatedAt:   v.UpdatedAt,
-		Title:       v.Title,
-		Description: v.Description,
-		Bookmark:    v.Bookmark,
-		Start:       v.Start,
-		End:         v.End,
+		ID:              v.ID,
+		CreatedAt:       v.CreatedAt,
+		UpdatedAt:       v.UpdatedAt,
+		Title:           v.Title,
+		Description:     v.Description,
+		Bookmark:        v.Bookmark,
+		Start:           v.Start,
+		End:             v.End,
+		UserHasReported: v.UserHasReported,
 	}
 	res.Author = unmarshalPostAuthorResponseBodyToDataeventsviewsPostAuthorView(v.Author)
 
@@ -670,14 +671,15 @@ func marshalNewDataEventRequestBodyToDataeventsNewDataEvent(v *NewDataEventReque
 // *dataevents.DataEvent from a value of type *DataEventResponseBody.
 func unmarshalDataEventResponseBodyToDataeventsDataEvent(v *DataEventResponseBody) *dataevents.DataEvent {
 	res := &dataevents.DataEvent{
-		ID:          *v.ID,
-		CreatedAt:   *v.CreatedAt,
-		UpdatedAt:   *v.UpdatedAt,
-		Title:       *v.Title,
-		Description: *v.Description,
-		Bookmark:    v.Bookmark,
-		Start:       *v.Start,
-		End:         *v.End,
+		ID:              *v.ID,
+		CreatedAt:       *v.CreatedAt,
+		UpdatedAt:       *v.UpdatedAt,
+		Title:           *v.Title,
+		Description:     *v.Description,
+		Bookmark:        v.Bookmark,
+		Start:           *v.Start,
+		End:             *v.End,
+		UserHasReported: v.UserHasReported,
 	}
 	res.Author = unmarshalPostAuthorResponseBodyToDataeventsPostAuthor(v.Author)
 

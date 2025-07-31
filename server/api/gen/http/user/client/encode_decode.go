@@ -3381,6 +3381,7 @@ func unmarshalUserResponseBodyToUserviewsUserView(v *UserResponseBody) *userview
 		Email:     v.Email,
 		Bio:       v.Bio,
 		Admin:     v.Admin,
+		Moderator: v.Moderator,
 		UpdatedAt: v.UpdatedAt,
 		TncDate:   v.TncDate,
 	}
@@ -3411,6 +3412,7 @@ func unmarshalUserResponseBodyToUserUser(v *UserResponseBody) *user.User {
 		Email:     *v.Email,
 		Bio:       *v.Bio,
 		Admin:     *v.Admin,
+		Moderator: v.Moderator,
 		UpdatedAt: *v.UpdatedAt,
 		TncDate:   *v.TncDate,
 	}

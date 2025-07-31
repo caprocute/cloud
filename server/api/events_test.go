@@ -64,7 +64,8 @@ func TestEventsUpdateMyEvent(t *testing.T) {
 				"start": "<<PRESENCE>>",
 				"end": "<<PRESENCE>>",
 				"title": "Event #1",
-				"description": "More about Event #1"
+				"description": "More about Event #1",
+				"userHasReported": "<<PRESENCE>>"
 			}
 		}`)
 
@@ -104,7 +105,8 @@ func TestEventsUpdateMyEvent(t *testing.T) {
 				"start": "<<PRESENCE>>",
 				"end": "<<PRESENCE>>",
 				"title": "Event #2",
-				"description": "More about Event #2"
+				"description": "More about Event #2",
+				"userHasReported": "<<PRESENCE>>"
 			}
 		}`)
 }
@@ -159,7 +161,8 @@ func TestEventsUpdateStrangersEvent(t *testing.T) {
 				"start": "<<PRESENCE>>",
 				"end": "<<PRESENCE>>",
 				"title": "Event #1",
-				"description": "More about Event #1"
+				"description": "More about Event #1",
+				"userHasReported": "<<PRESENCE>>"
 			}
 		}`)
 
@@ -233,7 +236,8 @@ func TestEventsDeleteMyEvent(t *testing.T) {
 				"start": "<<PRESENCE>>",
 				"end": "<<PRESENCE>>",
 				"title": "Event #1",
-				"description": "More about Event #1"
+				"description": "More about Event #1",
+				"userHasReported": "<<PRESENCE>>"
 			}
 		}`)
 
@@ -295,7 +299,8 @@ func TestEventsDeleteStrangersEvent(t *testing.T) {
 				"start": "<<PRESENCE>>",
 				"end": "<<PRESENCE>>",
 				"title": "Event #1",
-				"description": "More about Event #1"
+				"description": "More about Event #1",
+				"userHasReported": "<<PRESENCE>>"
 			}
 		}`)
 
@@ -355,7 +360,8 @@ func TestEventsEventFirstContextDiscussion(t *testing.T) {
 				"end": "<<PRESENCE>>",
 				"bookmark": "<<PRESENCE>>",
 				"title": "Event",
-				"description": "More about Event"
+				"description": "More about Event",
+				"userHasReported": "<<PRESENCE>>"
 			}
 		}`)
 
@@ -380,7 +386,8 @@ func TestEventsEventFirstContextDiscussion(t *testing.T) {
 				"end": "<<PRESENCE>>",
 				"bookmark": "<<PRESENCE>>",
 				"title": "Event",
-				"description": "More about Event"
+				"description": "More about Event",
+				"userHasReported": "<<PRESENCE>>"
 			}]
 		}`)
 }

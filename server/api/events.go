@@ -82,17 +82,36 @@ func (c *EventsService) DataEventsEndpoint(ctx context.Context, payload *eventsS
 		return nil, err
 	}
 
-	dep, err := ViewDataEvents(projectEvents.Events, projectEvents.UsersByID)
+	// Combine all events
+	allEvents := append(projectEvents.Events, stationEvents.Events...)
+	allUsersByID := make(map[int32]*data.User)
+	for k, v := range projectEvents.UsersByID {
+		allUsersByID[k] = v
+	}
+	for k, v := range stationEvents.UsersByID {
+		allUsersByID[k] = v
+	}
+
+	// Check user reports for all events if user is authenticated
+	var userReports map[int32]bool
+	if !p.Anonymous() {
+		mr := repositories.NewModerationRepository(c.db)
+		eventIDs := make([]int32, len(allEvents))
+		for i, event := range allEvents {
+			eventIDs[i] = int32(event.ID)
+		}
+		userReports, err = mr.CheckUserReportsForPosts(ctx, p.UserID(), eventIDs, data.ModerationDataEvent)
+		if err != nil {
+			log := Logger(ctx).Sugar()
+			log.Warnw("failed to check user reports for events", "error", err)
+			userReports = make(map[int32]bool) // fallback to empty map
+		}
+	}
+
+	dea, err := ViewDataEventsWithReports(allEvents, allUsersByID, userReports)
 	if err != nil {
 		return nil, err
 	}
-
-	des, err := ViewDataEvents(stationEvents.Events, stationEvents.UsersByID)
-	if err != nil {
-		return nil, err
-	}
-
-	dea := append(dep, des...)
 
 	return &eventsService.DataEvents{
 		Events: dea,
@@ -288,6 +307,7 @@ func ViewDataEvent(de *data.DataEvent, users map[int32]*data.User) (*eventsServi
 		}
 	}
 
+	defaultReported := false
 	return &eventsService.DataEvent{
 		ID:        de.ID,
 		CreatedAt: de.CreatedAt.Unix() * 1000,
@@ -297,11 +317,12 @@ func ViewDataEvent(de *data.DataEvent, users map[int32]*data.User) (*eventsServi
 			Name:  user.Name,
 			Photo: photo,
 		},
-		Bookmark:    de.StringBookmark(),
-		Title:       de.Title,
-		Description: de.Description,
-		Start:       de.Start.Unix() * 1000,
-		End:         de.End.Unix() * 1000,
+		Bookmark:        de.StringBookmark(),
+		Title:           de.Title,
+		Description:     de.Description,
+		Start:           de.Start.Unix() * 1000,
+		End:             de.End.Unix() * 1000,
+		UserHasReported: &defaultReported,
 	}, nil
 }
 
@@ -311,6 +332,22 @@ func ViewDataEvents(des []*data.DataEvent, users map[int32]*data.User) ([]*event
 		vde, err := ViewDataEvent(de, users)
 		if err != nil {
 			return nil, err
+		}
+		viewDes = append(viewDes, vde)
+	}
+	return viewDes, nil
+}
+
+func ViewDataEventsWithReports(des []*data.DataEvent, users map[int32]*data.User, reports map[int32]bool) ([]*eventsService.DataEvent, error) {
+	viewDes := make([]*eventsService.DataEvent, 0)
+	for _, de := range des {
+		vde, err := ViewDataEvent(de, users)
+		if err != nil {
+			return nil, err
+		}
+		if reports != nil {
+			hasReported := reports[int32(de.ID)]
+			vde.UserHasReported = &hasReported
 		}
 		viewDes = append(viewDes, vde)
 	}
