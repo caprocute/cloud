@@ -321,7 +321,7 @@ func (s *UserService) GetCurrent(ctx context.Context, payload *user.GetCurrentPa
 		SELECT 1 FROM fieldkit.moderator WHERE user_id = $1 LIMIT 1
 		`, p.UserID()); err != nil {
 		log := Logger(ctx).Sugar()
-		log.Errorw("query user is moderator failed", err)
+		log.Errorw("query user is moderator failed", "error", err)
 	}
 
 	currentUser.Moderator = isModerator

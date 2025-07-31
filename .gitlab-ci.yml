@@ -88,8 +88,9 @@ test:cypress:
     - MIGRATE_PATH=migrations/tsdb MIGRATE_DATABASE_URL=${FIELDKIT_TIME_SCALE_URL} migrations/cli/migrate migrate
     - (cd server && go test -p 1 -coverprofile=coverage.data ./...)
     - build/server &
+    - tools/wait-for-site.sh 127.0.0.1:8080
     - (cd portal && npm run serve) &
-    - sleep 30
+    - tools/wait-for-site.sh 127.0.0.1:8082
     - (cd portal && npm run cypress:run)
 
 build:tools-amd64:
