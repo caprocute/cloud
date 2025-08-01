@@ -675,9 +675,9 @@
         "previous": {
             "heading": "Previous Exports",
             "noItems": "No previous exports.",
-            "download": "Download"
-        },
-        "downloaded": "Downloaded"
+            "download": "Download",
+            "downloaded": "Downloaded"
+        }
     },
     "followPanel": {
         "follow": "Follow",
