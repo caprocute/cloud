@@ -32,7 +32,7 @@
                     :userStations="stations"
                 />
             </template>
-            <template v-else-if="!isBusy">
+            <template v-else-if="!isBusy && displayProject !== null">
                 <ForbiddenBanner
                     class="project-forbidden-banner"
                     :title="$tc('project.privateBannerTitle')"
