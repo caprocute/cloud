@@ -303,7 +303,6 @@ export default Vue.extend({
             console.log("viz: add");
             if (this.addChartDisabled) {
                 throw new Error("viz-add: no workspace");
-                return;
             }
             return this.workspace!.addChart().query();
         },
