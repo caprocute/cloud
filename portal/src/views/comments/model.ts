@@ -5,6 +5,7 @@ export interface DiscussionBase {
     createdAt: number;
     updatedAt: number;
     readonly?: boolean;
+    userHasReported?: boolean;
 }
 
 export class DiscussionBase {
@@ -14,19 +15,22 @@ export class DiscussionBase {
     createdAt: number;
     updatedAt: number;
     readonly?: boolean;
+    userHasReported?: boolean;
 
     constructor(
         id: number,
         author: { id: number; name: string; photo: object },
         bookmark: string | undefined,
         createdAt: number,
-        updatedAt: number
+        updatedAt: number,
+        userHasReported?: boolean
     ) {
         this.id = id;
         this.author = author;
         this.bookmark = bookmark;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+        this.userHasReported = userHasReported || false;
     }
 }
 
@@ -48,13 +52,14 @@ export class Comment extends DiscussionBase {
         bookmark: string | undefined,
         body: string,
         createdAt: number,
-        updatedAt: number
+        updatedAt: number,
+        userHasReported?: boolean
     ) {
-        super(id, author, bookmark, createdAt, updatedAt);
+        super(id, author, bookmark, createdAt, updatedAt, userHasReported);
         this.body = body;
         this.replies = [];
         this.readonly = true;
-        this.type = 'comment';
+        this.type = "comment";
     }
 }
 
@@ -91,15 +96,16 @@ export class DataEvent extends DiscussionBase {
         title: string,
         description: string,
         start: number,
-        end: number
+        end: number,
+        userHasReported?: boolean
     ) {
-        super(id, author, bookmark, createdAt, updatedAt);
+        super(id, author, bookmark, createdAt, updatedAt, userHasReported);
         this.title = title;
         this.description = description;
         this.start = start;
         this.end = end;
         this.readonly = true;
-        this.type = 'event';
+        this.type = "event";
     }
 }
 

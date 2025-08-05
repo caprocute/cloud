@@ -1,14 +1,15 @@
-@import "./mixins.scss";
+@use "mixins.scss";
+@use "variables";
 
 .form {
-    width: 460px;
+    width: 464px;
     background-color: white;
     text-align: center;
     padding: 45px 80px 45px;
     box-sizing: border-box;
     max-width: calc(100vw - 20px);
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         padding: 15px 10px 25px;
         width: 330px;
     }
@@ -16,7 +17,7 @@
     &--success {
         padding-top: 58px;
 
-        @include bp-down($xs) {
+        @include mixins.bp-down(variables.$xs) {
             padding-top: 28px;
         }
     }
@@ -27,9 +28,9 @@
         flex-direction: column;
         box-sizing: border-box;
         min-height: 100vh;
-        @include flex(center, center);
+        @include mixins.flex(center, center);
 
-        @include bp-down($xs) {
+        @include mixins.bp-down(variables.$xs) {
             padding: 40px 0;
             justify-content: flex-start;
         }
@@ -50,7 +51,7 @@
                 color: #fff;
             }
 
-            @include bp-down($xs) {
+            @include mixins.bp-down(variables.$xs) {
                 margin-bottom: 30px;
                 font-size: 25px;
             }
@@ -66,7 +67,7 @@
         font-size: 24px;
         margin-bottom: 35px;
 
-        @include bp-down($xs) {
+        @include mixins.bp-down(variables.$xs) {
             font-size: 20px;
             margin-top: 10px;
         }
@@ -74,13 +75,13 @@
         + .form-subtitle {
             margin: -10px 0 30px;
 
-            @include bp-down($xs) {
+            @include mixins.bp-down(variables.$xs) {
                 margin-top: -22px;
             }
         }
 
         .form--success & {
-            @include bp-down($xs) {
+            @include mixins.bp-down(variables.$xs) {
                 margin-top: 20px;
             }
         }
@@ -91,7 +92,7 @@
         font-size: 16px;
         line-height: 1.4;
 
-        @include bp-down($xs) {
+        @include mixins.bp-down(variables.$xs) {
             font-size: 14px;
         }
     }
@@ -110,12 +111,12 @@
         border-radius: 3px;
         letter-spacing: 0.1px;
 
-        @include bp-down($xs) {
+        @include mixins.bp-down(variables.$xs) {
             max-width: unset;
         }
 
         &:disabled {
-            background: $color-border;
+            background: variables.$color-border;
         }
     }
 
@@ -177,11 +178,11 @@
         position: relative;
         text-align: left;
 
-        @include bp-down($md) {
+        @include mixins.bp-down(variables.$md) {
             max-width: 500px;
         }
 
-        @include bp-down($xs) {
+        @include mixins.bp-down(variables.$xs) {
             padding: 0 20px 14px;
             width: 100%;
         }

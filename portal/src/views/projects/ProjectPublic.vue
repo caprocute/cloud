@@ -42,13 +42,10 @@
                 <div class="project-detail" v-if="project.goal">{{ $t("project.goal", { goal: project.goal }) }}</div>
                 <div class="project-detail">{{ project.description }}</div>
                 <div class="details-modules">
-                    <img
-                        v-for="module in projectModules"
-                        v-bind:key="module.name"
-                        alt="Module icon"
-                        class="module-icon"
-                        :src="module.url"
-                    />
+                    <div class="hoverable-item" v-for="(module, index) in projectModules" :key="module.name">
+                        <img alt="Module icon" class="module-icon" :src="module.url" />
+                        <span :ref="'module-tooltip-' + index" class="tooltip-text">{{ $t(module.name) }}</span>
+                    </div>
                 </div>
                 <div class="right-actions">
                     <FollowControl :project="project" v-if="isAuthenticated">
@@ -214,14 +211,16 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "../../scss/project";
-@import "../../scss/global";
+@use "src/scss/project";
+@use "src/scss/global";
+@use "src/scss/mixins";
+@use "src/scss/variables";
 
 .project-public {
     display: flex;
     flex-direction: column;
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         padding-bottom: 20px;
     }
 }
@@ -258,7 +257,7 @@ export default Vue.extend({
     border: solid 1px var(--color-border);
     background-color: white;
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         flex-wrap: wrap;
     }
 }
@@ -268,17 +267,17 @@ export default Vue.extend({
     display: flex;
     flex-direction: column;
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         flex-basis: 100%;
         padding-bottom: 0;
     }
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         padding: 10px 10px 0;
     }
 }
 .details .project-detail {
-    font-family: $font-family-light;
+    font-family: variables.$font-family-light;
     margin-bottom: 9px;
     line-height: 1.5;
     overflow-wrap: anywhere;
@@ -288,7 +287,7 @@ export default Vue.extend({
     width: 380px;
     max-height: 234px;
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         width: 100%;
     }
 }
@@ -297,11 +296,11 @@ export default Vue.extend({
     padding: 20px 20px 67px 20px;
     position: relative;
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         padding-top: 14px;
     }
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         padding: 10px 10px 64px;
     }
 }
@@ -311,7 +310,7 @@ export default Vue.extend({
     font-size: 24px;
     color: #2c3e50;
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         font-size: 22px;
     }
 }
@@ -353,7 +352,7 @@ export default Vue.extend({
 .project-container {
     margin-top: -10px;
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         margin-top: -28px;
     }
 }
@@ -367,10 +366,10 @@ export default Vue.extend({
 }
 
 .right-actions {
-    @include position(absolute, null 14px 18px null);
-    @include flex();
+    @include mixins.position(absolute, null 14px 18px null);
+    @include mixins.flex();
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         right: 0;
         bottom: 12px;
     }
@@ -387,17 +386,17 @@ export default Vue.extend({
     background-color: #ffffff;
     margin-top: 16px;
     position: relative;
-    @include flex();
+    @include mixins.flex();
 
-    @include bp-down($md) {
+    @include mixins.bp-down(variables.$md) {
         padding: 26px 23px 23px;
     }
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         flex-wrap: wrap;
     }
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         padding: 16px 10px 23px;
     }
 
@@ -406,14 +405,14 @@ export default Vue.extend({
         height: 35px;
         margin: 4px 14px 0;
 
-        @include bp-down($md) {
+        @include mixins.bp-down(variables.$md) {
             margin: 4px 7px 0 0;
 
-            @include position(absolute, 26px null null 29px);
+            @include mixins.position(absolute, 26px null null 29px);
         }
 
-        @include bp-down($xs) {
-            @include position(absolute, 16px null null 10px);
+        @include mixins.bp-down(variables.$xs) {
+            @include mixins.position(absolute, 16px null null 10px);
         }
     }
 
@@ -423,11 +422,11 @@ export default Vue.extend({
         margin: 0;
         line-height: 1.4;
 
-        @include bp-down($md) {
+        @include mixins.bp-down(variables.$md) {
             padding-left: 52px;
         }
 
-        @include bp-down($xs) {
+        @include mixins.bp-down(variables.$xs) {
             padding-left: 42px;
         }
     }
@@ -438,11 +437,11 @@ export default Vue.extend({
         margin: 0;
         font-weight: 300;
 
-        @include bp-down($md) {
+        @include mixins.bp-down(variables.$md) {
             padding-left: 52px;
         }
 
-        @include bp-down($xs) {
+        @include mixins.bp-down(variables.$xs) {
             padding-left: 42px;
         }
     }
@@ -451,11 +450,11 @@ export default Vue.extend({
         line-height: 1.5;
         margin: 9px 54px 0 0;
 
-        @include bp-down($md) {
+        @include mixins.bp-down(variables.$md) {
             margin-right: 20px;
         }
 
-        @include bp-down($sm) {
+        @include mixins.bp-down(variables.$sm) {
             flex-basis: 100%;
             margin: 11px 0 15px 0;
         }
@@ -466,7 +465,7 @@ export default Vue.extend({
         white-space: nowrap;
         align-self: center;
 
-        @include bp-down($xs) {
+        @include mixins.bp-down(variables.$xs) {
             width: 100%;
         }
     }
@@ -479,7 +478,7 @@ export default Vue.extend({
     padding: 17px 23px;
     flex: 1;
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         padding: 19px 10px;
     }
 
@@ -488,7 +487,7 @@ export default Vue.extend({
         font-size: 20px;
         font-weight: 500;
 
-        @include bp-down($sm) {
+        @include mixins.bp-down(variables.$sm) {
             font-size: 18px;
         }
     }
@@ -508,7 +507,7 @@ export default Vue.extend({
     }
 
     li {
-        @include flex(flex-start);
+        @include mixins.flex(flex-start);
         font-size: 16px;
         margin-bottom: 30px;
 
@@ -536,10 +535,10 @@ export default Vue.extend({
 }
 
 .project-team-activity {
-    @include flex();
+    @include mixins.flex();
     margin-top: 21px;
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         flex-wrap: wrap;
     }
 }
@@ -552,13 +551,13 @@ export default Vue.extend({
     background-color: #ffffff;
     margin-right: 32px;
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         flex-basis: 100%;
         margin-right: 0;
         margin-bottom: 26px;
     }
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         padding: 19px 10px;
     }
 
@@ -567,7 +566,7 @@ export default Vue.extend({
         font-weight: 500;
         margin: 0 0 23px;
 
-        @include bp-down($sm) {
+        @include mixins.bp-down(variables.$sm) {
             font-size: 18px;
         }
     }
@@ -577,7 +576,7 @@ export default Vue.extend({
         font-size: 14px;
         line-height: 1.5;
         margin-bottom: 15px;
-        @include flex(center);
+        @include mixins.flex(center);
 
         img {
             width: 35px;

@@ -6,7 +6,7 @@
 </template>
 
 <script lang="ts">
-import Vue, { PropType } from "vue";
+import Vue from "vue";
 
 export default Vue.extend({
     name: "TextField",
@@ -38,5 +38,5 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "../../scss/float-label";
+@use "src/scss/float-label";
 </style>

@@ -11,8 +11,8 @@ import Vue from "vue";
 import CommonComponents from "@/views/shared";
 import LoginForm from "./LoginForm.vue";
 
-import FKApi, { LoginPayload } from "@/api/api";
-import { ActionTypes, DiscourseParams, LoginDiscourseAction } from "@/store";
+import { LoginPayload } from "@/api/api";
+import { DiscourseParams, LoginDiscourseAction } from "@/store";
 import { toSingleValue } from "@/utilities";
 import Logo from "@/views/shared/Logo.vue";
 
@@ -103,5 +103,5 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "../../scss/forms.scss";
+@use "src/scss/forms.scss";
 </style>

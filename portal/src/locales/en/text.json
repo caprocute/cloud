@@ -1,5 +1,42 @@
 {
     "hello": "Hello from i18n!",
+    "pageTitles": {
+        "login": "Login",
+        "register": "Create Account",
+        "recover": "Recover Account",
+        "reset": "Reset Password",
+        "terms": "Terms and Conditions",
+        "projects": "Projects",
+        "viewProject": "Project Dashboard",
+        "viewProjectActivity": "Project Activity",
+        "viewProjectBigMap": "Project Map",
+        "viewProjectBigMapList": "Project Stations",
+        "addProject": "Create Project",
+        "editProject": "Edit Project",
+        "mapAllStations": "Stations Map",
+        "listAllStations": "Stations List",
+        "viewStation": "Station Dashboard",
+        "viewStationFromMap": "Station Dashboard",
+        "viewStationPhotos": "Station Photos",
+        "viewProjectStationPhotos": "Station Photos",
+        "mapStation": "Station Dashboard",
+        "mapAllStationsBounds": "Station Dashboard",
+        "exploreBookmark": "Data Dashboard",
+        "exploreShortBookmark": "Data Dashboard",
+        "viewProjectNotes": "Project Notes",
+        "viewMyNotes": "My Notes",
+        "notifications": "Notifications",
+        "user": "User Profile",
+        "adminMain": "Admin Dashboard",
+        "adminUsers": "Admin Users",
+        "adminStations": "Admin Stations",
+        "notFound": "Page Not Found"
+    },
+    "notFound": {
+        "title": "Page Not Found",
+        "message": "The page you are looking for doesn't exist or has been moved.",
+        "toDashboard": "Go to Dashboard"
+    },
     "water.ec.name": "Water Conductivity",
     "water.ph.name": "Water pH",
     "water.do.name": "Water Dissolved Oxygen",
@@ -56,6 +93,8 @@
     "random.random_7": "Random 7",
     "random.random_8": "Random 8",
     "random.random_9": "Random 9",
+    "fk.modules.unknown": "Unknown",
+    "fk.unknown": "Unknown",
     "layout": {
         "logo": {
             "fieldkit": {
@@ -106,7 +145,8 @@
             "community": "Community Projects",
             "anonymous": "Projects"
         },
-        "add": "Add Project"
+        "add": "Add Project",
+        "noUserProjects": "You're not a member of any projects yet. Create one to get started!"
     },
     "project": {
         "details": {
@@ -266,7 +306,7 @@
             "addPhotos": "Add photos",
             "deletePhoto": "Delete Photo",
             "setAsStationImage": "Set as Station Image",
-            "linkToPhotos": "View all photos"
+            "linkToPhotos": "View Gallery"
         },
         "inactive": "Inactive",
         "ownerAvatar": "Owner avatar",
@@ -390,6 +430,7 @@
             "sentSubtitle": "Check your inbox for the email with a link to reset your password.",
             "resending": "Resending",
             "backButton": "Back to Log in",
+            "resendButton": "Resend",
             "email": {
                 "label": "Email",
                 "required": "Email is a required field.",
@@ -553,7 +594,9 @@
         "saveSuccess": "Comment saved successfully!",
         "deleteSuccess": "Comment deleted successfully!",
         "dataEventSuccess": "Event saved successfully!",
-        "dataEventDeleteSuccess": "Event deleted successfully!"
+        "dataEventDeleteSuccess": "Event deleted successfully!",
+        "reportSuccess": "Report sent successfully!",
+        "reportError": "Report failed! Please try again later."
     },
     "seeMore": "See more",
     "seeLess": "See less",
@@ -632,9 +675,9 @@
         "previous": {
             "heading": "Previous Exports",
             "noItems": "No previous exports.",
-            "download": "Download"
-        },
-        "downloaded": "Downloaded"
+            "download": "Download",
+            "downloaded": "Downloaded"
+        }
     },
     "followPanel": {
         "follow": "Follow",
@@ -661,6 +704,19 @@
         },
         "legend": {
             "noData": "No Data or Inactive"
+        },
+        "header": {
+            "title": "Stations",
+            "subtitle": "Explore station data",
+            "viewProjectDashboard": "View Project Dashboard"
+        },
+        "sidebar": {
+            "viewing": {
+                "heading": "Viewing {stationsLength} Station(s)",
+                "noStationsOnMap": "No results based on map view",
+                "updateMapCheckbox": "Update results based on map view",
+                "exploreBtn": "Explore All Data"
+            }
         }
     },
     "confirmDeletePhoto": "Are you sure you want to delete this photo?",
@@ -686,6 +742,8 @@
         "noSensors": "Oh snap, this station doesn't appear to have any sensors to show you.",
         "nothingSelected": "Nothing selected to visualize, please choose a station or project from the left.",
         "saveAs": "Save As",
+        "saveAsPng": "Save as PNG",
+        "saveAsSvg": "Save as SVG",
         "chartTypes": {
             "timeSeries": "Time Series",
             "bar": "Bar",
@@ -704,7 +762,8 @@
         "stationTree": {
             "add": "Add",
             "remove": "Remove"
-        }
+        },
+        "timeSeriesXAxisLabel": "Time ({timeZone})"
     },
     "edit": "Edit",
     "save": "Save",
@@ -724,7 +783,8 @@
     },
     "languageSelector": {
         "english": "English",
-        "spanish": "Español"
+        "spanish": "Español",
+        "toggleText": "Language"
     },
     "iconAlts": {
         "close": "Close"
@@ -814,6 +874,43 @@
             "processRecsTsdb": "Process Recs (TsDB only)",
             "exploreData": "Explore Data",
             "transfer": "Transfer"
+        },
+        "moderation": "Moderation",
+        "moderationList": {
+            "title": "Moderation Requests",
+            "id": "ID",
+            "postId": "Post ID",
+            "type": "Type",
+            "reportedBy": "Reported By",
+            "reportedAt": "Reported At",
+            "acknowledgedBy": "Acknowledged By",
+            "status": "Status",
+            "actions": "Actions",
+            "review": "Review",
+            "pending": "Pending",
+            "acknowledged": "Acknowledged",
+            "noModerationRequests": "No moderation requests found.",
+            "loading": "Loading moderation requests...",
+            "errorLoadingContent": "Error loading content",
+            "postTypes": {
+                "discussionPost": "Discussion Post",
+                "dataEvent": "Data Event"
+            }
+        },
+        "moderationReview": {
+            "title": "Review Content",
+            "postType": "Post Type",
+            "reportedBy": "Reported By",
+            "content": "Content",
+            "actions": {
+                "delete": "Delete Content",
+                "keep": "Keep Content",
+                "cancel": "Cancel"
+            },
+            "postTypes": {
+                "discussionPost": "Discussion Post",
+                "dataEvent": "Data Event"
+            }
         }
     },
     "pagination": {
@@ -826,5 +923,19 @@
         "warning": "Warning, continuing will delete your account and all associated data. To confirm, please enter your email address.",
         "done": "Your account has been deleted.",
         "sameEmail": "Does not match your email."
+    },
+    "stationsMapSummary": {
+        "tabs": {
+            "explore": "Explore Data",
+            "notes": "Field Notes",
+            "details": "Station Details"
+        }
+    },
+    "loading": "Loading...",
+    "cancelReport": {
+        "canceling": "Canceling...",
+        "label": "Cancel Report",
+        "success": "Report canceled successfully.",
+        "error": "Failed to cancel report."
     }
 }

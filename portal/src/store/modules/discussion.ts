@@ -17,14 +17,14 @@ const getters = {
 const actions = (services: Services) => {
     return {
         [ActionTypes.NEED_DATA_EVENTS]: async (
-            { commit, dispatch, state }: { commit: any; dispatch: any; state: DiscussionState },
+            { commit, dispatch: _dispatch, state: _state }: { commit: any; dispatch: any; state: DiscussionState },
             payload: { bookmark: string }
         ) => {
             const dataEvents = await services.api.getDataEvents(payload.bookmark);
             commit(MutationTypes.DATA_EVENTS_UPDATE, dataEvents);
         },
         [ActionTypes.NEW_DATA_EVENT]: async (
-            { commit, dispatch, state }: { commit: any; dispatch: any; state: DiscussionState },
+            { commit, dispatch: _dispatch, state: _state }: { commit: any; dispatch: any; state: DiscussionState },
             payload: { dataEvent: DataEvent }
         ) => {
             commit(MutationTypes.DATA_EVENT_APPEND, payload.dataEvent);

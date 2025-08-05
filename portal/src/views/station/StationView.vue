@@ -2,7 +2,7 @@
     <StandardLayout>
         <div class="container-wrap" v-if="station">
             <DoubleHeader
-                :backRoute="projectId ? 'viewProject' : 'mapStation'"
+                :backRoute="backRoute"
                 :backTitle="projectId ? $tc('layout.backProjectDashboard') : $tc(partnerCustomization().nav.viz.back.map.label)"
                 :backRouteParams="{ id: projectId || station.id }"
             >
@@ -115,20 +115,8 @@
                     </div>
                 </div>
                 <div>
-                    <div class="station-projects" v-if="stationProjects.length > 0">
-                        <template v-if="stationProjects.length === 1">{{ $tc("station.singleProjectTitle") }}&nbsp;</template>
-                        <template v-else>{{ $tc("station.multipleProjectsTitle") }} &nbsp;</template>
-                        <router-link
-                            v-for="(project, index) in stationProjects"
-                            v-bind:key="project.id"
-                            :to="{ name: 'viewProject', params: { id: project.id } }"
-                            target="_blank"
-                        >
-                            {{ project.name }}
-                            <template v-if="stationProjects.length > 1 && index !== stationProjects.length - 1">,&nbsp;</template>
-                        </router-link>
-                    </div>
-                    <div v-if="photos" class="station-photos">
+                    <StationProjects :stationId="station.id"></StationProjects>
+                    <div v-if="photos" class="station-photos" :class="{ 'single-photo': photos && photos.length == 1 }">
                         <div class="photo-container" v-for="(n, index) in 4" v-bind:key="index" @click="navigateToPhotos()">
                             <AuthenticatedPhoto v-if="photos[index]" :url="photos[index].url" />
                             <div v-else class="photo-placeholder">
@@ -146,26 +134,8 @@
             <section class="container-box" v-if="station.modules.length > 0">
                 <h2>{{ $t("station.data") }}</h2>
 
-                <ul class="flex flex-wrap flex-space-between module-data-container">
-                    <li
-                        class="module-data-item"
-                        v-for="module in station.modules"
-                        v-bind:key="module.name"
-                        @click="onModuleClick(module.id)"
-                    >
-                        <h3 class="module-data-title flex flex-al-center">
-                            <img alt="Module icon" :src="getModuleImg(module)" />
-                            {{ getModuleName(module) }}
-                        </h3>
-                        <TinyChart
-                            :ref="'tinyChart-' + module.id"
-                            :moduleKey="getModuleKey(module)"
-                            :station-id="station.id"
-                            :station="station"
-                            :querier="sensorDataQuerier"
-                        />
-                    </li>
-                </ul>
+                <StationModules :station="station"></StationModules>
+
                 <button class="btn module-data-btn" @click="onClickExplore">{{ $t("station.exploreData") }}</button>
             </section>
 
@@ -257,7 +227,6 @@ import {
     GlobalState,
     MappedStations,
     ProjectAttribute,
-    ProjectModule,
     VisibleReadings,
 } from "@/store";
 import * as utils from "@/utilities";
@@ -268,19 +237,19 @@ import ProjectAttributes from "@/views/projects/ProjectAttributes.vue";
 import StationBattery from "@/views/station/StationBattery.vue";
 import { getPartnerCustomizationWithDefault, isCustomisationEnabled, PartnerCustomization } from "@/views/shared/partners";
 import UserPhoto from "@/views/shared/UserPhoto.vue";
-import { Project } from "@/api";
 import { mapState } from "vuex";
-import { SensorDataQuerier } from "@/views/shared/sensor_data_querier";
-import TinyChart from "@/views/viz/TinyChart.vue";
 import { BookmarkFactory, serializeBookmark } from "@/views/viz/viz";
 import { ExploreContext } from "@/views/viz/common";
 import FieldNotes from "@/views/fieldNotes/FieldNotes.vue";
 import { confirmLeaveWithDirtyCheck } from "@/store/modules/dirty";
 import { SnackbarStyle } from "@/store/modules/snackbar";
+import StationModules from "@/views/station/StationModules.vue";
+import StationProjects from "@/views/station/StationProjects.vue";
 
 export default Vue.extend({
     name: "StationView",
     components: {
+        StationProjects,
         StationBattery,
         StandardLayout,
         DoubleHeader,
@@ -290,15 +259,14 @@ export default Vue.extend({
         NotesForm,
         AuthenticatedPhoto,
         ProjectAttributes,
-        TinyChart,
         UserPhoto,
         FieldNotes,
+        StationModules,
     },
     data(): {
         selectedModule: DisplayModule | null;
         isMobileView: boolean;
         loading: boolean;
-        sensorDataQuerier: SensorDataQuerier;
         editModuleIndex: number | null;
         editingDescription: boolean;
         form: {
@@ -316,7 +284,6 @@ export default Vue.extend({
             form: {
                 description: "",
             },
-            sensorDataQuerier: new SensorDataQuerier(this.$services.api),
         };
     },
     watch: {
@@ -332,6 +299,12 @@ export default Vue.extend({
         ...mapState({
             userStations: (s: GlobalState) => Object.values(s.stations.user.stations),
         }),
+        backRoute(): string {
+            if (this.projectId) {
+                return "viewProject";
+            }
+            return this.isPartnerCustomisationEnabled ? "root" : "mapStation";
+        },
         visibleReadings(): VisibleReadings {
             return VisibleReadings.Current;
         },
@@ -386,9 +359,6 @@ export default Vue.extend({
 
             return false;
         },
-        stationProjects(): Project[] {
-            return this.$store.getters.stationProjects;
-        },
         isPartnerCustomisationEnabled(): boolean {
             return isCustomisationEnabled();
         },
@@ -405,7 +375,6 @@ export default Vue.extend({
         const stationId = this.$route.params.stationId;
 
         this.$store.dispatch(ActionTypes.NEED_NOTES, { id: stationId });
-        this.$store.dispatch(ActionTypes.NEED_PROJECTS_FOR_STATION, { id: this.$route.params.stationId });
 
         return this.$store.dispatch(ActionTypes.NEED_STATION, { id: stationId }).catch((e) => {
             if (AuthenticationRequiredError.isInstance(e)) {
@@ -415,6 +384,7 @@ export default Vue.extend({
                     query: { after: this.$route.path },
                 });
             }
+            return this.$router.push({ name: "notFound" });
         });
     },
     methods: {
@@ -467,8 +437,8 @@ export default Vue.extend({
                     });
                 })
                 .finally(() => {
-                  this.$store.dispatch(ActionTypes.UPDATE_STATION, payload);
-                  this.$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, "stationDescription");
+                    this.$store.dispatch(ActionTypes.UPDATE_STATION, payload);
+                    this.$store.dispatch(ActionTypes.CLEAR_DIRTY_FIELD, "stationDescription");
                     this.editingDescription = false;
                 });
         },
@@ -512,21 +482,6 @@ export default Vue.extend({
                 params: { projectId: this.projectId, stationId: String(this.station.id) },
             });
         },
-
-        onModuleClick(moduleId: number) {
-            const tinyChartComp = this.$refs["tinyChart-" + moduleId];
-            if (tinyChartComp && tinyChartComp[0]) {
-                const vizData = tinyChartComp[0].vizData;
-                if (vizData) {
-                    const bm = BookmarkFactory.forSensor(this.station.id, vizData.vizSensor, vizData.timeRange);
-                    const url = this.$router.resolve({
-                        name: "exploreBookmark",
-                        query: { bookmark: serializeBookmark(bm) },
-                    }).href;
-                    window.open(url, "_blank");
-                }
-            }
-        },
         onStationDescriptionInput() {
             const el = this.$refs["stationDescription"] as HTMLElement;
 
@@ -543,9 +498,10 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "src/scss/mixins";
-@import "src/scss/layout";
-@import "src/scss/forms.scss";
+@use "src/scss/mixins";
+@use "src/scss/layout";
+@use "src/scss/forms.scss";
+@use "src/scss/variables";
 
 * {
     box-sizing: border-box;
@@ -558,7 +514,7 @@ export default Vue.extend({
     padding: 15px 20px;
     font-size: 14px;
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         padding: 10px;
     }
 }
@@ -569,7 +525,7 @@ export default Vue.extend({
 
 .section {
     &-notes {
-        @include bp-down($xs) {
+        @include mixins.bp-down(variables.$xs) {
             padding: 0;
         }
     }
@@ -578,20 +534,20 @@ export default Vue.extend({
         display: flex;
         justify-content: space-between;
 
-        @include bp-down($sm) {
+        @include mixins.bp-down(variables.$sm) {
             flex-wrap: wrap;
             margin-top: 20px;
             margin-bottom: 60px;
         }
 
-        @include bp-down($xs) {
+        @include mixins.bp-down(variables.$xs) {
             margin-top: -10px;
         }
 
         > div {
             flex: 0 0 calc(50% - 10px);
 
-            @include bp-down($sm) {
+            @include mixins.bp-down(variables.$sm) {
                 flex-basis: 100%;
             }
         }
@@ -627,7 +583,7 @@ export default Vue.extend({
             }
 
             .photo-placeholder {
-                @include flex(center, center);
+                @include mixins.flex(center, center);
                 height: 100%;
 
                 img {
@@ -651,7 +607,7 @@ export default Vue.extend({
     }
     &-battery {
         margin-top: 5px;
-        @include flex(flex-start);
+        @include mixins.flex(flex-start);
 
         span {
             margin-left: 5px;
@@ -660,7 +616,7 @@ export default Vue.extend({
     &-modules {
         margin-left: 10px;
         flex-wrap: wrap;
-        @include flex;
+        @include mixins.flex;
 
         img {
             margin-right: 8px;
@@ -672,7 +628,7 @@ export default Vue.extend({
     &-coordinate {
         font-size: 12px;
 
-        @include bp-down($xs) {
+        @include mixins.bp-down(variables.$xs) {
             display: flex;
         }
 
@@ -684,7 +640,7 @@ export default Vue.extend({
             margin-left: 2px;
             min-width: 45px;
 
-            @include bp-down($xs) {
+            @include mixins.bp-down(variables.$xs) {
                 order: -1;
                 margin-right: 10px;
             }
@@ -696,7 +652,7 @@ export default Vue.extend({
     }
     &-row {
         padding: 15px 0;
-        @include flex(center);
+        @include mixins.flex(center);
 
         &:not(:last-of-type) {
             border-bottom: solid 1px var(--color-border);
@@ -706,7 +662,7 @@ export default Vue.extend({
             padding-bottom: 0;
         }
 
-        @include bp-down($sm) {
+        @include mixins.bp-down(variables.$sm) {
             max-width: unset;
 
             &:last-of-type {
@@ -714,7 +670,7 @@ export default Vue.extend({
             }
         }
 
-        @include bp-down($xs) {
+        @include mixins.bp-down(variables.$xs) {
             flex-wrap: wrap;
         }
 
@@ -730,7 +686,7 @@ export default Vue.extend({
         min-height: 130px;
         position: relative;
 
-        @include bp-down($xs) {
+        @include mixins.bp-down(variables.$xs) {
             padding-top: 54px;
             display: block;
         }
@@ -741,17 +697,17 @@ export default Vue.extend({
             transform: translateX(-1px);
             width: 100%;
 
-            @include bp-down($xs) {
+            @include mixins.bp-down(variables.$xs) {
                 padding: 20px 25px;
             }
         }
 
         ul {
-            z-index: $z-index-top;
+            z-index: variables.$z-index-top;
         }
 
         li {
-            @include flex(center);
+            @include mixins.flex(center);
             width: 300px;
             padding: 13px 16px;
             cursor: pointer;
@@ -759,7 +715,7 @@ export default Vue.extend({
             transition: border-left-width linear 0.25s;
             border-bottom: 1px solid var(--color-border);
 
-            @include bp-down($sm) {
+            @include mixins.bp-down(variables.$sm) {
                 padding: 10px 20px;
                 width: 100%;
             }
@@ -770,7 +726,7 @@ export default Vue.extend({
                 padding-left: 12px;
                 cursor: initial;
 
-                @include bp-down($sm) {
+                @include mixins.bp-down(variables.$sm) {
                     padding-left: 16px;
                 }
 
@@ -792,11 +748,11 @@ export default Vue.extend({
                 text-overflow: ellipsis;
                 width: 100%;
                 cursor: pointer;
+                z-index: -1; // allows module list toggle to work, i moved this from below the mixin, to here because of a warning. -jacob
 
-                @include bp-down($sm) {
+                @include mixins.bp-down(variables.$sm) {
                     display: block;
                 }
-                z-index: -1; // allows module list toggle to work
             }
         }
 
@@ -808,7 +764,7 @@ export default Vue.extend({
                 margin-bottom: 0;
             }
 
-            @include bp-down($lg) {
+            @include mixins.bp-down(variables.$lg) {
                 flex: 0 0 calc(50% - 10px);
             }
 
@@ -831,22 +787,22 @@ export default Vue.extend({
                 margin-right: 10px;
             }
 
-            @include bp-down($xs) {
+            @include mixins.bp-down(variables.$xs) {
                 padding: 16px 10px;
                 font-size: 18px;
-                @include position(absolute, 0 null null 0);
+                @include mixins.position(absolute, 0 null null 0);
             }
         }
     }
 
     &-photos {
-        @include flex;
+        @include mixins.flex;
         flex-wrap: wrap;
         justify-content: space-between;
         position: relative;
         height: 390px;
 
-        @include bp-down($sm) {
+        @include mixins.bp-down(variables.$sm) {
             margin-top: 20px;
         }
 
@@ -858,14 +814,26 @@ export default Vue.extend({
             background-color: #fff;
             font-size: 14px;
             font-weight: 900;
-            @include flex(center, center);
-            @include position(absolute, null 20px 20px null);
+            @include mixins.flex(center, center);
+            @include mixins.position(absolute, null 20px 20px null);
 
-            @include bp-down($sm) {
+            @include mixins.bp-down(variables.$sm) {
                 position: unset;
                 width: 100%;
                 margin-top: 5px;
                 height: 35px;
+            }
+        }
+
+        &.single-photo {
+            .photo-container {
+                &:nth-of-type(1) {
+                    flex: 0 0 100%;
+                    height: 100%;
+                }
+                &:nth-of-type(n + 2) {
+                    display: none;
+                }
             }
         }
     }
@@ -880,7 +848,7 @@ export default Vue.extend({
         color: #6a6d71;
         font-size: 10px;
         margin-bottom: 10px;
-        @include flex(center);
+        @include mixins.flex(center);
 
         ::v-deep .default-user-icon {
             width: 18px;
@@ -904,7 +872,7 @@ export default Vue.extend({
         color: #6a6d71;
         font-size: 10px;
         margin-bottom: 10px;
-        @include flex(center);
+        @include mixins.flex(center);
 
         ::v-deep .default-user-icon {
             width: 18px;
@@ -965,7 +933,7 @@ export default Vue.extend({
         color: #6a6d71;
         font-size: 10px;
         margin-bottom: 10px;
-        @include flex(center);
+        @include mixins.flex(center);
 
         ::v-deep .default-user-icon {
             width: 18px;
@@ -978,16 +946,6 @@ export default Vue.extend({
             margin-left: 3px;
         }
     }
-
-    &-projects {
-        font-size: 16px;
-        color: #6a6d71;
-        margin: 30px 0;
-
-        @include bp-down($xs) {
-            margin: 20px 0;
-        }
-    }
 }
 
 .small-light {
@@ -998,7 +956,7 @@ export default Vue.extend({
 .stations-map {
     height: 400px;
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         height: 450px;
     }
 }
@@ -1009,7 +967,7 @@ section {
 
 .loading-container {
     height: 100%;
-    @include flex(center);
+    @include mixins.flex(center);
 }
 .notes-view .lower .loading-container.empty {
     padding: 20px;
@@ -1031,50 +989,23 @@ section {
 
 .double-header {
     .link {
-        color: $color-primary;
+        color: variables.$color-primary;
         font-size: 12px;
         letter-spacing: 0.07px;
         text-decoration: initial;
 
         body.floodnet & {
-            color: $color-dark;
+            color: variables.$color-dark;
         }
     }
 }
 
-.module-data-container {
-    gap: 20px;
-
-    @include bp-down($sm) {
-        gap: 10px;
-    }
+::v-deep .back {
+    margin-bottom: 15px;
 }
 
-.module-data-item {
-    flex: 1 1 calc(50% - 10px);
-    min-width: 0;
-
-    @include bp-down($sm) {
-        flex: 0 0 100%;
-    }
-}
-
-.module-data-title {
-    color: $color-primary;
-    font-size: 12px;
-    margin-bottom: 10px;
-    cursor: pointer;
-
-    img {
-        margin-right: 7px;
-        width: 19px;
-        height: 19px;
-    }
-}
-
-.module-data-btn {
-    margin: 30px auto 8px auto;
-    display: block;
+::v-deep .back {
+    margin-bottom: 15px;
 }
 
 .module-edit-name {
@@ -1084,18 +1015,8 @@ section {
     margin-bottom: -1px;
 }
 
-::v-deep .back {
-    margin-bottom: 15px;
-}
-
-::v-deep .back {
-    margin-bottom: 15px;
-}
-
-.module-edit-name {
-    opacity: 0.4;
-    font-size: 12px;
-    margin-bottom: -1px;
-    cursor: pointer;
+.module-data-btn {
+    margin: 30px auto 8px auto;
+    display: block;
 }
 </style>

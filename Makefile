@@ -1,6 +1,6 @@
 VERSION_MAJOR = 0
-VERSION_MINOR = 3
-VERSION_PATCH = 59
+VERSION_MINOR = 4
+VERSION_PATCH = 3
 VERSION_PREL ?= $(BUILD_NUMBER)
 GIT_LOCAL_BRANCH ?= unknown
 GIT_HASH ?= $(shell git log -1 --format=%h)
@@ -49,7 +49,7 @@ charting-tests: charting-setup
 portal/src/secrets.ts: portal/src/secrets.ts.template
 	cp $^ $@
 
-binaries: $(BUILD)/server $(BUILD)/ingester $(BUILD)/fktool $(BUILD)/fkdata $(BUILD)/sanitizer $(BUILD)/webhook $(BUILD)/scratch $(BUILD)/movedata $(BUILD)/merger
+binaries: $(BUILD)/server $(BUILD)/ingester $(BUILD)/fktool $(BUILD)/fkdata $(BUILD)/sanitizer $(BUILD)/webhook $(BUILD)/scratch $(BUILD)/merger
 
 portal/node_modules:
 	cd portal && $(JSPKG) install
@@ -86,8 +86,6 @@ sanitizer: $(BUILD)/sanitizer
 
 webhook: $(BUILD)/webhook
 
-movedata: $(BUILD)/movedata
-
 merger: $(BUILD)/merger
 
 scratch: $(BUILD)/scratch
@@ -109,9 +107,6 @@ $(BUILD)/sanitizer: server/cmd/sanitizer/*.go $(SERVER_SOURCES)
 
 $(BUILD)/webhook: server/cmd/webhook/*.go $(SERVER_SOURCES)
 	cd server/cmd/webhook && $(GO) build -o $@ *.go
-
-$(BUILD)/movedata: server/cmd/movedata/*.go $(SERVER_SOURCES)
-	cd server/cmd/movedata && $(GO) build -o $@ *.go
 
 $(BUILD)/merger: server/cmd/merger/*.go $(SERVER_SOURCES)
 	cd server/cmd/merger && $(GO) build -o $@ *.go
@@ -172,10 +167,10 @@ migrate-image:
 	cd migrations && make image
 
 migrate-up:
-	cd migrations && MIGRATE_PATH=`pwd`/primary MIGRATE_DATABASE_URL=$(FIELDKIT_POSTGRES_URL) go run main.go migrate
+	cd migrations/cli && MIGRATE_PATH=`pwd`/../primary MIGRATE_DATABASE_URL=$(FIELDKIT_POSTGRES_URL) go run main.go migrate
 
 migrate-up-tsdb:
-	cd migrations && MIGRATE_PATH=`pwd`/tsdb MIGRATE_DATABASE_URL=$(FIELDKIT_TIME_SCALE_URL) go run main.go migrate
+	cd migrations/cli && MIGRATE_PATH=`pwd`/../tsdb MIGRATE_DATABASE_URL=$(FIELDKIT_TIME_SCALE_URL) go run main.go migrate
 
 ci: setup binaries jstests charting-setup
 
@@ -203,4 +198,7 @@ sanitize: sanitizer
 	docker exec fksanitize-pg pg_dump 'postgres://fieldkit:password@127.0.0.1/fieldkit?sslmode=disable' | bzip2 > db-sanitized.sql.bz2
 	docker stop fksanitize-pg
 
+reset-passwords:
+	cd tools/passwords && go run passwords.go -password asdfasdfasdf -set-all
+	
 .PHONY: schema-production sanitize

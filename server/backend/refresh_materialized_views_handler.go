@@ -42,6 +42,8 @@ func (h *RefreshMaterializedViewsHandler) Start(ctx context.Context, m *messages
 	if dirtyWindows, err := rw.QueryForDirty(ctx); err != nil {
 		return err
 	} else {
+		numberRows := 0
+
 		for _, dirty := range dirtyWindows {
 			for _, view := range h.tsConfig.MaterializedViews() {
 				if dirty.DataStart != nil && dirty.DataEnd != nil {
@@ -52,12 +54,19 @@ func (h *RefreshMaterializedViewsHandler) Start(ctx context.Context, m *messages
 					})
 				}
 			}
+
+			numberRows += dirty.NumberRows
 		}
 
 		log.Infow("refresh: deleting")
 
-		if err := rw.DeleteAll(ctx); err != nil {
+		deleted, err := rw.DeleteAll(ctx)
+		if err != nil {
 			return err
+		}
+
+		if numberRows != int(deleted) {
+			return fmt.Errorf("dirty rows conflict, expected to delete %d, got %d", numberRows, deleted)
 		}
 	}
 
@@ -143,14 +152,15 @@ type DirtyRange struct {
 	ModifiedTime *time.Time `json:"modified"`
 	DataStart    *time.Time `json:"data_start"`
 	DataEnd      *time.Time `json:"data_end"`
+	NumberRows   int        `json:"number_rows"`
 }
 
 func (rw *RefreshWindows) queryAllRows(ctx context.Context) ([]*DirtyRange, error) {
-	return rw.queryRows(ctx, "SELECT modified, data_start, data_end FROM fieldkit.sensor_data_dirty ORDER BY data_start")
+	return rw.queryRows(ctx, "SELECT modified, data_start, data_end, 1 AS number_rows FROM fieldkit.sensor_data_dirty ORDER BY data_start")
 }
 
 func (rw *RefreshWindows) queryAggregated(ctx context.Context) ([]*DirtyRange, error) {
-	return rw.queryRows(ctx, "SELECT MAX(modified), MIN(data_start), MAX(data_end) FROM fieldkit.sensor_data_dirty")
+	return rw.queryRows(ctx, "SELECT MAX(modified), MIN(data_start), MAX(data_end), COUNT(*) AS number_rows FROM fieldkit.sensor_data_dirty")
 }
 
 func (rw *RefreshWindows) QueryForDirty(ctx context.Context) ([]*DirtyRange, error) {
@@ -192,7 +202,7 @@ func (rw *RefreshWindows) queryRows(ctx context.Context, query string) ([]*Dirty
 	for pgRows.Next() {
 		row := &DirtyRange{}
 
-		if err := pgRows.Scan(&row.ModifiedTime, &row.DataStart, &row.DataEnd); err != nil {
+		if err := pgRows.Scan(&row.ModifiedTime, &row.DataStart, &row.DataEnd, &row.NumberRows); err != nil {
 			return nil, err
 		}
 
@@ -206,15 +216,16 @@ func (rw *RefreshWindows) queryRows(ctx context.Context, query string) ([]*Dirty
 	return rows, nil
 }
 
-func (rw *RefreshWindows) DeleteAll(ctx context.Context) error {
+func (rw *RefreshWindows) DeleteAll(ctx context.Context) (int64, error) {
 	tx, err := txs.RequireQueryable(ctx, rw.pool)
 	if err != nil {
-		return err
+		return 0, err
 	}
 
-	if _, err := tx.Exec(ctx, "DELETE FROM fieldkit.sensor_data_dirty"); err != nil {
-		return err
+	c, err := tx.Exec(ctx, "DELETE FROM fieldkit.sensor_data_dirty")
+	if err != nil {
+		return 0, err
 	}
 
-	return nil
+	return c.RowsAffected(), nil
 }

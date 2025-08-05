@@ -24,7 +24,7 @@ func BuildAddUpdatePayload(projectAddUpdateBody string, projectAddUpdateProjectI
 	{
 		err = json.Unmarshal([]byte(projectAddUpdateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Pariatur omnis tempora aliquid.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Magni consequuntur.\"\n   }'")
 		}
 	}
 	var projectID int32
@@ -89,7 +89,7 @@ func BuildModifyUpdatePayload(projectModifyUpdateBody string, projectModifyUpdat
 	{
 		err = json.Unmarshal([]byte(projectModifyUpdateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Qui earum veritatis.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"body\": \"Quibusdam corrupti minus accusamus aspernatur.\"\n   }'")
 		}
 	}
 	var projectID int32
@@ -267,7 +267,7 @@ func BuildAddPayload(projectAddBody string, projectAddAuth string) (*project.Add
 	{
 		err = json.Unmarshal([]byte(projectAddBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"etag\": \"Dicta eum eveniet.\",\n      \"logicalAddress\": 7095361522028688695,\n      \"meta\": \"Error sed.\",\n      \"module\": \"Est nostrum.\",\n      \"profile\": \"Ab numquam.\",\n      \"url\": \"Consequatur quia reprehenderit quod itaque totam.\",\n      \"version\": \"Fugiat natus eum.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"etag\": \"Laborum quis.\",\n      \"logicalAddress\": 2808342714132470919,\n      \"meta\": \"Libero voluptatem odio provident in.\",\n      \"module\": \"Asperiores inventore sunt omnis et consectetur dolore.\",\n      \"profile\": \"Magnam a facilis corporis.\",\n      \"url\": \"Labore et delectus id.\",\n      \"version\": \"Voluptas eveniet eius.\"\n   }'")
 		}
 		if body.Bounds != nil {
 			if err2 := ValidateProjectBoundsRequestBodyRequestBody(body.Bounds); err2 != nil {
@@ -312,7 +312,7 @@ func BuildUpdatePayload(projectUpdateBody string, projectUpdateProjectID string,
 	{
 		err = json.Unmarshal([]byte(projectUpdateBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"bounds\": {\n         \"max\": [\n            0.7756333709879861,\n            0.12851610098529084,\n            0.21710422047453748,\n            0.6135650519129959\n         ],\n         \"min\": [\n            0.09919410034289564,\n            0.6949960414904242,\n            0.544298778333374\n         ]\n      },\n      \"description\": \"Tenetur omnis nam.\",\n      \"endTime\": \"Consequatur tenetur ipsa odio alias quis.\",\n      \"goal\": \"Aliquam corrupti ut recusandae placeat nemo voluptatem.\",\n      \"location\": \"Ut quis quam.\",\n      \"name\": \"Consequatur ad sint qui ex tempore rem.\",\n      \"privacy\": 1205957887,\n      \"showStations\": false,\n      \"startTime\": \"Sit at consectetur iste voluptatum quisquam.\",\n      \"tags\": \"Necessitatibus rerum vel temporibus laboriosam vel.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"bounds\": {\n         \"max\": [\n            0.6351450284953896,\n            0.5945636430832958\n         ],\n         \"min\": [\n            0.06263288143999288,\n            0.30674447383982123,\n            0.45149329417928624\n         ]\n      },\n      \"description\": \"Exercitationem cum.\",\n      \"endTime\": \"Nostrum tenetur est vel consequatur et.\",\n      \"goal\": \"Ut aperiam corporis ut dolores voluptas quo.\",\n      \"location\": \"Et quod provident.\",\n      \"name\": \"Omnis magnam.\",\n      \"privacy\": 967012786,\n      \"showStations\": true,\n      \"startTime\": \"Iusto aut architecto deserunt.\",\n      \"tags\": \"Eius vero omnis nesciunt delectus unde sunt.\"\n   }'")
 		}
 		if body.Bounds != nil {
 			if err2 := ValidateProjectBoundsRequestBodyRequestBody(body.Bounds); err2 != nil {
@@ -421,7 +421,7 @@ func BuildInvitePayload(projectInviteBody string, projectInviteProjectID string,
 	{
 		err = json.Unmarshal([]byte(projectInviteBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"Sunt officia quo beatae.\",\n      \"role\": 1445769308\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"Tempora culpa id rerum nam.\",\n      \"role\": 540011695\n   }'")
 		}
 	}
 	var projectID int32
@@ -458,7 +458,7 @@ func BuildEditUserPayload(projectEditUserBody string, projectEditUserProjectID s
 	{
 		err = json.Unmarshal([]byte(projectEditUserBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"Dolorem voluptatem.\",\n      \"role\": 452061140\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"Reprehenderit aut sunt.\",\n      \"role\": 1245851732\n   }'")
 		}
 	}
 	var projectID int32
@@ -495,7 +495,7 @@ func BuildRemoveUserPayload(projectRemoveUserBody string, projectRemoveUserProje
 	{
 		err = json.Unmarshal([]byte(projectRemoveUserBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"Ullam praesentium minima molestias sequi.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"email\": \"Excepturi corrupti sit dolores sint.\"\n   }'")
 		}
 	}
 	var projectID int32
@@ -711,9 +711,11 @@ func BuildProjectsStationPayload(projectProjectsStationID string, projectProject
 			return nil, fmt.Errorf("invalid value for id, must be INT32")
 		}
 	}
-	var auth string
+	var auth *string
 	{
-		auth = projectProjectsStationAuth
+		if projectProjectsStationAuth != "" {
+			auth = &projectProjectsStationAuth
+		}
 	}
 	v := &project.ProjectsStationPayload{}
 	v.ID = id

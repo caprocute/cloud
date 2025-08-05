@@ -4,6 +4,8 @@
 
         <SharePanel v-if="shareVisible" containerClass="share-floating" :token="token" :bookmark="bookmark" @close="closePanel" />
 
+        <ExportChartContent></ExportChartContent>
+
         <div class="explore-view">
             <div class="explore-header">
                 <div class="explore-links">
@@ -58,7 +60,6 @@
 
             <div v-bind:class="{ 'workspace-container': true, busy: busy }">
                 <div class="busy-panel" v-if="busy">
-                    &nbsp;
                     <Spinner></Spinner>
                 </div>
 
@@ -118,23 +119,32 @@ import ExportPanel from "./ExportPanel.vue";
 import SharePanel from "./SharePanel.vue";
 import StationSummaryContent from "../shared/StationSummaryContent.vue";
 import PaginationControls from "@/views/shared/PaginationControls.vue";
-import { getPartnerCustomization, getPartnerCustomizationWithDefault, interpolatePartner, PartnerCustomization } from "../shared/partners";
-import { mapState, mapGetters } from "vuex";
-import { DisplayStation } from "@/store";
+import {
+    getPartnerCustomization,
+    getPartnerCustomizationWithDefault,
+    interpolatePartner,
+    isCustomisationEnabled,
+    PartnerCustomization,
+} from "../shared/partners";
+import { mapGetters, mapState } from "vuex";
+import { ActionTypes, DisplayStation } from "@/store";
 import { GlobalState } from "@/store/modules/global";
 import { SensorsResponse } from "./api";
-import { Workspace, Bookmark, Time, VizSensor, ChartType, FastTime, VizSettings } from "./viz";
+import { Bookmark, ChartType, FastTime, Time, VizSensor, VizSettings, Workspace } from "./viz";
 import { VizWorkspace } from "./VizWorkspace";
-import { isMobile, getBatteryIcon } from "@/utilities";
+import { getBatteryIcon, isMobile } from "@/utilities";
 import Comments from "../comments/Comments.vue";
 import StationBattery from "@/views/station/StationBattery.vue";
 import InfoTooltip from "@/views/shared/InfoTooltip.vue";
 import Spinner from "@/views/shared/Spinner.vue";
 import { confirmLeaveWithDirtyCheck } from "@/store/modules/dirty";
+import ExportChartContent from "@/views/viz/vega/ExportChartContent.vue";
+import project from "vega-lite/build/src/compile/selection/project";
 
 export default Vue.extend({
     name: "ExploreWorkspace",
     components: {
+        ExportChartContent,
         ...CommonComponents,
         StandardLayout,
         VizWorkspace,
@@ -179,6 +189,9 @@ export default Vue.extend({
         };
     },
     computed: {
+        project() {
+            return project;
+        },
         ...mapGetters({ isAuthenticated: "isAuthenticated" }),
         ...mapState({
             user: (s: GlobalState) => s.user.user,
@@ -220,7 +233,7 @@ export default Vue.extend({
         },
     },
     watch: {
-        async bookmark(newValue: Bookmark, oldValue: Bookmark): Promise<void> {
+        async bookmark(newValue: Bookmark, _oldValue: Bookmark): Promise<void> {
             console.log(`viz: bookmark-route(ew):`, newValue);
             if (this.workspace) {
                 await this.workspace.updateFromBookmark(newValue);
@@ -228,7 +241,7 @@ export default Vue.extend({
                 await this.createWorkspaceIfNecessary();
             }
         },
-        async selectedId(newValue: number, oldValue: number): Promise<void> {
+        async selectedId(newValue: number, _oldValue: number): Promise<void> {
             console.log("viz: selected-changed-associated", newValue);
         },
     },
@@ -252,8 +265,14 @@ export default Vue.extend({
                     }
                 });
         }
+        await this.$store.dispatch(ActionTypes.SET_REFRESH_WORKSPACE_FN, this.refreshWorkspace);
     },
     methods: {
+        isCustomisationEnabled,
+        refreshWorkspace() {
+            this.workspace = null;
+            this.createWorkspaceIfNecessary();
+        },
         async onBack() {
             if (this.bookmark.c) {
                 if (this.bookmark.c.map) {
@@ -328,7 +347,16 @@ export default Vue.extend({
                         const vizSensor: VizSensor = [stationId, [sensorModuleId, sensorId]];
 
                         const associated = await this.$services.api.getAssociatedStations(stationId);
-                        const stationIds = associated.stations.map((associatedStation) => associatedStation.station.id);
+                        // First station ID should be the station we're opening.
+                        const stationIds = _.sortBy(
+                            associated.stations.map((associatedStation) => associatedStation.station.id),
+                            (id) => {
+                                if (id == stationId) {
+                                    return 0;
+                                }
+                                return id;
+                            }
+                        );
                         console.log(`viz: show-station-associated`, { associated, stationIds });
 
                         const getInitialBookmark = () => {
@@ -436,7 +464,10 @@ export default Vue.extend({
 </script>
 
 <style lang="scss">
-@import "../../scss/layout";
+@use "src/scss/layout";
+@use "src/scss/mixins";
+@use "src/scss/variables";
+
 .vue-treeselect__control {
     @include bp-down($sm) {
         height: 29px;
@@ -505,15 +536,15 @@ export default Vue.extend({
     padding: 40px;
     flex-grow: 1;
 
-    @include bp-down($lg) {
+    @include mixins.bp-down(variables.$lg) {
         padding: 30px 45px 60px;
     }
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         padding: 30px 20px 30px;
     }
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         padding: 20px 10px 10px;
     }
 }
@@ -532,17 +563,17 @@ export default Vue.extend({
 }
 
 .explore-links {
-    @include position(absolute, 0 0 null null);
+    @include mixins.position(absolute, 0 0 null null);
 
     .link {
-        color: $color-primary;
+        color: variables.$color-primary;
         font-size: 12px;
         letter-spacing: 0.07px;
         text-decoration: initial;
         display: block;
 
         body.floodnet & {
-            color: $color-dark;
+            color: variables.$color-dark;
         }
     }
 }
@@ -555,7 +586,7 @@ export default Vue.extend({
     border: solid 1px #f4f5f7;
     min-height: 70vh;
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         border: 0;
         box-shadow: unset;
     }
@@ -630,9 +661,21 @@ export default Vue.extend({
         margin-left: 0.25em;
         margin-right: 0.5em;
     }
+
+    details {
+        @include mixins.bp-down(variables.$sm) {
+            bottom: -360px;
+            position: absolute;
+            left: 50%;
+        }
+    }
 }
-.graph .vega-embed {
+.graph .vega-embed:not(.vega-embed--dummy) {
     height: 340px;
+}
+.graph .vega-embed--dummy {
+    overflow: visible;
+    z-index: variables.$z-index-top;
 }
 .scrubber .vega-embed {
     height: 40px;
@@ -684,7 +727,7 @@ export default Vue.extend({
     margin-right: 40px;
     margin-bottom: 10px;
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         margin: 0 0 28px;
     }
 }
@@ -700,7 +743,7 @@ export default Vue.extend({
     align-items: center;
     min-height: 60px;
 
-    @include bp-down($md) {
+    @include mixins.bp-down(variables.$md) {
         min-height: unset;
         padding: 0;
         border: 0;
@@ -722,7 +765,7 @@ export default Vue.extend({
     align-items: center;
     display: flex;
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         align-items: flex-start;
     }
 
@@ -735,7 +778,7 @@ export default Vue.extend({
         display: flex;
         align-items: center;
 
-        @include bp-down($sm) {
+        @include mixins.bp-down(variables.$sm) {
             display: none;
         }
 
@@ -751,7 +794,7 @@ export default Vue.extend({
     width: 100%;
     flex: 0 0 500px;
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         flex: 1 1 auto;
         flex-wrap: wrap;
     }
@@ -761,7 +804,7 @@ export default Vue.extend({
     flex: 0 1 auto;
 
     &:first-of-type {
-        @include bp-down($sm) {
+        @include mixins.bp-down(variables.$sm) {
             margin-bottom: 12px;
         }
     }
@@ -773,7 +816,7 @@ export default Vue.extend({
     line-height: 35px;
     font-size: 40px;
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         line-height: 27px;
         margin-right: 7px;
     }
@@ -816,7 +859,7 @@ export default Vue.extend({
     align-items: flex-start;
     flex: 0 0 140px;
 
-    @include bp-down($md) {
+    @include mixins.bp-down(variables.$md) {
         display: none;
     }
 }
@@ -844,7 +887,7 @@ export default Vue.extend({
     display: flex;
     align-items: center;
 
-    @include bp-down($md) {
+    @include mixins.bp-down(variables.$md) {
         flex: 100%;
         justify-content: space-between;
         margin-bottom: 15px;
@@ -855,7 +898,7 @@ export default Vue.extend({
     margin-left: 20px;
     gap: 8px;
 
-    @include bp-down($md) {
+    @include mixins.bp-down(variables.$md) {
         width: 100%;
         margin: 0;
 
@@ -957,7 +1000,7 @@ export default Vue.extend({
     overflow-y: scroll;
     width: 30em;
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         width: 100%;
         top: 0;
         left: 0;
@@ -973,7 +1016,7 @@ export default Vue.extend({
     display: flex;
     align-items: center;
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         display: none;
     }
 
@@ -1009,7 +1052,7 @@ export default Vue.extend({
     display: flex;
     flex-direction: row;
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         color: #979797;
         font-size: 14px;
         letter-spacing: 0.06px;
@@ -1022,18 +1065,18 @@ export default Vue.extend({
     &:nth-child(n + 1) {
         margin-left: 20px;
 
-        @include bp-down($sm) {
+        @include mixins.bp-down(variables.$sm) {
             margin-left: 5px;
         }
     }
 
-    @include bp-down($lg) {
+    @include mixins.bp-down(variables.$lg) {
         padding: 0 14px;
         height: 40px;
         font-size: 16px;
     }
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         height: 30px;
         width: 30px;
         padding: 0;
@@ -1049,7 +1092,7 @@ export default Vue.extend({
     }
 
     &-text {
-        @include bp-down($sm) {
+        @include mixins.bp-down(variables.$sm) {
             display: none;
         }
     }
@@ -1061,7 +1104,7 @@ export default Vue.extend({
     display: flex;
     justify-content: space-between;
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         flex-direction: column;
         background: transparent;
         padding: 0 0 10px;
@@ -1101,7 +1144,7 @@ export default Vue.extend({
     margin-right: 13px;
     justify-content: center;
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         margin-left: auto;
         margin-right: 0;
     }
@@ -1109,10 +1152,11 @@ export default Vue.extend({
 </style>
 
 <style scoped lang="scss">
-@import "src/scss/mixins";
+@use "src/scss/mixins";
+@use "src/scss/variables";
 
 ::v-deep .double-header {
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         .actions {
             position: absolute;
             right: 0;
@@ -1131,7 +1175,7 @@ export default Vue.extend({
 }
 
 ::v-deep .scrubber {
-    @include bp-down($md) {
+    @include mixins.bp-down(variables.$md) {
         padding-bottom: 120px;
     }
 }
@@ -1144,7 +1188,7 @@ export default Vue.extend({
     position: relative;
 
     .info {
-        z-index: $z-index-top;
+        z-index: variables.$z-index-top;
         position: absolute;
         top: 17px;
         left: 20px;
@@ -1165,10 +1209,15 @@ export default Vue.extend({
     left: 50%;
     transform: translate(-50%, -50%);
     font-size: 24px;
-    z-index: $z-index-top;
+    z-index: variables.$z-index-top;
     background: #ffff;
     padding: 10px;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.07);
     white-space: nowrap;
+}
+
+::v-deep .chart-type.disabled {
+    opacity: 0.5;
+    pointer-events: none;
 }
 </style>

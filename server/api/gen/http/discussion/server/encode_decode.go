@@ -604,11 +604,12 @@ func EncodeDeleteMessageError(encoder func(context.Context, http.ResponseWriter)
 // *discussionviews.ThreadedPostView.
 func marshalDiscussionviewsThreadedPostViewToThreadedPostResponseBody(v *discussionviews.ThreadedPostView) *ThreadedPostResponseBody {
 	res := &ThreadedPostResponseBody{
-		ID:        *v.ID,
-		CreatedAt: *v.CreatedAt,
-		UpdatedAt: *v.UpdatedAt,
-		Body:      *v.Body,
-		Bookmark:  v.Bookmark,
+		ID:              *v.ID,
+		CreatedAt:       *v.CreatedAt,
+		UpdatedAt:       *v.UpdatedAt,
+		Body:            *v.Body,
+		Bookmark:        v.Bookmark,
+		UserHasReported: v.UserHasReported,
 	}
 	if v.Author != nil {
 		res.Author = marshalDiscussionviewsPostAuthorViewToPostAuthorResponseBody(v.Author)
@@ -669,11 +670,12 @@ func unmarshalNewPostRequestBodyToDiscussionNewPost(v *NewPostRequestBody) *disc
 // type *ThreadedPostResponseBody from a value of type *discussion.ThreadedPost.
 func marshalDiscussionThreadedPostToThreadedPostResponseBody(v *discussion.ThreadedPost) *ThreadedPostResponseBody {
 	res := &ThreadedPostResponseBody{
-		ID:        v.ID,
-		CreatedAt: v.CreatedAt,
-		UpdatedAt: v.UpdatedAt,
-		Body:      v.Body,
-		Bookmark:  v.Bookmark,
+		ID:              v.ID,
+		CreatedAt:       v.CreatedAt,
+		UpdatedAt:       v.UpdatedAt,
+		Body:            v.Body,
+		Bookmark:        v.Bookmark,
+		UserHasReported: v.UserHasReported,
 	}
 	if v.Author != nil {
 		res.Author = marshalDiscussionPostAuthorToPostAuthorResponseBody(v.Author)

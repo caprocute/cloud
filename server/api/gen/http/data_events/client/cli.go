@@ -44,7 +44,7 @@ func BuildAddDataEventPayload(dataEventsAddDataEventBody string, dataEventsAddDa
 	{
 		err = json.Unmarshal([]byte(dataEventsAddDataEventBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"event\": {\n         \"allProjectSensors\": false,\n         \"bookmark\": \"Aut consequatur recusandae mollitia.\",\n         \"description\": \"In quod laborum suscipit ut.\",\n         \"end\": 2022087987623247276,\n         \"start\": 8146506755535124313,\n         \"title\": \"Molestias nobis tempore aut numquam.\"\n      }\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"event\": {\n         \"allProjectSensors\": true,\n         \"bookmark\": \"Consequatur aliquam dignissimos quia.\",\n         \"description\": \"Facere facere repellat.\",\n         \"end\": 7577586275964425592,\n         \"start\": 7816285458348604520,\n         \"title\": \"Libero quia omnis fugiat.\"\n      }\n   }'")
 		}
 		if body.Event == nil {
 			err = goa.MergeErrors(err, goa.MissingFieldError("event", "body"))
@@ -74,7 +74,7 @@ func BuildUpdateDataEventPayload(dataEventsUpdateDataEventBody string, dataEvent
 	{
 		err = json.Unmarshal([]byte(dataEventsUpdateDataEventBody), &body)
 		if err != nil {
-			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"description\": \"Rerum voluptatem.\",\n      \"end\": 2898834277194477025,\n      \"start\": 4808730696518469450,\n      \"title\": \"Et voluptas totam enim qui.\"\n   }'")
+			return nil, fmt.Errorf("invalid JSON for body, \nerror: %s, \nexample of valid JSON:\n%s", err, "'{\n      \"description\": \"Sed libero delectus quibusdam consequuntur nulla.\",\n      \"end\": 1093943889297791375,\n      \"start\": 8445226239246284734,\n      \"title\": \"Sed doloremque quaerat.\"\n   }'")
 		}
 	}
 	var eventID int64

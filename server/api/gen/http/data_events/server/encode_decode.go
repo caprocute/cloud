@@ -489,14 +489,15 @@ func EncodeDeleteDataEventError(encoder func(context.Context, http.ResponseWrite
 // *dataeventsviews.DataEventView.
 func marshalDataeventsviewsDataEventViewToDataEventResponseBody(v *dataeventsviews.DataEventView) *DataEventResponseBody {
 	res := &DataEventResponseBody{
-		ID:          *v.ID,
-		CreatedAt:   *v.CreatedAt,
-		UpdatedAt:   *v.UpdatedAt,
-		Title:       *v.Title,
-		Description: *v.Description,
-		Bookmark:    v.Bookmark,
-		Start:       *v.Start,
-		End:         *v.End,
+		ID:              *v.ID,
+		CreatedAt:       *v.CreatedAt,
+		UpdatedAt:       *v.UpdatedAt,
+		Title:           *v.Title,
+		Description:     *v.Description,
+		Bookmark:        v.Bookmark,
+		Start:           *v.Start,
+		End:             *v.End,
+		UserHasReported: v.UserHasReported,
 	}
 	if v.Author != nil {
 		res.Author = marshalDataeventsviewsPostAuthorViewToPostAuthorResponseBody(v.Author)
@@ -553,14 +554,15 @@ func unmarshalNewDataEventRequestBodyToDataeventsNewDataEvent(v *NewDataEventReq
 // *DataEventResponseBody from a value of type *dataevents.DataEvent.
 func marshalDataeventsDataEventToDataEventResponseBody(v *dataevents.DataEvent) *DataEventResponseBody {
 	res := &DataEventResponseBody{
-		ID:          v.ID,
-		CreatedAt:   v.CreatedAt,
-		UpdatedAt:   v.UpdatedAt,
-		Title:       v.Title,
-		Description: v.Description,
-		Bookmark:    v.Bookmark,
-		Start:       v.Start,
-		End:         v.End,
+		ID:              v.ID,
+		CreatedAt:       v.CreatedAt,
+		UpdatedAt:       v.UpdatedAt,
+		Title:           v.Title,
+		Description:     v.Description,
+		Bookmark:        v.Bookmark,
+		Start:           v.Start,
+		End:             v.End,
+		UserHasReported: v.UserHasReported,
 	}
 	if v.Author != nil {
 		res.Author = marshalDataeventsPostAuthorToPostAuthorResponseBody(v.Author)

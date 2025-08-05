@@ -16,7 +16,7 @@
 		"allowJs": true,
 		"sourceMap": true,
 		"baseUrl": ".",
-		"types": ["webpack-env", "jest"],
+		"types": ["webpack-env", "jest", "cypress"],
 		"paths": {
 			"@/*": ["src/*"]
 		},

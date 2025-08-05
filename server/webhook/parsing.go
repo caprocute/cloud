@@ -184,7 +184,7 @@ func (m *WebHookMessage) evaluateCondition(ctx context.Context, cache *JqCache, 
 	} else if value == nil {
 		return false, nil
 	} else {
-		log.Infow("parsing:condition", "expression", expression, "value", value)
+		log.Infow("parsing:condition", "expression", expression, "expression_value", value)
 
 		switch v := value.(type) {
 		case string: // TODO Consider a warning to encourage returning bool.

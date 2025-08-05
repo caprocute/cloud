@@ -2,7 +2,14 @@
     <label class="has-float-label">
         <ResizeAuto>
             <template v-slot:default="{}">
-                <textarea rows="1" :value="value" :type="type" :placeholder="placeholder || label" @input="(ev) => onInput(ev)" />
+                <textarea
+                    rows="1"
+                    :value="value"
+                    :type="type"
+                    :placeholder="placeholder || label"
+                    :data-cy="dataCy"
+                    @input="(ev) => onInput(ev)"
+                />
             </template>
         </ResizeAuto>
         <span v-if="label">{{ label }}</span>
@@ -35,6 +42,10 @@ export default Vue.extend({
         label: {
             type: String,
             required: false,
+        },
+        dataCy: {
+            type: String,
+            default: "",
         },
     },
     methods: {

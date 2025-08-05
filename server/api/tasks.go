@@ -8,7 +8,6 @@ import (
 
 	tasks "gitlab.com/fieldkit/cloud/server/api/gen/tasks"
 	"gitlab.com/fieldkit/cloud/server/common"
-	"gitlab.com/fieldkit/cloud/server/messages"
 )
 
 type TasksService struct {
@@ -28,10 +27,6 @@ func (c *TasksService) Five(ctx context.Context) error {
 	log.Infow("updating community rankings")
 
 	if _, err := c.options.Database.ExecContext(ctx, `SELECT fk_update_community_ranking()`); err != nil {
-		return err
-	}
-
-	if err := c.options.Publisher.Publish(ctx, &messages.RefreshAllMaterializedViews{}); err != nil {
 		return err
 	}
 

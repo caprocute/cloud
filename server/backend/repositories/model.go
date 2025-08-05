@@ -36,6 +36,7 @@ type VizConfig struct {
 	Disabled   bool           `json:"disabled"`
 	MinimumGap int32          `json:"minimumGap"`
 	Thresholds *VizThresholds `json:"thresholds"`
+	BarChart   *bool          `json:"barChart"`
 }
 
 // TODO Fix JSON keys

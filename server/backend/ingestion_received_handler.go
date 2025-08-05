@@ -108,6 +108,10 @@ func (h *IngestionReceivedHandler) completed(ctx context.Context, saga *Ingestio
 		}
 	} else {
 		log.Infow("ingestion-saga: solo")
+
+		if err := mc.Event(ctx, &messages.RefreshAllMaterializedViews{}); err != nil {
+			return err
+		}
 	}
 
 	return nil

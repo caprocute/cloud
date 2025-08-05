@@ -26,15 +26,16 @@ type DataEventsView struct {
 
 // DataEventView is a type that runs validations on a projected type.
 type DataEventView struct {
-	ID          *int64
-	CreatedAt   *int64
-	UpdatedAt   *int64
-	Author      *PostAuthorView
-	Title       *string
-	Description *string
-	Bookmark    *string
-	Start       *int64
-	End         *int64
+	ID              *int64
+	CreatedAt       *int64
+	UpdatedAt       *int64
+	Author          *PostAuthorView
+	Title           *string
+	Description     *string
+	Bookmark        *string
+	Start           *int64
+	End             *int64
+	UserHasReported *bool
 }
 
 // PostAuthorView is a type that runs validations on a projected type.
@@ -70,6 +71,7 @@ var (
 			"bookmark",
 			"start",
 			"end",
+			"userHasReported",
 		},
 	}
 )

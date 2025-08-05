@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"time"
 
-	"gitlab.com/fieldkit/cloud/server/common/sqlxcache"
 	"github.com/jmoiron/sqlx/types"
+	"gitlab.com/fieldkit/cloud/server/common/sqlxcache"
 
 	"goa.design/goa/v3/security"
 
@@ -62,7 +62,22 @@ func (c *DiscussionService) Project(ctx context.Context, payload *discService.Pr
 		return nil, err
 	}
 
-	threaded, err := ThreadedPage(page)
+	// Check user reports for all posts if user is authenticated
+	var userReports map[int32]bool
+	if !p.Anonymous() {
+		mr := repositories.NewModerationRepository(c.db)
+		postIDs := make([]int32, len(page.Posts))
+		for i, post := range page.Posts {
+			postIDs[i] = int32(post.ID)
+		}
+		userReports, err = mr.CheckUserReportsForPosts(ctx, p.UserID(), postIDs, data.ModerationDiscussionPost)
+		if err != nil {
+			log.Warnw("failed to check user reports", "error", err)
+			userReports = make(map[int32]bool) // fallback to empty map
+		}
+	}
+
+	threaded, err := ThreadedPageWithReports(page, userReports)
 	if err != nil {
 		return nil, err
 	}
@@ -99,7 +114,23 @@ func (c *DiscussionService) Data(ctx context.Context, payload *discService.DataP
 		return nil, err
 	}
 
-	threaded, err := ThreadedPage(page)
+	// Check user reports for all posts if user is authenticated
+	var userReports map[int32]bool
+	if !p.Anonymous() {
+		mr := repositories.NewModerationRepository(c.db)
+		postIDs := make([]int32, len(page.Posts))
+		for i, post := range page.Posts {
+			postIDs[i] = int32(post.ID)
+		}
+		userReports, err = mr.CheckUserReportsForPosts(ctx, p.UserID(), postIDs, data.ModerationDiscussionPost)
+		if err != nil {
+			log := Logger(ctx).Sugar()
+			log.Warnw("failed to check user reports", "error", err)
+			userReports = make(map[int32]bool) // fallback to empty map
+		}
+	}
+
+	threaded, err := ThreadedPageWithReports(page, userReports)
 	if err != nil {
 		return nil, err
 	}
@@ -331,6 +362,7 @@ func ThreadedPost(dp *data.DiscussionPost, users map[int32]*data.User) (*discSer
 		}
 	}
 
+	defaultReported := false
 	return &discService.ThreadedPost{
 		ID:        dp.ID,
 		CreatedAt: dp.CreatedAt.Unix() * 1000,
@@ -340,10 +372,25 @@ func ThreadedPost(dp *data.DiscussionPost, users map[int32]*data.User) (*discSer
 			Name:  user.Name,
 			Photo: photo,
 		},
-		Replies:  []*discService.ThreadedPost{},
-		Bookmark: dp.StringBookmark(),
-		Body:     dp.Body,
+		Replies:         []*discService.ThreadedPost{},
+		Bookmark:        dp.StringBookmark(),
+		Body:            dp.Body,
+		UserHasReported: &defaultReported,
 	}, nil
+}
+
+func ThreadedPostWithReports(dp *data.DiscussionPost, users map[int32]*data.User, userReports map[int32]bool) (*discService.ThreadedPost, error) {
+	tp, err := ThreadedPost(dp, users)
+	if err != nil {
+		return nil, err
+	}
+	
+	if userReports != nil {
+		hasReported := userReports[int32(dp.ID)]
+		tp.UserHasReported = &hasReported
+	}
+	
+	return tp, nil
 }
 
 func ThreadedPage(page *data.PageOfDiscussion) ([]*discService.ThreadedPost, error) {
@@ -374,4 +421,27 @@ func reverse(posts []*discService.ThreadedPost) []*discService.ThreadedPost {
 		posts[i], posts[j] = posts[j], posts[i]
 	}
 	return posts
+}
+
+func ThreadedPageWithReports(page *data.PageOfDiscussion, userReports map[int32]bool) ([]*discService.ThreadedPost, error) {
+	byID := make(map[int64]*discService.ThreadedPost)
+	for _, post := range page.Posts {
+		tp, err := ThreadedPostWithReports(post, page.UsersByID, userReports)
+		if err != nil {
+			return nil, err
+		}
+
+		byID[tp.ID] = tp
+	}
+	threaded := make([]*discService.ThreadedPost, 0)
+	for _, post := range page.Posts {
+		tp := byID[post.ID]
+		if post.ThreadID != nil {
+			parent := byID[*post.ThreadID]
+			parent.Replies = append(parent.Replies, tp)
+		} else {
+			threaded = append(threaded, tp)
+		}
+	}
+	return reverse(threaded), nil
 }

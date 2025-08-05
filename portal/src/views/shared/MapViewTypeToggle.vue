@@ -23,7 +23,7 @@
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
-import {MapViewType} from '@/api';
+import { MapViewType } from "@/api";
 
 export default Vue.extend({
     name: "MapViewTypeToggle",
@@ -52,7 +52,9 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
-@import "src/scss/mixins";
+@use "src/scss/mixins";
+@use "src/scss/variables";
+
 .view-type {
     width: 115px;
     height: 38px;
@@ -61,9 +63,9 @@ export default Vue.extend({
     background-color: #ffffff;
     cursor: pointer;
     margin-left: 30px;
-    @include flex(center, center);
+    @include mixins.flex(center, center);
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         width: 98px;
         margin-left: 5px;
     }
@@ -73,18 +75,22 @@ export default Vue.extend({
     }
 
     &-container {
-        z-index: $z-index-top;
+        z-index: variables.$z-index-top;
         margin: 0;
         box-sizing: border-box;
-        @include flex(center, center);
-        @include position(absolute, 90px 25px null null);
+        @include mixins.flex(center, center);
+        @include mixins.position(absolute, 90px 62px null null);
 
-        @include bp-down($sm) {
-            @include position(absolute, 115px 10px null null);
+        body.floodnet & {
+            @include mixins.position(absolute, 90px 25px null null);
+        }
+
+        @include mixins.bp-down(variables.$sm) {
+            @include mixins.position(absolute, 115px 10px null null);
         }
 
         &.list-toggled {
-            @include bp-down($sm) {
+            @include mixins.bp-down(variables.$sm) {
                 left: 0;
                 width: 100%;
                 justify-content: flex-end;
@@ -96,19 +102,18 @@ export default Vue.extend({
     > a {
         flex-basis: 50%;
         height: 100%;
-        font-family: $font-family-light;
-        @include flex(center, center);
+        @include mixins.flex(center, center);
 
         &:nth-of-type(1) {
-            border-right: solid 1px $color-border;
+            border-right: solid 1px variables.$color-border;
         }
 
-        @include bp-down($sm) {
+        @include mixins.bp-down(variables.$sm) {
             font-size: 14px;
         }
 
         &.active {
-            font-family: $font-family-bold;
+            font-weight: 900;
         }
     }
 
@@ -119,16 +124,16 @@ export default Vue.extend({
 
 .toggle-btn {
     cursor: pointer;
-    z-index: $z-index-top;
+    z-index: variables.$z-index-top;
     position: relative;
     font-size: 14px;
     -webkit-tap-highlight-color: transparent;
-    font-family: $font-family-medium !important;
+    font-family: variables.$font-family-medium !important;
     height: 38px;
     display: flex;
     align-items: center;
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         .view-type-container:not(.list-toggled) & {
             background-color: #fff;
             padding: 0 10px;
@@ -142,7 +147,7 @@ export default Vue.extend({
     }
 
     * {
-        font-family: $font-family-medium !important;
+        font-family: variables.$font-family-medium !important;
     }
 
     span {
@@ -150,10 +155,10 @@ export default Vue.extend({
 
         &.active {
             opacity: 1;
-            color: $color-fieldkit-primary;
+            color: variables.$color-fieldkit-primary;
 
             body.floodnet & {
-                color: $color-dark;
+                color: variables.$color-dark;
             }
         }
     }
@@ -202,7 +207,7 @@ export default Vue.extend({
     display: none;
 }
 .toggle-btn input ~ i {
-    background-color: $color-primary;
+    background-color: variables.$color-primary;
 }
 .toggle-btn input:checked ~ i::before {
     transform: translate3d(18px, 2px, 0) scale3d(0, 0, 0);

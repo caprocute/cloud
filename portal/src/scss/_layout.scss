@@ -1,4 +1,5 @@
-@import "mixins";
+@use "mixins";
+@use "variables";
 
 .flex {
     display: flex;
@@ -14,6 +15,10 @@
     &-wrap {
         flex-wrap: wrap;
     }
+
+    &.al-center {
+        align-items: center;
+    }
 }
 
 .main-panel {
@@ -24,16 +29,16 @@
     text-align: left;
     padding: 65px 87px 60px;
 
-    @include bp-down($lg) {
+    @include mixins.bp-down(variables.$lg) {
         padding: 45px 45px 60px;
         align-items: center;
     }
 
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         padding: 45px 20px 30px;
     }
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         padding: 0;
     }
 }
@@ -46,15 +51,15 @@
     text-align: left;
     padding: 40px 90px;
 
-    @include bp-down($lg) {
+    @include mixins.bp-down(variables.$lg) {
         padding: 40px 60px;
     }
 
-    @include bp-down($md) {
+    @include mixins.bp-down(variables.$md) {
         padding: 30px 30px;
     }
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         padding: 20px 10px;
     }
 }

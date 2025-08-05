@@ -1,4 +1,4 @@
-FROM node:18.17.0-buster-slim
+FROM node:20.19.0-bookworm-slim
 ARG GIT_HASH=missing
 ARG VERSION=missing
 

@@ -9,6 +9,10 @@ export function isMobile(): boolean {
     return window.screen.availWidth < 1040;
 }
 
+export function isSmallScreen(): boolean {
+    return window.innerWidth < 768;
+}
+
 export function getFeaturesEnabled(): FeatureFlags {
     return {
         tsdb: window.localStorage["fk:backend"] === "tsdb",
@@ -28,7 +32,7 @@ export function serializePromiseChain(all, fn) {
 }
 
 export function promiseAfter(t, v = undefined) {
-    return new Promise(function(resolve) {
+    return new Promise(function (resolve) {
         setTimeout(resolve.bind(null, v), t);
     });
 }

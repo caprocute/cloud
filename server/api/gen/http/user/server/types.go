@@ -109,6 +109,7 @@ type AddResponseBody struct {
 	Bio       string                 `form:"bio" json:"bio" xml:"bio"`
 	Photo     *UserPhotoResponseBody `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
 	Admin     bool                   `form:"admin" json:"admin" xml:"admin"`
+	Moderator *bool                  `form:"moderator,omitempty" json:"moderator,omitempty" xml:"moderator,omitempty"`
 	UpdatedAt int64                  `form:"updatedAt" json:"updatedAt" xml:"updatedAt"`
 	TncDate   int64                  `form:"tncDate" json:"tncDate" xml:"tncDate"`
 }
@@ -122,6 +123,7 @@ type UpdateResponseBody struct {
 	Bio       string                 `form:"bio" json:"bio" xml:"bio"`
 	Photo     *UserPhotoResponseBody `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
 	Admin     bool                   `form:"admin" json:"admin" xml:"admin"`
+	Moderator *bool                  `form:"moderator,omitempty" json:"moderator,omitempty" xml:"moderator,omitempty"`
 	UpdatedAt int64                  `form:"updatedAt" json:"updatedAt" xml:"updatedAt"`
 	TncDate   int64                  `form:"tncDate" json:"tncDate" xml:"tncDate"`
 }
@@ -135,6 +137,7 @@ type ChangePasswordResponseBody struct {
 	Bio       string                 `form:"bio" json:"bio" xml:"bio"`
 	Photo     *UserPhotoResponseBody `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
 	Admin     bool                   `form:"admin" json:"admin" xml:"admin"`
+	Moderator *bool                  `form:"moderator,omitempty" json:"moderator,omitempty" xml:"moderator,omitempty"`
 	UpdatedAt int64                  `form:"updatedAt" json:"updatedAt" xml:"updatedAt"`
 	TncDate   int64                  `form:"tncDate" json:"tncDate" xml:"tncDate"`
 }
@@ -148,6 +151,7 @@ type AcceptTncResponseBody struct {
 	Bio       string                 `form:"bio" json:"bio" xml:"bio"`
 	Photo     *UserPhotoResponseBody `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
 	Admin     bool                   `form:"admin" json:"admin" xml:"admin"`
+	Moderator *bool                  `form:"moderator,omitempty" json:"moderator,omitempty" xml:"moderator,omitempty"`
 	UpdatedAt int64                  `form:"updatedAt" json:"updatedAt" xml:"updatedAt"`
 	TncDate   int64                  `form:"tncDate" json:"tncDate" xml:"tncDate"`
 }
@@ -161,6 +165,7 @@ type GetCurrentResponseBody struct {
 	Bio       string                 `form:"bio" json:"bio" xml:"bio"`
 	Photo     *UserPhotoResponseBody `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
 	Admin     bool                   `form:"admin" json:"admin" xml:"admin"`
+	Moderator *bool                  `form:"moderator,omitempty" json:"moderator,omitempty" xml:"moderator,omitempty"`
 	UpdatedAt int64                  `form:"updatedAt" json:"updatedAt" xml:"updatedAt"`
 	TncDate   int64                  `form:"tncDate" json:"tncDate" xml:"tncDate"`
 }
@@ -1999,6 +2004,7 @@ type UserResponseBody struct {
 	Bio       string                 `form:"bio" json:"bio" xml:"bio"`
 	Photo     *UserPhotoResponseBody `form:"photo,omitempty" json:"photo,omitempty" xml:"photo,omitempty"`
 	Admin     bool                   `form:"admin" json:"admin" xml:"admin"`
+	Moderator *bool                  `form:"moderator,omitempty" json:"moderator,omitempty" xml:"moderator,omitempty"`
 	UpdatedAt int64                  `form:"updatedAt" json:"updatedAt" xml:"updatedAt"`
 	TncDate   int64                  `form:"tncDate" json:"tncDate" xml:"tncDate"`
 }
@@ -2058,6 +2064,7 @@ func NewAddResponseBody(res *userviews.UserView) *AddResponseBody {
 		Email:     *res.Email,
 		Bio:       *res.Bio,
 		Admin:     *res.Admin,
+		Moderator: res.Moderator,
 		UpdatedAt: *res.UpdatedAt,
 		TncDate:   *res.TncDate,
 	}
@@ -2076,6 +2083,7 @@ func NewUpdateResponseBody(res *userviews.UserView) *UpdateResponseBody {
 		Email:     *res.Email,
 		Bio:       *res.Bio,
 		Admin:     *res.Admin,
+		Moderator: res.Moderator,
 		UpdatedAt: *res.UpdatedAt,
 		TncDate:   *res.TncDate,
 	}
@@ -2094,6 +2102,7 @@ func NewChangePasswordResponseBody(res *userviews.UserView) *ChangePasswordRespo
 		Email:     *res.Email,
 		Bio:       *res.Bio,
 		Admin:     *res.Admin,
+		Moderator: res.Moderator,
 		UpdatedAt: *res.UpdatedAt,
 		TncDate:   *res.TncDate,
 	}
@@ -2112,6 +2121,7 @@ func NewAcceptTncResponseBody(res *userviews.UserView) *AcceptTncResponseBody {
 		Email:     *res.Email,
 		Bio:       *res.Bio,
 		Admin:     *res.Admin,
+		Moderator: res.Moderator,
 		UpdatedAt: *res.UpdatedAt,
 		TncDate:   *res.TncDate,
 	}
@@ -2130,6 +2140,7 @@ func NewGetCurrentResponseBody(res *userviews.UserView) *GetCurrentResponseBody 
 		Email:     *res.Email,
 		Bio:       *res.Bio,
 		Admin:     *res.Admin,
+		Moderator: res.Moderator,
 		UpdatedAt: *res.UpdatedAt,
 		TncDate:   *res.TncDate,
 	}

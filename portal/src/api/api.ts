@@ -228,6 +228,7 @@ export class CurrentUser {
     mediaUrl: string;
     tncDate: number;
     admin: boolean;
+    moderator: boolean;
 }
 
 export enum UserRolesEnum {
@@ -460,6 +461,28 @@ export interface PendingInvites {
 export enum MapViewType {
     map = "map",
     list = "list",
+}
+
+export enum PostType { // backend types
+    DISCUSSION_POST = "discussion_post",
+    DATA_EVENT = "data_event",
+}
+
+export interface ModerationRequest {
+    id: number;
+    postId: number;
+    postType: PostType;
+    reportedBy: number;
+    reportedByName?: string;
+    reportedAt: string;
+    acknowledgedBy?: number;
+    acknowledgedByName?: string;
+    acknowledgedAt?: string;
+}
+
+export interface ModerationRequestResponse {
+    requests: ModerationRequest[];
+    totalPages: number;
 }
 
 class FKApi {
@@ -739,6 +762,15 @@ class FKApi {
         }
     }
 
+    public async adminUploadBackup(payload): Promise<void> {
+        return this.invoke({
+            auth: Auth.Required,
+            method: "POST",
+            url: this.baseUrl + "/admin/backup",
+            data: payload.file,
+        });
+    }
+
     register(user) {
         return this.invoke({
             auth: Auth.None,
@@ -924,10 +956,19 @@ class FKApi {
         });
     }
 
+    addStation(_data: { name: string; deviceId: string; locationName?: string; statusPb: string; description: string }) {
+        return this.invoke({
+            auth: Auth.Required,
+            method: "POST",
+            url: this.baseUrl + "/stations",
+        });
+    }
+
     addStationToProject(data) {
         return this.invoke({
             auth: Auth.Required,
             method: "POST",
+            data,
             url: this.baseUrl + "/projects/" + data.projectId + "/stations/" + data.stationId,
         });
     }
@@ -1469,6 +1510,7 @@ class FKApi {
             return _.extend(post, {
                 body: JSON.parse(post.body),
                 replies: this.parseBodies(post.replies),
+                userHasReported: post.userHasReported,
             });
         } catch (error) {
             return _.extend(post, {
@@ -1477,6 +1519,7 @@ class FKApi {
                     content: [{ type: "paragraph", content: [{ type: "text", text: post.body }] }],
                 },
                 replies: this.parseBodies(post.replies),
+                userHasReported: post.userHasReported,
             });
         }
     }
@@ -1676,7 +1719,7 @@ class FKApi {
                 maxDelay: 1000 * 60,
             });
 
-            this.wsBackoff.on("ready", async (number: number, delay: number) => {
+            this.wsBackoff.on("ready", async (_number: number, _delay: number) => {
                 // console.log("ws: ready", number, delay);
 
                 await this.establish(callback, status);
@@ -1713,6 +1756,65 @@ class FKApi {
             auth: Auth.Optional,
             method: "GET",
             url: this.baseUrl + "/projects/station/" + id,
+        });
+    }
+
+    public async reportPost(post: Comment | DataEvent): Promise<{ post: Comment }> {
+        const postTypeMap: { [key: string]: PostType } = {
+            comment: PostType.DISCUSSION_POST,
+            event: PostType.DATA_EVENT,
+        };
+
+        const postType = post.type as "comment" | "event";
+
+        return await this.invoke({
+            auth: Auth.Required,
+            method: "POST",
+            url: this.baseUrl + "/moderation",
+            data: {
+                postId: post.id,
+                postType: postTypeMap[postType],
+            },
+        });
+    }
+
+    public async getModerationRequests(page: number, pageSize: number): Promise<ModerationRequestResponse> {
+        const qp = new URLSearchParams();
+        qp.append("page", page.toString());
+        qp.append("pageSize", pageSize.toString());
+
+        return await this.invoke({
+            auth: Auth.Required,
+            method: "GET",
+            url: this.baseUrl + `/moderation/requests?${qp.toString()}`,
+        });
+    }
+
+    public async getModerationContent(postType: PostType, postId: number): Promise<string> {
+        return await this.invoke({
+            auth: Auth.Required,
+            method: "GET",
+            url: this.baseUrl + `/moderation/content/${postType}/${postId}`,
+        });
+    }
+
+    public async acknowledgeModerationRequest(id: number, action: "delete" | "keep"): Promise<void> {
+        return await this.invoke({
+            auth: Auth.Required,
+            method: "POST",
+            url: this.baseUrl + `/moderation/requests/${id}/acknowledge?action=${action}`,
+        });
+    }
+
+    public async cancelModerationRequest(postId: number, postType: PostType): Promise<void> {
+        const qp = new URLSearchParams();
+        qp.append("postId", postId.toString());
+        qp.append("postType", postType);
+
+        return await this.invoke({
+            auth: Auth.Required,
+            method: "DELETE",
+            url: this.baseUrl + `/moderation/cancel?${qp.toString()}`,
         });
     }
 }

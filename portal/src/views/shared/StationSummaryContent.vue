@@ -130,7 +130,8 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-@import "../../scss/mixins";
+@use "src/scss/mixins";
+@use "src/scss/variables";
 
 .image-container {
     flex: 0 0 95px;
@@ -174,7 +175,7 @@ export default Vue.extend({
         height: 24px;
     }
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         margin-right: 3px;
 
         img {
@@ -203,7 +204,7 @@ export default Vue.extend({
     font-size: 14px;
 
     > div {
-        @include flex(flex-start);
+        @include mixins.flex(flex-start);
         margin-bottom: 5px;
 
         &:first-of-type {
@@ -224,11 +225,11 @@ export default Vue.extend({
 }
 
 .station-modules {
-    @include flex();
+    @include mixins.flex();
     margin-left: -2px;
     flex: 0 0 100%;
 
-    @include bp-down($xs) {
+    @include mixins.bp-down(variables.$xs) {
         margin-top: 10px;
         margin-left: 0;
     }

@@ -15,34 +15,18 @@ import (
 
 // Client is the "test" service client.
 type Client struct {
-	GetEndpoint   goa.Endpoint
-	ErrorEndpoint goa.Endpoint
-	EmailEndpoint goa.Endpoint
+	NoopEndpoint goa.Endpoint
 }
 
 // NewClient initializes a "test" service client given the endpoints.
-func NewClient(get, error, email goa.Endpoint) *Client {
+func NewClient(noop goa.Endpoint) *Client {
 	return &Client{
-		GetEndpoint:   get,
-		ErrorEndpoint: error,
-		EmailEndpoint: email,
+		NoopEndpoint: noop,
 	}
 }
 
-// Get calls the "get" endpoint of the "test" service.
-func (c *Client) Get(ctx context.Context, p *GetPayload) (err error) {
-	_, err = c.GetEndpoint(ctx, p)
-	return
-}
-
-// Error calls the "error" endpoint of the "test" service.
-func (c *Client) Error(ctx context.Context) (err error) {
-	_, err = c.ErrorEndpoint(ctx, nil)
-	return
-}
-
-// Email calls the "email" endpoint of the "test" service.
-func (c *Client) Email(ctx context.Context, p *EmailPayload) (err error) {
-	_, err = c.EmailEndpoint(ctx, p)
+// Noop calls the "noop" endpoint of the "test" service.
+func (c *Client) Noop(ctx context.Context) (err error) {
+	_, err = c.NoopEndpoint(ctx, nil)
 	return
 }

@@ -405,7 +405,7 @@ func (e *CsvExporter) compactFieldSets(_ context.Context) error {
 					if maybeId != id {
 						if maybe.kind == fs.kind {
 							if len(maybe.fields) != len(fs.fields) {
-								panic("What, same kind different fields?")
+								return fmt.Errorf("same kind different fields")
 							}
 							if conflicts == nil || !conflicts[maybeId] {
 								candidates = append(candidates, maybe)

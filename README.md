@@ -30,15 +30,18 @@ The server-side architecture is broken into two main parts:
 - **Portal**: A Vuejs (JavaScript/TypeScript) single-page application that communicates with the backend server's API. This is the shiny and interesting stuff.
 
 # Local Setup
+
 ## Prerequisites
 
 Ensure your system is up to date:
+
 ```bash
 sudo apt update
 sudo apt upgrade
 ```
 
 Clone the project:
+
 ```bash
 git clone https://github.com/fieldkit/cloud
 ```
@@ -48,11 +51,13 @@ git clone https://github.com/fieldkit/cloud
 ### Install Docker Desktop
 
 1. Navigate to Downloads:
+
 ```bash
 cd ~/Downloads
 ```
 
 2. Install [Docker Desktop](https://www.docker.com/products/docker-desktop/):
+
 ```bash
 sudo apt-get update
 sudo apt-get install ./docker-desktop-<version>-<arch>.deb
@@ -118,6 +123,12 @@ npm install --global yarn
 Navigate to the project's portal folder and run:
 
 ```bash
+npm install
+```
+
+or
+
+```bash
 yarn install
 ```
 
@@ -127,6 +138,12 @@ yarn install
 
 ```bash
 npm install tiptap
+```
+
+2. Copy the secrets template in `portal/src` to a file named `secrets.ts`
+
+```bash
+cp portal/src/secrets.ts.template portal/src/secrets.ts
 ```
 
 ## Running the Project
@@ -140,14 +157,17 @@ sudo docker-compose up
 2. In a separate terminal, serve the project:
 
 ```bash
+cd portal
 yarn serve
 ```
 
 ## Known Issues
 
-- Issue with `@secrets` that's not getting resolved.
+- Issue with `@/secrets` that's not getting resolved:
+  - This will occur if `portal/src/secrets.ts` does not exist. `@` is set up as an alias for `src` within the portal project.
+
 ```
 
-This should give you a nicely formatted README.md on GitHub with all the instructions and references intact. Adjustments might be needed depending on the specific layout you had in mind or the specifics of the project.
+If you run into this, copy `/portal/src/secets.ts.template` to `portal/src/secrets.ts`.
 
-*EOF*
+```

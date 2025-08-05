@@ -32,11 +32,6 @@ func NewDescribeStationLocationHandler(db *sqlxcache.DB, metrics *logging.Metric
 func (h *DescribeStationLocationHandler) Handle(ctx context.Context, m *messages.StationLocationUpdated, j *gue.Job) error {
 	log := Logger(ctx).Sugar().With("station_id", m.StationID)
 
-	if !h.locations.IsEnabled() {
-		log.Infow("describing-location:disabled")
-		return nil
-	}
-
 	log.Infow("describing-location")
 
 	location := data.NewLocation(m.Location)
@@ -44,7 +39,7 @@ func (h *DescribeStationLocationHandler) Handle(ctx context.Context, m *messages
 	names, err := h.locations.Describe(ctx, location)
 	if err != nil {
 		return err
-	} else if names != nil {
+	} else if names != nil && (names.OtherLandName != nil || names.NativeLandName != nil) {
 		stations := repositories.NewStationRepository(h.db)
 
 		station, err := stations.QueryStationByID(ctx, m.StationID)
@@ -52,10 +47,15 @@ func (h *DescribeStationLocationHandler) Handle(ctx context.Context, m *messages
 			return err
 		}
 
-		station.PlaceOther = names.OtherLandName
-		station.PlaceNative = names.NativeLandName
+		if names.OtherLandName != nil {
+			station.PlaceOther = names.OtherLandName
+		}
 
-		if err := stations.UpdateStation(ctx, station); err != nil {
+		if names.NativeLandName != nil {
+			station.PlaceNative = names.NativeLandName
+		}
+
+		if err := stations.UpdateStationPlaces(ctx, station); err != nil {
 			return err
 		}
 	}

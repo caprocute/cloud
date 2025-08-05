@@ -76,6 +76,9 @@ import (
 	csvService "gitlab.com/fieldkit/cloud/server/api/gen/csv"
 	csvServiceSvr "gitlab.com/fieldkit/cloud/server/api/gen/http/csv/server"
 
+	adminService "gitlab.com/fieldkit/cloud/server/api/gen/admin"
+	adminServiceSvr "gitlab.com/fieldkit/cloud/server/api/gen/http/admin/server"
+
 	exportService "gitlab.com/fieldkit/cloud/server/api/gen/export"
 	exportServiceSvr "gitlab.com/fieldkit/cloud/server/api/gen/http/export/server"
 
@@ -96,6 +99,9 @@ import (
 
 	notificationsServiceSvr "gitlab.com/fieldkit/cloud/server/api/gen/http/notifications/server"
 	notificationsService "gitlab.com/fieldkit/cloud/server/api/gen/notifications"
+
+	moderationServiceSvr "gitlab.com/fieldkit/cloud/server/api/gen/http/moderation/server"
+	moderationService "gitlab.com/fieldkit/cloud/server/api/gen/moderation"
 )
 
 func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.Handler, error) {
@@ -150,6 +156,9 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	csvSvc := NewCsvService(ctx, options)
 	csvEndpoints := csvService.NewEndpoints(csvSvc)
 
+	adminSvc := NewAdminService(ctx, options)
+	adminEndpoints := adminService.NewEndpoints(adminSvc)
+
 	exportSvc := NewExportService(ctx, options)
 	exportEndpoints := exportService.NewEndpoints(exportSvc)
 
@@ -180,6 +189,9 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	notificationsSvc := NewNotificationsService(ctx, options)
 	notificationsEndpoints := notificationsService.NewEndpoints(notificationsSvc)
 
+	moderationSvc := NewModerationService(ctx, options)
+	moderationEndpoints := moderationService.NewEndpoints(moderationSvc)
+
 	for _, mw := range []func(goa.Endpoint) goa.Endpoint{jwtContext(), logErrors()} {
 		modulesEndpoints.Use(mw)
 		tasksEndpoints.Use(mw)
@@ -205,6 +217,8 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 		oidcEndpoints.Use(mw)
 		ttnEndpoints.Use(mw)
 		notificationsEndpoints.Use(mw)
+		adminEndpoints.Use(mw)
+		moderationEndpoints.Use(mw)
 	}
 
 	samlConfig := &SamlAuthConfig{
@@ -249,6 +263,8 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	discourseServer := discourseServiceSvr.New(discourseEndpoints, mux, dec, enc, eh, nil)
 	oidcServer := oidcServiceSvr.New(oidcEndpoints, mux, dec, enc, eh, nil)
 	ttnServer := ttnServiceSvr.New(ttnEndpoints, mux, dec, enc, eh, nil)
+	adminServer := adminServiceSvr.New(adminEndpoints, mux, dec, enc, eh, nil)
+	moderationServer := moderationServiceSvr.New(moderationEndpoints, mux, dec, enc, eh, nil)
 
 	upgrader := &websocket.Upgrader{}
 	upgrader.CheckOrigin = func(r *http.Request) bool {
@@ -300,6 +316,8 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	oidcServiceSvr.Mount(mux, oidcServer)
 	ttnServiceSvr.Mount(mux, ttnServer)
 	notificationsServiceSvr.Mount(mux, notificationsServer)
+	adminServiceSvr.Mount(mux, adminServer)
+	moderationServiceSvr.Mount(mux, moderationServer)
 
 	log := Logger(ctx).Sugar()
 

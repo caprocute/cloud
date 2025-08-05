@@ -17,14 +17,8 @@ import (
 
 // Client lists the test service endpoint HTTP clients.
 type Client struct {
-	// Get Doer is the HTTP client used to make requests to the get endpoint.
-	GetDoer goahttp.Doer
-
-	// Error Doer is the HTTP client used to make requests to the error endpoint.
-	ErrorDoer goahttp.Doer
-
-	// Email Doer is the HTTP client used to make requests to the email endpoint.
-	EmailDoer goahttp.Doer
+	// Noop Doer is the HTTP client used to make requests to the noop endpoint.
+	NoopDoer goahttp.Doer
 
 	// CORS Doer is the HTTP client used to make requests to the  endpoint.
 	CORSDoer goahttp.Doer
@@ -49,9 +43,7 @@ func NewClient(
 	restoreBody bool,
 ) *Client {
 	return &Client{
-		GetDoer:             doer,
-		ErrorDoer:           doer,
-		EmailDoer:           doer,
+		NoopDoer:            doer,
 		CORSDoer:            doer,
 		RestoreResponseBody: restoreBody,
 		scheme:              scheme,
@@ -61,63 +53,20 @@ func NewClient(
 	}
 }
 
-// Get returns an endpoint that makes HTTP requests to the test service get
+// Noop returns an endpoint that makes HTTP requests to the test service noop
 // server.
-func (c *Client) Get() goa.Endpoint {
+func (c *Client) Noop() goa.Endpoint {
 	var (
-		decodeResponse = DecodeGetResponse(c.decoder, c.RestoreResponseBody)
+		decodeResponse = DecodeNoopResponse(c.decoder, c.RestoreResponseBody)
 	)
 	return func(ctx context.Context, v interface{}) (interface{}, error) {
-		req, err := c.BuildGetRequest(ctx, v)
+		req, err := c.BuildNoopRequest(ctx, v)
 		if err != nil {
 			return nil, err
 		}
-		resp, err := c.GetDoer.Do(req)
+		resp, err := c.NoopDoer.Do(req)
 		if err != nil {
-			return nil, goahttp.ErrRequestError("test", "get", err)
-		}
-		return decodeResponse(resp)
-	}
-}
-
-// Error returns an endpoint that makes HTTP requests to the test service error
-// server.
-func (c *Client) Error() goa.Endpoint {
-	var (
-		decodeResponse = DecodeErrorResponse(c.decoder, c.RestoreResponseBody)
-	)
-	return func(ctx context.Context, v interface{}) (interface{}, error) {
-		req, err := c.BuildErrorRequest(ctx, v)
-		if err != nil {
-			return nil, err
-		}
-		resp, err := c.ErrorDoer.Do(req)
-		if err != nil {
-			return nil, goahttp.ErrRequestError("test", "error", err)
-		}
-		return decodeResponse(resp)
-	}
-}
-
-// Email returns an endpoint that makes HTTP requests to the test service email
-// server.
-func (c *Client) Email() goa.Endpoint {
-	var (
-		encodeRequest  = EncodeEmailRequest(c.encoder)
-		decodeResponse = DecodeEmailResponse(c.decoder, c.RestoreResponseBody)
-	)
-	return func(ctx context.Context, v interface{}) (interface{}, error) {
-		req, err := c.BuildEmailRequest(ctx, v)
-		if err != nil {
-			return nil, err
-		}
-		err = encodeRequest(req, v)
-		if err != nil {
-			return nil, err
-		}
-		resp, err := c.EmailDoer.Do(req)
-		if err != nil {
-			return nil, goahttp.ErrRequestError("test", "email", err)
+			return nil, goahttp.ErrRequestError("test", "noop", err)
 		}
 		return decodeResponse(resp)
 	}
