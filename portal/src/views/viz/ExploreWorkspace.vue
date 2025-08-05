@@ -469,7 +469,7 @@ export default Vue.extend({
 @use "src/scss/variables";
 
 .vue-treeselect__control {
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         height: 29px;
         font-size: 12px;
     }
@@ -477,7 +477,7 @@ export default Vue.extend({
 
 .vue-treeselect__placeholder,
 .vue-treeselect__single-value {
-    @include bp-down($sm) {
+    @include mixins.bp-down(variables.$sm) {
         line-height: 29px;
     }
 }
@@ -837,7 +837,7 @@ export default Vue.extend({
     justify-content: flex-end;
     align-items: center;
 
-    @include bp-down($md) {
+    @include mixins.bp-down(variables.$md) {
         position: absolute;
         bottom: 35px;
         max-width: 400px;
@@ -867,7 +867,7 @@ export default Vue.extend({
 .controls-container .view-by {
     margin: 0 10px 0 10px;
 
-    @include bp-down($md) {
+    @include mixins.bp-down(variables.$md) {
         display: none;
     }
 }
@@ -877,7 +877,7 @@ export default Vue.extend({
     cursor: pointer;
     color: #6a6d71;
 
-    @include bp-down($md) {
+    @include mixins.bp-down(variables.$md) {
         padding: 4px 6px 3px 6px;
         font-size: 11px;
     }
@@ -914,13 +914,13 @@ export default Vue.extend({
     input {
         height: 32px;
         padding: 7px 11px 4px 11px;
-        border: 1px solid $color-border;
+        border: 1px solid variables.$color-border;
         border-radius: 2px;
         cursor: pointer;
-        font-family: $font-family-medium;
+        font-family: variables.$font-family-medium;
         box-sizing: border-box;
 
-        @include bp-down($md) {
+        @include mixins.bp-down(variables.$md) {
             height: 29px;
             color: #000;
             font-size: 12px;
@@ -935,13 +935,13 @@ export default Vue.extend({
 .controls-container .fast-time.selected {
     font-weight: 900;
     color: #fff;
-    background: $color-primary;
-    border: 1px solid $color-primary;
+    background: variables.$color-primary;
+    border: 1px solid variables.$color-primary;
     border-radius: 2px;
 
     body.floodnet & {
-        background: $color-floodnet-dark;
-        border-color: $color-floodnet-dark;
+        background: variables.$color-floodnet-dark;
+        border-color: variables.$color-floodnet-dark;
     }
 }
 
