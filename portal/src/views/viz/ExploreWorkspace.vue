@@ -468,6 +468,20 @@ export default Vue.extend({
 @use "src/scss/mixins";
 @use "src/scss/variables";
 
+.vue-treeselect__control {
+    @include mixins.bp-down(variables.$sm) {
+        height: 29px;
+        font-size: 12px;
+    }
+}
+
+.vue-treeselect__placeholder,
+.vue-treeselect__single-value {
+    @include mixins.bp-down(variables.$sm) {
+        line-height: 29px;
+    }
+}
+
 #vg-tooltip-element {
     background-color: #f4f5f7;
     border-radius: 1px;
@@ -729,7 +743,7 @@ export default Vue.extend({
     align-items: center;
     min-height: 60px;
 
-    @include mixins.bp-down(variables.$sm) {
+    @include mixins.bp-down(variables.$md) {
         min-height: unset;
         padding: 0;
         border: 0;
@@ -803,6 +817,7 @@ export default Vue.extend({
     font-size: 40px;
 
     @include mixins.bp-down(variables.$sm) {
+        line-height: 27px;
         margin-right: 7px;
     }
 
@@ -811,10 +826,25 @@ export default Vue.extend({
     }
 }
 
+.group-no-data .controls-container .right {
+    opacity: 0.4;
+    pointer-events: none;
+}
+
 .controls-container .right {
     display: flex;
+    flex-wrap: wrap;
     justify-content: flex-end;
     align-items: center;
+
+    @include mixins.bp-down(variables.$md) {
+        position: absolute;
+        bottom: 35px;
+        max-width: 400px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100%;
+    }
 
     &.time {
         margin-left: auto;
@@ -829,34 +859,46 @@ export default Vue.extend({
     align-items: flex-start;
     flex: 0 0 140px;
 
-    @include mixins.bp-down(variables.$sm) {
+    @include mixins.bp-down(variables.$md) {
         display: none;
     }
 }
 
 .controls-container .view-by {
-    margin: 0px 10px 0 10px;
+    margin: 0 10px 0 10px;
+
+    @include mixins.bp-down(variables.$md) {
+        display: none;
+    }
 }
 
 .controls-container .fast-time {
-    margin: 0px 10px 0 10px;
+    padding: 4px 10px 3px 10px;
     cursor: pointer;
+    color: #6a6d71;
+
+    @include mixins.bp-down(variables.$md) {
+        padding: 4px 6px 3px 6px;
+        font-size: 11px;
+    }
 }
 
 .controls-container .fast-time-container {
     display: flex;
+    align-items: center;
 
-    @include mixins.bp-down(variables.$sm) {
-        display: none;
+    @include mixins.bp-down(variables.$md) {
+        flex: 100%;
+        justify-content: space-between;
+        margin-bottom: 15px;
     }
 }
 
 .controls-container .date-picker {
     margin-left: 20px;
+    gap: 8px;
 
-    @include mixins.bp-down(variables.$sm) {
-        position: absolute;
-        bottom: 70px;
+    @include mixins.bp-down(variables.$md) {
         width: 100%;
         margin: 0;
 
@@ -869,14 +911,20 @@ export default Vue.extend({
         }
     }
 
-    span {
-        &:nth-of-type(1) {
-            margin-right: 5px;
-        }
-    }
-
     input {
-        height: 18px;
+        height: 32px;
+        padding: 7px 11px 4px 11px;
+        border: 1px solid variables.$color-border;
+        border-radius: 2px;
+        cursor: pointer;
+        font-family: variables.$font-family-medium;
+        box-sizing: border-box;
+
+        @include mixins.bp-down(variables.$md) {
+            height: 29px;
+            color: #000;
+            font-size: 12px;
+        }
     }
 
     .vc-day-layer {
@@ -884,16 +932,17 @@ export default Vue.extend({
     }
 }
 
-.controls-container .date-picker input {
-    padding: 5px;
-    border: 1px solid rgb(215, 220, 225);
-    border-radius: 4px;
-    cursor: pointer;
-}
-
 .controls-container .fast-time.selected {
-    text-decoration: underline;
-    font-weight: bold;
+    font-weight: 900;
+    color: #fff;
+    background: variables.$color-primary;
+    border: 1px solid variables.$color-primary;
+    border-radius: 2px;
+
+    body.floodnet & {
+        background: variables.$color-floodnet-dark;
+        border-color: variables.$color-floodnet-dark;
+    }
 }
 
 .controls-container .left .button {
@@ -1126,7 +1175,7 @@ export default Vue.extend({
 }
 
 ::v-deep .scrubber {
-    @include mixins.bp-down(variables.$sm) {
+    @include mixins.bp-down(variables.$md) {
         padding-bottom: 120px;
     }
 }
@@ -1147,8 +1196,6 @@ export default Vue.extend({
 }
 
 ::v-deep .group-no-data {
-    position: relative;
-
     .viz,
     .scrubber {
         opacity: 0.4;
@@ -1166,6 +1213,7 @@ export default Vue.extend({
     background: #ffff;
     padding: 10px;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.07);
+    white-space: nowrap;
 }
 
 ::v-deep .chart-type.disabled {
