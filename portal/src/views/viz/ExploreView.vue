@@ -109,7 +109,7 @@ export default Vue.extend({
                 Vue.set(this.resolved, savedBookmark.token, bookmark);
                 // console.log(`viz: open-bookmark-saved`, savedBookmark.token);
             }
-            await this.$router.push({ name: "exploreShortBookmark", query: { v: this.bookmarkToToken[encoded] } });
+            await this.$router.replace({ name: "exploreShortBookmark", query: { v: this.bookmarkToToken[encoded] } });
         },
         async exportWorkspace(): Promise<void> {
             try {
