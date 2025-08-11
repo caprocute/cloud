@@ -44,29 +44,70 @@ func (h *RefreshMaterializedViewsHandler) Start(ctx context.Context, m *messages
 	} else {
 		numberRows := 0
 
+		now := time.Now().UTC()
+
 		for _, dirty := range dirtyWindows {
 			for _, view := range h.tsConfig.MaterializedViews() {
 				if dirty.DataStart != nil && dirty.DataEnd != nil {
-					mc.Publish(ctx, &messages.RefreshMaterializedView{
-						View:  view.ShortName,
-						Start: *dirty.DataStart,
-						End:   *dirty.DataEnd,
-					})
+					// Calculate this view's 'horizon' time, which is the time after
+					// which samples are being read live. We can't attempt to
+					// materialize after this time.
+					horizon := view.TimeBucket(view.HorizonTime(now))
+					start := view.TimeBucket(*dirty.DataStart).UTC()
+					last := view.TimeBucket(*dirty.DataEnd).Add(view.BucketWidth).UTC()
+
+					for {
+						end := start.Add(view.RefreshWidth)
+						finished := false
+
+						if end.After(last) {
+							log.Infow("refresh:last", "end", end, "last", last)
+							end = last
+							finished = true
+						}
+
+						if end.After(horizon) {
+							log.Infow("refresh:horizon", "end", end, "horizon", horizon)
+							end = horizon
+							finished = true
+						}
+
+						if start == end || start.After(end) {
+							break
+						}
+
+						log.Infow("refresh:send", "view", view.ShortName, "start", start, "end", end)
+
+						mc.Publish(ctx, &messages.RefreshMaterializedView{
+							View:  view.ShortName,
+							Start: start,
+							End:   end,
+						}, jobs.WithPriority(5))
+
+						start = end
+
+						if finished {
+							break
+						}
+					}
+
 				}
 			}
 
 			numberRows += dirty.NumberRows
 		}
 
-		log.Infow("refresh: deleting")
+		if numberRows > 0 {
+			log.Infow("refresh: deleting")
 
-		deleted, err := rw.DeleteAll(ctx)
-		if err != nil {
-			return err
-		}
+			deleted, err := rw.DeleteAll(ctx)
+			if err != nil {
+				return err
+			}
 
-		if numberRows != int(deleted) {
-			return fmt.Errorf("dirty rows conflict, expected to delete %d, got %d", numberRows, deleted)
+			if numberRows != int(deleted) {
+				return fmt.Errorf("dirty rows conflict, expected to delete %d, got %d", numberRows, deleted)
+			}
 		}
 	}
 
@@ -85,9 +126,7 @@ func (h *RefreshMaterializedViewsHandler) getRefreshSQL(_ context.Context, m *me
 	// Calculate this view's 'horizon' time, which is the time after
 	// which samples are being read live. We can't attempt to
 	// materialize after this time.
-	now := time.Now().UTC()
-
-	horizon := view.HorizonTime(now)
+	horizon := view.HorizonTime(time.Now().UTC())
 
 	// Calculate the buckets affected. TsDB will only materialize
 	// bucket/bins that fall completely within this range. Again,
@@ -124,9 +163,9 @@ func (h *RefreshMaterializedViewsHandler) RefreshView(ctx context.Context, m *me
 				if err != ErrEmptyRefresh {
 					return err
 				}
-				log.Infow("refresh:empty", "start", m.Start, "end", m.End)
+				log.Infow("refresh", "start", m.Start, "end", m.End, "empty", true)
 			} else {
-				log.Infow("refresh", "start", m.Start, "end", m.End, "sql", sql, "args", args)
+				log.Infow("refresh", "start", m.Start, "end", m.End, "args", args)
 
 				if _, err := pgPool.Exec(ctx, sql, args...); err != nil {
 					return err
@@ -164,24 +203,18 @@ func (rw *RefreshWindows) queryAggregated(ctx context.Context) ([]*DirtyRange, e
 }
 
 func (rw *RefreshWindows) QueryForDirty(ctx context.Context) ([]*DirtyRange, error) {
-	// log := Logger(ctx).Sugar()
+	log := Logger(ctx).Sugar()
 
-	// This is here for debugging. For now we simply aggregated the dirty
-	// regions into one and use that. We may never have to get more clever.
-	// About the only times I imagine we'd get dirty regions that are far apart
-	// enough from the materialized views perspective is with very old uploads
-	// or stations with huge gaps? We'll see.
 	allDirty, err := rw.queryAllRows(ctx)
 	if err != nil {
 		return nil, err
 	}
 
 	for _, dirty := range allDirty {
-		// log.Infow("dirty", "dirty", dirty)
-		_ = dirty
+		log.Infow("dirty", "dirty_start", dirty.DataStart.UTC(), "dirty_end", dirty.DataEnd.UTC(), "modified", dirty.ModifiedTime.UTC())
 	}
 
-	return rw.queryAggregated(ctx)
+	return allDirty, nil
 }
 
 func (rw *RefreshWindows) queryRows(ctx context.Context, query string) ([]*DirtyRange, error) {
