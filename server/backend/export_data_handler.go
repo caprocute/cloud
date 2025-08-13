@@ -345,19 +345,34 @@ func (e *CsvExporter) Prepare(ctx context.Context, urls []string) error {
 		return fmt.Sprintf("%v", r.data.Readings.Uptime)
 	})
 	e.preparing.addField("gps", func(r *records) string {
-		return fmt.Sprintf("%v", r.data.Readings.Location.Fix)
+		if loc := r.data.Readings.Location; loc != nil {
+			return fmt.Sprintf("%v", loc.Fix)
+		}
+		return ""
 	})
 	e.preparing.addField("latitude", func(r *records) string {
-		return fmt.Sprintf("%v", r.data.Readings.Location.Latitude)
+		if loc := r.data.Readings.Location; loc != nil {
+			return fmt.Sprintf("%v", loc.Latitude)
+		}
+		return ""
 	})
 	e.preparing.addField("longitude", func(r *records) string {
-		return fmt.Sprintf("%v", r.data.Readings.Location.Longitude)
+		if loc := r.data.Readings.Location; loc != nil {
+			return fmt.Sprintf("%v", loc.Longitude)
+		}
+		return ""
 	})
 	e.preparing.addField("altitude", func(r *records) string {
-		return fmt.Sprintf("%v", r.data.Readings.Location.Altitude)
+		if loc := r.data.Readings.Location; loc != nil {
+			return fmt.Sprintf("%v", loc.Altitude)
+		}
+		return ""
 	})
 	e.preparing.addField("gps_time", func(r *records) string {
-		return fmt.Sprintf("%v", r.data.Readings.Location.Time)
+		if loc := r.data.Readings.Location; loc != nil {
+			return fmt.Sprintf("%v", loc.Time)
+		}
+		return ""
 	})
 	e.preparing.addField("note", func(r *records) string {
 		return ""
