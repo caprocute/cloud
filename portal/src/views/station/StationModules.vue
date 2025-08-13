@@ -50,15 +50,17 @@ export default Vue.extend({
         getModuleKey(module: DisplayModule): string {
             return module.name.replace("modules.", "fk.");
         },
-        onModuleClick(moduleId: number) {
+        async onModuleClick(moduleId: number) {
             const tinyChartComp = this.$refs["tinyChart-" + moduleId];
             if (tinyChartComp && tinyChartComp[0]) {
                 const vizData = tinyChartComp[0].vizData;
                 if (vizData) {
                     const bm = BookmarkFactory.forSensor(this.station.id, vizData.vizSensor, vizData.timeRange);
+                    const encoded = serializeBookmark(bm);
+                    const savedBookmark = await this.$services.api.saveBookmark(encoded);
                     const url = this.$router.resolve({
-                        name: "exploreBookmark",
-                        query: { bookmark: serializeBookmark(bm) },
+                        name: "exploreShortBookmark",
+                        query: { v: savedBookmark.token },
                     }).href;
                     window.open(url, "_blank");
                 }
