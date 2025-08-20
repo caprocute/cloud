@@ -388,7 +388,6 @@ func (r *StationRepository) UpsertStationModule(ctx context.Context, module *dat
 }
 
 func (r *StationRepository) UpdateStationModule(ctx context.Context, module *data.StationModule) (*data.StationModule, error) {
-	// Update the station_module table (hardware metadata that can change)
 	if _, err := r.db.NamedExecContext(ctx, `
         UPDATE fieldkit.station_module SET
               flags = :flags,
@@ -401,8 +400,6 @@ func (r *StationRepository) UpdateStationModule(ctx context.Context, module *dat
 		return nil, err
 	}
 
-	// Update fields in configuration_module table (position, index, label)
-	// Note: Only update if we have configuration data
 	if module.ConfigurationID != 0 {
 		configParams := map[string]interface{}{
 			"module_id":    module.ID,
