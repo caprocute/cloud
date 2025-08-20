@@ -388,19 +388,38 @@ func (r *StationRepository) UpsertStationModule(ctx context.Context, module *dat
 }
 
 func (r *StationRepository) UpdateStationModule(ctx context.Context, module *data.StationModule) (*data.StationModule, error) {
+	// Update the station_module table (hardware metadata that can change)
 	if _, err := r.db.NamedExecContext(ctx, `
         UPDATE fieldkit.station_module SET
-			  module_index = :module_index,
-              position = :position,
               flags = :flags,
               name = :name,
               manufacturer = :manufacturer,
               kind = :kind,
-              version = :version,
-              label = :label
+              version = :version
 		WHERE id = :id
 		`, module); err != nil {
 		return nil, err
+	}
+
+	// Update fields in configuration_module table (position, index, label)
+	// Note: Only update if we have configuration data
+	if module.ConfigurationID != 0 {
+		configParams := map[string]interface{}{
+			"module_id":    module.ID,
+			"module_index": module.Index,
+			"position":     module.Position,
+			"label":        module.Label,
+		}
+
+		if _, err := r.db.NamedExecContext(ctx, `
+			UPDATE fieldkit.configuration_module SET
+				module_index = :module_index,
+				position = :position,
+				label = :label
+			WHERE module_id = :module_id
+			`, configParams); err != nil {
+			return nil, err
+		}
 	}
 
 	return module, nil
@@ -1666,8 +1685,10 @@ func (r *StationRepository) QueryStationModuleByID(ctx context.Context, id int32
 	module = &data.StationModule{}
 	if err := r.db.GetContext(ctx, module, `
 		SELECT
-			id, hardware_id, module_index, position, flags, name, manufacturer, kind, version
-		FROM fieldkit.station_module WHERE id = $1
+			sm.id, cm.configuration_id, sm.hardware_id, cm.module_index, cm.position, sm.flags, sm.name, sm.manufacturer, sm.kind, sm.version, cm.label
+		FROM fieldkit.station_module AS sm 
+		LEFT JOIN fieldkit.configuration_module AS cm ON (sm.id = cm.module_id)
+		WHERE sm.id = $1
 		`, id); err != nil {
 		return nil, err
 	}
