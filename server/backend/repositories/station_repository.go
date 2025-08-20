@@ -829,7 +829,7 @@ func (r *StationRepository) QueryStationFull(ctx context.Context, id int32) (*da
 	modules := []*data.StationModule{}
 	if err := r.db.SelectContext(ctx, &modules, `
 		SELECT
-			sm.id, cm.configuration_id, sm.hardware_id, cm.module_index, cm.position, sm.flags, sm.manufacturer, sm.kind, sm.version, sm.name, sm.label
+			sm.id, cm.configuration_id, sm.hardware_id, cm.module_index, cm.position, sm.flags, sm.manufacturer, sm.kind, sm.version, sm.name, cm.label
 		FROM fieldkit.configuration_module AS cm JOIN fieldkit.station_module AS sm ON (cm.module_id = sm.id)
 		WHERE cm.configuration_id IN (
 			SELECT id FROM fieldkit.station_configuration WHERE provision_id IN (
@@ -993,7 +993,7 @@ func (r *StationRepository) QueryStationFullByOwnerID(ctx context.Context, id in
 	modules := []*data.StationModule{}
 	if err := r.db.SelectContext(ctx, &modules, `
 		SELECT
-			sm.id, cm.configuration_id, sm.hardware_id, cm.module_index, cm.position, sm.flags, sm.manufacturer, sm.kind, sm.version, sm.name, sm.label
+			sm.id, cm.configuration_id, sm.hardware_id, cm.module_index, cm.position, sm.flags, sm.manufacturer, sm.kind, sm.version, sm.name, cm.label
 		FROM fieldkit.configuration_module AS cm JOIN fieldkit.station_module AS sm ON (cm.module_id = sm.id)
 		WHERE cm.configuration_id IN (
 			SELECT id FROM fieldkit.station_configuration WHERE provision_id IN (
@@ -1163,7 +1163,7 @@ func (r *StationRepository) QueryStationFullByProjectID(ctx context.Context, id 
 	modules := []*data.StationModule{}
 	if err := r.db.SelectContext(ctx, &modules, `
 		SELECT
-			sm.id, cm.configuration_id, sm.hardware_id, cm.module_index, cm.position, sm.flags, sm.manufacturer, sm.kind, sm.version, sm.name, sm.label
+			sm.id, cm.configuration_id, sm.hardware_id, cm.module_index, cm.position, sm.flags, sm.manufacturer, sm.kind, sm.version, sm.name, cm.label
 		FROM fieldkit.configuration_module AS cm JOIN fieldkit.station_module AS sm ON (cm.module_id = sm.id)
         WHERE cm.configuration_id IN (
 			SELECT id FROM fieldkit.station_configuration WHERE provision_id IN (
