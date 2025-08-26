@@ -21,7 +21,7 @@ test:go:
     POSTGRES_PASSWORD: password
     FIELDKIT_POSTGRES_URL: postgres://fieldkit:password@db:5432/fieldkit?sslmode=disable
   services:
-    - name: timescale/timescaledb:2.15.3-pg16
+    - name: parjom/timescaledb-postgis:2.17.2-pg16-postgis350
       alias: db
   script:
     - (cd server/cmd/server && go build -o build/server)
@@ -72,7 +72,7 @@ test:cypress:
     FIELDKIT_API_DOMAIN: 127.0.0.1:8080
     FIELDKIT_API_HOST: http://127.0.0.1:8080
   services:
-    - name: timescale/timescaledb:2.15.3-pg16
+    - name: parjom/timescaledb-postgis:2.17.2-pg16-postgis350
       alias: db
   script:
     - apt update -qyy && apt install -qyy xvfb libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libgtk-3-0 libgdm1 libgbm1 libasound2 golang
