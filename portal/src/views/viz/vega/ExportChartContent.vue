@@ -2,12 +2,8 @@
     <div class="export-chart-content" id="export-chart-content">
         <div class="project-detail-wrap" v-if="project">
             <div class="project-detail-card">
-                <div
-                    id="exported-project-photo"
-                    class="photo-container"
-                    :style="{ backgroundImage: `url(${projectPhoto})`, backgroundSize: 'cover', backgroundPosition: 'center' }"
-                >
-                    <ProjectPhoto :project="project" :image-size="132" @project-photo-loaded="onProjectPhotoLoaded($event)" />
+                <div class="photo-container">
+                    <ProjectPhoto :project="project" :image-size="600" />
                 </div>
                 <div class="detail-container">
                     <div>
@@ -52,12 +48,8 @@ export default Vue.extend({
             default: null,
         },
     },
-    data(): {
-        projectPhoto: string | null;
-    } {
-        return {
-            projectPhoto: null,
-        };
+    data() {
+        return {};
     },
     computed: {
         typedStationSensorPairs(): { stationName: string; sensorName: string }[] {
@@ -69,9 +61,6 @@ export default Vue.extend({
         getKeyColor(idx: number): string {
             const color = idx === 0 ? chartStyles.primaryLine.stroke : chartStyles.secondaryLine.stroke;
             return color;
-        },
-        onProjectPhotoLoaded(photo: string) {
-            this.projectPhoto = photo;
         },
     },
 });
@@ -91,10 +80,6 @@ export default Vue.extend({
 
     @media (max-width: 768px) {
         width: 100%;
-    }
-
-    .project-photo {
-        visibility: hidden;
     }
 
     .project-detail-card {
@@ -120,9 +105,21 @@ export default Vue.extend({
     .photo-container {
         height: 50px;
         flex: 0 0 50px;
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
+        margin: 0 12px 0 0;
+        border-radius: 2px;
+        overflow: hidden;
+        position: relative;
+
+        .project-photo {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+        }
     }
 }
 
