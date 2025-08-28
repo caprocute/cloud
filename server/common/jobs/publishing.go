@@ -64,18 +64,19 @@ func PopSaga() PublishOption {
 	}
 }
 
-func WithHigherPriority() PublishOption {
+func WithPriority(priority gue.JobPriority) PublishOption {
 	return func(tm *TransportMessage, job *JobOptions) error {
-		job.Priority = -1
+		job.Priority = priority
 		return nil
 	}
 }
 
+func WithHigherPriority() PublishOption {
+	return WithPriority(-1)
+}
+
 func WithLowerPriority() PublishOption {
-	return func(tm *TransportMessage, job *JobOptions) error {
-		job.Priority = 1
-		return nil
-	}
+	return WithPriority(1)
 }
 
 func Untransacted() PublishOption {

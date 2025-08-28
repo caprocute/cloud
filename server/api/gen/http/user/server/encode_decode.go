@@ -2661,6 +2661,7 @@ func marshalUserviewsUserViewToUserResponseBody(v *userviews.UserView) *UserResp
 		Email:     *v.Email,
 		Bio:       *v.Bio,
 		Admin:     *v.Admin,
+		Moderator: v.Moderator,
 		UpdatedAt: *v.UpdatedAt,
 		TncDate:   *v.TncDate,
 	}
@@ -2691,6 +2692,7 @@ func marshalUserUserToUserResponseBody(v *user.User) *UserResponseBody {
 		Email:     v.Email,
 		Bio:       v.Bio,
 		Admin:     v.Admin,
+		Moderator: v.Moderator,
 		UpdatedAt: v.UpdatedAt,
 		TncDate:   v.TncDate,
 	}

@@ -93,15 +93,16 @@ type DeleteDataEventPayload struct {
 }
 
 type DataEvent struct {
-	ID          int64
-	CreatedAt   int64
-	UpdatedAt   int64
-	Author      *PostAuthor
-	Title       string
-	Description string
-	Bookmark    *string
-	Start       int64
-	End         int64
+	ID              int64
+	CreatedAt       int64
+	UpdatedAt       int64
+	Author          *PostAuthor
+	Title           string
+	Description     string
+	Bookmark        *string
+	Start           int64
+	End             int64
+	UserHasReported *bool
 }
 
 type PostAuthor struct {
@@ -200,7 +201,8 @@ func newDataEventsView(res *DataEvents) *dataeventsviews.DataEventsView {
 // newDataEvent converts projected type DataEvent to service type DataEvent.
 func newDataEvent(vres *dataeventsviews.DataEventView) *DataEvent {
 	res := &DataEvent{
-		Bookmark: vres.Bookmark,
+		Bookmark:        vres.Bookmark,
+		UserHasReported: vres.UserHasReported,
 	}
 	if vres.ID != nil {
 		res.ID = *vres.ID
@@ -233,14 +235,15 @@ func newDataEvent(vres *dataeventsviews.DataEventView) *DataEvent {
 // DataEventView using the "default" view.
 func newDataEventView(res *DataEvent) *dataeventsviews.DataEventView {
 	vres := &dataeventsviews.DataEventView{
-		ID:          &res.ID,
-		CreatedAt:   &res.CreatedAt,
-		UpdatedAt:   &res.UpdatedAt,
-		Title:       &res.Title,
-		Description: &res.Description,
-		Bookmark:    res.Bookmark,
-		Start:       &res.Start,
-		End:         &res.End,
+		ID:              &res.ID,
+		CreatedAt:       &res.CreatedAt,
+		UpdatedAt:       &res.UpdatedAt,
+		Title:           &res.Title,
+		Description:     &res.Description,
+		Bookmark:        res.Bookmark,
+		Start:           &res.Start,
+		End:             &res.End,
+		UserHasReported: res.UserHasReported,
 	}
 	if res.Author != nil {
 		vres.Author = transformPostAuthorToDataeventsviewsPostAuthorView(res.Author)
@@ -255,14 +258,15 @@ func transformDataeventsviewsDataEventViewToDataEvent(v *dataeventsviews.DataEve
 		return nil
 	}
 	res := &DataEvent{
-		ID:          *v.ID,
-		CreatedAt:   *v.CreatedAt,
-		UpdatedAt:   *v.UpdatedAt,
-		Title:       *v.Title,
-		Description: *v.Description,
-		Bookmark:    v.Bookmark,
-		Start:       *v.Start,
-		End:         *v.End,
+		ID:              *v.ID,
+		CreatedAt:       *v.CreatedAt,
+		UpdatedAt:       *v.UpdatedAt,
+		Title:           *v.Title,
+		Description:     *v.Description,
+		Bookmark:        v.Bookmark,
+		Start:           *v.Start,
+		End:             *v.End,
+		UserHasReported: v.UserHasReported,
 	}
 	if v.Author != nil {
 		res.Author = transformDataeventsviewsPostAuthorViewToPostAuthor(v.Author)
@@ -302,14 +306,15 @@ func transformDataeventsviewsAuthorPhotoViewToAuthorPhoto(v *dataeventsviews.Aut
 // *dataeventsviews.DataEventView from a value of type *DataEvent.
 func transformDataEventToDataeventsviewsDataEventView(v *DataEvent) *dataeventsviews.DataEventView {
 	res := &dataeventsviews.DataEventView{
-		ID:          &v.ID,
-		CreatedAt:   &v.CreatedAt,
-		UpdatedAt:   &v.UpdatedAt,
-		Title:       &v.Title,
-		Description: &v.Description,
-		Bookmark:    v.Bookmark,
-		Start:       &v.Start,
-		End:         &v.End,
+		ID:              &v.ID,
+		CreatedAt:       &v.CreatedAt,
+		UpdatedAt:       &v.UpdatedAt,
+		Title:           &v.Title,
+		Description:     &v.Description,
+		Bookmark:        v.Bookmark,
+		Start:           &v.Start,
+		End:             &v.End,
+		UserHasReported: v.UserHasReported,
 	}
 	if v.Author != nil {
 		res.Author = transformPostAuthorToDataeventsviewsPostAuthorView(v.Author)

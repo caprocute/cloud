@@ -248,6 +248,7 @@ export default Vue.extend({
     visibility: hidden;
     transition: opacity 0.33s ease-in;
     overflow-y: auto;
+    box-sizing: border-box;
 
     @at-root .container-side.active & {
         opacity: 1;

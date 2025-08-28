@@ -81,7 +81,8 @@ func TestDiscussionPostFirstProjectDiscussion(t *testing.T) {
 					"name": "<<PRESENCE>>"
 				},
 				"replies": [],
-				"body": "Message"
+				"body": "Message",
+				"userHasReported": "<<PRESENCE>>"
 			}
 		}`)
 
@@ -102,7 +103,8 @@ func TestDiscussionPostFirstProjectDiscussion(t *testing.T) {
 					"name": "<<PRESENCE>>"
 				},
 				"replies": [],
-				"body": "Message"
+				"body": "Message",
+				"userHasReported": "<<PRESENCE>>"
 			}]
 		}`)
 }
@@ -183,9 +185,11 @@ func TestDiscussionPostProjectDiscussionReply(t *testing.T) {
 						"name": "<<PRESENCE>>"
 					},
 					"replies": [],
-					"body": "Reply"
+					"body": "Reply",
+					"userHasReported": "<<PRESENCE>>"
 				}],
-				"body": "Message"
+				"body": "Message",
+				"userHasReported": "<<PRESENCE>>"
 			}]
 		}`)
 }
@@ -230,7 +234,8 @@ func TestDiscussionUpdateMyPost(t *testing.T) {
 					"name": "<<PRESENCE>>"
 				},
 				"replies": [],
-				"body": "Message #1"
+				"body": "Message #1",
+				"userHasReported": "<<PRESENCE>>"
 			}
 		}`)
 
@@ -261,7 +266,8 @@ func TestDiscussionUpdateMyPost(t *testing.T) {
 					"name": "<<PRESENCE>>"
 				},
 				"replies": [],
-				"body": "Message #2"
+				"body": "Message #2",
+				"userHasReported": "<<PRESENCE>>"
 			}
 		}`)
 }
@@ -309,7 +315,8 @@ func TestDiscussionUpdateStrangersPost(t *testing.T) {
 					"name": "<<PRESENCE>>"
 				},
 				"replies": [],
-				"body": "Message #1"
+				"body": "Message #1",
+				"userHasReported": "<<PRESENCE>>"
 			}
 		}`)
 
@@ -370,7 +377,8 @@ func TestDiscussionDeleteMyPost(t *testing.T) {
 					"name": "<<PRESENCE>>"
 				},
 				"replies": [],
-				"body": "Message #1"
+				"body": "Message #1",
+				"userHasReported": "<<PRESENCE>>"
 			}
 		}`)
 
@@ -425,7 +433,8 @@ func TestDiscussionAdministratorDeleteStrangersPost(t *testing.T) {
 					"name": "<<PRESENCE>>"
 				},
 				"replies": [],
-				"body": "Message #1"
+				"body": "Message #1",
+				"userHasReported": "<<PRESENCE>>"
 			}
 		}`)
 
@@ -483,7 +492,8 @@ func TestDiscussionDeleteStrangersPost(t *testing.T) {
 					"name": "<<PRESENCE>>"
 				},
 				"replies": [],
-				"body": "Message #1"
+				"body": "Message #1",
+				"userHasReported": "<<PRESENCE>>"
 			}
 		}`)
 
@@ -567,7 +577,8 @@ func TestDiscussionDeleteMyPostWithReply(t *testing.T) {
 					"name": "<<PRESENCE>>"
 				},
 				"replies": [],
-				"body": "Message #2"
+				"body": "Message #2",
+				"userHasReported": "<<PRESENCE>>"
 			}]
 		}`)
 }
@@ -615,7 +626,8 @@ func TestDiscussionPostFirstContextDiscussionLegacyBookmark(t *testing.T) {
 				},
 				"replies": [],
 				"bookmark": "<<PRESENCE>>",
-				"body": "Message"
+				"body": "Message",
+				"userHasReported": "<<PRESENCE>>"
 			}
 		}`)
 
@@ -637,7 +649,8 @@ func TestDiscussionPostFirstContextDiscussionLegacyBookmark(t *testing.T) {
 				},
 				"replies": [],
 				"bookmark": "<<PRESENCE>>",
-				"body": "Message"
+				"body": "Message",
+				"userHasReported": "<<PRESENCE>>"
 			}]
 		}`)
 }
@@ -685,7 +698,8 @@ func TestDiscussionPostFirstContextDiscussion(t *testing.T) {
 				},
 				"replies": [],
 				"bookmark": "<<PRESENCE>>",
-				"body": "Message"
+				"body": "Message",
+				"userHasReported": "<<PRESENCE>>"
 			}
 		}`)
 
@@ -708,7 +722,8 @@ func TestDiscussionPostFirstContextDiscussion(t *testing.T) {
 				},
 				"replies": [],
 				"bookmark": "<<PRESENCE>>",
-				"body": "Message"
+				"body": "Message",
+				"userHasReported": "<<PRESENCE>>"
 			}]
 		}`)
 }

@@ -20,6 +20,9 @@ const getters = {
     isTncValid: (state: UserState) => {
         return state?.user?.tncDate != undefined && state.user.tncDate >= Config.tncDate;
     },
+    isModerator: (state: UserState) => {
+        return state?.user?.moderator;
+    },
     isAdmin: (state: UserState) => {
         return state.user?.admin;
     },
