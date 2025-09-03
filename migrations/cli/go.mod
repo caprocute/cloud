@@ -1,9 +1,9 @@
 module gitlab.com/fieldkit/cloud/migrations
 
-go 1.22
+go 1.23.0
 
 require (
-	github.com/go-pg/pg/v10 v10.9.1
+	github.com/go-pg/pg/v10 v10.15.0
 	github.com/robinjoseph08/go-pg-migrations/v3 v3.0.0
 	gitlab.com/fieldkit/cloud/migrations/support v0.0.0
 )
@@ -12,6 +12,7 @@ require (
 	github.com/cpuguy83/go-md2man/v2 v2.0.0-20190314233015-f79a8a8ca69d // indirect
 	github.com/fatih/color v1.7.0 // indirect
 	github.com/git-chglog/git-chglog v0.0.0-20200414013904-db796966b373 // indirect
+	github.com/go-pg/pg v8.0.7+incompatible // indirect
 	github.com/go-pg/zerochecker v0.2.0 // indirect
 	github.com/imdario/mergo v0.3.8 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
@@ -26,19 +27,19 @@ require (
 	github.com/tsuyoshiwada/go-gitcmd v0.0.0-20180205145712-5f1f5f9475df // indirect
 	github.com/urfave/cli v1.22.1 // indirect
 	github.com/vmihailenco/bufpool v0.1.11 // indirect
-	github.com/vmihailenco/msgpack/v5 v5.3.0 // indirect
+	github.com/vmihailenco/msgpack/v5 v5.3.4 // indirect
 	github.com/vmihailenco/tagparser v0.1.2 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	go.opentelemetry.io/otel v0.19.0 // indirect
 	go.opentelemetry.io/otel/metric v0.19.0 // indirect
 	go.opentelemetry.io/otel/trace v0.19.0 // indirect
-	golang.org/x/crypto v0.0.0-20210322153248-0c34fe9e7dc2 // indirect
-	golang.org/x/sys v0.0.0-20210320140829-1e4c9ba3b0c4 // indirect
+	golang.org/x/crypto v0.36.0 // indirect
+	golang.org/x/sys v0.31.0 // indirect
 	golang.org/x/tools v0.0.0-20200522201501-cb1345f3a375 // indirect
 	gopkg.in/AlecAivazis/survey.v1 v1.8.7 // indirect
 	gopkg.in/kyokomi/emoji.v1 v1.5.1 // indirect
 	gopkg.in/yaml.v2 v2.3.0 // indirect
-	mellium.im/sasl v0.2.1 // indirect
+	mellium.im/sasl v0.3.1 // indirect
 )
 
 replace gitlab.com/fieldkit/cloud/migrations/support => ../support
