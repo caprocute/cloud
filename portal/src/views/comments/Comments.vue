@@ -202,9 +202,18 @@
                                 <span v-if="item.body" class="icon icon-comment"></span>
                                 <span v-else class="icon icon-flag"></span>
                                 <ListItemOptions
-                                    v-if="user && (user.id === item.author.id || user.admin)"
+                                    v-if="user"
                                     @listItemOptionClick="onListItemOptionClick($event, item)"
                                     :options="getCommentOptions(item)"
+                                    :ref="'options-' + item.id"
+                                />
+                                <CancelReportLink
+                                    v-if="user"
+                                    :postId="item.id"
+                                    :postType="item.body ? PostType.DISCUSSION_POST : PostType.DATA_EVENT"
+                                    :userHasReported="item.userHasReported || false"
+                                    @report-canceled="onReportCanceled(item)"
+                                    :ref="'cancel-report-' + item.id"
                                 />
                                 <span class="timestamp">{{ formatTimestamp(item.createdAt) }}</span>
                             </div>
@@ -258,7 +267,7 @@
                                                 {{ reply.author.name }}
                                             </span>
                                             <ListItemOptions
-                                                v-if="user && (user.id === reply.author.id || user.admin)"
+                                                v-if="user"
                                                 @listItemOptionClick="onListItemOptionClick($event, reply)"
                                                 :options="getCommentOptions(reply)"
                                             />
@@ -316,7 +325,7 @@ import CommonComponents from "@/views/shared";
 import moment from "moment";
 import { NewComment, NewDataEvent } from "@/views/comments/model";
 import { Comment, DataEvent, DiscussionBase } from "@/views/comments/model";
-import { CurrentUser, ProjectUser } from "@/api";
+import { CurrentUser, ProjectUser, PostType } from "@/api";
 import ListItemOptions from "@/views/shared/ListItemOptions.vue";
 import Tiptap from "@/views/shared/Tiptap.vue";
 import { deserializeBookmark, Workspace } from "../viz/viz";
@@ -327,6 +336,7 @@ import { ActionTypes } from "@/store";
 import { interpolatePartner } from "@/views/shared/partners";
 import InfoTooltip from "@/views/shared/InfoTooltip.vue";
 import { SnackbarStyle } from "@/store/modules/snackbar";
+import CancelReportLink from "@/views/shared/CancelReportLink.vue";
 
 export default Vue.extend({
     name: "Comments",
@@ -336,6 +346,7 @@ export default Vue.extend({
         Tiptap,
         SectionToggle,
         InfoTooltip,
+        CancelReportLink,
     },
     props: {
         user: {
@@ -406,6 +417,9 @@ export default Vue.extend({
         ActionTypes() {
             return ActionTypes;
         },
+        PostType() {
+            return PostType;
+        },
         projectId(): number {
             if (this.parentData instanceof Bookmark) {
                 return this.parentData.p[0];
@@ -418,13 +432,13 @@ export default Vue.extend({
             }
             return null;
         },
+        // we need it in order to see if the user is an admin and can delete posts
         isAdmin(): boolean {
             if (this.user.id && this.projectId) {
                 return this.$store.getters.isAdminForProject(this.user.id, this.projectId);
             }
             return false;
         },
-        // we need it in order to see if the user is an admin and can delete posts
         isProjectLoaded(): boolean {
             if (this.projectId) {
                 const project = this.$getters.projectsById[this.projectId];
@@ -564,7 +578,8 @@ export default Vue.extend({
                                         response.post.bookmark,
                                         response.post.body,
                                         response.post.createdAt,
-                                        response.post.updatedAt
+                                        response.post.updatedAt,
+                                        response.post.userHasReported
                                     )
                                 );
                             this.resetNewReply();
@@ -581,7 +596,8 @@ export default Vue.extend({
                                     response.post.bookmark,
                                     response.post.body,
                                     response.post.createdAt,
-                                    response.post.updatedAt
+                                    response.post.updatedAt,
+                                    response.post.userHasReported
                                 )
                             );
                             this.newComment.body = "";
@@ -623,11 +639,29 @@ export default Vue.extend({
                 .then((data) => {
                     this.posts = [];
                     data.posts.forEach((post) => {
-                        this.posts.push(new Comment(post.id, post.author, post.bookmark, post.body, post.createdAt, post.updatedAt));
+                        this.posts.push(
+                            new Comment(
+                                post.id,
+                                post.author,
+                                post.bookmark,
+                                post.body,
+                                post.createdAt,
+                                post.updatedAt,
+                                post.userHasReported
+                            )
+                        );
 
                         post.replies.forEach((reply) => {
                             this.posts[this.posts.length - 1].replies.push(
-                                new Comment(reply.id, reply.author, reply.bookmark, reply.body, reply.createdAt, reply.updatedAt)
+                                new Comment(
+                                    reply.id,
+                                    reply.author,
+                                    reply.bookmark,
+                                    reply.body,
+                                    reply.createdAt,
+                                    reply.updatedAt,
+                                    reply.userHasReported
+                                )
                             );
                         });
                     });
@@ -733,7 +767,8 @@ export default Vue.extend({
                         event.title ? JSON.parse(event.title) : event.title,
                         event.description ? JSON.parse(event.description) : event.description,
                         event.start,
-                        event.end
+                        event.end,
+                        event.userHasReported
                     )
                 );
             });
@@ -797,35 +832,42 @@ export default Vue.extend({
                     this.deleteDataEvent(item.id);
                 }
             }
+            if (event === "report") {
+                this.$services.api
+                    .reportPost(item)
+                    .then(() => {
+                        this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
+                            message: this.$tc("comments.reportSuccess"),
+                            type: SnackbarStyle.success,
+                        });
+                        item.userHasReported = true;
+                        this.closeOptionsMenu(item.id);
+                    })
+                    .catch(() => {
+                        this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
+                            message: this.$tc("comments.reportError"),
+                            type: SnackbarStyle.fail,
+                        });
+                        this.closeOptionsMenu(item.id);
+                    });
+            }
         },
         getCommentOptions(post: Comment): { label: string; event: string }[] {
             if (!this.user) {
                 return [];
             }
 
+            const options: { label: string; event: string }[] = [];
+
             if (this.user.id === post.author.id) {
-                return [
-                    {
-                        label: "Edit post",
-                        event: "edit-comment",
-                    },
-                    {
-                        label: "Delete post",
-                        event: "delete-comment",
-                    },
-                ];
+                options.push({ label: "Edit post", event: "edit-comment" }, { label: "Delete post", event: "delete-comment" });
             }
 
-            if (this.isAdmin) {
-                return [
-                    {
-                        label: "Delete post",
-                        event: "delete-comment",
-                    },
-                ];
+            if (this.user.id !== post.author.id) {
+                options.push({ label: "Report", event: "report" });
             }
 
-            return [];
+            return options;
         },
         highlightComment(): void {
             this.$nextTick(() => {
@@ -869,6 +911,20 @@ export default Vue.extend({
                 body: null,
                 threadId: null,
             };
+        },
+        onReportCanceled(item: any) {
+            if (item) {
+                item.userHasReported = false;
+            }
+        },
+        closeOptionsMenu(id: number) {
+            const optionsRef = this.$refs["options-" + id];
+            if (Array.isArray(optionsRef) && optionsRef[0] && "querySelector" in (optionsRef[0] as Vue).$el) {
+                const menuEl = ((optionsRef[0] as Vue).$el as HTMLElement).querySelector(".options-btns");
+                if (menuEl) {
+                    menuEl.classList.remove("visible");
+                }
+            }
         },
     },
 });
@@ -1307,8 +1363,7 @@ header {
     border: 1px solid #ff6600;
 }
 .comment-toggle {
-    margin-top: 20px;
-    //margin-left: 20px;
+    margin-top: 22px;
 }
 
 .edit-event {

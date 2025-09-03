@@ -260,7 +260,7 @@ export default Vue.extend({
     opacity: 1 !important;
 
     @include mixins.bp-down(variables.$sm) {
-        bottom: -195px;
+        bottom: -240px;
         top: unset !important;
         left: 50%;
         transform: translateX(-50%);

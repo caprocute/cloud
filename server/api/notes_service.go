@@ -144,7 +144,7 @@ func (s *NotesService) Get(ctx context.Context, payload *notes.GetPayload) (*not
 		SELECT m.*, l.note_id
 		FROM fieldkit.notes_media AS m
 		LEFT JOIN fieldkit.notes_media_link AS l ON (m.id = l.media_id)
-		WHERE m.station_id = $1 ORDER BY m.id DESC
+		WHERE m.station_id = $1 ORDER BY m.created_at DESC
 		`, payload.StationID); err != nil {
 		return nil, err
 	}

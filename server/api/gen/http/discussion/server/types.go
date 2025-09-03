@@ -413,13 +413,14 @@ type DeleteMessageBadRequestResponseBody struct {
 
 // ThreadedPostResponseBody is used to define fields on response body types.
 type ThreadedPostResponseBody struct {
-	ID        int64                       `form:"id" json:"id" xml:"id"`
-	CreatedAt int64                       `form:"createdAt" json:"createdAt" xml:"createdAt"`
-	UpdatedAt int64                       `form:"updatedAt" json:"updatedAt" xml:"updatedAt"`
-	Author    *PostAuthorResponseBody     `form:"author" json:"author" xml:"author"`
-	Replies   []*ThreadedPostResponseBody `form:"replies" json:"replies" xml:"replies"`
-	Body      string                      `form:"body" json:"body" xml:"body"`
-	Bookmark  *string                     `form:"bookmark,omitempty" json:"bookmark,omitempty" xml:"bookmark,omitempty"`
+	ID              int64                       `form:"id" json:"id" xml:"id"`
+	CreatedAt       int64                       `form:"createdAt" json:"createdAt" xml:"createdAt"`
+	UpdatedAt       int64                       `form:"updatedAt" json:"updatedAt" xml:"updatedAt"`
+	Author          *PostAuthorResponseBody     `form:"author" json:"author" xml:"author"`
+	Replies         []*ThreadedPostResponseBody `form:"replies" json:"replies" xml:"replies"`
+	Body            string                      `form:"body" json:"body" xml:"body"`
+	Bookmark        *string                     `form:"bookmark,omitempty" json:"bookmark,omitempty" xml:"bookmark,omitempty"`
+	UserHasReported *bool                       `form:"userHasReported,omitempty" json:"userHasReported,omitempty" xml:"userHasReported,omitempty"`
 }
 
 // PostAuthorResponseBody is used to define fields on response body types.

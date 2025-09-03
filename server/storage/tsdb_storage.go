@@ -16,34 +16,39 @@ var (
 			BucketWidth:       time.Minute,
 			EndOffsetSQL:      "3 minutes",
 			EndOffsetDuration: time.Minute * 3,
+			RefreshWidth:      time.Hour * 3,
 		},
 		{
 			Name:              "fieldkit.sensor_data_10m",
 			ShortName:         "10m",
 			BucketWidth:       time.Minute * 10,
 			EndOffsetSQL:      "30 minutes",
-			EndOffsetDuration: time.Minute * 30,
+			EndOffsetDuration: time.Minute * 10 * 3,
+			RefreshWidth:      time.Hour * 6,
 		},
 		{
 			Name:              "fieldkit.sensor_data_1h",
 			ShortName:         "1h",
-			BucketWidth:       time.Hour * 1,
+			BucketWidth:       time.Hour,
 			EndOffsetSQL:      "3 hours",
 			EndOffsetDuration: time.Hour * 3,
+			RefreshWidth:      time.Hour * 12,
 		},
 		{
 			Name:              "fieldkit.sensor_data_6h",
 			ShortName:         "6h",
 			BucketWidth:       time.Hour * 6,
 			EndOffsetSQL:      "18 hours",
-			EndOffsetDuration: time.Hour * 18,
+			EndOffsetDuration: time.Hour * 6 * 3,
+			RefreshWidth:      time.Hour * 24,
 		},
 		{
 			Name:              "fieldkit.sensor_data_24h",
 			ShortName:         "24h",
 			BucketWidth:       time.Hour * 24,
 			EndOffsetSQL:      "72 hours",
-			EndOffsetDuration: time.Hour * 72,
+			EndOffsetDuration: time.Hour * 24 * 3,
+			RefreshWidth:      time.Hour * 24 * 3,
 		},
 	}
 )
@@ -54,6 +59,7 @@ type MaterializedView struct {
 	BucketWidth       time.Duration
 	EndOffsetSQL      string
 	EndOffsetDuration time.Duration
+	RefreshWidth      time.Duration
 }
 
 func (mv *MaterializedView) MakeRefreshAllSQL() (string, []interface{}, error) {

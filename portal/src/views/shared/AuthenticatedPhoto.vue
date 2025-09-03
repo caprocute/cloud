@@ -1,4 +1,4 @@
-<template>
+<template class="wrap">
     <img v-if="photo && !processing" :src="photo" class="authenticated-photo photo" :class="{ processing: processing }" alt="Image" />
     <div v-else-if="notFound" class="not-found">
         <i class="fas fa-image"></i>
@@ -34,6 +34,9 @@ export default Vue.extend({
     watch: {
         url(this: any) {
             return this.refresh();
+        },
+        processing(newVal) {
+            this.$emit("loading-change", newVal);
         },
     },
     created(this: any) {

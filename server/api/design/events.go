@@ -28,6 +28,7 @@ var DataEvent = ResultType("application/vnd.app.events.data.event", func() {
 		Attribute("bookmark", String)
 		Attribute("start", Int64)
 		Attribute("end", Int64)
+		Attribute("userHasReported", Boolean)
 		Required("id", "createdAt", "updatedAt", "author", "title", "description", "start", "end")
 	})
 	View("default", func() {
@@ -40,6 +41,7 @@ var DataEvent = ResultType("application/vnd.app.events.data.event", func() {
 		Attribute("bookmark")
 		Attribute("start")
 		Attribute("end")
+		Attribute("userHasReported")
 	})
 })
 

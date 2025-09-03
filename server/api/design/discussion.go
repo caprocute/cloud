@@ -26,6 +26,7 @@ var ThreadedPost = ResultType("application/vnd.app.discussion.post", func() {
 		Attribute("replies", ArrayOf("ThreadedPost"))
 		Attribute("body", String)
 		Attribute("bookmark", String)
+		Attribute("userHasReported", Boolean)
 		Required("id", "createdAt", "updatedAt", "author", "replies", "body")
 	})
 	View("default", func() {
@@ -36,6 +37,7 @@ var ThreadedPost = ResultType("application/vnd.app.discussion.post", func() {
 		Attribute("replies")
 		Attribute("body")
 		Attribute("bookmark")
+		Attribute("userHasReported")
 	})
 })
 

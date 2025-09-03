@@ -413,13 +413,14 @@ type DeleteMessageBadRequestResponseBody struct {
 
 // ThreadedPostResponseBody is used to define fields on response body types.
 type ThreadedPostResponseBody struct {
-	ID        *int64                      `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
-	CreatedAt *int64                      `form:"createdAt,omitempty" json:"createdAt,omitempty" xml:"createdAt,omitempty"`
-	UpdatedAt *int64                      `form:"updatedAt,omitempty" json:"updatedAt,omitempty" xml:"updatedAt,omitempty"`
-	Author    *PostAuthorResponseBody     `form:"author,omitempty" json:"author,omitempty" xml:"author,omitempty"`
-	Replies   []*ThreadedPostResponseBody `form:"replies,omitempty" json:"replies,omitempty" xml:"replies,omitempty"`
-	Body      *string                     `form:"body,omitempty" json:"body,omitempty" xml:"body,omitempty"`
-	Bookmark  *string                     `form:"bookmark,omitempty" json:"bookmark,omitempty" xml:"bookmark,omitempty"`
+	ID              *int64                      `form:"id,omitempty" json:"id,omitempty" xml:"id,omitempty"`
+	CreatedAt       *int64                      `form:"createdAt,omitempty" json:"createdAt,omitempty" xml:"createdAt,omitempty"`
+	UpdatedAt       *int64                      `form:"updatedAt,omitempty" json:"updatedAt,omitempty" xml:"updatedAt,omitempty"`
+	Author          *PostAuthorResponseBody     `form:"author,omitempty" json:"author,omitempty" xml:"author,omitempty"`
+	Replies         []*ThreadedPostResponseBody `form:"replies,omitempty" json:"replies,omitempty" xml:"replies,omitempty"`
+	Body            *string                     `form:"body,omitempty" json:"body,omitempty" xml:"body,omitempty"`
+	Bookmark        *string                     `form:"bookmark,omitempty" json:"bookmark,omitempty" xml:"bookmark,omitempty"`
+	UserHasReported *bool                       `form:"userHasReported,omitempty" json:"userHasReported,omitempty" xml:"userHasReported,omitempty"`
 }
 
 // PostAuthorResponseBody is used to define fields on response body types.

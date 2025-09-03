@@ -193,6 +193,7 @@ type User struct {
 	Bio       string
 	Photo     *UserPhoto
 	Admin     bool
+	Moderator *bool
 	UpdatedAt int64
 	TncDate   int64
 }
@@ -585,7 +586,9 @@ func newDownloadedPhotoView(res *DownloadedPhoto) *userviews.DownloadedPhotoView
 
 // newUser converts projected type User to service type User.
 func newUser(vres *userviews.UserView) *User {
-	res := &User{}
+	res := &User{
+		Moderator: vres.Moderator,
+	}
 	if vres.ID != nil {
 		res.ID = *vres.ID
 	}
@@ -622,6 +625,7 @@ func newUserView(res *User) *userviews.UserView {
 		Email:     &res.Email,
 		Bio:       &res.Bio,
 		Admin:     &res.Admin,
+		Moderator: res.Moderator,
 		UpdatedAt: &res.UpdatedAt,
 		TncDate:   &res.TncDate,
 	}

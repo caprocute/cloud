@@ -742,11 +742,12 @@ func DecodeDeleteMessageResponse(decoder func(*http.Response) goahttp.Decoder, r
 // *ThreadedPostResponseBody.
 func unmarshalThreadedPostResponseBodyToDiscussionviewsThreadedPostView(v *ThreadedPostResponseBody) *discussionviews.ThreadedPostView {
 	res := &discussionviews.ThreadedPostView{
-		ID:        v.ID,
-		CreatedAt: v.CreatedAt,
-		UpdatedAt: v.UpdatedAt,
-		Body:      v.Body,
-		Bookmark:  v.Bookmark,
+		ID:              v.ID,
+		CreatedAt:       v.CreatedAt,
+		UpdatedAt:       v.UpdatedAt,
+		Body:            v.Body,
+		Bookmark:        v.Bookmark,
+		UserHasReported: v.UserHasReported,
 	}
 	res.Author = unmarshalPostAuthorResponseBodyToDiscussionviewsPostAuthorView(v.Author)
 	res.Replies = make([]*discussionviews.ThreadedPostView, len(v.Replies))
@@ -816,11 +817,12 @@ func marshalNewPostRequestBodyToDiscussionNewPost(v *NewPostRequestBody) *discus
 // type *discussion.ThreadedPost from a value of type *ThreadedPostResponseBody.
 func unmarshalThreadedPostResponseBodyToDiscussionThreadedPost(v *ThreadedPostResponseBody) *discussion.ThreadedPost {
 	res := &discussion.ThreadedPost{
-		ID:        *v.ID,
-		CreatedAt: *v.CreatedAt,
-		UpdatedAt: *v.UpdatedAt,
-		Body:      *v.Body,
-		Bookmark:  v.Bookmark,
+		ID:              *v.ID,
+		CreatedAt:       *v.CreatedAt,
+		UpdatedAt:       *v.UpdatedAt,
+		Body:            *v.Body,
+		Bookmark:        v.Bookmark,
+		UserHasReported: v.UserHasReported,
 	}
 	res.Author = unmarshalPostAuthorResponseBodyToDiscussionPostAuthor(v.Author)
 	res.Replies = make([]*discussion.ThreadedPost, len(v.Replies))
