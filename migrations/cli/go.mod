@@ -1,6 +1,6 @@
 module gitlab.com/fieldkit/cloud/migrations
 
-go 1.23.0
+go 1.23
 
 require gitlab.com/fieldkit/cloud/migrations/support v0.0.0
 
