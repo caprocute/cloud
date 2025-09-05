@@ -57,12 +57,26 @@ export default Vue.extend({
                 if (vizData) {
                     const bm = BookmarkFactory.forSensor(this.station.id, vizData.vizSensor, vizData.timeRange);
                     const encoded = serializeBookmark(bm);
-                    const savedBookmark = await this.$services.api.saveBookmark(encoded);
-                    const url = this.$router.resolve({
-                        name: "exploreShortBookmark",
-                        query: { v: savedBookmark.token },
-                    }).href;
-                    window.open(url, "_blank");
+
+                    // open blank window immediately to avoid popup blocker and
+                    const newWindow = window.open("about:blank", "_blank");
+                    if (!newWindow) {
+                        console.error("Failed to open new window - popup may be blocked");
+                        return;
+                    }
+
+                    // get the token behind the scenes and append it to the new window
+                    try {
+                        const savedBookmark = await this.$services.api.saveBookmark(encoded);
+                        const url = this.$router.resolve({
+                            name: "exploreShortBookmark",
+                            query: { v: savedBookmark.token },
+                        }).href;
+
+                        newWindow.location.href = url;
+                    } catch (error) {
+                        newWindow.close();
+                    }
                 }
             }
         },
