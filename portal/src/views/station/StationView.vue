@@ -457,6 +457,9 @@ export default Vue.extend({
             this.$store
                 .dispatch(ActionTypes.UPDATE_STATION_MODULE, payload)
                 .then(() => {
+                    if (this.selectedModule) {
+                        this.selectedModule = this.station.modules.find((m) => m.id === this.selectedModule!.id)!;
+                    }
                     this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
                         message: this.$tc("station.moduleNameUpdateSuccess"),
                         type: SnackbarStyle.success,
