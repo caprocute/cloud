@@ -44,7 +44,7 @@ describe("Station Page", () => {
     it("go back to stations dashboard", function () {
         cy.visit(this.stationPageUrl);
 
-        cy.get('[data-cy="backBtn"]').click();
+        cy.get('[data-cy="backBtn"]').should("exist").click();
         cy.url().should("eq", Cypress.config("baseUrl") + `/dashboard/stations/${this.stationId}`);
     });
 
