@@ -2754,7 +2754,7 @@ Cancel a moderation request
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` moderation cancel --post-id 901307722 --post-type "Aut cupiditate." --auth "Bearer 󶔽"
+    `+os.Args[0]+` moderation cancel --post-id 901307722 --post-type "Aut cupiditate." --auth "Bearer 𾙿􈖚򞎨𧩏㽃󧱠"
 `, os.Args[0])
 }
 
@@ -2767,7 +2767,7 @@ Check if user has reported a specific post
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` moderation check-user-report --post-id 470607174 --post-type "Tempore iste ut aut nulla et tempore." --auth "Bearer 򦍗񵃽􄉒򖢙"
+    `+os.Args[0]+` moderation check-user-report --post-id 470607174 --post-type "Tempore iste ut aut nulla et tempore." --auth "Bearer 𵥲󐺂𛈃󏺐󳁛"
 `, os.Args[0])
 }
 
@@ -2780,7 +2780,7 @@ Acknowledge a moderation request with action
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` moderation acknowledge --id 809061598 --action "Autem ratione." --auth "Bearer 󑔖誠񷤍󘴚"
+    `+os.Args[0]+` moderation acknowledge --id 809061598 --action "Autem ratione." --auth "Bearer 񆄿򦣊"
 `, os.Args[0])
 }
 
@@ -2793,7 +2793,7 @@ List moderation requests
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` moderation list-requests --page 751866611 --page-size 527899872 --auth "Bearer 򕎥򒹘򿵛𰰐񜔓񕏂"
+    `+os.Args[0]+` moderation list-requests --page 751866611 --page-size 527899872 --auth "Bearer 񗗺𗦩𚊬򐇱"
 `, os.Args[0])
 }
 
@@ -2806,7 +2806,7 @@ Get content for moderation review
     -auth STRING: 
 
 Example:
-    `+os.Args[0]+` moderation get-content --post-type "Quia eos deleniti esse." --post-id 1078847296 --auth "Bearer 򣰀򹏻󋽎􁗑󺥚𥽁"
+    `+os.Args[0]+` moderation get-content --post-type "Quia eos deleniti esse." --post-id 1078847296 --auth "Bearer 񅰕򰗰򽾊򚗷򶲱"
 `, os.Args[0])
 }
 

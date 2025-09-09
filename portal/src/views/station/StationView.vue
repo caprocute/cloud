@@ -457,7 +457,6 @@ export default Vue.extend({
             this.$store
                 .dispatch(ActionTypes.UPDATE_STATION_MODULE, payload)
                 .then(() => {
-                    // Update selectedModule to point to the updated module from store
                     if (this.selectedModule) {
                         this.selectedModule = this.station.modules.find((m) => m.id === this.selectedModule!.id)!;
                     }

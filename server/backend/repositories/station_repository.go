@@ -836,7 +836,7 @@ func (r *StationRepository) QueryStationFull(ctx context.Context, id int32) (*da
 				SELECT id FROM fieldkit.provision WHERE device_id = $1
 			)
 		)
-		ORDER BY cm.module_index
+		ORDER BY cm.configuration_id, cm.module_index
 		`, stations[0].DeviceID); err != nil {
 		return nil, err
 	}
@@ -1299,13 +1299,16 @@ func (r *StationRepository) toStationFull(stations []*data.Station,
 	}
 
 	stationIDByModuleID := make(map[int64]int32)
+	configurationProvisionMap := make(map[int64]int64)
 	for _, v := range configurations {
-		modules := modulesByConfigurationID[v.ID]
-		stationID := stationIDsByProvisionID[v.ProvisionID]
-		modulesByStationID[stationID] = append(modulesByStationID[stationID], modules...)
-		for _, m := range modules {
-			stationIDByModuleID[m.ID] = stationID
-		}
+		configurationProvisionMap[v.ID] = v.ProvisionID
+	}
+	
+	for _, v := range modules {
+		provisionID := configurationProvisionMap[v.ConfigurationID]
+		stationID := stationIDsByProvisionID[provisionID]
+		modulesByStationID[stationID] = append(modulesByStationID[stationID], v)
+		stationIDByModuleID[v.ID] = stationID
 	}
 
 	for _, v := range sensors {
