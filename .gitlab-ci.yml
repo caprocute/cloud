@@ -103,6 +103,7 @@ build:tools-amd64:
     - (cd server/cmd/sanitizer && go build -o ../../../build/sanitizer *.go)
     - (cd server/cmd/scratch && go build -o ../../../build/scratch *.go)
     - (cd server/cmd/merger && go build -o ../../../build/merger *.go)
+    - (cd tools/passwords && go build -o ../../build/passwords *.go)
   artifacts:
     name: "cloud-tools-amd64-${CI_COMMIT_REF_NAME}"
     paths:
@@ -111,6 +112,7 @@ build:tools-amd64:
       - build/sanitizer
       - build/scratch
       - build/merger
+      - build/passwords
 
 build:compile:
   stage: build
@@ -300,11 +302,10 @@ deploy:staging:
     - chmod 0600 "${SSH_KEY}"
     - (cd migrations && docker build --progress=plain -t conservify/fk-cloud-migrations:latest .)
     - (cd tools && docker build --progress=plain -t conservify/fk-cloud-tools:latest .)
-    - MIGRATE_DATABASE_URL=`jq -r .database_url.value ${TERRAFORM_ENV}`
+    - MIGRATE_DATABASE_URL=`jq -r .database_external_url.value ${TERRAFORM_ENV}`
     - docker run -e MIGRATE_PATH=/migrations -e MIGRATE_DATABASE_URL=${MIGRATE_DATABASE_URL} -v `pwd`/${PRIMARY_MIGRATIONS_PATH}:/migrations conservify/fk-cloud-migrations migrate
     - docker run -v $(pwd)/.secure_files:/work/.secure_files -v $(pwd)/dev-ops-main:/work/dev-ops-main conservify/fk-cloud-tools /work/deployer deploy --cert ${SSH_KEY} --terraform ${TERRAFORM_ENV} --archive ${ARCHIVE} --poll ${POLL_URL}
-    - export FIELDKIT_POSTGRES_URL=`jq -r .database_url.value ${TERRAFORM_ENV}`
-    - export FIELDKIT_TIME_SCALE_URL=`jq -r .timescaledb_url.value ${TERRAFORM_ENV}`
+    - export FIELDKIT_POSTGRES_URL=`jq -r .database_external_url.value ${TERRAFORM_ENV}`
   environment:
     name: staging
     url: https://portal.fkdev.org
@@ -336,7 +337,7 @@ deploy:prod:
     - chmod 0600 "${SSH_KEY}"
     - (cd migrations && docker build --progress=plain -t conservify/fk-cloud-migrations:latest .)
     - (cd tools && docker build --progress=plain -t conservify/fk-cloud-tools:latest .)
-    - MIGRATE_DATABASE_URL=`jq -r .database_url.value ${TERRAFORM_ENV}`
+    - MIGRATE_DATABASE_URL=`jq -r .database_external_url.value ${TERRAFORM_ENV}`
     - docker run -e MIGRATE_PATH=/migrations -e MIGRATE_DATABASE_URL=${MIGRATE_DATABASE_URL} -v `pwd`/${PRIMARY_MIGRATIONS_PATH}:/migrations conservify/fk-cloud-migrations migrate
     - docker run -v $(pwd)/.secure_files:/work/.secure_files -v $(pwd)/dev-ops-main:/work/dev-ops-main conservify/fk-cloud-tools /work/deployer deploy --cert ${SSH_KEY} --terraform ${TERRAFORM_ENV} --archive ${ARCHIVE} --poll ${POLL_URL}
   environment:

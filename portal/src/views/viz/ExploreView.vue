@@ -112,7 +112,7 @@ export default Vue.extend({
                 await this.$store.dispatch(ActionTypes.SET_DISCUSSION_PERMISSIONS, savedBookmark.permissions);
                 // console.log(`viz: open-bookmark-saved`, savedBookmark.token);
             }
-            await this.$router.push({ name: "exploreShortBookmark", query: { v: this.bookmarkToToken[encoded] } });
+            await this.$router.replace({ name: "exploreShortBookmark", query: { v: this.bookmarkToToken[encoded] } });
         },
         async exportWorkspace(): Promise<void> {
             try {
