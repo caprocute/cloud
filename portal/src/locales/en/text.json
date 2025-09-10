@@ -7,7 +7,7 @@
         "reset": "Reset Password",
         "terms": "Terms and Conditions",
         "projects": "Projects",
-        "viewProject": "Project Details",
+        "viewProject": "Project Dashboard",
         "viewProjectActivity": "Project Activity",
         "viewProjectBigMap": "Project Map",
         "viewProjectBigMapList": "Project Stations",
@@ -15,11 +15,12 @@
         "editProject": "Edit Project",
         "mapAllStations": "Stations Map",
         "listAllStations": "Stations List",
-        "viewStation": "Station Details",
-        "viewStationFromMap": "Station Details",
+        "viewStation": "Station Dashboard",
+        "viewStationFromMap": "Station Dashboard",
         "viewStationPhotos": "Station Photos",
-        "mapStation": "Station Details",
-        "mapAllStationsBounds": "Station Details",
+        "viewProjectStationPhotos": "Station Photos",
+        "mapStation": "Station Dashboard",
+        "mapAllStationsBounds": "Station Dashboard",
         "exploreBookmark": "Data Dashboard",
         "exploreShortBookmark": "Data Dashboard",
         "viewProjectNotes": "Project Notes",
@@ -593,7 +594,9 @@
         "saveSuccess": "Comment saved successfully!",
         "deleteSuccess": "Comment deleted successfully!",
         "dataEventSuccess": "Event saved successfully!",
-        "dataEventDeleteSuccess": "Event deleted successfully!"
+        "dataEventDeleteSuccess": "Event deleted successfully!",
+        "reportSuccess": "Report sent successfully!",
+        "reportError": "Report failed! Please try again later."
     },
     "seeMore": "See more",
     "seeLess": "See less",
@@ -672,9 +675,9 @@
         "previous": {
             "heading": "Previous Exports",
             "noItems": "No previous exports.",
-            "download": "Download"
-        },
-        "downloaded": "Downloaded"
+            "download": "Download",
+            "downloaded": "Downloaded"
+        }
     },
     "followPanel": {
         "follow": "Follow",
@@ -871,6 +874,43 @@
             "processRecsTsdb": "Process Recs (TsDB only)",
             "exploreData": "Explore Data",
             "transfer": "Transfer"
+        },
+        "moderation": "Moderation",
+        "moderationList": {
+            "title": "Moderation Requests",
+            "id": "ID",
+            "postId": "Post ID",
+            "type": "Type",
+            "reportedBy": "Reported By",
+            "reportedAt": "Reported At",
+            "acknowledgedBy": "Acknowledged By",
+            "status": "Status",
+            "actions": "Actions",
+            "review": "Review",
+            "pending": "Pending",
+            "acknowledged": "Acknowledged",
+            "noModerationRequests": "No moderation requests found.",
+            "loading": "Loading moderation requests...",
+            "errorLoadingContent": "Error loading content",
+            "postTypes": {
+                "discussionPost": "Discussion Post",
+                "dataEvent": "Data Event"
+            }
+        },
+        "moderationReview": {
+            "title": "Review Content",
+            "postType": "Post Type",
+            "reportedBy": "Reported By",
+            "content": "Content",
+            "actions": {
+                "delete": "Delete Content",
+                "keep": "Keep Content",
+                "cancel": "Cancel"
+            },
+            "postTypes": {
+                "discussionPost": "Discussion Post",
+                "dataEvent": "Data Event"
+            }
         }
     },
     "pagination": {
@@ -890,5 +930,12 @@
             "notes": "Field Notes",
             "details": "Station Details"
         }
+    },
+    "loading": "Loading...",
+    "cancelReport": {
+        "canceling": "Canceling...",
+        "label": "Cancel Report",
+        "success": "Report canceled successfully.",
+        "error": "Failed to cancel report."
     }
 }

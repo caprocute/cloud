@@ -390,17 +390,33 @@ func (r *StationRepository) UpsertStationModule(ctx context.Context, module *dat
 func (r *StationRepository) UpdateStationModule(ctx context.Context, module *data.StationModule) (*data.StationModule, error) {
 	if _, err := r.db.NamedExecContext(ctx, `
         UPDATE fieldkit.station_module SET
-			  module_index = :module_index,
-              position = :position,
               flags = :flags,
               name = :name,
               manufacturer = :manufacturer,
               kind = :kind,
-              version = :version,
-              label = :label
+              version = :version
 		WHERE id = :id
 		`, module); err != nil {
 		return nil, err
+	}
+
+	if module.ConfigurationID != 0 {
+		configParams := map[string]interface{}{
+			"module_id":    module.ID,
+			"module_index": module.Index,
+			"position":     module.Position,
+			"label":        module.Label,
+		}
+
+		if _, err := r.db.NamedExecContext(ctx, `
+			UPDATE fieldkit.configuration_module SET
+				module_index = :module_index,
+				position = :position,
+				label = :label
+			WHERE module_id = :module_id
+			`, configParams); err != nil {
+			return nil, err
+		}
 	}
 
 	return module, nil
@@ -813,14 +829,14 @@ func (r *StationRepository) QueryStationFull(ctx context.Context, id int32) (*da
 	modules := []*data.StationModule{}
 	if err := r.db.SelectContext(ctx, &modules, `
 		SELECT
-			sm.id, cm.configuration_id, sm.hardware_id, cm.module_index, cm.position, sm.flags, sm.manufacturer, sm.kind, sm.version, sm.name, sm.label
+			sm.id, cm.configuration_id, sm.hardware_id, cm.module_index, cm.position, sm.flags, sm.manufacturer, sm.kind, sm.version, sm.name, cm.label
 		FROM fieldkit.configuration_module AS cm JOIN fieldkit.station_module AS sm ON (cm.module_id = sm.id)
 		WHERE cm.configuration_id IN (
 			SELECT id FROM fieldkit.station_configuration WHERE provision_id IN (
 				SELECT id FROM fieldkit.provision WHERE device_id = $1
 			)
 		)
-		ORDER BY cm.module_index
+		ORDER BY cm.configuration_id, cm.module_index
 		`, stations[0].DeviceID); err != nil {
 		return nil, err
 	}
@@ -977,7 +993,7 @@ func (r *StationRepository) QueryStationFullByOwnerID(ctx context.Context, id in
 	modules := []*data.StationModule{}
 	if err := r.db.SelectContext(ctx, &modules, `
 		SELECT
-			sm.id, cm.configuration_id, sm.hardware_id, cm.module_index, cm.position, sm.flags, sm.manufacturer, sm.kind, sm.version, sm.name, sm.label
+			sm.id, cm.configuration_id, sm.hardware_id, cm.module_index, cm.position, sm.flags, sm.manufacturer, sm.kind, sm.version, sm.name, cm.label
 		FROM fieldkit.configuration_module AS cm JOIN fieldkit.station_module AS sm ON (cm.module_id = sm.id)
 		WHERE cm.configuration_id IN (
 			SELECT id FROM fieldkit.station_configuration WHERE provision_id IN (
@@ -1147,7 +1163,7 @@ func (r *StationRepository) QueryStationFullByProjectID(ctx context.Context, id 
 	modules := []*data.StationModule{}
 	if err := r.db.SelectContext(ctx, &modules, `
 		SELECT
-			sm.id, cm.configuration_id, sm.hardware_id, cm.module_index, cm.position, sm.flags, sm.manufacturer, sm.kind, sm.version, sm.name, sm.label
+			sm.id, cm.configuration_id, sm.hardware_id, cm.module_index, cm.position, sm.flags, sm.manufacturer, sm.kind, sm.version, sm.name, cm.label
 		FROM fieldkit.configuration_module AS cm JOIN fieldkit.station_module AS sm ON (cm.module_id = sm.id)
         WHERE cm.configuration_id IN (
 			SELECT id FROM fieldkit.station_configuration WHERE provision_id IN (
@@ -1283,13 +1299,16 @@ func (r *StationRepository) toStationFull(stations []*data.Station,
 	}
 
 	stationIDByModuleID := make(map[int64]int32)
+	configurationProvisionMap := make(map[int64]int64)
 	for _, v := range configurations {
-		modules := modulesByConfigurationID[v.ID]
-		stationID := stationIDsByProvisionID[v.ProvisionID]
-		modulesByStationID[stationID] = append(modulesByStationID[stationID], modules...)
-		for _, m := range modules {
-			stationIDByModuleID[m.ID] = stationID
-		}
+		configurationProvisionMap[v.ID] = v.ProvisionID
+	}
+	
+	for _, v := range modules {
+		provisionID := configurationProvisionMap[v.ConfigurationID]
+		stationID := stationIDsByProvisionID[provisionID]
+		modulesByStationID[stationID] = append(modulesByStationID[stationID], v)
+		stationIDByModuleID[v.ID] = stationID
 	}
 
 	for _, v := range sensors {
@@ -1666,8 +1685,10 @@ func (r *StationRepository) QueryStationModuleByID(ctx context.Context, id int32
 	module = &data.StationModule{}
 	if err := r.db.GetContext(ctx, module, `
 		SELECT
-			id, hardware_id, module_index, position, flags, name, manufacturer, kind, version
-		FROM fieldkit.station_module WHERE id = $1
+			sm.id, cm.configuration_id, sm.hardware_id, cm.module_index, cm.position, sm.flags, sm.name, sm.manufacturer, sm.kind, sm.version, cm.label
+		FROM fieldkit.station_module AS sm 
+		LEFT JOIN fieldkit.configuration_module AS cm ON (sm.id = cm.module_id)
+		WHERE sm.id = $1
 		`, id); err != nil {
 		return nil, err
 	}
