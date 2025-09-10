@@ -46,7 +46,7 @@
                     </template>
                 </div>
             </template>
-            <template #right  v-if="permissions.canAddEvent">
+            <template #right v-if="permissions.canAddEvent">
                 <div class="event-level-selector">
                     <label for="allProjectRadio" v-if="stationBelongsToAProject">
                         <div class="event-level-radio">
@@ -484,7 +484,6 @@ export default Vue.extend({
             return null;
         },
         permissions(): { canAddComment: boolean; canAddEvent: boolean } {
-            console.log("permissions radoi", this.$state.discussion.permissions);
             return this.$state.discussion.permissions;
         },
     },
