@@ -455,4 +455,35 @@ export default Vue.extend({
     height: 35px;
     margin: 6px 7px 0 0;
 }
+
+.hoverable-item {
+    position: relative;
+
+    @include mixins.attention() {
+        .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+    }
+}
+
+.tooltip-text {
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.25s;
+    padding: 8px 16px;
+    border-radius: 2px;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.24);
+    border: solid 1px #f4f5f7;
+    background-color: #fff;
+    font-size: 14px;
+    white-space: nowrap;
+    transform: translateX(-50%);
+    z-index: variables.$z-index-top;
+    @include mixins.position(absolute, null null calc(-100% + 10px) 50%);
+
+    @include mixins.bp-down(variables.$sm) {
+        bottom: calc(-100% + 15px);
+    }
+}
 </style>

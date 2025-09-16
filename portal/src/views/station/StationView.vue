@@ -631,7 +631,7 @@ export default Vue.extend({
         }
 
         ::v-deep .tooltip-text { 
-            bottom: -100%;
+            bottom: calc(-100% - 6px);
         }
     }
     &-coordinate {
