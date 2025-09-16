@@ -52,7 +52,7 @@
                 <ModuleIcon
                     v-for="(module, index) in station.modules"
                     v-bind:key="index"
-                    :module="{ url: $loadAsset(getModuleImg(module)), name: module.name }"
+                    :module="module"
                 />
             </div>
 
@@ -63,7 +63,7 @@
             <ModuleIcon
                 v-for="(module, index) in station.modules"
                 v-bind:key="index"
-                :module="{ url: $loadAsset(getModuleImg(module)), name: module.name }"
+                :module="module"
             />
         </div>
     </div>
@@ -115,9 +115,6 @@ export default Vue.extend({
     methods: {
         getBatteryIcon() {
             return this.$loadAsset(utils.getBatteryIcon(this.station.battery));
-        },
-        getModuleImg(module) {
-            return utils.getModuleImg(module);
         },
         partnerCustomization(): PartnerCustomization {
             return getPartnerCustomizationWithDefault();

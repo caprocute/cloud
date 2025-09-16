@@ -190,7 +190,7 @@ export default Vue.extend({
             return this.$getters.projectsById[this.displayProject.id].modules.map((m) => {
                 return {
                     name: m.name,
-                    url: this.getModuleImg(m),
+                    url: this.$loadAsset(utils.getModuleImg(m)),
                 };
             });
         },
@@ -252,9 +252,6 @@ export default Vue.extend({
         switchView(): void {
             this.activeStationId = null;
             this.layoutChanges++;
-        },
-        getModuleImg(module: ProjectModule): string {
-            return this.$loadAsset(utils.getModuleImg(module));
         },
         showSummary(station: DisplayStation): void {
             console.log("map: show-summay", station);

@@ -99,6 +99,10 @@ export function getModuleImg(module) {
     }
 }
 
+export function getModuleKey(module) {
+    return module.name.replace("modules.", "fk.");
+}
+
 export function getBatteryIcon(percentage: number | null): string {
     if (!percentage) {
         return "battery/0.svg";

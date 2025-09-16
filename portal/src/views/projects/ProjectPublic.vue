@@ -191,15 +191,12 @@ export default Vue.extend({
             return this.$getters.projectsById[this.displayProject.id].modules.map((m) => {
                 return {
                     name: m.name,
-                    url: this.getModuleImg(m),
+                    url: this.$loadAsset(utils.getModuleImg(m)),
                 };
             });
         },
     },
     methods: {
-        getModuleImg(module: ProjectModule): string {
-            return this.$loadAsset(utils.getModuleImg(module));
-        },
         getTeamHeading(): string {
             // TODO i18n
             const members = this.displayProject.users.length == 1 ? "member" : "members";

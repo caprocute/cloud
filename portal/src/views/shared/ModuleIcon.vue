@@ -1,19 +1,35 @@
 <template>
     <div class="hoverable-item">
-        <img alt="Module icon" class="module-icon" :src="module.url" />
-        <span class="tooltip-text">{{ $t(module.name) }}</span>
+        <img alt="Module icon" class="module-icon" :src="moduleImageUrl" />
+        <span class="tooltip-text">{{ $tc(module.name) }}</span>
     </div>
 </template>
 
 <script lang="ts">
 import Vue, { PropType } from "vue";
+import * as utils from "@/utilities";
+import { DisplayModule } from "@/store";
+
+type ModuleProps = DisplayModule | { name: string; url: string };
 
 export default Vue.extend({
     name: "ModuleIcon",
     props: {
         module: {
-            type: Object as PropType<{ url: string; name: string }>,
+            type: Object as PropType<ModuleProps>,
             required: true,
+        },
+    },
+    computed: {
+        moduleImageUrl(): string {
+            // handle both DisplayModule and { name: string; url: string } types
+            if ('url' in this.module && typeof this.module.url === 'string') {
+                // already has a URL (project module)
+                return this.module.url;
+            } else {
+                // needs asset loading
+                return this.$loadAsset(utils.getModuleImg(this.module as DisplayModule));
+            }
         },
     },
 });

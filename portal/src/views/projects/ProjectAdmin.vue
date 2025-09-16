@@ -147,7 +147,7 @@ export default Vue.extend({
             return this.displayProject.modules.map((m) => {
                 return {
                     name: m.name,
-                    url: this.getModuleImg(m),
+                    url: this.$loadAsset(utils.getModuleImg(m)),
                 };
             });
         },
@@ -176,9 +176,6 @@ export default Vue.extend({
         },
         openActivityFeed(): void {
             this.viewingActivityFeed = true;
-        },
-        getModuleImg(module: ProjectModule): string {
-            return this.$loadAsset(utils.getModuleImg(module));
         },
         // tooltip is shown via CSS on desktop, the js makes sure the tooltip doesn't overflow the screen on mobile
         showTooltip(ref: string): void {
