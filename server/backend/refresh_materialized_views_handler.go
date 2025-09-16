@@ -44,10 +44,16 @@ func (h *RefreshMaterializedViewsHandler) Start(ctx context.Context, m *messages
 	} else {
 		numberRows := 0
 
+		for _, dirty := range dirtyWindows {
+			numberRows += dirty.NumberRows
+		}
+
 		now := time.Now().UTC()
 
-		for _, dirty := range dirtyWindows {
-			for _, view := range h.tsConfig.MaterializedViews() {
+		for _, view := range h.tsConfig.MaterializedViews() {
+			publishes := 0
+
+			for _, dirty := range dirtyWindows {
 				if dirty.DataStart != nil && dirty.DataEnd != nil {
 					// Calculate this view's 'horizon' time, which is the time after
 					// which samples are being read live. We can't attempt to
@@ -76,7 +82,7 @@ func (h *RefreshMaterializedViewsHandler) Start(ctx context.Context, m *messages
 							break
 						}
 
-						log.Infow("refresh:send", "view", view.ShortName, "start", start, "end", end)
+						log.Debugw("refresh:send", "view", view.ShortName, "start", start, "end", end)
 
 						mc.Publish(ctx, &messages.RefreshMaterializedView{
 							View:  view.ShortName,
@@ -85,6 +91,7 @@ func (h *RefreshMaterializedViewsHandler) Start(ctx context.Context, m *messages
 						}, jobs.WithPriority(5))
 
 						start = end
+						publishes += 1
 
 						if finished {
 							break
@@ -94,7 +101,7 @@ func (h *RefreshMaterializedViewsHandler) Start(ctx context.Context, m *messages
 				}
 			}
 
-			numberRows += dirty.NumberRows
+			log.Infow("refresh:view", "view", view.ShortName, "publishes", publishes)
 		}
 
 		if numberRows > 0 {
