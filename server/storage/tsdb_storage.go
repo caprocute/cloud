@@ -16,7 +16,7 @@ var (
 			BucketWidth:       time.Minute,
 			EndOffsetSQL:      "3 minutes",
 			EndOffsetDuration: time.Minute * 3,
-			RefreshWidth:      time.Hour * 3,
+			RefreshWidth:      time.Hour * 24,
 		},
 		{
 			Name:              "fieldkit.sensor_data_10m",
@@ -24,7 +24,7 @@ var (
 			BucketWidth:       time.Minute * 10,
 			EndOffsetSQL:      "30 minutes",
 			EndOffsetDuration: time.Minute * 10 * 3,
-			RefreshWidth:      time.Hour * 6,
+			RefreshWidth:      time.Hour * 24,
 		},
 		{
 			Name:              "fieldkit.sensor_data_1h",
@@ -32,7 +32,7 @@ var (
 			BucketWidth:       time.Hour,
 			EndOffsetSQL:      "3 hours",
 			EndOffsetDuration: time.Hour * 3,
-			RefreshWidth:      time.Hour * 12,
+			RefreshWidth:      time.Hour * 24,
 		},
 		{
 			Name:              "fieldkit.sensor_data_6h",
@@ -105,6 +105,7 @@ func (tsc *TimeScaleDBConfig) RefreshViews(ctx context.Context) error {
 	log := Logger(ctx).Sugar()
 
 	queries := []string{
+		"CALL refresh_continuous_aggregate('fieldkit.sensor_data_1m', NULL, NOW() - INTERVAL '20 minutes');",
 		"CALL refresh_continuous_aggregate('fieldkit.sensor_data_10m', NULL, NOW() - INTERVAL '20 minutes');",
 		"CALL refresh_continuous_aggregate('fieldkit.sensor_data_1h', NULL, NOW() - INTERVAL '3 hours');",
 		"CALL refresh_continuous_aggregate('fieldkit.sensor_data_6h', NULL, NOW() - INTERVAL '21 hours');",
