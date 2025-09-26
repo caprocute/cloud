@@ -218,7 +218,7 @@ func (r *ProgressReader) Read(p []byte) (int, error) {
 	n, err := r.ReadCloser.Read(p)
 	r.file += int64(n)
 
-	if r.notify != nil {
+	if r.notify != nil && n > 0 {
 		if err := r.notify(r.ctx, WalkProgress{
 			read: int64(n),
 			file: r.file,
