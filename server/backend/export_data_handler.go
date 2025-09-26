@@ -23,7 +23,7 @@ import (
 )
 
 const (
-	SecondsBetweenProgressUpdates = 1
+	SecondsBetweenProgressUpdates = 1.0 / 2.0
 )
 
 type ExportDataHandler struct {
@@ -47,15 +47,17 @@ func NewExportDataHandler(db *sqlxcache.DB, files files.FileArchive, metrics *lo
 }
 
 func (h *ExportDataHandler) progress(ctx context.Context, de *data.DataExport, progress WalkProgress) error {
+	// Important to always update this, or bytes get lost.
+	h.bytesRead += progress.read
+	// I like state being consistent, so we do this here also.
+	de.Progress = (float64(h.bytesRead) / float64(h.bytesExpectedToRead)) * 100.0
+
 	elapsed := time.Since(h.updatedAt)
 	if elapsed.Seconds() < SecondsBetweenProgressUpdates {
 		return nil
 	}
 
 	h.updatedAt = time.Now()
-	h.bytesRead += progress.read
-
-	de.Progress = (float64(h.bytesRead) / float64(h.bytesExpectedToRead)) * 100.0
 
 	r, err := repositories.NewExportRepository(h.db)
 	if err != nil {
