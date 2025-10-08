@@ -4,6 +4,9 @@
             <div class="menu">
                 <router-link :to="{ name: 'adminUsers' }" class="link"><h2>Users</h2></router-link>
                 <router-link :to="{ name: 'adminStations' }" class="link"><h2>Stations</h2></router-link>
+                <router-link :to="{ name: 'adminModeration' }" class="link">
+                    <h2>{{ $t("admin.moderation") }}</h2>
+                </router-link>
             </div>
 
             <div class="backup-upload form-container">

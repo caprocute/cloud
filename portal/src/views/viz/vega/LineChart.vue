@@ -1,6 +1,6 @@
 <template>
     <div class="h-100">
-        <ExportChartButton v-if="!settings.tiny" :vega="vega"></ExportChartButton>
+        <ExportChartButton v-if="!settings.tiny" :vega="vega" :series="series"></ExportChartButton>
         <div ref="vegaContainer" class="viz linechart h-100"></div>
         <div v-if="isLoading" class="loading-container">
             <Spinner class="spinner" />
@@ -260,7 +260,7 @@ export default Vue.extend({
     opacity: 1 !important;
 
     @include mixins.bp-down(variables.$sm) {
-        bottom: -195px;
+        bottom: -240px;
         top: unset !important;
         left: 50%;
         transform: translateX(-50%);

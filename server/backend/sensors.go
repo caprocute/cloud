@@ -57,6 +57,26 @@ type QueryParams struct {
 	EndOfTime       bool              `json:"end_of_time"`
 }
 
+func (qp *QueryParams) SensorIDs() []int64 {
+	ids := make([]int64, 0)
+
+	for _, s := range qp.Sensors {
+		ids = append(ids, s.SensorID)
+	}
+
+	return ids
+}
+
+func (qp *QueryParams) ModuleIDs() []string {
+	ids := make([]string, 0)
+
+	for _, s := range qp.Sensors {
+		ids = append(ids, s.ModuleID)
+	}
+
+	return ids
+}
+
 func ParseStationIDs(raw *string) []int32 {
 	stations := make([]int32, 0)
 	if raw != nil {

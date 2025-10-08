@@ -31,9 +31,11 @@ import NotificationsView from "./views/notifications/NotificationsView.vue";
 import AdminMain from "./views/admin/AdminMain.vue";
 import AdminUsers from "./views/admin/AdminUsers.vue";
 import AdminStations from "./views/admin/AdminStations.vue";
+import AdminModeration from "./views/admin/AdminModeration.vue";
 import Playground from "./views/admin/Playground.vue";
 
 import StationView from "./views/station/StationView.vue";
+import NotFoundView from "./views/NotFoundView.vue";
 
 import { deserializeBookmark } from "./views/viz/viz";
 import TermsView from "@/views/auth/TermsView.vue";
@@ -642,7 +644,24 @@ const routes = [
             secured: true,
         },
     },
+    {
+        path: "/admin/moderation",
+        name: "adminModeration",
+        component: AdminModeration,
+        meta: {
+            admin: true,
+            secured: true,
+        },
+    },
     getRoot(),
+    {
+        path: "*",
+        name: "notFound",
+        component: NotFoundView,
+        meta: {
+            secured: false,
+        },
+    },
 ];
 
 export default function routerFactory(store) {

@@ -11,9 +11,9 @@ import * as ActionTypes from "@/store/actions";
 import { AuthenticationRequiredError } from "@/api";
 import { getPartnerCustomization, PartnerCustomization } from "./views/shared/partners";
 import SnackBar from "@/views/shared/SnackBar.vue";
-import {Locales} from '@/views/shared/LanguageSelector.vue';
-import moment from 'moment';
-import i18n from '@/i18n';
+import { Locales } from "@/views/shared/LanguageSelector.vue";
+import moment from "moment";
+import i18n from "@/i18n";
 import { updateDocumentTitle } from "@/router";
 
 export default Vue.extend({

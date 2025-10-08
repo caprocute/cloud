@@ -19,8 +19,8 @@
             </DoubleHeader>
 
             <silent-box
-                v-if="photos && photos.length > 0"
-                :gallery="gallery"
+                v-if="photos && photos.length > 0 && gallery.some((item) => item && item.src)"
+                :gallery="gallery.filter((item) => item && item.src)"
                 @silentbox-overlay-opened="togglePageScroll()"
                 @silentbox-overlay-hidden="togglePageScroll()"
             >
@@ -36,6 +36,7 @@
                         v-if="silentboxItem.photo"
                         :url="silentboxItem.photo.url"
                         :loading="silentboxItem.photo.id === loadingPhotoId"
+                        @loading-change="silentboxItem.loading = $event"
                     />
                 </template>
             </silent-box>
@@ -88,7 +89,7 @@ export default Vue.extend({
     data: (): {
         photoOptions: ListItemOption[];
         loadingPhotoId: number | null;
-        gallery: { src: string; photo: NoteMedia }[];
+        gallery: { src: string; photo: NoteMedia; loading: boolean }[];
     } => {
         return {
             photoOptions: [],
@@ -169,12 +170,17 @@ export default Vue.extend({
             reader.readAsDataURL(image);
         },
         initGallery(): void {
-            this.gallery = [];
-            this.photos.forEach((photo) => {
+            this.gallery = this.photos.map((photo) => ({
+                src: "",
+                photo: photo,
+                loading: true,
+            }));
+            this.photos.forEach((photo, index) => {
                 this.$services.api.loadMedia(photo["url"]).then((src) => {
-                    this.gallery.push({
+                    this.$set(this.gallery, index, {
                         src: src,
                         photo: photo,
+                        loading: false,
                     });
                 });
             });
@@ -266,22 +272,42 @@ input[type="file"] {
 #silentbox-gallery {
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-between;
+    gap: 20px 10px;
+    margin-top: 20px;
+
+    @include mixins.bp-down(variables.$xs) {
+        justify-content: space-between;
+    }
 }
 
 ::v-deep .silentbox-item {
     position: relative;
-    margin-top: 10px;
-    flex: 0 0 calc(50% - 5px);
     background-color: #e2e4e6;
-    min-height: 300px;
+    height: 300px;
+    min-width: 100px;
 
-    &:nth-of-type(1) {
-        flex: 0 0 100%;
-        margin-top: 15px;
+    /* Safari-specific fix */
+    @supports (-webkit-hyphens: none) {
+        flex: 0 0 calc(50% - 5px);
+        width: calc(50% - 5px);
+    }
+
+    &:has(.spinner) {
+        min-width: 250px;
+        min-height: 250px;
     }
 
     @include mixins.bp-down(variables.$xs) {
+        height: auto;
+        max-height: 80vh;
+        flex: 1 1 auto;
+
+        /* Safari-specific fix for mobile */
+        @supports (-webkit-hyphens: none) {
+            flex: 1 1 100%;
+            width: 100%;
+        }
+
         &:nth-of-type(even) {
             .options-btns {
                 right: auto;
@@ -293,8 +319,7 @@ input[type="file"] {
         object-fit: cover;
         border-radius: 2px;
         width: 100%;
-        min-height: 200px;
-        max-height: 400px;
+        height: 100%;
     }
 }
 

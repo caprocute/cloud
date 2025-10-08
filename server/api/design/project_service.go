@@ -140,6 +140,30 @@ var ProjectUpdate = ResultType("application/vnd.app.project.update", func() {
 	})
 })
 
+var ProjectBasic = ResultType("application/vnd.app.project.basic+json", func() {
+	TypeName("ProjectBasic")
+	Attributes(func() {
+		Attribute("id", Int32)
+		Attribute("name", String)
+		Required("id", "name")
+	})
+	View("default", func() {
+		Attribute("id")
+		Attribute("name")
+	})
+})
+
+var ProjectsBasic = ResultType("application/vnd.app.projects.basic+json", func() {
+	TypeName("ProjectsBasic")
+	Attributes(func() {
+		Attribute("projects", CollectionOf(ProjectBasic))
+		Required("projects")
+	})
+	View("default", func() {
+		Attribute("projects")
+	})
+})
+
 var _ = Service("project", func() {
 	Method("add update", func() {
 		Security(JWTAuth, func() {
@@ -625,17 +649,16 @@ var _ = Service("project", func() {
 
 	Method("projects station", func() {
 		Security(JWTAuth, func() {
-			Scope("api:access")
+			// Optional
 		})
 
 		Payload(func() {
 			Token("auth")
-			Required("auth")
 			Attribute("id", Int32)
 			Required("id")
 		})
 
-		Result(Projects)
+		Result(ProjectsBasic)
 
 		HTTP(func() {
 			GET("projects/station/{id}")

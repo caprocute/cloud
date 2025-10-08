@@ -11,32 +11,44 @@ import (
 var (
 	MaterializedViews = []*MaterializedView{
 		{
+			Name:              "fieldkit.sensor_data_1m",
+			ShortName:         "1m",
+			BucketWidth:       time.Minute,
+			EndOffsetSQL:      "3 minutes",
+			EndOffsetDuration: time.Minute * 3,
+			RefreshWidth:      time.Hour * 24,
+		},
+		{
 			Name:              "fieldkit.sensor_data_10m",
 			ShortName:         "10m",
 			BucketWidth:       time.Minute * 10,
-			EndOffsetSQL:      "20 minutes",
-			EndOffsetDuration: time.Minute * 20,
+			EndOffsetSQL:      "30 minutes",
+			EndOffsetDuration: time.Minute * 10 * 3,
+			RefreshWidth:      time.Hour * 24,
 		},
 		{
 			Name:              "fieldkit.sensor_data_1h",
 			ShortName:         "1h",
-			BucketWidth:       time.Hour * 1,
+			BucketWidth:       time.Hour,
 			EndOffsetSQL:      "3 hours",
 			EndOffsetDuration: time.Hour * 3,
+			RefreshWidth:      time.Hour * 24,
 		},
 		{
 			Name:              "fieldkit.sensor_data_6h",
 			ShortName:         "6h",
 			BucketWidth:       time.Hour * 6,
-			EndOffsetSQL:      "21 hours",
-			EndOffsetDuration: time.Hour * 21,
+			EndOffsetSQL:      "18 hours",
+			EndOffsetDuration: time.Hour * 6 * 3,
+			RefreshWidth:      time.Hour * 24,
 		},
 		{
 			Name:              "fieldkit.sensor_data_24h",
 			ShortName:         "24h",
 			BucketWidth:       time.Hour * 24,
 			EndOffsetSQL:      "72 hours",
-			EndOffsetDuration: time.Hour * 72,
+			EndOffsetDuration: time.Hour * 24 * 3,
+			RefreshWidth:      time.Hour * 24 * 3,
 		},
 	}
 )
@@ -47,6 +59,7 @@ type MaterializedView struct {
 	BucketWidth       time.Duration
 	EndOffsetSQL      string
 	EndOffsetDuration time.Duration
+	RefreshWidth      time.Duration
 }
 
 func (mv *MaterializedView) MakeRefreshAllSQL() (string, []interface{}, error) {
@@ -92,6 +105,7 @@ func (tsc *TimeScaleDBConfig) RefreshViews(ctx context.Context) error {
 	log := Logger(ctx).Sugar()
 
 	queries := []string{
+		"CALL refresh_continuous_aggregate('fieldkit.sensor_data_1m', NULL, NOW() - INTERVAL '20 minutes');",
 		"CALL refresh_continuous_aggregate('fieldkit.sensor_data_10m', NULL, NOW() - INTERVAL '20 minutes');",
 		"CALL refresh_continuous_aggregate('fieldkit.sensor_data_1h', NULL, NOW() - INTERVAL '3 hours');",
 		"CALL refresh_continuous_aggregate('fieldkit.sensor_data_6h', NULL, NOW() - INTERVAL '21 hours');",

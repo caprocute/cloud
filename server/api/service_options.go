@@ -62,7 +62,7 @@ func CreateServiceOptions(ctx context.Context, config *ApiConfiguration, databas
 		return nil, err
 	}
 
-	locations := data.NewDescribeLocations(config.MapboxToken, metrics)
+	locations := data.NewDescribeLocations(config.MapboxToken, config.NativeLandsToken, metrics)
 
 	controllerOptions = &ControllerOptions{
 		Session:         awsSession,

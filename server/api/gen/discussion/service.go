@@ -97,13 +97,14 @@ type DeleteMessagePayload struct {
 }
 
 type ThreadedPost struct {
-	ID        int64
-	CreatedAt int64
-	UpdatedAt int64
-	Author    *PostAuthor
-	Replies   []*ThreadedPost
-	Body      string
-	Bookmark  *string
+	ID              int64
+	CreatedAt       int64
+	UpdatedAt       int64
+	Author          *PostAuthor
+	Replies         []*ThreadedPost
+	Body            string
+	Bookmark        *string
+	UserHasReported *bool
 }
 
 type PostAuthor struct {
@@ -201,7 +202,8 @@ func newDiscussionView(res *Discussion) *discussionviews.DiscussionView {
 // ThreadedPost.
 func newThreadedPost(vres *discussionviews.ThreadedPostView) *ThreadedPost {
 	res := &ThreadedPost{
-		Bookmark: vres.Bookmark,
+		Bookmark:        vres.Bookmark,
+		UserHasReported: vres.UserHasReported,
 	}
 	if vres.ID != nil {
 		res.ID = *vres.ID
@@ -231,11 +233,12 @@ func newThreadedPost(vres *discussionviews.ThreadedPostView) *ThreadedPost {
 // ThreadedPostView using the "default" view.
 func newThreadedPostView(res *ThreadedPost) *discussionviews.ThreadedPostView {
 	vres := &discussionviews.ThreadedPostView{
-		ID:        &res.ID,
-		CreatedAt: &res.CreatedAt,
-		UpdatedAt: &res.UpdatedAt,
-		Body:      &res.Body,
-		Bookmark:  res.Bookmark,
+		ID:              &res.ID,
+		CreatedAt:       &res.CreatedAt,
+		UpdatedAt:       &res.UpdatedAt,
+		Body:            &res.Body,
+		Bookmark:        res.Bookmark,
+		UserHasReported: res.UserHasReported,
 	}
 	if res.Author != nil {
 		vres.Author = transformPostAuthorToDiscussionviewsPostAuthorView(res.Author)
@@ -256,11 +259,12 @@ func transformDiscussionviewsThreadedPostViewToThreadedPost(v *discussionviews.T
 		return nil
 	}
 	res := &ThreadedPost{
-		ID:        *v.ID,
-		CreatedAt: *v.CreatedAt,
-		UpdatedAt: *v.UpdatedAt,
-		Body:      *v.Body,
-		Bookmark:  v.Bookmark,
+		ID:              *v.ID,
+		CreatedAt:       *v.CreatedAt,
+		UpdatedAt:       *v.UpdatedAt,
+		Body:            *v.Body,
+		Bookmark:        v.Bookmark,
+		UserHasReported: v.UserHasReported,
 	}
 	if v.Author != nil {
 		res.Author = transformDiscussionviewsPostAuthorViewToPostAuthor(v.Author)
@@ -306,11 +310,12 @@ func transformDiscussionviewsAuthorPhotoViewToAuthorPhoto(v *discussionviews.Aut
 // type *discussionviews.ThreadedPostView from a value of type *ThreadedPost.
 func transformThreadedPostToDiscussionviewsThreadedPostView(v *ThreadedPost) *discussionviews.ThreadedPostView {
 	res := &discussionviews.ThreadedPostView{
-		ID:        &v.ID,
-		CreatedAt: &v.CreatedAt,
-		UpdatedAt: &v.UpdatedAt,
-		Body:      &v.Body,
-		Bookmark:  v.Bookmark,
+		ID:              &v.ID,
+		CreatedAt:       &v.CreatedAt,
+		UpdatedAt:       &v.UpdatedAt,
+		Body:            &v.Body,
+		Bookmark:        v.Bookmark,
+		UserHasReported: v.UserHasReported,
 	}
 	if v.Author != nil {
 		res.Author = transformPostAuthorToDiscussionviewsPostAuthorView(v.Author)

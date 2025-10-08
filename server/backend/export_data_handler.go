@@ -23,7 +23,7 @@ import (
 )
 
 const (
-	SecondsBetweenProgressUpdates = 1
+	SecondsBetweenProgressUpdates = 1.0 / 2.0
 )
 
 type ExportDataHandler struct {
@@ -47,15 +47,17 @@ func NewExportDataHandler(db *sqlxcache.DB, files files.FileArchive, metrics *lo
 }
 
 func (h *ExportDataHandler) progress(ctx context.Context, de *data.DataExport, progress WalkProgress) error {
+	// Important to always update this, or bytes get lost.
+	h.bytesRead += progress.read
+	// I like state being consistent, so we do this here also.
+	de.Progress = (float64(h.bytesRead) / float64(h.bytesExpectedToRead)) * 100.0
+
 	elapsed := time.Since(h.updatedAt)
 	if elapsed.Seconds() < SecondsBetweenProgressUpdates {
 		return nil
 	}
 
 	h.updatedAt = time.Now()
-	h.bytesRead += progress.read
-
-	de.Progress = (float64(h.bytesRead) / float64(h.bytesExpectedToRead)) * 100.0
 
 	r, err := repositories.NewExportRepository(h.db)
 	if err != nil {
@@ -288,6 +290,11 @@ func newFieldSet(kind string) *fieldSet {
 	}
 }
 
+type uniqueLayoutKey struct {
+	metaId   int64
+	moduleId string
+}
+
 func (p *fieldSet) addField(name string, get optionalFieldFunc) {
 	p.fields = append(p.fields, &csvField{name: name, get: get})
 }
@@ -296,8 +303,8 @@ type preparingCsv struct {
 	fields    *fieldSet
 	metas     map[int64]*pb.DataRecord
 	conflicts map[string]map[string]bool
-	modules   map[string]*fieldSet
-	order     []string
+	modules   map[uniqueLayoutKey]*fieldSet
+	order     []uniqueLayoutKey
 	compacted []*fieldSet
 }
 
@@ -319,8 +326,8 @@ func NewCsvExporter(files files.FileArchive, metrics *logging.Metrics, writer io
 			fields:    newFieldSet("fixed"),
 			metas:     make(map[int64]*pb.DataRecord),
 			conflicts: make(map[string]map[string]bool),
-			modules:   make(map[string]*fieldSet),
-			order:     make([]string, 0),
+			modules:   make(map[uniqueLayoutKey]*fieldSet),
+			order:     make([]uniqueLayoutKey, 0),
 		},
 	}
 	self.walker = NewFkbWalker(files, metrics, self, progress, true)
@@ -345,19 +352,34 @@ func (e *CsvExporter) Prepare(ctx context.Context, urls []string) error {
 		return fmt.Sprintf("%v", r.data.Readings.Uptime)
 	})
 	e.preparing.addField("gps", func(r *records) string {
-		return fmt.Sprintf("%v", r.data.Readings.Location.Fix)
+		if loc := r.data.Readings.Location; loc != nil {
+			return fmt.Sprintf("%v", loc.Fix)
+		}
+		return ""
 	})
 	e.preparing.addField("latitude", func(r *records) string {
-		return fmt.Sprintf("%v", r.data.Readings.Location.Latitude)
+		if loc := r.data.Readings.Location; loc != nil {
+			return fmt.Sprintf("%v", loc.Latitude)
+		}
+		return ""
 	})
 	e.preparing.addField("longitude", func(r *records) string {
-		return fmt.Sprintf("%v", r.data.Readings.Location.Longitude)
+		if loc := r.data.Readings.Location; loc != nil {
+			return fmt.Sprintf("%v", loc.Longitude)
+		}
+		return ""
 	})
 	e.preparing.addField("altitude", func(r *records) string {
-		return fmt.Sprintf("%v", r.data.Readings.Location.Altitude)
+		if loc := r.data.Readings.Location; loc != nil {
+			return fmt.Sprintf("%v", loc.Altitude)
+		}
+		return ""
 	})
 	e.preparing.addField("gps_time", func(r *records) string {
-		return fmt.Sprintf("%v", r.data.Readings.Location.Time)
+		if loc := r.data.Readings.Location; loc != nil {
+			return fmt.Sprintf("%v", loc.Time)
+		}
+		return ""
 	})
 	e.preparing.addField("note", func(r *records) string {
 		return ""
@@ -377,8 +399,8 @@ func (e *CsvExporter) Prepare(ctx context.Context, urls []string) error {
 
 const CompactFieldSets = true
 
-func (e *CsvExporter) compactFieldSets(_ context.Context) error {
-	unassigned := make(map[string]*fieldSet)
+func (e *CsvExporter) compactFieldSets(ctx context.Context) error {
+	unassigned := make(map[uniqueLayoutKey]*fieldSet)
 	compacted := make([]*fieldSet, 0)
 	for id, fs := range e.prepared.modules {
 		unassigned[id] = fs
@@ -394,20 +416,20 @@ func (e *CsvExporter) compactFieldSets(_ context.Context) error {
 	// the first field set that returns a value.
 	for _, id := range e.prepared.order {
 		if fs, ok := unassigned[id]; ok {
-			assignedIds := make([]string, 0)
+			assignedIds := make([]uniqueLayoutKey, 0)
 			assignedIds = append(assignedIds, id)
 			candidates := make([]*fieldSet, 1)
 			candidates[0] = fs
 
 			if CompactFieldSets {
-				conflicts := e.prepared.conflicts[id]
+				conflicts := e.prepared.conflicts[id.moduleId]
 				for maybeId, maybe := range unassigned {
 					if maybeId != id {
 						if maybe.kind == fs.kind {
 							if len(maybe.fields) != len(fs.fields) {
 								return fmt.Errorf("same kind different fields")
 							}
-							if conflicts == nil || !conflicts[maybeId] {
+							if conflicts == nil || !conflicts[maybeId.moduleId] {
 								candidates = append(candidates, maybe)
 								assignedIds = append(assignedIds, maybeId)
 							}
@@ -430,9 +452,9 @@ func (e *CsvExporter) compactFieldSets(_ context.Context) error {
 				for i := 0; i < numberFields; i += 1 {
 					fields[i] = &csvField{
 						name: fs.fields[i].name,
-						get: (func(i int) optionalFieldFunc {
+						get: (func(c []*fieldSet, i int) optionalFieldFunc {
 							return func(r *records) *string {
-								for _, fs := range candidates {
+								for _, fs := range c {
 									value := fs.fields[i].get(r)
 									if value != nil {
 										return value
@@ -440,7 +462,7 @@ func (e *CsvExporter) compactFieldSets(_ context.Context) error {
 								}
 								return nil
 							}
-						})(i),
+						})(candidates, i),
 					}
 				}
 				combined := &fieldSet{
@@ -463,6 +485,10 @@ func (e *CsvExporter) Export(ctx context.Context, urls []string) error {
 
 	if err := e.compactFieldSets(ctx); err != nil {
 		return err
+	}
+
+	for key, _ := range e.prepared.modules {
+		log.Infow("prepared", "module", key, "module_id", key.moduleId, "meta_id", key.metaId)
 	}
 
 	log.Infow("prepared", "conflicts", e.prepared.conflicts)
@@ -491,7 +517,7 @@ func (e *CsvExporter) Export(ctx context.Context, urls []string) error {
 	return nil
 }
 
-func (e *CsvExporter) prepare(ctx context.Context, rawRecord *pb.DataRecord) error {
+func (e *CsvExporter) prepare(ctx context.Context, metaId int64, rawRecord *pb.DataRecord) error {
 	log := Logger(ctx).Sugar()
 
 	if rawRecord.Metadata != nil {
@@ -520,11 +546,16 @@ func (e *CsvExporter) prepare(ctx context.Context, rawRecord *pb.DataRecord) err
 				}
 			}
 
-			if _, ok := e.preparing.modules[id]; ok {
+			uniqueLayout := uniqueLayoutKey{
+				moduleId: id,
+				metaId:   metaId,
+			}
+
+			if _, ok := e.preparing.modules[uniqueLayout]; ok {
 				continue
 			}
 
-			log.Infow("module", "module_id", id, "module_name", module.Name)
+			log.Infow("module", "module_id", id, "meta_id", metaId, "module_name", module.Name, "index", moduleIndex, "position", module.Position)
 
 			fields := newFieldSet(module.Name)
 
@@ -532,16 +563,26 @@ func (e *CsvExporter) prepare(ctx context.Context, rawRecord *pb.DataRecord) err
 			// this row, if the module wasn't present when this row was
 			// generated then return nil for no-value.
 			checkForModule := func(get fieldFunc) optionalFieldFunc {
-				return (func(id string) optionalFieldFunc {
+				return (func(key uniqueLayoutKey) optionalFieldFunc {
 					return func(r *records) *string {
-						if _, ok := r.modules[id]; ok {
-							value := get(r)
-							return &value
+						if _, ok := r.modules[key.moduleId]; ok {
+							// We can only use this "getter" if the field is in the position that it thinks.
+							// This depends on the meta record. Field accessors are per (metaId, moduleId)
+							// combination, so there should be another one that'll find the right value. The
+							// scenario here is that a module was on the station and then was moved to another
+							// bay, and a second module placed in the same position.
+							if r.data.Readings.Meta == uint64(key.metaId) {
+								value := get(r)
+								return &value
+
+							} else {
+								return nil
+							}
 						} else {
 							return nil
 						}
 					}
-				})(id)
+				})(uniqueLayout)
 			}
 
 			fields.addField("module_index", checkForModule(func(r *records) string {
@@ -595,8 +636,8 @@ func (e *CsvExporter) prepare(ctx context.Context, rawRecord *pb.DataRecord) err
 				})(moduleIndex, sensorIndex))
 			}
 
-			e.preparing.modules[id] = fields
-			e.preparing.order = append(e.preparing.order, id)
+			e.preparing.modules[uniqueLayout] = fields
+			e.preparing.order = append(e.preparing.order, uniqueLayout)
 		}
 	}
 
@@ -611,7 +652,7 @@ func (e *CsvExporter) OnMeta(ctx context.Context, recordNumber int64, rawRecord 
 	if e.preparing != nil {
 		e.preparing.metas[recordNumber] = rawRecord
 
-		if err := e.prepare(ctx, rawRecord); err != nil {
+		if err := e.prepare(ctx, recordNumber, rawRecord); err != nil {
 			return err
 		}
 	}

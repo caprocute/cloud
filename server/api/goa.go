@@ -99,6 +99,9 @@ import (
 
 	notificationsServiceSvr "gitlab.com/fieldkit/cloud/server/api/gen/http/notifications/server"
 	notificationsService "gitlab.com/fieldkit/cloud/server/api/gen/notifications"
+
+	moderationServiceSvr "gitlab.com/fieldkit/cloud/server/api/gen/http/moderation/server"
+	moderationService "gitlab.com/fieldkit/cloud/server/api/gen/moderation"
 )
 
 func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.Handler, error) {
@@ -186,6 +189,9 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	notificationsSvc := NewNotificationsService(ctx, options)
 	notificationsEndpoints := notificationsService.NewEndpoints(notificationsSvc)
 
+	moderationSvc := NewModerationService(ctx, options)
+	moderationEndpoints := moderationService.NewEndpoints(moderationSvc)
+
 	for _, mw := range []func(goa.Endpoint) goa.Endpoint{jwtContext(), logErrors()} {
 		modulesEndpoints.Use(mw)
 		tasksEndpoints.Use(mw)
@@ -212,6 +218,7 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 		ttnEndpoints.Use(mw)
 		notificationsEndpoints.Use(mw)
 		adminEndpoints.Use(mw)
+		moderationEndpoints.Use(mw)
 	}
 
 	samlConfig := &SamlAuthConfig{
@@ -257,6 +264,7 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	oidcServer := oidcServiceSvr.New(oidcEndpoints, mux, dec, enc, eh, nil)
 	ttnServer := ttnServiceSvr.New(ttnEndpoints, mux, dec, enc, eh, nil)
 	adminServer := adminServiceSvr.New(adminEndpoints, mux, dec, enc, eh, nil)
+	moderationServer := moderationServiceSvr.New(moderationEndpoints, mux, dec, enc, eh, nil)
 
 	upgrader := &websocket.Upgrader{}
 	upgrader.CheckOrigin = func(r *http.Request) bool {
@@ -309,6 +317,7 @@ func CreateGoaV3Handler(ctx context.Context, options *ControllerOptions) (http.H
 	ttnServiceSvr.Mount(mux, ttnServer)
 	notificationsServiceSvr.Mount(mux, notificationsServer)
 	adminServiceSvr.Mount(mux, adminServer)
+	moderationServiceSvr.Mount(mux, moderationServer)
 
 	log := Logger(ctx).Sugar()
 

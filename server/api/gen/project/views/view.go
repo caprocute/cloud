@@ -51,6 +51,14 @@ type DownloadedPhoto struct {
 	View string
 }
 
+// ProjectsBasic is the viewed result type that is projected based on a view.
+type ProjectsBasic struct {
+	// Type to project
+	Projected *ProjectsBasicView
+	// View to render
+	View string
+}
+
 // ProjectUpdateView is a type that runs validations on a projected type.
 type ProjectUpdateView struct {
 	ID        *int64
@@ -124,6 +132,21 @@ type DownloadedPhotoView struct {
 	Body        []byte
 }
 
+// ProjectsBasicView is a type that runs validations on a projected type.
+type ProjectsBasicView struct {
+	Projects ProjectBasicCollectionView
+}
+
+// ProjectBasicCollectionView is a type that runs validations on a projected
+// type.
+type ProjectBasicCollectionView []*ProjectBasicView
+
+// ProjectBasicView is a type that runs validations on a projected type.
+type ProjectBasicView struct {
+	ID   *int32
+	Name *string
+}
+
 var (
 	// ProjectUpdateMap is a map of attribute names in result type ProjectUpdate
 	// indexed by view name.
@@ -178,6 +201,13 @@ var (
 			"etag",
 		},
 	}
+	// ProjectsBasicMap is a map of attribute names in result type ProjectsBasic
+	// indexed by view name.
+	ProjectsBasicMap = map[string][]string{
+		"default": []string{
+			"projects",
+		},
+	}
 	// ProjectCollectionMap is a map of attribute names in result type
 	// ProjectCollection indexed by view name.
 	ProjectCollectionMap = map[string][]string{
@@ -196,6 +226,22 @@ var (
 			"showStations",
 			"bounds",
 			"following",
+		},
+	}
+	// ProjectBasicCollectionMap is a map of attribute names in result type
+	// ProjectBasicCollection indexed by view name.
+	ProjectBasicCollectionMap = map[string][]string{
+		"default": []string{
+			"id",
+			"name",
+		},
+	}
+	// ProjectBasicMap is a map of attribute names in result type ProjectBasic
+	// indexed by view name.
+	ProjectBasicMap = map[string][]string{
+		"default": []string{
+			"id",
+			"name",
 		},
 	}
 )
@@ -254,6 +300,18 @@ func ValidateDownloadedPhoto(result *DownloadedPhoto) (err error) {
 	switch result.View {
 	case "default", "":
 		err = ValidateDownloadedPhotoView(result.Projected)
+	default:
+		err = goa.InvalidEnumValueError("view", result.View, []interface{}{"default"})
+	}
+	return
+}
+
+// ValidateProjectsBasic runs the validations defined on the viewed result type
+// ProjectsBasic.
+func ValidateProjectsBasic(result *ProjectsBasic) (err error) {
+	switch result.View {
+	case "default", "":
+		err = ValidateProjectsBasicView(result.Projected)
 	default:
 		err = goa.InvalidEnumValueError("view", result.View, []interface{}{"default"})
 	}
@@ -433,6 +491,41 @@ func ValidateDownloadedPhotoView(result *DownloadedPhotoView) (err error) {
 	}
 	if result.Etag == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("etag", "result"))
+	}
+	return
+}
+
+// ValidateProjectsBasicView runs the validations defined on ProjectsBasicView
+// using the "default" view.
+func ValidateProjectsBasicView(result *ProjectsBasicView) (err error) {
+
+	if result.Projects != nil {
+		if err2 := ValidateProjectBasicCollectionView(result.Projects); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	return
+}
+
+// ValidateProjectBasicCollectionView runs the validations defined on
+// ProjectBasicCollectionView using the "default" view.
+func ValidateProjectBasicCollectionView(result ProjectBasicCollectionView) (err error) {
+	for _, item := range result {
+		if err2 := ValidateProjectBasicView(item); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	return
+}
+
+// ValidateProjectBasicView runs the validations defined on ProjectBasicView
+// using the "default" view.
+func ValidateProjectBasicView(result *ProjectBasicView) (err error) {
+	if result.ID == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("id", "result"))
+	}
+	if result.Name == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("name", "result"))
 	}
 	return
 }

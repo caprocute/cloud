@@ -6,7 +6,7 @@
         "reset": "Restablecer contraseña",
         "terms": "Términos y condiciones",
         "projects": "Proyectos",
-        "viewProject": "Detalles del proyecto",
+        "viewProject": "Panel del proyecto",
         "viewProjectActivity": "Actividad del proyecto",
         "viewProjectBigMap": "Mapa del proyecto",
         "viewProjectBigMapList": "Estaciones del proyecto",
@@ -14,11 +14,12 @@
         "editProject": "Editar proyecto",
         "mapAllStations": "Mapa de estaciones",
         "listAllStations": "Lista de estaciones",
-        "viewStation": "Detalles de la estación",
-        "viewStationFromMap": "Detalles de la estación",
+        "viewStation": "Panel de la estación",
+        "viewStationFromMap": "Panel de la estación",
         "viewStationPhotos": "Fotos de la estación",
-        "mapStation": "Detalles de la estación",
-        "mapAllStationsBounds": "Detalles de la estación",
+        "viewProjectStationPhotos": "Fotos de la estación",
+        "mapStation": "Panel de la estación",
+        "mapAllStationsBounds": "Panel de la estación",
         "exploreBookmark": "Panel de datos",
         "exploreShortBookmark": "Panel de datos",
         "viewProjectNotes": "Notas del proyecto",
@@ -27,7 +28,8 @@
         "user": "Perfil de usuario",
         "adminMain": "Panel de administración",
         "adminUsers": "Usuarios (Admin)",
-        "adminStations": "Estaciones (Admin)"
+        "adminStations": "Estaciones (Admin)",
+        "notFound": "Página no encontrada"
     },
     "hello": "Hello from i18n!",
     "water.ec.name": "Conductividad de agua",
@@ -86,6 +88,8 @@
     "random.random_7": "Aleatorio 7",
     "random.random_8": "Aleatorio 8",
     "random.random_9": "Aleatorio 9",
+    "fk.modules.unknown": "Desconocido",
+    "fk.unknown": "Desconocido",
     "layout": {
         "logo": {
             "fieldkit": {
@@ -663,9 +667,9 @@
         "previous": {
             "heading": "Exportaciones anteriores",
             "noItems": "No hay exportaciones anteriores.",
-            "download": "Descargar"
-        },
-        "downloaded": "Descargado"
+            "download": "Descargar",
+            "downloaded": "Descargado"
+        }
     },
     "followPanel": {
         "follow": "Seguir",
@@ -857,5 +861,10 @@
         "warning": "Advertencia, al continuar se eliminará tu cuenta y todos los datos asociados. Para confirmar, por favor ingresa tu dirección de correo electrónico.",
         "done": "Tu cuenta ha sido eliminada.",
         "sameEmail": "El correo electrónico no coincide."
+    },
+    "notFound": {
+        "title": "Página no encontrada",
+        "message": "La página que estás buscando no existe o ha sido movida.",
+        "toDashboard": "Ir al Panel Principal"
     }
 }
