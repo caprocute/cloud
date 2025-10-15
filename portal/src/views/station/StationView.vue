@@ -384,7 +384,14 @@ export default Vue.extend({
                     query: { after: this.$route.path },
                 });
             }
-            return this.$router.push({ name: "notFound" });
+            if (e.response?.status === 404) {
+                return this.$router.push({ name: "notFound" });
+            }
+            this.$store.dispatch(ActionTypes.SHOW_SNACKBAR, {
+                message: this.$tc("somethingWentWrong"),
+                type: SnackbarStyle.fail,
+            });
+            console.error(e);
         });
     },
     methods: {
