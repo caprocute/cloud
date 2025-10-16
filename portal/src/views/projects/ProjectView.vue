@@ -1,5 +1,14 @@
 <template>
-    <StandardLayout :viewingProjects="true" :viewingProject="displayProject" :disableScrolling="activityVisible">
+    <StandardLayout
+        :viewingProjects="true"
+        :viewingProject="displayProject"
+        :disableScrolling="activityVisible"
+        @sidebar-toggle="
+            $nextTick(() => {
+                layoutChanges++;
+            })
+        "
+    >
         <div class="container-wrap">
             <template v-if="displayProject">
                 <DoubleHeader
@@ -88,7 +97,9 @@ export default Vue.extend({
         },
     },
     data: () => {
-        return {};
+        return {
+            layoutChanges: 0,
+        };
     },
     computed: {
         ...mapGetters({ isAuthenticated: "isAuthenticated", isBusy: "isBusy" }),

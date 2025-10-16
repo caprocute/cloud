@@ -1,5 +1,11 @@
 <template>
-    <StandardLayout>
+    <StandardLayout
+        @sidebar-toggle="
+            $nextTick(() => {
+                layoutChanges++;
+            })
+        "
+    >
         <div class="container-wrap" v-if="station">
             <DoubleHeader
                 :backRoute="backRoute"
@@ -196,7 +202,13 @@
 
             <section v-if="showMap">
                 <div class="container-map">
-                    <StationsMap :mapped="mapped" :showStations="true" :mapBounds="mapped.bounds" :visibleReadings="visibleReadings" />
+                    <StationsMap
+                        :mapped="mapped"
+                        :showStations="true"
+                        :mapBounds="mapped.bounds"
+                        :visibleReadings="visibleReadings"
+                        :layoutChanges="layoutChanges"
+                    />
                 </div>
             </section>
 
@@ -273,11 +285,13 @@ export default Vue.extend({
             description: string | null;
         };
         editedModule: DisplayModule | null;
+        layoutChanges: number;
     } {
         return {
             selectedModule: null,
             isMobileView: window.screen.availWidth <= 500,
             loading: true,
+            layoutChanges: 0,
             editedModule: null,
             editModuleIndex: null,
             editingDescription: false,
