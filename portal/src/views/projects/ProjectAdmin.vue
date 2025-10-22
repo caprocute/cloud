@@ -63,10 +63,7 @@
                     </div>
                     <div class="details-modules">
                         <div class="title">{{ $t("project.modules") }}</div>
-                        <div class="hoverable-item" v-for="(module, index) in projectModules" :key="module.name">
-                            <img alt="Module icon" class="module-icon" :src="module.url" />
-                            <span :ref="'module-tooltip-' + index" class="tooltip-text">{{ $t(module.name) }}</span>
-                        </div>
+                        <ModuleIcon v-for="module in projectModules" :key="module.name" :module="module" />
                     </div>
                 </div>
             </div>
@@ -95,6 +92,7 @@
 import Vue, { PropType } from "vue";
 import { CurrentUser, DisplayProject, DisplayStation, Project, ProjectModule, ProjectUser } from "@/store";
 import CommonComponents from "@/views/shared";
+import ModuleIcon from "@/views/shared/ModuleIcon.vue";
 import ProjectStations from "./ProjectStations.vue";
 import ProjectDataFiles from "./ProjectDataFiles.vue";
 import StationsReadings from "./StationsReadings.vue";
@@ -112,6 +110,7 @@ export default Vue.extend({
         StationsReadings,
         TeamManager,
         Comments,
+        ModuleIcon,
     },
     metaInfo() {
         return {
@@ -148,7 +147,7 @@ export default Vue.extend({
             return this.displayProject.modules.map((m) => {
                 return {
                     name: m.name,
-                    url: this.getModuleImg(m),
+                    url: this.$loadAsset(utils.getModuleImg(m)),
                 };
             });
         },
@@ -177,9 +176,6 @@ export default Vue.extend({
         },
         openActivityFeed(): void {
             this.viewingActivityFeed = true;
-        },
-        getModuleImg(module: ProjectModule): string {
-            return this.$loadAsset(utils.getModuleImg(module));
         },
         // tooltip is shown via CSS on desktop, the js makes sure the tooltip doesn't overflow the screen on mobile
         showTooltip(ref: string): void {
@@ -430,11 +426,7 @@ export default Vue.extend({
     width: 100%;
     height: auto;
 }
-.module-icon {
-    width: 35px;
-    height: 35px;
-    margin: 6px 7px 0 0;
-}
+
 .project-detail {
     font-family: variables.$font-family-light;
     overflow-wrap: anywhere;
@@ -457,4 +449,22 @@ export default Vue.extend({
     align-items: baseline;
     overflow-wrap: anywhere;
 }
+
+::v-deep .module-icon {
+    width: 35px;
+    height: 35px;
+    margin: 6px 7px 0 0;
+}
+
+.hoverable-item {
+    position: relative;
+
+    @include mixins.attention() {
+        .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+    }
+}
+
 </style>

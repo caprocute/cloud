@@ -101,11 +101,10 @@
                         <div class="station-row">
                             <span class="bold">{{ $tc("station.modules") }}</span>
                             <div class="station-modules ml-10">
-                                <img
-                                    v-for="(module, moduleIndex) in station.modules"
-                                    v-bind:key="moduleIndex"
-                                    alt="Module icon"
-                                    :src="getModuleImg(module)"
+                                <ModuleIcon
+                                    v-for="(module, index) in station.modules"
+                                    v-bind:key="index"
+                                    :module="module"
                                 />
                             </div>
                         </div>
@@ -257,6 +256,7 @@ import { confirmLeaveWithDirtyCheck } from "@/store/modules/dirty";
 import { SnackbarStyle } from "@/store/modules/snackbar";
 import StationModules from "@/views/station/StationModules.vue";
 import StationProjects from "@/views/station/StationProjects.vue";
+import ModuleIcon from "@/views/shared/ModuleIcon.vue";
 
 export default Vue.extend({
     name: "StationView",
@@ -274,6 +274,7 @@ export default Vue.extend({
         UserPhoto,
         FieldNotes,
         StationModules,
+        ModuleIcon,
     },
     data(): {
         selectedModule: DisplayModule | null;
@@ -422,7 +423,7 @@ export default Vue.extend({
             return module.label || this.$tc(module.name.replace("modules.", "fk."));
         },
         getModuleKey(module: DisplayModule): string {
-            return module.name.replace("modules.", "fk.");
+            return utils.getModuleKey(module);
         },
         partnerCustomization(): PartnerCustomization {
             return getPartnerCustomizationWithDefault();
@@ -642,11 +643,16 @@ export default Vue.extend({
         flex-wrap: wrap;
         @include mixins.flex;
 
-        img {
-            margin-right: 8px;
-            margin-bottom: 5px;
+        gap: 5px 8px;
+        
+        ::v-deep .module-icon { 
             width: 25px;
             height: 25px;
+            margin-right: 0;
+        }
+
+        ::v-deep .tooltip-text { 
+            bottom: calc(-100% - 6px);
         }
     }
     &-coordinate {

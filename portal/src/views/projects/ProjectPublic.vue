@@ -42,10 +42,7 @@
                 <div class="project-detail" v-if="project.goal">{{ $t("project.goal", { goal: project.goal }) }}</div>
                 <div class="project-detail">{{ project.description }}</div>
                 <div class="details-modules">
-                    <div class="hoverable-item" v-for="(module, index) in projectModules" :key="module.name">
-                        <img alt="Module icon" class="module-icon" :src="module.url" />
-                        <span :ref="'module-tooltip-' + index" class="tooltip-text">{{ $t(module.name) }}</span>
-                    </div>
+                    <ModuleIcon v-for="module in projectModules" :key="module.name" :module="module" />
                 </div>
                 <div class="right-actions">
                     <FollowControl :project="project" v-if="isAuthenticated">
@@ -146,6 +143,7 @@ import ProjectStations from "./ProjectStations.vue";
 import CommonComponents from "@/views/shared";
 import Comments from "../comments/Comments.vue";
 import FollowControl from "@/views/shared/FollowControl.vue";
+import ModuleIcon from "@/views/shared/ModuleIcon.vue";
 import { twitterCardMeta } from "@/social";
 
 export default Vue.extend({
@@ -155,6 +153,7 @@ export default Vue.extend({
         ...CommonComponents,
         ProjectStations,
         FollowControl,
+        ModuleIcon,
     },
     data: () => {
         return {};
@@ -192,15 +191,12 @@ export default Vue.extend({
             return this.$getters.projectsById[this.displayProject.id].modules.map((m) => {
                 return {
                     name: m.name,
-                    url: this.getModuleImg(m),
+                    url: this.$loadAsset(utils.getModuleImg(m)),
                 };
             });
         },
     },
     methods: {
-        getModuleImg(module: ProjectModule): string {
-            return this.$loadAsset(utils.getModuleImg(module));
-        },
         getTeamHeading(): string {
             // TODO i18n
             const members = this.displayProject.users.length == 1 ? "member" : "members";
@@ -336,12 +332,6 @@ export default Vue.extend({
 }
 .details-bottom .title {
     font-family: var(--font-family-bold);
-}
-
-.module-icon {
-    width: 40px;
-    height: 40px;
-    margin-right: 10px;
 }
 
 ::v-deep .project-image {

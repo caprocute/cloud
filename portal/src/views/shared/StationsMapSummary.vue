@@ -76,11 +76,10 @@
                     <div v-if="station.modules.length > 0" class="details-row">
                         <span class="bold">{{ $tc("station.modules") }}</span>
                         <div class="station-modules ml-10">
-                            <img
+                            <ModuleIcon
                                 v-for="(module, moduleIndex) in station.modules"
                                 v-bind:key="moduleIndex"
-                                alt="Module icon"
-                                :src="getModuleImg(module)"
+                                :module="module"
                             />
                         </div>
                     </div>
@@ -115,6 +114,7 @@ import NotesForm from "@/views/notes/NotesForm.vue";
 import FieldNotes from "@/views/fieldNotes/FieldNotes.vue";
 import StationReadings from "@/views/station/StationReadings.vue";
 import StationPhoto from "@/views/shared/StationPhoto.vue";
+import ModuleIcon from "@/views/shared/ModuleIcon.vue";
 import debounce from "lodash/debounce";
 
 enum SummaryTabsEnum {
@@ -133,6 +133,7 @@ export default Vue.extend({
         StationReadings,
         StationPhoto,
         NotesForm,
+        ModuleIcon,
     },
     props: {
         station: {
@@ -341,10 +342,7 @@ export default Vue.extend({
             return module.label || this.$tc(module.name.replace("modules.", "fk."));
         },
         getModuleKey(module: DisplayModule): string {
-            return module.name.replace("modules.", "fk.");
-        },
-        getModuleImg(module: DisplayModule): string {
-            return this.$loadAsset(utils.getModuleImg(module));
+            return utils.getModuleKey(module);
         },
     },
 });

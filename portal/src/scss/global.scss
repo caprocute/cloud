@@ -223,14 +223,3 @@ a {
         display: none !important;
     }
 }
-
-.hoverable-item {
-    position: relative;
-
-    @include mixins.attention() {
-        .tooltip-text {
-            visibility: visible;
-            opacity: 1;
-        }
-    }
-}

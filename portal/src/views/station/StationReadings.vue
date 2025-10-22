@@ -36,7 +36,7 @@ export default Vue.extend({
             return module.label || this.$tc(module.name.replace("modules.", "fk."));
         },
         getModuleKey(module: DisplayModule): string {
-            return module.name.replace("modules.", "fk.");
+            return utils.getModuleKey(module);
         },
         onModuleClick(moduleId: number) {
             const tinyChartComp = this.$refs["tinyChart-" + moduleId];
