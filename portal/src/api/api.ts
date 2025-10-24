@@ -444,6 +444,7 @@ export interface SavedBookmark {
     url: string;
     bookmark: string;
     token: string;
+    permissions: { canAddComment: boolean; canAddEvent: boolean };
 }
 
 export interface PendingInvite {

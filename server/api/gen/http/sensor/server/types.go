@@ -16,17 +16,19 @@ import (
 // BookmarkResponseBody is the type of the "sensor" service "bookmark" endpoint
 // HTTP response body.
 type BookmarkResponseBody struct {
-	URL      string `form:"url" json:"url" xml:"url"`
-	Bookmark string `form:"bookmark" json:"bookmark" xml:"bookmark"`
-	Token    string `form:"token" json:"token" xml:"token"`
+	URL         string                           `form:"url" json:"url" xml:"url"`
+	Bookmark    string                           `form:"bookmark" json:"bookmark" xml:"bookmark"`
+	Token       string                           `form:"token" json:"token" xml:"token"`
+	Permissions *BookmarkPermissionsResponseBody `form:"permissions" json:"permissions" xml:"permissions"`
 }
 
 // ResolveResponseBody is the type of the "sensor" service "resolve" endpoint
 // HTTP response body.
 type ResolveResponseBody struct {
-	URL      string `form:"url" json:"url" xml:"url"`
-	Bookmark string `form:"bookmark" json:"bookmark" xml:"bookmark"`
-	Token    string `form:"token" json:"token" xml:"token"`
+	URL         string                           `form:"url" json:"url" xml:"url"`
+	Bookmark    string                           `form:"bookmark" json:"bookmark" xml:"bookmark"`
+	Token       string                           `form:"token" json:"token" xml:"token"`
+	Permissions *BookmarkPermissionsResponseBody `form:"permissions" json:"permissions" xml:"permissions"`
 }
 
 // MetaUnauthorizedResponseBody is the type of the "sensor" service "meta"
@@ -605,24 +607,37 @@ type ResolveBadRequestResponseBody struct {
 	Fault bool `form:"fault" json:"fault" xml:"fault"`
 }
 
+// BookmarkPermissionsResponseBody is used to define fields on response body
+// types.
+type BookmarkPermissionsResponseBody struct {
+	CanAddEvent   bool `form:"canAddEvent" json:"canAddEvent" xml:"canAddEvent"`
+	CanAddComment bool `form:"canAddComment" json:"canAddComment" xml:"canAddComment"`
+}
+
 // NewBookmarkResponseBody builds the HTTP response body from the result of the
 // "bookmark" endpoint of the "sensor" service.
-func NewBookmarkResponseBody(res *sensorviews.SavedBookmarkView) *BookmarkResponseBody {
+func NewBookmarkResponseBody(res *sensorviews.BookmarkAndPermissionsView) *BookmarkResponseBody {
 	body := &BookmarkResponseBody{
 		URL:      *res.URL,
 		Bookmark: *res.Bookmark,
 		Token:    *res.Token,
+	}
+	if res.Permissions != nil {
+		body.Permissions = marshalSensorviewsBookmarkPermissionsViewToBookmarkPermissionsResponseBody(res.Permissions)
 	}
 	return body
 }
 
 // NewResolveResponseBody builds the HTTP response body from the result of the
 // "resolve" endpoint of the "sensor" service.
-func NewResolveResponseBody(res *sensorviews.SavedBookmarkView) *ResolveResponseBody {
+func NewResolveResponseBody(res *sensorviews.BookmarkAndPermissionsView) *ResolveResponseBody {
 	body := &ResolveResponseBody{
 		URL:      *res.URL,
 		Bookmark: *res.Bookmark,
 		Token:    *res.Token,
+	}
+	if res.Permissions != nil {
+		body.Permissions = marshalSensorviewsBookmarkPermissionsViewToBookmarkPermissionsResponseBody(res.Permissions)
 	}
 	return body
 }

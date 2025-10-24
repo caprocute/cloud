@@ -18,6 +18,7 @@ import { Bookmark, serializeBookmark, deserializeBookmark } from "./viz";
 import Vue from "vue";
 import ExploreWorkspace from "./ExploreWorkspace.vue";
 import { confirmLeaveWithDirtyCheck } from "@/store/modules/dirty";
+import { ActionTypes } from "@/store";
 
 export default Vue.extend({
     name: "ExploreView",
@@ -87,12 +88,13 @@ export default Vue.extend({
         async refreshBookmarkFromToken(): Promise<void> {
             const token = this.token;
             // console.log(`viz: bookmark-resolving`, token);
-
             try {
                 if (!this.resolved[token] && token) {
                     const savedBookmark = await this.$services.api.resolveBookmark(token);
                     console.log(`viz: bookmark-resolved`, savedBookmark);
                     Vue.set(this.resolved, token, deserializeBookmark(savedBookmark.bookmark));
+                    console.log("setting permissions radoi", savedBookmark);
+                    await this.$store.dispatch(ActionTypes.SET_DISCUSSION_PERMISSIONS, savedBookmark.permissions);
                 } else {
                     console.log(`viz: bookmark-missing`);
                 }
@@ -107,6 +109,7 @@ export default Vue.extend({
                 const savedBookmark = await this.$services.api.saveBookmark(encoded);
                 Vue.set(this.bookmarkToToken, encoded, savedBookmark.token);
                 Vue.set(this.resolved, savedBookmark.token, bookmark);
+                await this.$store.dispatch(ActionTypes.SET_DISCUSSION_PERMISSIONS, savedBookmark.permissions);
                 // console.log(`viz: open-bookmark-saved`, savedBookmark.token);
             }
             await this.$router.replace({ name: "exploreShortBookmark", query: { v: this.bookmarkToToken[encoded] } });

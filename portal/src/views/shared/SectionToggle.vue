@@ -3,9 +3,19 @@
         <hr class="toggle-hr" />
         <div class="toggle-wrap">
             <div class="toggle-bg">
-                <div class="toggle-controls" v-if="showToggle">
-                    <a @click="toggleClickHandler($event, 'left')" :class="{ selected: matchSection('left') }">{{ leftLabel }}</a>
-                    <a @click="toggleClickHandler($event, 'right')" :class="{ selected: matchSection('right') }">
+                <div class="toggle-controls">
+                    <a
+                        v-if="show.left"
+                        @click="toggleClickHandler($event, 'left')"
+                        :class="{ selected: matchSection('left') }"
+                    >
+                        {{ leftLabel }}
+                    </a>
+                    <a
+                        v-if="show.right"
+                        @click="toggleClickHandler($event, 'right')"
+                        :class="{ selected: matchSection('right') }"
+                    >
                         {{ rightLabel }}
                     </a>
                 </div>
@@ -17,7 +27,7 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import Vue, {PropType} from "vue";
 
 export default Vue.extend({
     name: "SectionToggle",
@@ -34,9 +44,9 @@ export default Vue.extend({
             type: String,
             default: "left",
         },
-        showToggle: {
-            type: Boolean,
-            required: true,
+        show: {
+            type: Object as PropType<{ left: boolean; right: boolean }>,
+            default: () => ({ left: true, right: true }),
         },
     },
     data(): {

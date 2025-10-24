@@ -16,17 +16,19 @@ import (
 // BookmarkResponseBody is the type of the "sensor" service "bookmark" endpoint
 // HTTP response body.
 type BookmarkResponseBody struct {
-	URL      *string `form:"url,omitempty" json:"url,omitempty" xml:"url,omitempty"`
-	Bookmark *string `form:"bookmark,omitempty" json:"bookmark,omitempty" xml:"bookmark,omitempty"`
-	Token    *string `form:"token,omitempty" json:"token,omitempty" xml:"token,omitempty"`
+	URL         *string                          `form:"url,omitempty" json:"url,omitempty" xml:"url,omitempty"`
+	Bookmark    *string                          `form:"bookmark,omitempty" json:"bookmark,omitempty" xml:"bookmark,omitempty"`
+	Token       *string                          `form:"token,omitempty" json:"token,omitempty" xml:"token,omitempty"`
+	Permissions *BookmarkPermissionsResponseBody `form:"permissions,omitempty" json:"permissions,omitempty" xml:"permissions,omitempty"`
 }
 
 // ResolveResponseBody is the type of the "sensor" service "resolve" endpoint
 // HTTP response body.
 type ResolveResponseBody struct {
-	URL      *string `form:"url,omitempty" json:"url,omitempty" xml:"url,omitempty"`
-	Bookmark *string `form:"bookmark,omitempty" json:"bookmark,omitempty" xml:"bookmark,omitempty"`
-	Token    *string `form:"token,omitempty" json:"token,omitempty" xml:"token,omitempty"`
+	URL         *string                          `form:"url,omitempty" json:"url,omitempty" xml:"url,omitempty"`
+	Bookmark    *string                          `form:"bookmark,omitempty" json:"bookmark,omitempty" xml:"bookmark,omitempty"`
+	Token       *string                          `form:"token,omitempty" json:"token,omitempty" xml:"token,omitempty"`
+	Permissions *BookmarkPermissionsResponseBody `form:"permissions,omitempty" json:"permissions,omitempty" xml:"permissions,omitempty"`
 }
 
 // MetaUnauthorizedResponseBody is the type of the "sensor" service "meta"
@@ -605,6 +607,13 @@ type ResolveBadRequestResponseBody struct {
 	Fault *bool `form:"fault,omitempty" json:"fault,omitempty" xml:"fault,omitempty"`
 }
 
+// BookmarkPermissionsResponseBody is used to define fields on response body
+// types.
+type BookmarkPermissionsResponseBody struct {
+	CanAddEvent   *bool `form:"canAddEvent,omitempty" json:"canAddEvent,omitempty" xml:"canAddEvent,omitempty"`
+	CanAddComment *bool `form:"canAddComment,omitempty" json:"canAddComment,omitempty" xml:"canAddComment,omitempty"`
+}
+
 // NewMetaResultOK builds a "sensor" service "meta" endpoint result from a HTTP
 // "OK" response.
 func NewMetaResultOK(body interface{}) *sensor.MetaResult {
@@ -1019,14 +1028,15 @@ func NewRecentlyBadRequest(body *RecentlyBadRequestResponseBody) *goa.ServiceErr
 	return v
 }
 
-// NewBookmarkSavedBookmarkOK builds a "sensor" service "bookmark" endpoint
-// result from a HTTP "OK" response.
-func NewBookmarkSavedBookmarkOK(body *BookmarkResponseBody) *sensorviews.SavedBookmarkView {
-	v := &sensorviews.SavedBookmarkView{
+// NewBookmarkAndPermissionsViewOK builds a "sensor" service "bookmark"
+// endpoint result from a HTTP "OK" response.
+func NewBookmarkAndPermissionsViewOK(body *BookmarkResponseBody) *sensorviews.BookmarkAndPermissionsView {
+	v := &sensorviews.BookmarkAndPermissionsView{
 		URL:      body.URL,
 		Bookmark: body.Bookmark,
 		Token:    body.Token,
 	}
+	v.Permissions = unmarshalBookmarkPermissionsResponseBodyToSensorviewsBookmarkPermissionsView(body.Permissions)
 
 	return v
 }
@@ -1091,14 +1101,15 @@ func NewBookmarkBadRequest(body *BookmarkBadRequestResponseBody) *goa.ServiceErr
 	return v
 }
 
-// NewResolveSavedBookmarkOK builds a "sensor" service "resolve" endpoint
-// result from a HTTP "OK" response.
-func NewResolveSavedBookmarkOK(body *ResolveResponseBody) *sensorviews.SavedBookmarkView {
-	v := &sensorviews.SavedBookmarkView{
+// NewResolveBookmarkAndPermissionsOK builds a "sensor" service "resolve"
+// endpoint result from a HTTP "OK" response.
+func NewResolveBookmarkAndPermissionsOK(body *ResolveResponseBody) *sensorviews.BookmarkAndPermissionsView {
+	v := &sensorviews.BookmarkAndPermissionsView{
 		URL:      body.URL,
 		Bookmark: body.Bookmark,
 		Token:    body.Token,
 	}
+	v.Permissions = unmarshalBookmarkPermissionsResponseBodyToSensorviewsBookmarkPermissionsView(body.Permissions)
 
 	return v
 }
@@ -1925,6 +1936,18 @@ func ValidateResolveBadRequestResponseBody(body *ResolveBadRequestResponseBody) 
 	}
 	if body.Fault == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("fault", "body"))
+	}
+	return
+}
+
+// ValidateBookmarkPermissionsResponseBody runs the validations defined on
+// BookmarkPermissionsResponseBody
+func ValidateBookmarkPermissionsResponseBody(body *BookmarkPermissionsResponseBody) (err error) {
+	if body.CanAddEvent == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("canAddEvent", "body"))
+	}
+	if body.CanAddComment == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("canAddComment", "body"))
 	}
 	return
 }

@@ -30,9 +30,9 @@ type Service interface {
 	// Recently implements recently.
 	Recently(context.Context, *RecentlyPayload) (res *RecentlyResult, err error)
 	// Bookmark implements bookmark.
-	Bookmark(context.Context, *BookmarkPayload) (res *SavedBookmark, err error)
+	Bookmark(context.Context, *BookmarkPayload) (res *BookmarkAndPermissions, err error)
 	// Resolve implements resolve.
-	Resolve(context.Context, *ResolvePayload) (res *SavedBookmark, err error)
+	Resolve(context.Context, *ResolvePayload) (res *BookmarkAndPermissions, err error)
 }
 
 // Auther defines the authorization functions to be implemented by the service.
@@ -122,17 +122,24 @@ type BookmarkPayload struct {
 	Bookmark string
 }
 
-// SavedBookmark is the result type of the sensor service bookmark method.
-type SavedBookmark struct {
-	URL      string
-	Bookmark string
-	Token    string
+// BookmarkAndPermissions is the result type of the sensor service bookmark
+// method.
+type BookmarkAndPermissions struct {
+	URL         string
+	Bookmark    string
+	Token       string
+	Permissions *BookmarkPermissions
 }
 
 // ResolvePayload is the payload type of the sensor service resolve method.
 type ResolvePayload struct {
 	Auth *string
 	V    string
+}
+
+type BookmarkPermissions struct {
+	CanAddEvent   bool
+	CanAddComment bool
 }
 
 // MakeUnauthorized builds a goa.ServiceError from an error.
@@ -171,23 +178,24 @@ func MakeBadRequest(err error) *goa.ServiceError {
 	}
 }
 
-// NewSavedBookmark initializes result type SavedBookmark from viewed result
-// type SavedBookmark.
-func NewSavedBookmark(vres *sensorviews.SavedBookmark) *SavedBookmark {
-	return newSavedBookmark(vres.Projected)
+// NewBookmarkAndPermissions initializes result type BookmarkAndPermissions
+// from viewed result type BookmarkAndPermissions.
+func NewBookmarkAndPermissions(vres *sensorviews.BookmarkAndPermissions) *BookmarkAndPermissions {
+	return newBookmarkAndPermissions(vres.Projected)
 }
 
-// NewViewedSavedBookmark initializes viewed result type SavedBookmark from
-// result type SavedBookmark using the given view.
-func NewViewedSavedBookmark(res *SavedBookmark, view string) *sensorviews.SavedBookmark {
-	p := newSavedBookmarkView(res)
-	return &sensorviews.SavedBookmark{Projected: p, View: "default"}
+// NewViewedBookmarkAndPermissions initializes viewed result type
+// BookmarkAndPermissions from result type BookmarkAndPermissions using the
+// given view.
+func NewViewedBookmarkAndPermissions(res *BookmarkAndPermissions, view string) *sensorviews.BookmarkAndPermissions {
+	p := newBookmarkAndPermissionsView(res)
+	return &sensorviews.BookmarkAndPermissions{Projected: p, View: "default"}
 }
 
-// newSavedBookmark converts projected type SavedBookmark to service type
-// SavedBookmark.
-func newSavedBookmark(vres *sensorviews.SavedBookmarkView) *SavedBookmark {
-	res := &SavedBookmark{}
+// newBookmarkAndPermissions converts projected type BookmarkAndPermissions to
+// service type BookmarkAndPermissions.
+func newBookmarkAndPermissions(vres *sensorviews.BookmarkAndPermissionsView) *BookmarkAndPermissions {
+	res := &BookmarkAndPermissions{}
 	if vres.URL != nil {
 		res.URL = *vres.URL
 	}
@@ -197,16 +205,45 @@ func newSavedBookmark(vres *sensorviews.SavedBookmarkView) *SavedBookmark {
 	if vres.Token != nil {
 		res.Token = *vres.Token
 	}
+	if vres.Permissions != nil {
+		res.Permissions = newBookmarkPermissions(vres.Permissions)
+	}
 	return res
 }
 
-// newSavedBookmarkView projects result type SavedBookmark to projected type
-// SavedBookmarkView using the "default" view.
-func newSavedBookmarkView(res *SavedBookmark) *sensorviews.SavedBookmarkView {
-	vres := &sensorviews.SavedBookmarkView{
+// newBookmarkAndPermissionsView projects result type BookmarkAndPermissions to
+// projected type BookmarkAndPermissionsView using the "default" view.
+func newBookmarkAndPermissionsView(res *BookmarkAndPermissions) *sensorviews.BookmarkAndPermissionsView {
+	vres := &sensorviews.BookmarkAndPermissionsView{
 		URL:      &res.URL,
 		Bookmark: &res.Bookmark,
 		Token:    &res.Token,
+	}
+	if res.Permissions != nil {
+		vres.Permissions = newBookmarkPermissionsView(res.Permissions)
+	}
+	return vres
+}
+
+// newBookmarkPermissions converts projected type BookmarkPermissions to
+// service type BookmarkPermissions.
+func newBookmarkPermissions(vres *sensorviews.BookmarkPermissionsView) *BookmarkPermissions {
+	res := &BookmarkPermissions{}
+	if vres.CanAddEvent != nil {
+		res.CanAddEvent = *vres.CanAddEvent
+	}
+	if vres.CanAddComment != nil {
+		res.CanAddComment = *vres.CanAddComment
+	}
+	return res
+}
+
+// newBookmarkPermissionsView projects result type BookmarkPermissions to
+// projected type BookmarkPermissionsView using the "default" view.
+func newBookmarkPermissionsView(res *BookmarkPermissions) *sensorviews.BookmarkPermissionsView {
+	vres := &sensorviews.BookmarkPermissionsView{
+		CanAddEvent:   &res.CanAddEvent,
+		CanAddComment: &res.CanAddComment,
 	}
 	return vres
 }

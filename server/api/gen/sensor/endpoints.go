@@ -171,7 +171,7 @@ func NewBookmarkEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint
 		if err != nil {
 			return nil, err
 		}
-		vres := NewViewedSavedBookmark(res, "default")
+		vres := NewViewedBookmarkAndPermissions(res, "default")
 		return vres, nil
 	}
 }
@@ -199,7 +199,7 @@ func NewResolveEndpoint(s Service, authJWTFn security.AuthJWTFunc) goa.Endpoint 
 		if err != nil {
 			return nil, err
 		}
-		vres := NewViewedSavedBookmark(res, "default")
+		vres := NewViewedBookmarkAndPermissions(res, "default")
 		return vres, nil
 	}
 }

@@ -1125,9 +1125,12 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SavedBookmark'
+                $ref: '#/components/schemas/BookmarkAndPermissions'
               example:
                 bookmark: Ut laboriosam.
+                permissions:
+                  canAddComment: false
+                  canAddEvent: true
                 token: Odit autem.
                 url: Qui ab iste rerum qui.
         "400":
@@ -1208,11 +1211,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SavedBookmark'
+                $ref: '#/components/schemas/BookmarkAndPermissions'
               example:
                 bookmark: Qui nihil commodi veritatis necessitatibus est aperiam.
+                permissions:
+                  canAddComment: false
+                  canAddEvent: true
                 token: Incidunt aut eum commodi odit velit suscipit.
-                url: Similique nobis consequatur.
+                url: Nobis consequatur.
         "400":
           description: ""
           content:
@@ -21274,14 +21280,14 @@ components:
       properties:
         body:
           type: string
-          example: Reprehenderit quisquam quia necessitatibus sunt placeat nesciunt.
+          example: Labore iusto omnis.
         userId:
           type: integer
-          example: 325550856
+          example: 376678469
           format: int32
       example:
-        body: Itaque modi labore iusto.
-        userId: 1366704941
+        body: Sint ab amet labore ducimus nemo.
+        userId: 1230874032
       required:
       - userId
       - body
@@ -22186,6 +22192,21 @@ components:
       required:
       - station
       - hidden
+    AppBookmarkPermissions:
+      type: object
+      properties:
+        canAddComment:
+          type: boolean
+          example: true
+        canAddEvent:
+          type: boolean
+          example: false
+      example:
+        canAddComment: false
+        canAddEvent: true
+      required:
+      - canAddEvent
+      - canAddComment
     AppDeviceDataSummary:
       type: object
       properties:
@@ -23183,18 +23204,18 @@ components:
           $ref: '#/components/schemas/PostAuthor'
         body:
           type: string
-          example: Temporibus laudantium quaerat amet illo inventore.
+          example: Et amet delectus doloremque sint aut ut.
         createdAt:
           type: integer
-          example: 6684415667549008819
+          example: 7318295624584851236
           format: int64
         id:
           type: integer
-          example: 901707411
+          example: 2053285189
           format: int32
         updatedAt:
           type: integer
-          example: 764153982433856246
+          example: 4339015458048235471
           format: int64
       example:
         author:
@@ -23202,10 +23223,10 @@ components:
           name: Accusamus voluptatem ea similique at.
           photo:
             url: Maiores eos omnis ut.
-        body: Sint aut ut.
-        createdAt: 5394667659494426037
-        id: 1958184505
-        updatedAt: 8582874588535516871
+        body: Reprehenderit quisquam quia necessitatibus sunt placeat nesciunt.
+        createdAt: 3914768041311739701
+        id: 1744949868
+        updatedAt: 1398230281869459306
       required:
       - id
       - createdAt
@@ -25906,6 +25927,32 @@ components:
         - 1836912270
       required:
       - errors
+    BookmarkAndPermissions:
+      type: object
+      properties:
+        bookmark:
+          type: string
+          example: Est temporibus optio in sunt.
+        permissions:
+          $ref: '#/components/schemas/AppBookmarkPermissions'
+        token:
+          type: string
+          example: Tenetur molestiae saepe ut fugit.
+        url:
+          type: string
+          example: Ducimus sapiente autem sed.
+      example:
+        bookmark: Dolor repudiandae ad perferendis rerum laudantium.
+        permissions:
+          canAddComment: false
+          canAddEvent: true
+        token: Id voluptatibus et temporibus laudantium.
+        url: Cumque non incidunt expedita.
+      required:
+      - url
+      - bookmark
+      - token
+      - permissions
     CheckUserReportResult:
       type: object
       properties:
@@ -29786,26 +29833,6 @@ components:
         email: Dolor non voluptatem.
       required:
       - email
-    SavedBookmark:
-      type: object
-      properties:
-        bookmark:
-          type: string
-          example: Est temporibus optio in sunt.
-        token:
-          type: string
-          example: Tenetur molestiae saepe ut fugit.
-        url:
-          type: string
-          example: Ducimus sapiente autem sed.
-      example:
-        bookmark: Incidunt expedita.
-        token: Dolor repudiandae ad perferendis rerum laudantium.
-        url: Distinctio incidunt autem repudiandae cumque.
-      required:
-      - url
-      - bookmark
-      - token
     SeenRequestBody:
       type: object
       properties:
@@ -29832,15 +29859,15 @@ components:
       properties:
         maximum:
           type: number
-          example: 0.9429378
+          example: 0.45004886
           format: float
         minimum:
           type: number
-          example: 0.12687774
+          example: 0.74275964
           format: float
       example:
-        maximum: 0.23962522
-        minimum: 0.2916901
+        maximum: 0.52225006
+        minimum: 0.6461913
       required:
       - minimum
       - maximum
@@ -29849,15 +29876,15 @@ components:
       properties:
         last:
           type: number
-          example: 0.13054448
+          example: 0.36398298
           format: float
         time:
           type: integer
-          example: 1577390059089266609
+          example: 7221284928264828388
           format: int64
       example:
-        last: 0.6355502
-        time: 79656871422341836
+        last: 0.9839145
+        time: 1170240588807112545
       required:
       - last
       - time
@@ -29931,11 +29958,11 @@ components:
       properties:
         id:
           type: integer
-          example: 447870185658218121
+          example: 280507505210604299
           format: int64
         metaRecordId:
           type: integer
-          example: 8718923149046467619
+          example: 4209708601204633058
           format: int64
         modules:
           type: array
@@ -30115,15 +30142,15 @@ components:
               unitOfMeasure: At facilis ut est.
         provisionId:
           type: integer
-          example: 9126958475646646762
+          example: 7116272578628602850
           format: int64
         sourceId:
           type: integer
-          example: 1590596574
+          example: 1061306212
           format: int32
         time:
           type: integer
-          example: 5286563714071827726
+          example: 519638123380088492
           format: int64
       example:
         id: 1902529884445714517
@@ -33355,43 +33382,42 @@ components:
       properties:
         flags:
           type: integer
-          example: 1982989151
+          example: 1440414712
           format: int32
         fullKey:
           type: string
-          example: Consequatur facere sed dolorem dolorum non quo.
+          example: Eligendi reiciendis fugit odio laboriosam.
         hardwareId:
           type: string
-          example: Ducimus nemo eos nostrum.
+          example: A cumque molestias accusantium et quidem dolores.
         hardwareIdBase64:
           type: string
-          example: Voluptatem rerum iure quam a cumque.
+          example: Error sed reprehenderit cum corporis dignissimos.
         id:
           type: integer
-          example: 2144756620372015790
+          example: 4425475243711734800
           format: int64
         internal:
           type: boolean
           example: false
         label:
           type: string
-          example: Reprehenderit cum corporis dignissimos.
+          example: Quo voluptatem maiores sit ullam.
         meta:
           type: object
           example:
-            Et porro sequi consequuntur nihil odio id.: Accusamus cupiditate cumque.
-            Soluta odio odit praesentium dicta qui.: Quisquam voluptas ab et qui neque.
+            Id natus accusamus.: Cumque quod soluta.
           additionalProperties: true
         metaRecordId:
           type: integer
-          example: 5955935101016254994
+          example: 8052676517083928135
           format: int64
         name:
           type: string
-          example: Et quidem dolores pariatur error.
+          example: Doloremque quis consequatur facere sed dolorem dolorum.
         position:
           type: integer
-          example: 1874909856
+          example: 871752835
           format: int32
         sensors:
           type: array
@@ -33426,35 +33452,50 @@ components:
               last: 0.6062201
               time: 8891625838275171052
             unitOfMeasure: At facilis ut est.
-          - fullKey: Cum fugit impedit nobis eveniet.
-            key: Aliquam quas sunt possimus doloremque ipsa.
-            meta:
-              Sed enim nesciunt nobis aut corporis tenetur.: Sed sunt distinctio distinctio eos.
-            name: Quod consequatur consequatur explicabo eos quia.
-            ranges:
-            - maximum: 0.8214958
-              minimum: 0.34605667
-            - maximum: 0.8214958
-              minimum: 0.34605667
-            reading:
-              last: 0.6062201
-              time: 8891625838275171052
-            unitOfMeasure: At facilis ut est.
       example:
-        flags: 340258130
-        fullKey: Architecto est.
-        hardwareId: Omnis qui qui et a.
-        hardwareIdBase64: Iure modi ipsam.
-        id: 1263823881240507147
-        internal: false
-        label: Quidem ut.
+        flags: 458078424
+        fullKey: Ut temporibus fugit inventore omnis.
+        hardwareId: Praesentium dicta qui voluptatibus.
+        hardwareIdBase64: Voluptas ab et qui.
+        id: 2303783639994179233
+        internal: true
+        label: Et a.
         meta:
-          Consectetur corporis enim nemo non.: Dolorem doloribus qui et similique aut consequatur.
-          Dolore explicabo cumque suscipit.: Magni sunt cum assumenda aperiam.
-        metaRecordId: 1191600516897855342
-        name: Fugit inventore omnis quod consequatur ipsum.
-        position: 2077611321
+          Doloribus consectetur corporis enim nemo non in.: Doloribus qui et similique aut consequatur.
+          Est corporis qui assumenda dolore.: Cumque suscipit commodi magni sunt cum assumenda.
+          Nostrum quidem.: Similique sint quibusdam architecto.
+        metaRecordId: 920821725089172551
+        name: Et omnis qui.
+        position: 1093208749
         sensors:
+        - fullKey: Cum fugit impedit nobis eveniet.
+          key: Aliquam quas sunt possimus doloremque ipsa.
+          meta:
+            Sed enim nesciunt nobis aut corporis tenetur.: Sed sunt distinctio distinctio eos.
+          name: Quod consequatur consequatur explicabo eos quia.
+          ranges:
+          - maximum: 0.8214958
+            minimum: 0.34605667
+          - maximum: 0.8214958
+            minimum: 0.34605667
+          reading:
+            last: 0.6062201
+            time: 8891625838275171052
+          unitOfMeasure: At facilis ut est.
+        - fullKey: Cum fugit impedit nobis eveniet.
+          key: Aliquam quas sunt possimus doloremque ipsa.
+          meta:
+            Sed enim nesciunt nobis aut corporis tenetur.: Sed sunt distinctio distinctio eos.
+          name: Quod consequatur consequatur explicabo eos quia.
+          ranges:
+          - maximum: 0.8214958
+            minimum: 0.34605667
+          - maximum: 0.8214958
+            minimum: 0.34605667
+          reading:
+            last: 0.6062201
+            time: 8891625838275171052
+          unitOfMeasure: At facilis ut est.
         - fullKey: Cum fugit impedit nobis eveniet.
           key: Aliquam quas sunt possimus doloremque ipsa.
           meta:
@@ -33499,6 +33540,24 @@ components:
           items:
             $ref: '#/components/schemas/AppStationNote'
           example:
+          - author:
+              id: 858855066
+              name: Odit minima animi est.
+              photo:
+                url: Similique architecto et et vero aut.
+            body: Eveniet dolor eveniet ipsum aperiam et eaque.
+            createdAt: 44366409423168046
+            id: 1788819876
+            updatedAt: 1256516182942579004
+          - author:
+              id: 858855066
+              name: Odit minima animi est.
+              photo:
+                url: Similique architecto et et vero aut.
+            body: Eveniet dolor eveniet ipsum aperiam et eaque.
+            createdAt: 44366409423168046
+            id: 1788819876
+            updatedAt: 1256516182942579004
           - author:
               id: 858855066
               name: Odit minima animi est.
@@ -33791,19 +33850,19 @@ components:
       properties:
         fullKey:
           type: string
-          example: Incidunt soluta aut totam sunt ut.
+          example: Deserunt cum nihil ea quia et.
         key:
           type: string
-          example: Non sunt in.
+          example: Dolorum quos aperiam quidem enim non.
         meta:
           type: object
           example:
-            Consequatur maxime et tempore.: Repudiandae non non sit repudiandae eaque blanditiis.
-            Non sed deserunt cum.: Ea quia et amet earum.
+            Delectus deserunt atque eos inventore commodi.: Aut ut esse voluptatibus reiciendis ea corrupti.
+            Fuga repudiandae non non sit repudiandae eaque.: Iste minus odio beatae.
           additionalProperties: true
         name:
           type: string
-          example: Maiores sit ullam ea ipsa id atque.
+          example: Nesciunt ab aut est dolor eligendi.
         ranges:
           type: array
           items:
@@ -33815,19 +33874,22 @@ components:
             minimum: 0.34605667
           - maximum: 0.8214958
             minimum: 0.34605667
+          - maximum: 0.8214958
+            minimum: 0.34605667
         reading:
           $ref: '#/components/schemas/SensorReading'
         unitOfMeasure:
           type: string
-          example: Reiciendis fugit odio laboriosam non nesciunt.
+          example: Sunt in fugit incidunt soluta aut.
       example:
-        fullKey: Esse voluptatibus.
-        key: Eos inventore commodi illum aut.
+        fullKey: In nobis repudiandae.
+        key: Et id reprehenderit molestias vel.
         meta:
-          Molestias vel temporibus.: Nobis repudiandae illo nesciunt quibusdam magnam deleniti.
-          Nihil et saepe ut sit aut.: Eos eum voluptas ratione et id.
-        name: Minus odio.
+          Magnam deleniti.: Ipsam magnam et porro sequi.
+        name: Et saepe ut.
         ranges:
+        - maximum: 0.8214958
+          minimum: 0.34605667
         - maximum: 0.8214958
           minimum: 0.34605667
         - maximum: 0.8214958
@@ -33835,7 +33897,7 @@ components:
         reading:
           last: 0.6062201
           time: 8891625838275171052
-        unitOfMeasure: Vel delectus deserunt.
+        unitOfMeasure: Aut odio eos eum voluptas.
       required:
       - name
       - unitOfMeasure

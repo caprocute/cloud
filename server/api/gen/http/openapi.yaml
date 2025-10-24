@@ -8987,6 +8987,22 @@ definitions:
       url: Ratione explicabo voluptas corrupti suscipit.
     required:
     - url
+  BookmarkPermissionsResponseBody:
+    title: 'Mediatype identifier: application/vnd.app.bookmark.permissions; view=default'
+    type: object
+    properties:
+      canAddComment:
+        type: boolean
+        example: false
+      canAddEvent:
+        type: boolean
+        example: true
+    example:
+      canAddComment: false
+      canAddEvent: false
+    required:
+    - canAddEvent
+    - canAddComment
   CsvNoopBadRequestResponseBody:
     title: 'Mediatype identifier: application/vnd.goa.error; view=default'
     type: object
@@ -27120,12 +27136,14 @@ definitions:
     - timeout
     - fault
   SensorBookmarkResponseBody:
-    title: 'Mediatype identifier: application/vnd.app.bookmark; view=default'
+    title: 'Mediatype identifier: application/vnd.app.bookmark-and-permissions; view=default'
     type: object
     properties:
       bookmark:
         type: string
         example: Ducimus expedita.
+      permissions:
+        $ref: '#/definitions/BookmarkPermissionsResponseBody'
       token:
         type: string
         example: Reiciendis voluptate odit.
@@ -27135,12 +27153,16 @@ definitions:
     description: BookmarkResponseBody result type (default view)
     example:
       bookmark: Asperiores aliquid.
+      permissions:
+        canAddComment: true
+        canAddEvent: true
       token: Id voluptatum optio aspernatur modi voluptas.
-      url: Alias rerum qui expedita enim aut enim.
+      url: Enim aut enim.
     required:
     - url
     - bookmark
     - token
+    - permissions
   SensorBookmarkUnauthorizedResponseBody:
     title: 'Mediatype identifier: application/vnd.goa.error; view=default'
     type: object
@@ -27866,12 +27888,14 @@ definitions:
     - timeout
     - fault
   SensorResolveResponseBody:
-    title: 'Mediatype identifier: application/vnd.app.bookmark; view=default'
+    title: 'Mediatype identifier: application/vnd.app.bookmark-and-permissions; view=default'
     type: object
     properties:
       bookmark:
         type: string
         example: Corrupti et.
+      permissions:
+        $ref: '#/definitions/BookmarkPermissionsResponseBody'
       token:
         type: string
         example: Sapiente dolore voluptas culpa minima error sequi.
@@ -27881,12 +27905,16 @@ definitions:
     description: ResolveResponseBody result type (default view)
     example:
       bookmark: Repudiandae dignissimos nobis beatae est.
+      permissions:
+        canAddComment: true
+        canAddEvent: true
       token: Culpa ab eum pariatur consequatur veritatis asperiores.
       url: Id ea maxime nesciunt quo.
     required:
     - url
     - bookmark
     - token
+    - permissions
   SensorResolveUnauthorizedResponseBody:
     title: 'Mediatype identifier: application/vnd.goa.error; view=default'
     type: object

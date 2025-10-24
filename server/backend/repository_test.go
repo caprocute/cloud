@@ -246,3 +246,40 @@ func TestNotificationRepositoryAdd(t *testing.T) {
 	assert.NoError(err)
 	assert.Equal(0, len(notifs))
 }
+
+func TestProjectQueryIDs(t *testing.T) {
+	assert := assert.New(t)
+	e, err := tests.NewTestEnv()
+	assert.NoError(err)
+
+	user, err := e.AddUser()
+	assert.NoError(err)
+	assert.NotNil(user)
+
+	p1, err := e.AddProjectWithPrivacy(data.Private)
+	assert.NoError(err)
+
+	p2, err := e.AddProjectWithPrivacy(data.Private)
+	assert.NoError(err)
+
+	pr := repositories.NewProjectRepository(e.DB)
+
+	projects, err := pr.QueryByIDs(e.Ctx, []int32{p1.ID, p2.ID})
+	assert.NoError(err)
+	assert.Equal(2, len(projects))
+}
+
+func TestQueryStationIDs(t *testing.T) {
+	assert := assert.New(t)
+	e, err := tests.NewTestEnv()
+	assert.NoError(err)
+
+	added, err := e.AddStations(2)
+	assert.NoError(err)
+
+	sr := repositories.NewStationRepository(e.DB)
+
+	stations, err := sr.QueryStationsByIDs(e.Ctx, []int32{added.Stations[0].ID, added.Stations[1].ID})
+	assert.NoError(err)
+	assert.Equal(2, len(stations))
+}

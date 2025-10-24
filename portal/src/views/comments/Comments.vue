@@ -6,10 +6,10 @@
             class="comment-toggle"
             :leftLabel="$tc('comments.sectionToggle.leftLabel')"
             :rightLabel="$tc('comments.sectionToggle.rightLabel')"
+            :default="permissions.canAddComment ? 'left' : 'right'"
+            :show="{ left: permissions.canAddComment, right: permissions.canAddEvent }"
             @toggle="onSectionToggle"
-            :default="logMode === 'comment' ? 'left' : 'right'"
-            v-if="viewType === 'data'"
-            :showToggle="showPostsTypeToggle()"
+            v-if="viewType === 'data' && permissions"
         >
             <template #left>
                 <div class="new-comment" :class="{ 'align-center': !user }">
@@ -46,7 +46,7 @@
                     </template>
                 </div>
             </template>
-            <template #right>
+            <template #right v-if="permissions.canAddEvent">
                 <div class="event-level-selector">
                     <label for="allProjectRadio" v-if="stationBelongsToAProject">
                         <div class="event-level-radio">
@@ -483,6 +483,9 @@ export default Vue.extend({
             }
             return null;
         },
+        permissions(): { canAddComment: boolean; canAddEvent: boolean } {
+            return this.$state.discussion.permissions;
+        },
     },
     watch: {
         async parentData(): Promise<void> {
@@ -894,28 +897,6 @@ export default Vue.extend({
         },
         interpolatePartner(baseString): string {
             return interpolatePartner(baseString);
-        },
-        // don't allow the user to log an event if the viz group has no data, by simply hiding the Event logging toggle
-        areWorkspaceGroupsEmpty(): boolean {
-            let areEmpty = false;
-
-            if (this.workspace) {
-                this.workspace.groups.forEach((group) => {
-                    if (group.isEmpty()) {
-                        areEmpty = true;
-                    }
-                });
-            }
-
-            return areEmpty;
-        },
-        showPostsTypeToggle(): boolean {
-            return (
-                (((this.user && this.user.admin) ||
-                    (this.projectUser && this.projectUser.user && this.projectUser.role === "Administrator")) &&
-                    !this.areWorkspaceGroupsEmpty()) ||
-                false
-            );
         },
         onEditCommentInput(comment: any, event: string) {
             if (JSON.stringify(event) !== comment.body) {

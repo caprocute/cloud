@@ -11,48 +11,66 @@ import (
 	goa "goa.design/goa/v3/pkg"
 )
 
-// SavedBookmark is the viewed result type that is projected based on a view.
-type SavedBookmark struct {
+// BookmarkAndPermissions is the viewed result type that is projected based on
+// a view.
+type BookmarkAndPermissions struct {
 	// Type to project
-	Projected *SavedBookmarkView
+	Projected *BookmarkAndPermissionsView
 	// View to render
 	View string
 }
 
-// SavedBookmarkView is a type that runs validations on a projected type.
-type SavedBookmarkView struct {
-	URL      *string
-	Bookmark *string
-	Token    *string
+// BookmarkAndPermissionsView is a type that runs validations on a projected
+// type.
+type BookmarkAndPermissionsView struct {
+	URL         *string
+	Bookmark    *string
+	Token       *string
+	Permissions *BookmarkPermissionsView
+}
+
+// BookmarkPermissionsView is a type that runs validations on a projected type.
+type BookmarkPermissionsView struct {
+	CanAddEvent   *bool
+	CanAddComment *bool
 }
 
 var (
-	// SavedBookmarkMap is a map of attribute names in result type SavedBookmark
-	// indexed by view name.
-	SavedBookmarkMap = map[string][]string{
+	// BookmarkAndPermissionsMap is a map of attribute names in result type
+	// BookmarkAndPermissions indexed by view name.
+	BookmarkAndPermissionsMap = map[string][]string{
 		"default": []string{
 			"url",
 			"bookmark",
 			"token",
+			"permissions",
+		},
+	}
+	// BookmarkPermissionsMap is a map of attribute names in result type
+	// BookmarkPermissions indexed by view name.
+	BookmarkPermissionsMap = map[string][]string{
+		"default": []string{
+			"canAddEvent",
+			"canAddComment",
 		},
 	}
 )
 
-// ValidateSavedBookmark runs the validations defined on the viewed result type
-// SavedBookmark.
-func ValidateSavedBookmark(result *SavedBookmark) (err error) {
+// ValidateBookmarkAndPermissions runs the validations defined on the viewed
+// result type BookmarkAndPermissions.
+func ValidateBookmarkAndPermissions(result *BookmarkAndPermissions) (err error) {
 	switch result.View {
 	case "default", "":
-		err = ValidateSavedBookmarkView(result.Projected)
+		err = ValidateBookmarkAndPermissionsView(result.Projected)
 	default:
 		err = goa.InvalidEnumValueError("view", result.View, []interface{}{"default"})
 	}
 	return
 }
 
-// ValidateSavedBookmarkView runs the validations defined on SavedBookmarkView
-// using the "default" view.
-func ValidateSavedBookmarkView(result *SavedBookmarkView) (err error) {
+// ValidateBookmarkAndPermissionsView runs the validations defined on
+// BookmarkAndPermissionsView using the "default" view.
+func ValidateBookmarkAndPermissionsView(result *BookmarkAndPermissionsView) (err error) {
 	if result.URL == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("url", "result"))
 	}
@@ -61,6 +79,23 @@ func ValidateSavedBookmarkView(result *SavedBookmarkView) (err error) {
 	}
 	if result.Token == nil {
 		err = goa.MergeErrors(err, goa.MissingFieldError("token", "result"))
+	}
+	if result.Permissions != nil {
+		if err2 := ValidateBookmarkPermissionsView(result.Permissions); err2 != nil {
+			err = goa.MergeErrors(err, err2)
+		}
+	}
+	return
+}
+
+// ValidateBookmarkPermissionsView runs the validations defined on
+// BookmarkPermissionsView using the "default" view.
+func ValidateBookmarkPermissionsView(result *BookmarkPermissionsView) (err error) {
+	if result.CanAddEvent == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("canAddEvent", "result"))
+	}
+	if result.CanAddComment == nil {
+		err = goa.MergeErrors(err, goa.MissingFieldError("canAddComment", "result"))
 	}
 	return
 }

@@ -40,7 +40,7 @@ var (
 
 func NewTestEnv() (e *TestEnv, err error) {
 	if globalEnv != nil {
-		log.Printf("using existing test env")
+		// log.Printf("using existing test env")
 		return globalEnv, nil
 	}
 
