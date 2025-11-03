@@ -8,6 +8,7 @@
         <ul v-if="showLangList" class="language-list">
             <li @click="changeLang(Locales.enUS)">{{ $t("languageSelector.english") }}</li>
             <li @click="changeLang(Locales.esEs)">{{ $t("languageSelector.spanish") }}</li>
+            <li @click="changeLang(Locales.viVN)">{{ $t("languageSelector.vietnamese") }}</li>
         </ul>
     </div>
 </template>
@@ -22,6 +23,7 @@ import { isSmallScreen } from "@/utilities";
 export enum Locales {
     enUS = "en-US",
     esEs = "es-ES",
+    viVN = "vi-VN",
 }
 
 export default Vue.extend({

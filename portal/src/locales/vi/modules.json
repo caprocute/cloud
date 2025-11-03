@@ -1,0 +1,139 @@
+{
+    "modules": {
+        "water": {
+            "name": "Nước"
+        },
+        "water.ec": {
+            "name": "Độ dẫn điện nước",
+            "sensors": {
+                "ec": "Độ dẫn điện",
+                "tds": "TDS",
+                "salinity": "Độ mặn"
+            }
+        },
+        "water.ph": {
+            "name": "Độ pH nước",
+            "sensors": {
+                "ph": "pH"
+            }
+        },
+        "water.do": {
+            "name": "Oxy hòa tan trong nước",
+            "sensors": {
+                "do": "DO",
+                "temperature": "Nhiệt độ",
+                "pressure": "Áp suất"
+            }
+        },
+        "water.dox": {
+            "name": "Oxy hòa tan trong nước",
+            "sensors": {
+                "dox": "DO"
+            }
+        },
+        "water.temp": {
+            "name": "Nhiệt độ nước",
+            "sensors": {
+                "temp": "Nhiệt độ"
+            }
+        },
+        "water.orp": {
+            "name": "ORP nước",
+            "sensors": {
+                "orp": "ORP"
+            }
+        },
+        "water.unknown": {
+            "name": "Nước"
+        },
+        "weather": {
+            "name": "Thời tiết",
+            "sensors": {
+                "humidity": "Độ ẩm",
+                "temperature_1": "Nhiệt độ 1",
+                "pressure": "Áp suất",
+                "temperature_2": "Nhiệt độ 2",
+                "rain": "Mưa",
+                "wind": "Gió",
+                "wind_mv": "Gió ADC thô",
+                "wind_speed": "Tốc độ gió",
+                "wind_dir": "Hướng gió",
+                "wind_dir_mv": "Hướng gió ADC thô",
+                "wind_hr_max_speed": "Tốc độ gió tối đa (1 giờ)",
+                "wind_hr_max_dir": "Hướng gió tối đa (1 giờ)",
+                "wind_10m_max_speed": "Tốc độ gió tối đa (10 phút)",
+                "wind_10m_max_dir": "Hướng gió tối đa (10 phút)",
+                "wind_2m_avg_speed": "Tốc độ gió trung bình (2 phút)",
+                "wind_2m_avg_dir": "Hướng gió trung bình (2 phút)",
+                "rain_this_hour": "Mưa giờ này",
+                "rain_prev_hour": "Mưa giờ trước"
+            }
+        },
+        "distance": {
+            "name": "Khoảng cách",
+            "sensors": {
+                "distance": "Khoảng cách",
+                "distance_0": "Khoảng cách 0",
+                "distance_1": "Khoảng cách 1",
+                "distance_2": "Khoảng cách 2",
+                "calibration": "Hiệu chỉnh"
+            }
+        },
+        "diagnostics": {
+            "name": "Chẩn đoán",
+            "sensors": {
+                "battery_charge": "Mức pin",
+                "battery_voltage": "Điện áp pin",
+                "battery_vbus": "Điện áp bus pin",
+                "battery_vs": "Điện áp shunt pin",
+                "battery_ma": "Dòng pin",
+                "battery_power": "Công suất pin",
+                "solar_vbus": "Điện áp bus năng lượng mặt trời",
+                "solar_vs": "Điện áp shunt năng lượng mặt trời",
+                "solar_ma": "Dòng năng lượng mặt trời",
+                "solar_power": "Công suất năng lượng mặt trời",
+                "free_memory": "Bộ nhớ trống",
+                "uptime": "Thời gian hoạt động",
+                "temperature": "Nhiệt độ"
+            }
+        },
+        "random": {
+            "name": "Ngẫu nhiên",
+            "sensors": {
+                "random_0": "Ngẫu nhiên 0",
+                "random_1": "Ngẫu nhiên 1",
+                "random_2": "Ngẫu nhiên 2",
+                "random_3": "Ngẫu nhiên 3",
+                "random_4": "Ngẫu nhiên 4",
+                "random_5": "Ngẫu nhiên 5",
+                "random_6": "Ngẫu nhiên 6",
+                "random_7": "Ngẫu nhiên 7",
+                "random_8": "Ngẫu nhiên 8",
+                "random_9": "Ngẫu nhiên 9"
+            }
+        },
+        "testing": {
+            "sensors": {
+                "sin": "Sin(x)",
+                "saw.weekly": "Saw(x)"
+            }
+        },
+        "wh.floodnet": {
+            "name": "FloodNet",
+            "sensors": {
+                "battery": "Pin",
+                "distance": "Khoảng cách",
+                "depth": "Độ sâu",
+                "depthUnfiltered": "Độ sâu (Chưa lọc)",
+                "tideFeet": "Mực nước thủy triều",
+                "altitude": "Độ cao",
+                "temperature": "Nhiệt độ",
+                "pressure": "Áp suất",
+                "sdError": "Lỗi SD",
+                "humidity": "Độ ẩm",
+                "maxPrecipLast5MinMmPerMin": "Lượng mưa"
+            }
+        }
+    }
+}
+

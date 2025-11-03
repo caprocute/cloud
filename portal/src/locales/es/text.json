@@ -759,7 +759,9 @@
     },
     "languageSelector": {
         "english": "Inglés",
-        "spanish": "Español"
+        "spanish": "Español",
+        "vietnamese": "Vietnamita",
+        "toggleText": "Idioma"
     },
     "iconAlts": {
         "close": "Cerrar"

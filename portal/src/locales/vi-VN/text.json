@@ -1,0 +1,526 @@
+{
+    "hello": "Xin chào từ i18n!",
+    "pageTitles": {
+        "login": "Đăng nhập",
+        "register": "Tạo tài khoản",
+        "recover": "Khôi phục tài khoản",
+        "reset": "Đặt lại mật khẩu",
+        "terms": "Điều khoản và điều kiện",
+        "projects": "Dự án",
+        "viewProject": "Bảng điều khiển dự án",
+        "viewProjectActivity": "Hoạt động dự án",
+        "viewProjectBigMap": "Bản đồ dự án",
+        "viewProjectBigMapList": "Trạm dự án",
+        "addProject": "Tạo dự án",
+        "editProject": "Chỉnh sửa dự án",
+        "mapAllStations": "Bản đồ trạm",
+        "listAllStations": "Danh sách trạm",
+        "viewStation": "Bảng điều khiển trạm",
+        "viewStationFromMap": "Bảng điều khiển trạm",
+        "viewStationPhotos": "Ảnh trạm",
+        "viewProjectStationPhotos": "Ảnh trạm",
+        "mapStation": "Bảng điều khiển trạm",
+        "mapAllStationsBounds": "Bảng điều khiển trạm",
+        "exploreBookmark": "Bảng điều khiển dữ liệu",
+        "exploreShortBookmark": "Bảng điều khiển dữ liệu",
+        "viewProjectNotes": "Ghi chú dự án",
+        "viewMyNotes": "Ghi chú của tôi",
+        "notifications": "Thông báo",
+        "user": "Hồ sơ người dùng",
+        "adminMain": "Bảng điều khiển quản trị",
+        "adminUsers": "Quản trị người dùng",
+        "adminStations": "Quản trị trạm",
+        "notFound": "Không tìm thấy trang"
+    },
+    "notFound": {
+        "title": "Không tìm thấy trang",
+        "message": "Trang bạn đang tìm kiếm không tồn tại hoặc đã được di chuyển.",
+        "toDashboard": "Đi đến Bảng điều khiển"
+    },
+    "water.ec.name": "Độ dẫn điện nước",
+    "water.ph.name": "Độ pH nước",
+    "water.do.name": "Oxy hòa tan trong nước",
+    "water.temp.name": "Nhiệt độ nước",
+    "water.orp.name": "ORP nước",
+    "water.unknown.name": "Nước",
+    "weather.name": "Thời tiết",
+    "distance.name": "Khoảng cách",
+    "diagnostics.name": "Chẩn đoán",
+    "random.name": "Ngẫu nhiên",
+    "weather.humidity": "Độ ẩm",
+    "weather.temperature_1": "Nhiệt độ 1",
+    "weather.pressure": "Áp suất",
+    "weather.temperature_2": "Nhiệt độ 2",
+    "weather.rain": "Mưa",
+    "weather.wind_speed": "Tốc độ gió",
+    "weather.wind_dir": "Hướng gió",
+    "weather.wind_dir_mv": "Hướng gió ADC thô",
+    "weather.wind_hr_max_speed": "Tốc độ gió tối đa (1 giờ)",
+    "weather.wind_hr_max_dir": "Hướng gió tối đa (1 giờ)",
+    "weather.wind_10m_max_speed": "Tốc độ gió tối đa (10 phút)",
+    "weather.wind_10m_max_dir": "Hướng gió tối đa (10 phút)",
+    "weather.wind_2m_avg_speed": "Tốc độ gió trung bình (2 phút)",
+    "weather.wind_2m_avg_dir": "Hướng gió trung bình (2 phút)",
+    "weather.rain_this_hour": "Mưa giờ này",
+    "weather.rain_prev_hour": "Mưa giờ trước",
+    "water.ec": "Độ dẫn điện",
+    "water.tds": "Tổng chất rắn hòa tan",
+    "water.salinity": "Độ mặn",
+    "water.ph": "pH",
+    "water.do": "Oxy hòa tan",
+    "water.temp": "Nhiệt độ",
+    "water.orp": "ORP",
+    "distance.distance_0": "Khoảng cách 0",
+    "distance.distance_1": "Khoảng cách 1",
+    "distance.distance_2": "Khoảng cách 2",
+    "distance.calibration": "Hiệu chỉnh",
+    "diagnostics.battery_charge": "Mức pin",
+    "diagnostics.battery_voltage": "Điện áp pin",
+    "diagnostics.battery_vbus": "Điện áp bus pin",
+    "diagnostics.battery_vs": "Điện áp shunt pin",
+    "diagnostics.battery_ma": "Dòng pin",
+    "diagnostics.battery_power": "Công suất pin",
+    "diagnostics.free_memory": "Bộ nhớ trống",
+    "diagnostics.uptime": "Thời gian hoạt động",
+    "diagnostics.temperature": "Nhiệt độ",
+    "random.random_0": "Ngẫu nhiên 0",
+    "random.random_1": "Ngẫu nhiên 1",
+    "random.random_2": "Ngẫu nhiên 2",
+    "random.random_3": "Ngẫu nhiên 3",
+    "random.random_4": "Ngẫu nhiên 4",
+    "random.random_5": "Ngẫu nhiên 5",
+    "random.random_6": "Ngẫu nhiên 6",
+    "random.random_7": "Ngẫu nhiên 7",
+    "random.random_8": "Ngẫu nhiên 8",
+    "random.random_9": "Ngẫu nhiên 9",
+    "fk.modules.unknown": "Không xác định",
+    "fk.unknown": "Không xác định",
+    "layout": {
+        "logo": {
+            "fieldkit": {
+                "alt": "FieldKit"
+            },
+            "floodnet": {
+                "alt": "Floodnet"
+            },
+            "compass": {
+                "alt": "Logo FieldKit Compass"
+            }
+        },
+        "side": {
+            "projects": {
+                "title": "Dự án"
+            },
+            "sensors": {
+                "title": "Cảm biến",
+                "empty": "Chưa có cảm biến nào được thêm"
+            },
+            "stations": {
+                "title": "Trạm",
+                "empty": "Chưa có trạm nào được thêm"
+            },
+            "madeBy": "Được tạo bởi"
+        },
+        "header": {
+            "login": "Đăng nhập",
+            "logout": "Đăng xuất",
+            "admin": "Quản trị",
+            "myAccount": "Tài khoản của tôi",
+            "markAllSeen": "Đánh dấu tất cả đã đọc",
+            "notifications": "Thông báo",
+            "noNotifications": "Bạn không có thông báo chưa đọc."
+        },
+        "backProjects": "Quay lại Dự án",
+        "backProjectDashboard": "Quay lại Bảng điều khiển Dự án",
+        "backToPrevious": "Quay lại Trước đó",
+        "backProject": "Quay lại {name}",
+        "backToStations": "Quay lại Trạm",
+        "backToSensors": "Quay lại Bản đồ Cảm biến",
+        "backStationDashboard": "Quay lại Bảng điều khiển Trạm",
+        "backDashboard": "Quay lại Bảng điều khiển"
+    },
+    "projects": {
+        "title": {
+            "mine": "Dự án của tôi",
+            "community": "Dự án cộng đồng",
+            "anonymous": "Dự án"
+        },
+        "add": "Thêm Dự án",
+        "noUserProjects": "Bạn chưa là thành viên của dự án nào. Tạo một dự án để bắt đầu!"
+    },
+    "project": {
+        "details": {
+            "title": "Chi tiết Dự án"
+        },
+        "started": "Bắt đầu: {started, date}",
+        "location": "{location}",
+        "duration": "{duration, projectDuration}",
+        "goal": "{goal}",
+        "nativeLands": "Đất bản địa: {nativeLands}",
+        "recentActivity": "Hoạt động gần đây",
+        "follow": "Theo dõi",
+        "unfollow": "Bỏ theo dõi",
+        "activity": {
+            "button": "Hoạt động",
+            "title": "Lịch sử Hoạt động",
+            "uploadedData": "Đã tải lên Dữ liệu",
+            "readingsUploaded": "{records} số đọc đã được tải lên từ {name}, với {errorText}",
+            "noErrors": "không có lỗi.",
+            "withError": "một lỗi.",
+            "deployedStation": "Trạm đã triển khai",
+            "activityDeployed": "{activityName} đã được triển khai.",
+            "empty": "Không có hoạt động gần đây."
+        },
+        "dashboard": "Bảng điều khiển Dự án",
+        "stations": {
+            "title": "Trạm",
+            "add": {
+                "trigger": "Thêm",
+                "title": "Thêm Trạm",
+                "cta": "Thêm"
+            },
+            "edit": {
+                "trigger": "Xóa",
+                "title": "Xóa Trạm",
+                "cta": "Xóa"
+            },
+            "search": "Tìm kiếm Trạm",
+            "none": {
+                "title": "Không có Trạm",
+                "text": "Thêm một trạm vào dự án này để bao gồm dữ liệu và hoạt động gần đây của nó."
+            }
+        },
+        "form": {
+            "name": {
+                "label": "Tên Dự án",
+                "required": "Tên là trường bắt buộc.",
+                "maxLength": "Trường này có giới hạn 100 ký tự."
+            },
+            "description": {
+                "label": "Mô tả ngắn",
+                "required": "Mô tả là trường bắt buộc.",
+                "maxLength": "Trường này có giới hạn 100 ký tự."
+            },
+            "goal": {
+                "label": "Mục tiêu Dự án",
+                "required": "Mục tiêu là trường bắt buộc.",
+                "maxLength": "Trường này có giới hạn 100 ký tự."
+            },
+            "location": {
+                "label": "Vị trí",
+                "required": "Vị trí là trường bắt buộc.",
+                "maxLength": "Trường này có giới hạn 100 ký tự."
+            },
+            "tags": {
+                "label": "Thẻ",
+                "help": "Nhấn Enter để phân tách thẻ.",
+                "maxLength": "Trường này có giới hạn 100 ký tự."
+            },
+            "makePublic": "Công khai dự án này",
+            "showExact": "Hiển thị vị trí chính xác của trạm",
+            "showGeneral": "Hiển thị vị trí chung của trạm",
+            "delete": {
+                "link": "Xóa Dự án"
+            },
+            "saveNew": "Thêm dự án",
+            "saveChanges": "Lưu cập nhật",
+            "showStations": "Hiển thị Trạm",
+            "hideStations": "Ẩn Trạm",
+            "mapTextShow": "Người khác sẽ thấy trạm và tọa độ GPS chính xác trên bản đồ",
+            "mapTextHide": "Trạm sẽ không hiển thị trên bản đồ cho người khác",
+            "mapHint": "Kéo hoặc phóng to để đặt chế độ xem bản đồ",
+            "startDate": "Ngày bắt đầu",
+            "endDate": "Ngày kết thúc",
+            "confirmLeavePopupMessage": "Bạn có thay đổi chưa lưu. Bạn có chắc chắn muốn rời đi không?",
+            "confirmDelete": "Bạn có chắc chắn muốn xóa dự án này không?"
+        },
+        "invite": {
+            "accept": "Chấp nhận Lời mời",
+            "decline": "Từ chối"
+        },
+        "create": {
+            "title": "Dự án Mới"
+        },
+        "edit": {
+            "title": "Chỉnh sửa Dự án",
+            "link": "Chỉnh sửa Dự án"
+        },
+        "updateSuccess": "Chi tiết dự án đã được cập nhật!",
+        "addSuccess": "Dự án đã được thêm!",
+        "privateBannerTitle": "Dự án này là riêng tư",
+        "privateBannerSubtitle": "Bạn không có quyền truy cập để xem dự án này",
+        "team": "Đội nhóm",
+        "modules": "Mô-đun",
+        "dataFiles": "Tệp Dữ liệu",
+        "noDataFiles": "Chưa có số đọc nào được tải lên.",
+        "share": "Chia sẻ",
+        "update": {
+            "needLogin": {
+                "part1": "Vui lòng",
+                "part2": "đăng nhập",
+                "part3": "để xem dự án."
+            },
+            "label": "Nhập cập nhật dự án của bạn bên dưới.",
+            "delete": "Xóa cập nhật này"
+        },
+        "teamManager": {
+            "heading": "Quản lý Đội nhóm",
+            "members": "Thành viên",
+            "role": "Vai trò",
+            "updateRole": "Cập nhật Vai trò",
+            "invitePending": "Lời mời đang chờ",
+            "newMember": {
+                "placeholder": "Email thành viên mới",
+                "emailRequired": "Email là trường bắt buộc.",
+                "emailValid": "Phải là địa chỉ email hợp lệ.",
+                "duplicate": "Người dùng này đã được mời.",
+                "selectRole": "Chọn Vai trò"
+            },
+            "invite": "Mời",
+            "confirmRemove": "Bạn có chắc chắn muốn xóa thành viên đội nhóm này không?"
+        }
+    },
+    "station": {
+        "readings": {
+            "title": "Số đọc Mới nhất",
+            "empty": "Không có trạm nào trong dự án này.",
+            "none": "Chưa có số đọc nào.",
+            "loading": "Đang tải"
+        },
+        "deployed": "Đã triển khai",
+        "deployedOn": "Đã triển khai vào",
+        "by": "bởi",
+        "readyToDeploy": "Sẵn sàng triển khai",
+        "lastSynced": "Đồng bộ cuối",
+        "firmwareVersion": "Phiên bản firmware:",
+        "modules": "Mô-đun",
+        "nativeLand": "Đất bản địa:",
+        "latitude": "Vĩ độ",
+        "longitude": "Kinh độ",
+        "allPhotos": "Tất cả ảnh",
+        "emptyPhotos": "Chưa có ảnh nào cho trạm này.",
+        "navigateToStation": "Điều hướng đến Trạm",
+        "lastSeen": "Lần cuối thấy",
+        "batteryLevel": "Mức Pin",
+        "btn": {
+            "addPhotos": "Thêm ảnh",
+            "deletePhoto": "Xóa Ảnh",
+            "setAsStationImage": "Đặt làm Ảnh Trạm",
+            "linkToPhotos": "Xem Thư viện"
+        },
+        "inactive": "Không hoạt động",
+        "ownerAvatar": "Ảnh đại diện chủ sở hữu",
+        "belongsTo": "Thuộc về:",
+        "addDescription": "Thêm mô tả trạm",
+        "singleProjectTitle": "Dự án:",
+        "multipleProjectsTitle": "Dự án:",
+        "data": "Dữ liệu",
+        "exploreData": "Khám phá Dữ liệu",
+        "descriptionUpdateSuccess": "Mô tả trạm đã được cập nhật thành công!",
+        "moduleNameUpdateSuccess": "Tên mô-đun đã được cập nhật thành công!",
+        "photo": {
+            "module": {
+                "alt": "Biểu tượng Mô-đun"
+            },
+            "alt": "Ảnh Trạm",
+            "default": {
+                "alt": "Ảnh Trạm Mặc định"
+            }
+        },
+        "nativeLands": " Đất bản địa:"
+    },
+    "stations": {
+        "addNew": "Thêm Trạm Mới",
+        "noStations": "Bạn không có trạm nào. Tải ứng dụng FieldKit, đăng nhập và kết nối với trạm của bạn để thêm nó vào tài khoản."
+    },
+    "user": {
+        "profile": {
+            "title": "Tài khoản của tôi",
+            "saved": "Hồ sơ đã được lưu.",
+            "password": {
+                "changed": "Mật khẩu đã được thay đổi.",
+                "failed": "Vui lòng kiểm tra mật khẩu của bạn và thử lại."
+            },
+            "photo": {
+                "title": "Ảnh Hồ sơ",
+                "change": "Thay đổi Ảnh",
+                "choose": "Chọn Tệp",
+                "noFile": "Chưa chọn tệp"
+            },
+            "form": {
+                "name": {
+                    "label": "Tên",
+                    "required": "Tên là trường bắt buộc."
+                },
+                "bio": {
+                    "label": "Mô tả ngắn",
+                    "required": "Mô tả ngắn là trường bắt buộc."
+                },
+                "email": {
+                    "label": "Email",
+                    "required": "Email là trường bắt buộc.",
+                    "email": "Phải là địa chỉ email hợp lệ.",
+                    "taken": "Địa chỉ này có vẻ đã được đăng ký.",
+                    "recover": "Khôi phục Tài khoản"
+                },
+                "makePublic": "Công khai hồ sơ của tôi",
+                "update": "Cập nhật",
+                "password": {
+                    "title": "Thay đổi Mật khẩu",
+                    "existing": {
+                        "label": "Mật khẩu hiện tại",
+                        "required": "Đây là trường bắt buộc.",
+                        "min": "Mật khẩu phải có ít nhất 10 ký tự."
+                    },
+                    "password": {
+                        "label": "Mật khẩu mới",
+                        "required": "Đây là trường bắt buộc.",
+                        "min": "Mật khẩu phải có ít nhất 10 ký tự."
+                    },
+                    "confirmation": {
+                        "label": "Xác nhận mật khẩu mới",
+                        "required": "Xác nhận là trường bắt buộc.",
+                        "sameAsPassword": "Mật khẩu phải khớp."
+                    },
+                    "update": "Cập nhật"
+                }
+            }
+        }
+    },
+    "reset": {
+        "form": {
+            "title": "Đặt lại Mật khẩu",
+            "name": {
+                "label": "Tên",
+                "required": "Tên là trường bắt buộc."
+            },
+            "email": {
+                "label": "Email",
+                "required": "Email là trường bắt buộc.",
+                "valid": "Phải là địa chỉ email hợp lệ.",
+                "taken": "Địa chỉ này có vẻ đã được đăng ký."
+            },
+            "password": {
+                "label": "Mật khẩu",
+                "required": "Đây là trường bắt buộc.",
+                "valid": "Mật khẩu phải có ít nhất 10 ký tự."
+            },
+            "passwordConfirmation": {
+                "label": "Xác nhận mật khẩu",
+                "required": "Xác nhận là trường bắt buộc.",
+                "valid": "Mật khẩu phải khớp."
+            },
+            "backButton": "Quay lại Đăng nhập",
+            "successTitle": "Thành công!",
+            "failedTitle": "Mật khẩu không được đặt lại",
+            "failedSubtitle": "Rất tiếc, chúng tôi không thể đặt lại mật khẩu của bạn.",
+            "retry": {
+                "please": "Vui lòng",
+                "contactUs": "liên hệ với chúng tôi",
+                "assitance": "nếu bạn muốn được hỗ trợ."
+            }
+        }
+    },
+    "recover": {
+        "form": {
+            "title": "Khôi phục Tài khoản",
+            "subtitle": "Nhập địa chỉ email của bạn bên dưới, và hướng dẫn đặt lại mật khẩu sẽ được gửi.",
+            "button": "Khôi phục",
+            "sentTitle": "Email Đặt lại Mật khẩu đã được Gửi",
+            "sentSubtitle": "Kiểm tra hộp thư của bạn để tìm email có liên kết đặt lại mật khẩu.",
+            "resending": "Đang gửi lại",
+            "backButton": "Quay lại Đăng nhập",
+            "resendButton": "Gửi lại",
+            "email": {
+                "label": "Email",
+                "required": "Email là trường bắt buộc.",
+                "valid": "Phải là địa chỉ email hợp lệ.",
+                "taken": "Địa chỉ này có vẻ đã được đăng ký."
+            }
+        }
+    },
+    "login": {
+        "form": {
+            "title": "Đăng nhập vào Tài khoản của bạn",
+            "spoofEmail": {
+                "label": "Email giả mạo",
+                "required": "Email giả mạo là trường bắt buộc.",
+                "valid": "Phải là địa chỉ email hợp lệ."
+            },
+            "email": {
+                "label": "Email",
+                "required": "Email là trường bắt buộc.",
+                "valid": "Phải là địa chỉ email hợp lệ."
+            },
+            "password": {
+                "label": "Mật khẩu",
+                "required": "Đây là trường bắt buộc.",
+                "valid": "Mật khẩu phải có ít nhất 10 ký tự."
+            }
+        },
+        "resetLink": "Đặt lại mật khẩu",
+        "loginButton": "Đăng nhập",
+        "loginFailed": "Rất tiếc, chúng tôi không thể đăng nhập cho bạn. Vui lòng kiểm tra thông tin đăng nhập và thử lại.",
+        "createAccountLink": "Tạo tài khoản",
+        "loginError": "Bạn phải đăng nhập để xem trang này.",
+        "privateProject": "Dự án này là riêng tư",
+        "privateStation": "Trạm này thuộc về một dự án riêng tư"
+    },
+    "createAccount": {
+        "form": {
+            "title": "Tạo Tài khoản của bạn",
+            "name": {
+                "label": "Tên",
+                "required": "Tên là trường bắt buộc."
+            },
+            "email": {
+                "label": "Email",
+                "required": "Email là trường bắt buộc.",
+                "valid": "Phải là địa chỉ email hợp lệ.",
+                "taken": "Địa chỉ này có vẻ đã được đăng ký."
+            },
+            "password": {
+                "label": "Mật khẩu",
+                "required": "Đây là trường bắt buộc.",
+                "valid": "Mật khẩu phải có ít nhất 10 ký tự."
+            },
+            "passwordConfirmation": {
+                "label": "Xác nhận mật khẩu",
+                "required": "Xác nhận là trường bắt buộc.",
+                "valid": "Mật khẩu phải khớp."
+            },
+            "terms": {
+                "label": "Bằng cách tạo tài khoản, bạn đồng ý với",
+                "labelLink": "Điều khoản Sử dụng của chúng tôi.",
+                "required": "Đây là trường bắt buộc."
+            },
+            "createAccountButton": "Tạo Tài khoản",
+            "backButton": "Quay lại Đăng nhập",
+            "created": {
+                "title": "Tài khoản đã được Tạo",
+                "subtitle": "Chúng tôi đã gửi cho bạn email xác thực tài khoản.",
+                "resendButton": "Gửi lại Email"
+            },
+            "resendMessage": "Đang gửi lại"
+        },
+        "resetLink": "Đặt lại mật khẩu",
+        "loginButton": "Đăng nhập",
+        "loginFailed": "Rất tiếc, chúng tôi không thể đăng nhập cho bạn. Vui lòng kiểm tra thông tin đăng nhập và thử lại.",
+        "createAccountLink": "Tạo tài khoản"
+    },
+    "languageSelector": {
+        "english": "Tiếng Anh",
+        "spanish": "Tiếng Tây Ban Nha",
+        "vietnamese": "Tiếng Việt",
+        "toggleText": "Ngôn ngữ"
+    },
+    "selected": "Đã chọn",
+    "yes": "Có",
+    "no": "Không",
+    "cancel": "Hủy",
+    "delete": "Xóa",
+    "edit": "Chỉnh sửa",
+    "save": "Lưu",
+    "loading": "Đang tải..."
+}
+
