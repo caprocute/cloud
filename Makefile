@@ -201,4 +201,21 @@ sanitize: sanitizer
 reset-passwords:
 	cd tools/passwords && go run passwords.go -password asdfasdfasdf -set-all
 	
-.PHONY: schema-production sanitize
+deploy-build:
+	@echo "Building and pushing Docker images to AWS ECR..."
+	@./deployment/build-and-push.sh $(VERSION) $(ENV)
+
+deploy-push: deploy-build
+
+deploy-update:
+	@echo "Deploying to AWS ECS..."
+	@./deployment/deploy.sh $(VERSION) $(ENV)
+
+deploy-setup:
+	@echo "Setting up ECS infrastructure..."
+	@./deployment/create-ecs-services.sh $(ENV)
+
+deploy-full: deploy-build deploy-update
+	@echo "Full deployment completed!"
+
+.PHONY: schema-production sanitize deploy-build deploy-push deploy-update deploy-setup deploy-full

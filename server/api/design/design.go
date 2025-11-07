@@ -23,9 +23,11 @@ var Origins = []string{
 	"https://dataviz.floodnet.nyc",
 	"https://fkdev.org",
 	"https://*.fkdev.org",
-	"/(.+[.])?fklocal.org:\\d+/",   // Dev
-	"/127.0.0.1:\\d+/",             // Dev
-	"/192.168.(\\d+).(\\d+):\\d+/", // Dev
+	"http://*.elb.ap-southeast-1.amazonaws.com",  // AWS ALB staging
+	"https://*.elb.ap-southeast-1.amazonaws.com", // AWS ALB staging (HTTPS)
+	"/(.+[.])?fklocal.org:\\d+/",                 // Dev
+	"/127.0.0.1:\\d+/",                           // Dev
+	"/192.168.(\\d+).(\\d+):\\d+/",               // Dev
 }
 
 func commonOptions() {

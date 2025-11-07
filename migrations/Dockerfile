@@ -14,6 +14,8 @@ RUN go build -o migrate *.go
 FROM ubuntu:22.04
 
 COPY --from=source /work/cli/migrate /work/migrate
+COPY primary/ /work/primary/
+COPY tsdb/ /work/tsdb/
 
 WORKDIR /work
 

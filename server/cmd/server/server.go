@@ -500,6 +500,36 @@ func main() {
 	apiOnly.Handle("/ingestion", ingesterFinal)
 	apiOnly.NotFoundHandler = apiFinal
 
+	// Thêm routing để serve API trên cùng domain (cho staging ALB)
+	// Chỉ serve API khi request path không match với portal static files
+	sameDomainApi := rootRouter.Methods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS").Subrouter()
+	sameDomainApi.PathPrefix("/projects").Handler(apiFinal)
+	sameDomainApi.PathPrefix("/users").Handler(apiFinal)
+	sameDomainApi.PathPrefix("/user").Handler(apiFinal)
+	sameDomainApi.PathPrefix("/stations").Handler(apiFinal)
+	sameDomainApi.PathPrefix("/station").Handler(apiFinal)
+	sameDomainApi.PathPrefix("/data").Handler(apiFinal)
+	sameDomainApi.PathPrefix("/sensors").Handler(apiFinal)
+	sameDomainApi.PathPrefix("/meta").Handler(apiFinal)
+	sameDomainApi.PathPrefix("/modules").Handler(apiFinal)
+	sameDomainApi.PathPrefix("/login").Handler(apiFinal)
+	sameDomainApi.PathPrefix("/logout").Handler(apiFinal)
+	sameDomainApi.PathPrefix("/refresh").Handler(apiFinal)
+	sameDomainApi.PathPrefix("/validate").Handler(apiFinal)
+	sameDomainApi.PathPrefix("/ingestion").Handler(ingesterFinal)
+	sameDomainApi.PathPrefix("/export").Handler(apiFinal)
+	sameDomainApi.PathPrefix("/notes").Handler(apiFinal)
+	sameDomainApi.PathPrefix("/discussion").Handler(apiFinal)
+	sameDomainApi.PathPrefix("/data-events").Handler(apiFinal)
+	sameDomainApi.PathPrefix("/notifications").Handler(apiFinal)
+	sameDomainApi.PathPrefix("/bookmarks").Handler(apiFinal)
+	sameDomainApi.PathPrefix("/admin").Handler(apiFinal)
+	sameDomainApi.PathPrefix("/moderation").Handler(apiFinal)
+	sameDomainApi.PathPrefix("/auth").Handler(apiFinal)
+	sameDomainApi.PathPrefix("/oidc").Handler(apiFinal)
+	sameDomainApi.PathPrefix("/discourse").Handler(apiFinal)
+	sameDomainApi.PathPrefix("/mentionables").Handler(apiFinal)
+
 	rootRouter.NotFoundHandler = staticFinal
 
 	server := &http.Server{

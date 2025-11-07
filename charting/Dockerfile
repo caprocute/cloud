@@ -5,7 +5,17 @@ ARG VERSION=missing
 WORKDIR /app
 COPY ./package*.json /app/
 RUN apt-get update \
-    && apt-get install -qq libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev
+    && apt-get install -qq -y \
+        libcairo2-dev \
+        libpango1.0-dev \
+        libjpeg-dev \
+        libgif-dev \
+        librsvg2-dev \
+        build-essential \
+        make \
+        g++ \
+        python3 \
+        pkg-config
 RUN npm install
 COPY tsconfig.* en.json /app/
 COPY *.ts /app/
