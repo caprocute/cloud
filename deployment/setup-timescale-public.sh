@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# Script để expose PostgreSQL ra public qua Network Load Balancer
-# Sử dụng: ./deployment/setup-postgres-public.sh [ENVIRONMENT]
-# Ví dụ: ./deployment/setup-postgres-public.sh staging
+# Script để expose TimescaleDB ra public qua Network Load Balancer
+# Sử dụng: ./deployment/setup-timescale-public.sh [ENVIRONMENT]
+# Ví dụ: ./deployment/setup-timescale-public.sh staging
 
 set -e
 
@@ -35,7 +35,7 @@ if [ -z "$DETECTED_ACCOUNT_ID" ]; then
     echo ""
     echo "2. Hoặc set AWS_PROFILE:"
     echo "   export AWS_PROFILE=your-profile-name"
-    echo "   ./deployment/setup-postgres-public.sh ${ENVIRONMENT}"
+    echo "   ./deployment/setup-timescale-public.sh ${ENVIRONMENT}"
     echo ""
     echo "3. Hoặc set AWS credentials trực tiếp:"
     echo "   export AWS_ACCESS_KEY_ID=your-access-key"
@@ -52,7 +52,7 @@ AWS_ACCOUNT_ID="$DETECTED_ACCOUNT_ID"
 echo "✅ AWS Account ID: ${AWS_ACCOUNT_ID}"
 
 CLUSTER_NAME="fieldkit-${ENVIRONMENT}-db-v1"
-SERVICE_NAME="${CLUSTER_NAME}-postgres"
+SERVICE_NAME="${CLUSTER_NAME}-timescale"
 VPC_ID=${VPC_ID:-""}
 SUBNET_IDS=${SUBNET_IDS:-""}
 SECURITY_GROUP_ID=${SECURITY_GROUP_ID:-""}
@@ -124,19 +124,19 @@ if [ -z "$VPC_ID" ] || [ -z "$SUBNET_IDS" ] || [ -z "$SECURITY_GROUP_ID" ]; then
     echo "   aws ecs describe-services --cluster ${CLUSTER_NAME} --services ${SERVICE_NAME} --region ${AWS_REGION} --query 'services[0].networkConfiguration.awsvpcConfiguration.securityGroups[0]' --output text"
     echo ""
     echo "   Hoặc tạo security group mới:"
-    echo "   aws ec2 create-security-group --group-name fieldkit-${ENVIRONMENT}-postgres-sg --description \"Security group for FieldKit PostgreSQL\" --vpc-id YOUR_VPC_ID --region ${AWS_REGION}"
+    echo "   aws ec2 create-security-group --group-name fieldkit-${ENVIRONMENT}-timescale-sg --description \"Security group for FieldKit TimescaleDB\" --vpc-id YOUR_VPC_ID --region ${AWS_REGION}"
     echo ""
     echo "Ví dụ sử dụng:"
     echo "   export VPC_ID=\"vpc-12345678\""
     echo "   export SUBNET_IDS=\"subnet-11111111,subnet-22222222\""
     echo "   export SECURITY_GROUP_ID=\"sg-12345678\""
-    echo "   ./deployment/setup-postgres-public.sh ${ENVIRONMENT}"
+    echo "   ./deployment/setup-timescale-public.sh ${ENVIRONMENT}"
     echo ""
     exit 1
 fi
 
 echo "=========================================="
-echo "Setup Public Access cho PostgreSQL"
+echo "Setup Public Access cho TimescaleDB"
 echo "=========================================="
 echo "Environment: ${ENVIRONMENT}"
 echo "Cluster: ${CLUSTER_NAME}"
@@ -219,7 +219,7 @@ if [ "$SERVICE_STATUS" = "NOT_FOUND" ] || [ "$SERVICE_STATUS" = "None" ] || [ -z
 fi
 
 # Tạo security group cho NLB
-NLB_SG_NAME="fieldkit-${ENVIRONMENT}-postgres-nlb-sg"
+NLB_SG_NAME="fieldkit-${ENVIRONMENT}-timescale-nlb-sg"
 NLB_SG_ID=$(aws ec2 describe-security-groups \
     --filters "Name=group-name,Values=${NLB_SG_NAME}" "Name=vpc-id,Values=${VPC_ID}" \
     --region ${AWS_REGION} \
@@ -230,14 +230,14 @@ if [ -z "$NLB_SG_ID" ] || [ "$NLB_SG_ID" = "None" ]; then
     echo "Đang tạo security group cho NLB..."
     NLB_SG_ID=$(aws ec2 create-security-group \
         --group-name ${NLB_SG_NAME} \
-        --description "Security group for FieldKit PostgreSQL NLB" \
+        --description "Security group for FieldKit TimescaleDB NLB" \
         --vpc-id ${VPC_ID} \
         --region ${AWS_REGION} \
         --query 'GroupId' \
         --output text)
     
-    # Cho phép PostgreSQL từ internet (⚠️  Cảnh báo bảo mật!)
-    echo "⚠️  Cho phép PostgreSQL port 5432 từ internet (khuyến nghị chỉ cho phép IP cụ thể)"
+    # Cho phép TimescaleDB từ internet (⚠️  Cảnh báo bảo mật!)
+    echo "⚠️  Cho phép TimescaleDB port 5432 từ internet (khuyến nghị chỉ cho phép IP cụ thể)"
     read -p "Bạn có muốn cho phép từ tất cả IP (0.0.0.0/0)? (y/n) " -n 1 -r
     echo
     if [[ $REPLY =~ ^[Yy]$ ]]; then
@@ -264,7 +264,7 @@ else
 fi
 
 # Cập nhật security group của service để cho phép traffic từ NLB
-echo "Đang cập nhật security group của PostgreSQL service..."
+echo "Đang cập nhật security group của TimescaleDB service..."
 aws ec2 authorize-security-group-ingress \
     --group-id ${SECURITY_GROUP_ID} \
     --protocol tcp \
@@ -273,7 +273,7 @@ aws ec2 authorize-security-group-ingress \
     --region ${AWS_REGION} 2>/dev/null || echo "   Rule đã tồn tại"
 
 # Tạo Network Load Balancer
-NLB_NAME="fieldkit-${ENVIRONMENT}-postgres-nlb"
+NLB_NAME="fieldkit-${ENVIRONMENT}-timescale-nlb"
 NLB_ARN=$(aws elbv2 describe-load-balancers \
     --names ${NLB_NAME} \
     --region ${AWS_REGION} \
@@ -314,7 +314,7 @@ NLB_DNS=$(aws elbv2 describe-load-balancers \
     --output text)
 
 # Tạo target group
-TG_NAME="fieldkit-${ENVIRONMENT}-postgres-tg"
+TG_NAME="fieldkit-${ENVIRONMENT}-timescale-tg"
 TG_ARN=$(aws elbv2 describe-target-groups \
     --names ${TG_NAME} \
     --region ${AWS_REGION} \
@@ -368,23 +368,23 @@ echo "Đang cập nhật service để sử dụng load balancer..."
 aws ecs update-service \
     --cluster ${CLUSTER_NAME} \
     --service ${SERVICE_NAME} \
-    --load-balancers targetGroupArn=${TG_ARN},containerName=postgres,containerPort=5432 \
+    --load-balancers targetGroupArn=${TG_ARN},containerName=timescale,containerPort=5432 \
     --region ${AWS_REGION} > /dev/null
 
 echo ""
 echo "=========================================="
-echo "✅ PostgreSQL Public Access setup hoàn tất!"
+echo "✅ TimescaleDB Public Access setup hoàn tất!"
 echo "=========================================="
 echo ""
 echo "NLB DNS: ${NLB_DNS}"
 echo "Connection string:"
-echo "  postgres://fieldkit:PASSWORD@${NLB_DNS}:5432/fieldkit"
+echo "  postgres://postgres:PASSWORD@${NLB_DNS}:5432/fk"
 echo ""
 echo "Để lấy password:"
-echo "  aws secretsmanager get-secret-value --secret-id fieldkit/${ENVIRONMENT}/database/postgres/password --region ${AWS_REGION} --query SecretString --output text"
+echo "  aws secretsmanager get-secret-value --secret-id fieldkit/${ENVIRONMENT}/database/timescale/password --region ${AWS_REGION} --query SecretString --output text"
 echo ""
 echo "⚠️  Lưu ý bảo mật:"
-echo "  - PostgreSQL đang expose ra internet"
+echo "  - TimescaleDB đang expose ra internet"
 echo "  - Nên sử dụng SSL/TLS connection"
 echo "  - Nên giới hạn IP source trong security group"
 echo "=========================================="

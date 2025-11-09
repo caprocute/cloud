@@ -38,6 +38,44 @@ Hướng dẫn đóng gói và triển khai các thành phần ứng dụng Fiel
    - Secrets Manager (để lưu secrets)
    - CloudWatch Logs (để logging)
 
+   **Cách lấy AWS Access Key ID và Secret Access Key:**
+   
+   **Bước 1: Đăng nhập AWS Console**
+   - Truy cập: https://console.aws.amazon.com
+   - Đăng nhập với tài khoản AWS của bạn
+   
+   **Bước 2: Tạo Access Key**
+   - Click vào tên user ở góc trên bên phải (hoặc vào IAM service)
+   - Chọn "Security credentials" tab
+   - Scroll xuống phần "Access keys"
+   - Click "Create access key"
+   - Chọn use case (ví dụ: "Command Line Interface (CLI)")
+   - Click "Next" và "Create access key"
+   - **QUAN TRỌNG**: Download hoặc copy ngay Access Key ID và Secret Access Key
+     - Secret Access Key chỉ hiển thị 1 lần duy nhất
+     - Nếu mất, phải tạo access key mới
+   
+   **Bước 3: Cấu hình AWS CLI**
+   ```bash
+   # Cấu hình default credentials
+   aws configure
+   
+   # Hoặc tạo profile riêng
+   aws configure --profile fieldkit
+   ```
+   
+   Khi được hỏi, nhập:
+   - **AWS Access Key ID**: [Paste Access Key ID đã copy]
+   - **AWS Secret Access Key**: [Paste Secret Access Key đã copy]
+   - **Default region name**: `ap-southeast-1` (hoặc region bạn muốn)
+   - **Default output format**: `json`
+   
+   **Lưu ý bảo mật:**
+   - Không commit Access Keys vào Git
+   - Không chia sẻ Access Keys qua email/chat
+   - Nếu nghi ngờ bị lộ, xóa access key ngay và tạo mới
+   - Sử dụng IAM roles thay vì access keys khi có thể (trên EC2/ECS)
+   
    **Kiểm tra quyền AWS CLI:**
    ```bash
    # Kiểm tra AWS CLI đã được cài đặt
@@ -199,15 +237,127 @@ Script này sẽ:
 - Đăng ký task definitions cho server và charting
 - Tạo services cho server và charting
 
-### Bước 2: Setup Secrets
+### Bước 2: Setup Load Balancers
 
-#### 2.1. Setup Session Key
+Sau khi tạo database và server services, setup Load Balancers ngay để có thể truy cập các dịch vụ.
+
+#### 2.1. Setup Application Load Balancer cho Server
+
+```bash
+./deployment/setup-load-balancer.sh staging
+```
+
+Script này sẽ:
+- Tạo Application Load Balancer (ALB) internet-facing
+- Tạo target group cho server service
+- Cấu hình HTTP listener (port 80)
+- Cập nhật server service để sử dụng load balancer
+
+Sau khi hoàn thành, bạn sẽ nhận được ALB DNS name để truy cập web application.
+
+#### 2.2. Setup Public Access cho PostgreSQL (Optional)
+
+**Trước khi chạy script, cần set các biến môi trường:**
+
+```bash
+# Lấy VPC_ID
+export VPC_ID=$(aws ec2 describe-vpcs --region ap-southeast-1 --filters "Name=isDefault,Values=true" --query 'Vpcs[0].VpcId' --output text)
+
+# Lấy SUBNET_IDS (cần ít nhất 2 subnets)
+export SUBNET_IDS=$(aws ec2 describe-subnets --region ap-southeast-1 --filters "Name=vpc-id,Values=${VPC_ID}" --query 'Subnets[*].SubnetId' --output text | tr '\t' ',')
+
+# Lấy SECURITY_GROUP_ID từ service hiện tại (nếu đã có)
+export SECURITY_GROUP_ID=$(aws ecs describe-services \
+  --cluster fieldkit-staging-db-v1 \
+  --services fieldkit-staging-db-v1-postgres \
+  --region ap-southeast-1 \
+  --query 'services[0].networkConfiguration.awsvpcConfiguration.securityGroups[0]' \
+  --output text)
+
+# Hoặc tạo security group mới
+# export SECURITY_GROUP_ID=$(aws ec2 create-security-group \
+#   --group-name fieldkit-staging-postgres-sg \
+#   --description "Security group for FieldKit PostgreSQL" \
+#   --vpc-id ${VPC_ID} \
+#   --region ap-southeast-1 \
+#   --query 'GroupId' --output text)
+```
+
+**Chạy script:**
+
+```bash
+./deployment/setup-postgres-public.sh staging
+```
+
+Script này sẽ:
+- Tự động tìm default VPC và subnets nếu chưa set biến môi trường
+- Hiển thị hướng dẫn chi tiết nếu thiếu thông tin
+- Tạo Network Load Balancer (NLB) internet-facing
+- Tạo target group cho PostgreSQL service
+- Cấu hình TCP listener (port 5432)
+- Cập nhật PostgreSQL service để sử dụng load balancer
+
+**⚠️ Cảnh báo bảo mật**: Expose PostgreSQL ra internet có rủi ro bảo mật. Nên:
+- Giới hạn IP source trong security group
+- Sử dụng SSL/TLS connection
+- Xem xét sử dụng VPN hoặc Bastion Host thay vì public access
+
+#### 2.3. Setup Public Access cho TimescaleDB (Optional)
+
+**Trước khi chạy script, cần set các biến môi trường:**
+
+```bash
+# Lấy VPC_ID
+export VPC_ID=$(aws ec2 describe-vpcs --region ap-southeast-1 --filters "Name=isDefault,Values=true" --query 'Vpcs[0].VpcId' --output text)
+
+# Lấy SUBNET_IDS (cần ít nhất 2 subnets)
+export SUBNET_IDS=$(aws ec2 describe-subnets --region ap-southeast-1 --filters "Name=vpc-id,Values=${VPC_ID}" --query 'Subnets[*].SubnetId' --output text | tr '\t' ',')
+
+# Lấy SECURITY_GROUP_ID từ service hiện tại (nếu đã có)
+export SECURITY_GROUP_ID=$(aws ecs describe-services \
+  --cluster fieldkit-staging-db-v1 \
+  --services fieldkit-staging-db-v1-timescale \
+  --region ap-southeast-1 \
+  --query 'services[0].networkConfiguration.awsvpcConfiguration.securityGroups[0]' \
+  --output text)
+
+# Hoặc tạo security group mới
+# export SECURITY_GROUP_ID=$(aws ec2 create-security-group \
+#   --group-name fieldkit-staging-timescale-sg \
+#   --description "Security group for FieldKit TimescaleDB" \
+#   --vpc-id ${VPC_ID} \
+#   --region ap-southeast-1 \
+#   --query 'GroupId' --output text)
+```
+
+**Chạy script:**
+
+```bash
+./deployment/setup-timescale-public.sh staging
+```
+
+Script này sẽ:
+- Tự động tìm default VPC và subnets nếu chưa set biến môi trường
+- Hiển thị hướng dẫn chi tiết nếu thiếu thông tin
+- Tạo Network Load Balancer (NLB) internet-facing
+- Tạo target group cho TimescaleDB service
+- Cấu hình TCP listener (port 5432)
+- Cập nhật TimescaleDB service để sử dụng load balancer
+
+**⚠️ Cảnh báo bảo mật**: Expose TimescaleDB ra internet có rủi ro bảo mật. Nên:
+- Giới hạn IP source trong security group
+- Sử dụng SSL/TLS connection
+- Xem xét sử dụng VPN hoặc Bastion Host thay vì public access
+
+### Bước 3: Setup Secrets
+
+#### 3.1. Setup Session Key
 
 ```bash
 ./deployment/setup-session-key.sh staging
 ```
 
-#### 2.2. Setup Database Connection Strings
+#### 3.2. Setup Database Connection Strings
 
 ```bash
 # Tự động tạo connection strings từ service discovery
@@ -220,7 +370,7 @@ Hoặc setup thủ công:
 ./deployment/setup-database-secrets.sh staging
 ```
 
-### Bước 3: Chạy Database Migrations
+### Bước 4: Chạy Database Migrations
 
 Có 2 cách để chạy migrations:
 
@@ -261,38 +411,219 @@ Script này sẽ:
 
 **Lưu ý**: Migrations image cần được build với migrations files đã được copy vào image (đã được cập nhật trong `migrations/Dockerfile`).
 
-### Bước 4: Setup Load Balancers
+#### Kiểm tra trạng thái Public Services
 
-#### 4.1. Setup Application Load Balancer cho Server
+Sau khi setup Load Balancers, bạn có thể kiểm tra trạng thái của tất cả các dịch vụ:
 
 ```bash
-./deployment/setup-load-balancer.sh staging
+./deployment/check-public-services.sh staging
+```
+
+Script này sẽ kiểm tra:
+- **Server Service**: Application Load Balancer (ALB) và health status
+- **PostgreSQL**: Network Load Balancer (NLB) và connection info
+- **TimescaleDB**: Network Load Balancer (NLB) và connection info
+
+Với mỗi dịch vụ, script sẽ hiển thị:
+- ✅ Load Balancer đã được tạo và DNS name
+- ✅ Target Group và số lượng healthy targets
+- ✅ Service đã được attach vào Load Balancer
+- 🌐 Public access URLs/connection strings
+
+**Ví dụ output:**
+```
+==========================================
+Kiểm tra Public Services Status
+==========================================
+Environment: staging
+Region: ap-southeast-1
+==========================================
+
+----------------------------------------
+📋 server
+----------------------------------------
+✅ Load Balancer: fieldkit-staging-server-alb
+   Type: application
+   Scheme: internet-facing
+   State: active
+   DNS: fieldkit-staging-server-alb-xxx.elb.ap-southeast-1.amazonaws.com
+
+✅ Target Group: fieldkit-staging-server-tg
+   Healthy targets: 2/2
+   ✅ Có 2 healthy target(s)
+
+✅ Service đã được attach vào Target Group
+
+🌐 Public Access:
+   URL: http://fieldkit-staging-server-alb-xxx.elb.ap-southeast-1.amazonaws.com
+   Health check: http://fieldkit-staging-server-alb-xxx.elb.ap-southeast-1.amazonaws.com/status
+```
+
+#### Export Database URLs để sử dụng
+
+Trước khi chạy migrations, bạn có thể export database connection URLs vào biến môi trường:
+
+```bash
+# Export database URLs từ AWS Secrets Manager
+source ./deployment/export-database-urls.sh staging
+
+# Sau đó có thể sử dụng các biến:
+echo $FIELDKIT_POSTGRES_URL
+echo $FIELDKIT_TIME_SCALE_URL
+
+# Hoặc sử dụng trực tiếp trong commands
+cd migrations/cli
+export MIGRATE_PATH="../primary"
+export MIGRATE_DATABASE_URL="$FIELDKIT_POSTGRES_URL"
+go run main.go migrate
 ```
 
 Script này sẽ:
-- Tạo Application Load Balancer (ALB) internet-facing
-- Tạo target group cho server service
-- Cấu hình HTTP listener (port 80)
-- Cập nhật server service để sử dụng load balancer
+- Lấy PostgreSQL connection URL từ AWS Secrets Manager
+- Lấy TimescaleDB connection URL từ AWS Secrets Manager
+- Export vào biến môi trường `FIELDKIT_POSTGRES_URL` và `FIELDKIT_TIME_SCALE_URL`
 
-Sau khi hoàn thành, bạn sẽ nhận được ALB DNS name để truy cập web application.
+**Lưu ý**: Phải dùng `source` để export biến vào shell hiện tại. Nếu chạy trực tiếp (`./deployment/export-database-urls.sh`), script sẽ chỉ hiển thị hướng dẫn.
 
-#### 4.2. Setup Public Access cho PostgreSQL (Optional)
+#### Chi tiết về Migration CLI
 
-```bash
-./deployment/setup-postgres-public.sh staging
+Migration CLI sử dụng thư viện `go-pg-migrations` để quản lý database migrations. Dưới đây là các cách sử dụng:
+
+**Cấu trúc Migration CLI:**
+
+```
+migrations/
+├── cli/              # Migration CLI tool
+│   ├── main.go       # Entry point
+│   └── go.mod
+├── support/          # Migration support library
+│   ├── migrate.go    # Migration logic
+│   └── go.mod
+├── primary/          # PostgreSQL migrations
+│   └── *.up.sql      # Migration files
+└── tsdb/             # TimescaleDB migrations
+    └── *.up.sql      # Migration files
 ```
 
-Script này sẽ:
-- Tạo Network Load Balancer (NLB) internet-facing
-- Tạo target group cho PostgreSQL service
-- Cấu hình TCP listener (port 5432)
-- Cập nhật PostgreSQL service để sử dụng load balancer
+**Cách sử dụng Migration CLI:**
 
-**⚠️ Cảnh báo bảo mật**: Expose PostgreSQL ra internet có rủi ro bảo mật. Nên:
-- Giới hạn IP source trong security group
-- Sử dụng SSL/TLS connection
-- Xem xét sử dụng VPN hoặc Bastion Host thay vì public access
+**1. Chạy migrations từ local (sử dụng Go):**
+
+**Cách A: Sử dụng export-database-urls.sh (Khuyến nghị)**
+
+```bash
+# Export database URLs từ AWS Secrets Manager
+source ./deployment/export-database-urls.sh staging
+
+# Chạy migrations cho PostgreSQL
+cd migrations/cli
+export MIGRATE_PATH="../primary"
+export MIGRATE_DATABASE_URL="$FIELDKIT_POSTGRES_URL"
+go run main.go migrate
+
+# Chạy migrations cho TimescaleDB
+export MIGRATE_PATH="../tsdb"
+export MIGRATE_DATABASE_URL="$FIELDKIT_TIME_SCALE_URL"
+go run main.go migrate
+```
+
+**Cách B: Set connection string trực tiếp**
+
+```bash
+# Chạy migrations cho PostgreSQL
+cd migrations/cli
+export MIGRATE_PATH="../primary"
+export MIGRATE_DATABASE_URL="postgres://user:password@host:5432/database?sslmode=disable"
+go run main.go migrate
+
+# Chạy migrations cho TimescaleDB
+export MIGRATE_PATH="../tsdb"
+export MIGRATE_DATABASE_URL="postgres://user:password@host:5432/database?sslmode=disable"
+go run main.go migrate
+```
+
+**2. Sử dụng Makefile commands:**
+
+```bash
+# Chạy migrations cho PostgreSQL
+make migrate-up
+
+# Chạy migrations cho TimescaleDB
+make migrate-up-tsdb
+```
+
+**3. Chạy migrations từ Docker:**
+
+```bash
+# Build migration image
+cd migrations
+make image
+
+# Chạy migrations
+cd primary
+export DATABASE_URL="postgres://user:password@host:5432/database?sslmode=disable"
+make migrate
+```
+
+**4. Các commands có sẵn:**
+
+Migration CLI hỗ trợ các commands từ thư viện `go-pg-migrations`:
+
+- `migrate` - Chạy tất cả migrations chưa được apply
+- `migrate up` - Tương tự `migrate`
+- `migrate down` - Rollback migration cuối cùng
+- `migrate reset` - Rollback tất cả migrations
+- `migrate version` - Hiển thị version hiện tại
+- `migrate set_version <version>` - Set version cụ thể (không chạy migration)
+
+**Ví dụ:**
+ export MIGRATE_DATABASE_URL="postgres://fieldkit:WxdI7USgPlkSVOcrE8cCcn2vA@fieldkit-staging-postgres-nlb-2e92e35ac371a189.elb.ap-southeast-1.amazonaws.com:5432/fieldkit?sslmode=disable"
+
+  export MIGRATE_DATABASE_URL="postgres://postgres:GCDJNCpezOzfOhjPJLLkjZ2nh@fieldkit-staging-timescale-nlb-fb46e5c996ec1a7b.elb.ap-southeast-1.amazonaws.com:5432/fk?sslmode=disable"
+
+```bash
+# Export database URLs trước
+source ./deployment/export-database-urls.sh staging
+
+# Kiểm tra version hiện tại
+cd migrations/cli
+export MIGRATE_PATH="../primary"
+export MIGRATE_DATABASE_URL="$FIELDKIT_POSTGRES_URL"
+go run main.go version
+
+# Rollback migration cuối cùng
+go run main.go down
+
+# Set version cụ thể (cẩn thận!)
+go run main.go set_version 20220722000001
+```
+
+**Lưu ý quan trọng:**
+
+1. **Biến môi trường bắt buộc:**
+   - `MIGRATE_PATH`: Đường dẫn đến thư mục chứa migration files (ví dụ: `../primary` hoặc `../tsdb`)
+   - `MIGRATE_DATABASE_URL`: Connection string đến database (PostgreSQL format)
+
+2. **Migration files:**
+   - Tên file phải theo format: `YYYYMMDDHHMMSS_description.up.sql`
+   - File `.down.sql` tương ứng cho rollback (hiện tại chưa được implement đầy đủ)
+
+3. **Schema và permissions:**
+   - Migration CLI tự động tạo schema `fieldkit` nếu chưa có
+   - Tự động grant permissions cho role `fieldkit` nếu tồn tại
+   - Set `search_path` thành `fieldkit, public`
+
+4. **Connection string format:**
+   ```
+   postgres://[user]:[password]@[host]:[port]/[database]?sslmode=[mode]
+   ```
+
+**Troubleshooting:**
+
+- **Lỗi "MIGRATE_PATH is required"**: Đảm bảo đã set biến môi trường `MIGRATE_PATH`
+- **Lỗi "MIGRATE_DATABASE_URL is required"**: Đảm bảo đã set biến môi trường `MIGRATE_DATABASE_URL`
+- **Lỗi kết nối database**: Kiểm tra connection string và network connectivity
+- **Lỗi permissions**: Đảm bảo user có quyền tạo schema và tables
 
 ### Bước 5: Build và Push Images
 
@@ -329,6 +660,10 @@ deployment/
 ├── deploy-database.sh              # Deploy database cluster và services
 ├── setup-load-balancer.sh          # Setup ALB cho server service
 ├── setup-postgres-public.sh        # Setup NLB cho PostgreSQL (optional)
+├── setup-timescale-public.sh       # Setup NLB cho TimescaleDB (optional)
+├── export-database-urls.sh         # Export database URLs từ Secrets Manager
+├── check-public-services.sh        # Kiểm tra trạng thái public của các dịch vụ
+├── check-server-access.sh          # Kiểm tra server service access
 ├── run-migrations.sh               # Chạy database migrations trên ECS
 ├── run-migrations-local.sh        # Chạy database migrations từ máy local
 ├── setup-session-key.sh            # Tạo session key secret
@@ -682,6 +1017,25 @@ aws ecr get-login-password --region ap-southeast-1 | \
 - Policy name hiện tại là `FieldKitDeploymentPolicyV5` (có thể thay đổi trong script)
 - Nếu đã setup policy trước đó, cần cập nhật lại vì policy đã được cải thiện với Resource scope đúng
 - Đảm bảo Resource ARN trong policy khớp với repository name pattern: `hieuhk_fieldkit/*`
+
+### Lỗi "Không thể lấy AWS_ACCOUNT_ID từ AWS credentials"
+
+**Nguyên nhân**: AWS CLI chưa được cấu hình với Access Key ID và Secret Access Key.
+
+**Giải pháp**: Xem hướng dẫn chi tiết ở phần [Cách lấy AWS Access Key ID](#yêu-cầu) ở trên.
+
+**Quick Fix:**
+```bash
+# 1. Lấy Access Key từ AWS Console (xem hướng dẫn ở trên)
+# 2. Cấu hình AWS CLI
+aws configure
+
+# 3. Kiểm tra credentials
+aws sts get-caller-identity
+
+# 4. Chạy lại script
+./deployment/setup-timescale-public.sh staging
+```
 
 ### Lỗi "The config profile (fieldkit) could not be found"
 
