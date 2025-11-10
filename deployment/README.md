@@ -379,13 +379,13 @@ Có 2 cách để chạy migrations:
 Chạy migrations trực tiếp từ máy tính của bạn, kết nối đến database trên AWS:
 
 ```bash
-# Chạy migrations cho cả PostgreSQL và TimescaleDB
+# Chạy migrations cho database (PostgreSQL với TimescaleDB extension)
 ./deployment/run-migrations-local.sh staging
 ```
 
 **Yêu cầu:**
 - Go đã được cài đặt (`go version`)
-- Database connection strings đã được setup trong Secrets Manager
+- Database connection string đã được setup trong Secrets Manager
 - Network có thể kết nối đến database (qua NLB hoặc VPN)
 
 **Lợi ích:**
@@ -393,20 +393,21 @@ Chạy migrations trực tiếp từ máy tính của bạn, kết nối đến 
 - Dễ debug (xem logs trực tiếp)
 - Không tốn chi phí ECS task
 
+**Lưu ý**: Hệ thống hiện tại chỉ sử dụng 1 database duy nhất (PostgreSQL với TimescaleDB extension), không còn database TimescaleDB riêng biệt.
+
 #### Cách 2: Chạy trên ECS (Tự động)
 
 Chạy migrations như một ECS task:
 
 ```bash
-# Chạy migrations cho cả PostgreSQL và TimescaleDB
+# Chạy migrations cho database
 ./deployment/run-migrations.sh staging
 ```
 
 Script này sẽ:
-- Lấy connection strings từ Secrets Manager
+- Lấy connection string từ Secrets Manager
 - Tạo task definition cho migrations
-- Chạy migrations cho PostgreSQL (từ `/work/primary`)
-- Chạy migrations cho TimescaleDB (từ `/work/tsdb`)
+- Chạy migrations cho database (từ `/work/primary`)
 - Đợi và kiểm tra kết quả
 
 **Lưu ý**: Migrations image cần được build với migrations files đã được copy vào image (đã được cập nhật trong `migrations/Dockerfile`).
@@ -422,7 +423,6 @@ Sau khi setup Load Balancers, bạn có thể kiểm tra trạng thái của t�
 Script này sẽ kiểm tra:
 - **Server Service**: Application Load Balancer (ALB) và health status
 - **PostgreSQL**: Network Load Balancer (NLB) và connection info
-- **TimescaleDB**: Network Load Balancer (NLB) và connection info
 
 Với mỗi dịch vụ, script sẽ hiển thị:
 - ✅ Load Balancer đã được tạo và DNS name
@@ -458,6 +458,107 @@ Region: ap-southeast-1
    URL: http://fieldkit-staging-server-alb-xxx.elb.ap-southeast-1.amazonaws.com
    Health check: http://fieldkit-staging-server-alb-xxx.elb.ap-southeast-1.amazonaws.com/status
 ```
+
+#### Test API Tạo Station
+
+Sau khi server service đã được expose ra public, bạn có thể test API tạo station:
+
+```bash
+# Test với ALB DNS tự động lấy từ AWS
+./deployment/test-create-station-api.sh staging "" "Bearer YOUR_JWT_TOKEN"
+
+# Hoặc chỉ định API URL cụ thể
+./deployment/test-create-station-api.sh staging "http://fieldkit-staging-server-alb-xxx.elb.ap-southeast-1.amazonaws.com" "Bearer YOUR_JWT_TOKEN"
+```
+
+Script này sẽ:
+- Tự động lấy ALB DNS từ AWS (nếu chưa cung cấp)
+- Kiểm tra API health endpoint (`/status`)
+- Tạo test payload với deviceId và name ngẫu nhiên
+- Gửi POST request đến `/stations` endpoint
+- Hiển thị response và parse station ID nếu thành công
+
+**Lưu ý**: Bạn cần có JWT token để test API. Token có thể lấy từ:
+- Đăng nhập qua API `/login` endpoint
+- Hoặc từ browser sau khi đăng nhập vào portal
+
+**API Endpoint Details:**
+- **URL**: `POST /stations`
+- **Authentication**: JWT Bearer token (required)
+- **Required fields**: `name`, `deviceId`
+- **Optional fields**: `locationName`, `statusPb`, `description`
+
+**Ví dụ request với curl:**
+```bash
+curl -X POST 'http://fieldkit-staging-server-alb-xxx.elb.ap-southeast-1.amazonaws.com/stations' \
+  -H 'Content-Type: application/json' \
+  -H 'Authorization: Bearer YOUR_JWT_TOKEN' \
+  -d '{
+    "name": "My Test Station",
+    "deviceId": "0123456789abcdef0123456789abcdef",
+    "locationName": "Test Location",
+    "description": "Test station"
+  }'
+```
+
+#### Test API /sensors/data/recently
+
+Endpoint này trả về dữ liệu sensor gần đây cho các stations:
+
+```bash
+# Test với station IDs cụ thể
+./deployment/test-sensors-recently-api.sh staging "" "1,2,3" "Bearer YOUR_JWT_TOKEN"
+
+# Hoặc chỉ định API URL và windows
+WINDOWS="1,24,168" ./deployment/test-sensors-recently-api.sh staging "http://fieldkit-staging-server-alb-xxx.elb.ap-southeast-1.amazonaws.com" "1,2,3" "Bearer YOUR_JWT_TOKEN"
+```
+
+Script này sẽ:
+- Tự động lấy ALB DNS từ AWS (nếu chưa cung cấp)
+- Kiểm tra API health endpoint (`/status`)
+- Gửi GET request đến `/sensors/data/recently` với query parameters
+- Hiển thị response và parse JSON nếu thành công
+
+**API Endpoint Details:**
+- **URL**: `GET /sensors/data/recently`
+- **Authentication**: Optional (JWT Bearer token)
+- **Query Parameters**:
+  - `stations`: string (required, comma-separated station IDs)
+    - Ví dụ: `stations=1,2,3`
+  - `windows`: string (optional, comma-separated hours)
+    - Ví dụ: `windows=1,24,168` (1 hour, 24 hours, 1 week)
+    - Default: `1,24`
+
+**Ví dụ request với curl:**
+```bash
+# Không có auth (chỉ public data)
+curl -X GET 'http://fieldkit-staging-server-alb-xxx.elb.ap-southeast-1.amazonaws.com/sensors/data/recently?stations=1,2,3&windows=1,24'
+
+# Với auth (full data)
+curl -X GET 'http://fieldkit-staging-server-alb-xxx.elb.ap-southeast-1.amazonaws.com/sensors/data/recently?stations=1,2,3&windows=1,24' \
+  -H 'Authorization: Bearer YOUR_JWT_TOKEN'
+```
+
+**Response Format:**
+```json
+{
+  "object": {
+    "windows": {
+      "3600000000000": [...],    // 1 hour in nanoseconds
+      "86400000000000": [...]    // 24 hours in nanoseconds
+    },
+    "stations": {
+      "1": { "last": 1234567890 },
+      "2": { "last": 1234567890 }
+    }
+  }
+}
+```
+
+**Lưu ý**: 
+- Endpoint này là **GET request**, không phải WebSocket
+- Nếu cần WebSocket, sử dụng endpoint `/notifications/listen` cho real-time updates
+- Station IDs phải là số nguyên hợp lệ, phân cách bằng dấu phẩy
 
 #### Export Database URLs để sử dụng
 
@@ -499,11 +600,11 @@ migrations/
 ├── support/          # Migration support library
 │   ├── migrate.go    # Migration logic
 │   └── go.mod
-├── primary/          # PostgreSQL migrations
-│   └── *.up.sql      # Migration files
-└── tsdb/             # TimescaleDB migrations
+└── primary/          # Database migrations (PostgreSQL với TimescaleDB extension)
     └── *.up.sql      # Migration files
 ```
+
+**Lưu ý**: Hệ thống hiện tại chỉ sử dụng 1 database duy nhất (PostgreSQL với TimescaleDB extension). Tất cả migrations được chạy trên cùng một database.
 
 **Cách sử dụng Migration CLI:**
 
@@ -512,32 +613,22 @@ migrations/
 **Cách A: Sử dụng export-database-urls.sh (Khuyến nghị)**
 
 ```bash
-# Export database URLs từ AWS Secrets Manager
+# Export database URL từ AWS Secrets Manager
 source ./deployment/export-database-urls.sh staging
 
-# Chạy migrations cho PostgreSQL
+# Chạy migrations cho database
 cd migrations/cli
 export MIGRATE_PATH="../primary"
 export MIGRATE_DATABASE_URL="$FIELDKIT_POSTGRES_URL"
-go run main.go migrate
-
-# Chạy migrations cho TimescaleDB
-export MIGRATE_PATH="../tsdb"
-export MIGRATE_DATABASE_URL="$FIELDKIT_TIME_SCALE_URL"
 go run main.go migrate
 ```
 
 **Cách B: Set connection string trực tiếp**
 
 ```bash
-# Chạy migrations cho PostgreSQL
+# Chạy migrations cho database
 cd migrations/cli
 export MIGRATE_PATH="../primary"
-export MIGRATE_DATABASE_URL="postgres://user:password@host:5432/database?sslmode=disable"
-go run main.go migrate
-
-# Chạy migrations cho TimescaleDB
-export MIGRATE_PATH="../tsdb"
 export MIGRATE_DATABASE_URL="postgres://user:password@host:5432/database?sslmode=disable"
 go run main.go migrate
 ```
@@ -545,11 +636,11 @@ go run main.go migrate
 **2. Sử dụng Makefile commands:**
 
 ```bash
-# Chạy migrations cho PostgreSQL
-make migrate-up
+# Export database URL trước
+source ./deployment/export-database-urls.sh staging
 
-# Chạy migrations cho TimescaleDB
-make migrate-up-tsdb
+# Chạy migrations cho database
+make migrate-up
 ```
 
 **3. Chạy migrations từ Docker:**
@@ -577,25 +668,22 @@ Migration CLI hỗ trợ các commands từ thư viện `go-pg-migrations`:
 - `migrate set_version <version>` - Set version cụ thể (không chạy migration)
 
 **Ví dụ:**
- export MIGRATE_DATABASE_URL="postgres://fieldkit:WxdI7USgPlkSVOcrE8cCcn2vA@fieldkit-staging-postgres-nlb-2e92e35ac371a189.elb.ap-southeast-1.amazonaws.com:5432/fieldkit?sslmode=disable"
-
-  export MIGRATE_DATABASE_URL="postgres://postgres:GCDJNCpezOzfOhjPJLLkjZ2nh@fieldkit-staging-timescale-nlb-fb46e5c996ec1a7b.elb.ap-southeast-1.amazonaws.com:5432/fk?sslmode=disable"
 
 ```bash
-# Export database URLs trước
+# Export database URL trước
 source ./deployment/export-database-urls.sh staging
 
 # Kiểm tra version hiện tại
 cd migrations/cli
 export MIGRATE_PATH="../primary"
 export MIGRATE_DATABASE_URL="$FIELDKIT_POSTGRES_URL"
-go run main.go version
+go run main.go migrate version
 
 # Rollback migration cuối cùng
-go run main.go down
+go run main.go migrate down
 
 # Set version cụ thể (cẩn thận!)
-go run main.go set_version 20220722000001
+go run main.go migrate set_version 20220722000001
 ```
 
 **Lưu ý quan trọng:**
@@ -664,6 +752,8 @@ deployment/
 ├── export-database-urls.sh         # Export database URLs từ Secrets Manager
 ├── check-public-services.sh        # Kiểm tra trạng thái public của các dịch vụ
 ├── check-server-access.sh          # Kiểm tra server service access
+├── test-create-station-api.sh      # Test API tạo station
+├── test-sensors-recently-api.sh    # Test API /sensors/data/recently
 ├── run-migrations.sh               # Chạy database migrations trên ECS
 ├── run-migrations-local.sh        # Chạy database migrations từ máy local
 ├── setup-session-key.sh            # Tạo session key secret

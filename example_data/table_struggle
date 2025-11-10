@@ -1,0 +1,246 @@
+-- fieldkit.project definition
+
+-- Drop table
+
+-- DROP TABLE fieldkit.project;
+
+CREATE TABLE fieldkit.project ( id serial4 NOT NULL, "name" varchar(100) NOT NULL, description text DEFAULT ''::text NOT NULL, goal varchar(100) DEFAULT ''::character varying NOT NULL, "location" varchar(100) DEFAULT ''::character varying NOT NULL, tags varchar(100) DEFAULT ''::character varying NOT NULL, start_time timestamp NULL, end_time timestamp NULL, media_url varchar(255) NULL, media_content_type varchar(255) NULL, privacy int4 NOT NULL, bounds json NULL, show_stations bool DEFAULT false NOT NULL, community_ranking int4 NOT NULL, CONSTRAINT project_pkey PRIMARY KEY (id));
+-- fieldkit.aggregated_sensor definition
+
+-- Drop table
+
+-- DROP TABLE fieldkit.aggregated_sensor;
+
+CREATE TABLE fieldkit.aggregated_sensor (
+	id serial4 NOT NULL,
+	"key" text NOT NULL,
+	interestingness_priority int4 NULL,
+	CONSTRAINT aggregated_sensor_pkey PRIMARY KEY (id)
+);
+CREATE UNIQUE INDEX aggregated_sensor_key_idx ON fieldkit.aggregated_sensor USING btree (key);
+
+
+-- fieldkit.module_meta definition
+
+-- Drop table
+
+-- DROP TABLE fieldkit.module_meta;
+
+CREATE TABLE fieldkit.module_meta (
+	id serial4 NOT NULL,
+	"key" text NOT NULL,
+	manufacturer int4 NOT NULL,
+	kinds _int4 NOT NULL,
+	"version" _int4 NOT NULL,
+	internal bool NOT NULL,
+	"ordering" int4 NOT NULL,
+	CONSTRAINT module_meta_pkey PRIMARY KEY (id)
+);
+
+
+-- fieldkit.sensor_data definition
+
+-- Drop table
+
+-- DROP TABLE fieldkit.sensor_data;
+
+CREATE TABLE fieldkit.sensor_data (
+	"time" timestamptz NOT NULL,
+	station_id int4 NOT NULL,
+	module_id int4 NOT NULL,
+	sensor_id int4 NOT NULL,
+	value float8 NOT NULL
+)
+WITH (
+	fillfactor=90
+);
+CREATE INDEX sensor_data_idx ON fieldkit.sensor_data USING btree (station_id, module_id, sensor_id, "time" DESC);
+CREATE INDEX sensor_data_module_id_idx ON fieldkit.sensor_data USING btree (module_id);
+CREATE INDEX sensor_data_time_idx ON fieldkit.sensor_data USING btree ("time" DESC);
+CREATE UNIQUE INDEX sensor_index_idx ON fieldkit.sensor_data USING btree ("time", station_id, module_id, sensor_id);
+
+-- Table Triggers
+
+create trigger ts_cagg_invalidation_trigger after
+insert
+    or
+delete
+    or
+update
+    on
+    fieldkit.sensor_data for each row execute function _timescaledb_functions.continuous_agg_invalidation_trigger('1');
+create trigger ts_insert_blocker before
+insert
+    on
+    fieldkit.sensor_data for each row execute function _timescaledb_functions.insert_blocker();
+
+
+-- fieldkit.station_module definition
+
+-- Drop table
+
+-- DROP TABLE fieldkit.station_module;
+
+CREATE TABLE fieldkit.station_module (
+	id serial4 NOT NULL,
+	hardware_id bytea NOT NULL,
+	flags int4 NOT NULL,
+	manufacturer int4 NOT NULL,
+	kind int4 NOT NULL,
+	"version" int4 NOT NULL,
+	"name" varchar NOT NULL,
+	"label" text NULL,
+	CONSTRAINT station_module_pkey PRIMARY KEY (id)
+);
+
+
+-- fieldkit.module_sensor definition
+
+-- Drop table
+
+-- DROP TABLE fieldkit.module_sensor;
+
+CREATE TABLE fieldkit.module_sensor (
+	id serial4 NOT NULL,
+	module_id int4 NOT NULL,
+	sensor_index int4 NOT NULL,
+	unit_of_measure varchar NOT NULL,
+	"name" varchar NOT NULL,
+	reading_last float8 NULL,
+	reading_time timestamp NULL,
+	CONSTRAINT module_sensor_pkey PRIMARY KEY (id),
+	CONSTRAINT module_sensor_module_id_fkey FOREIGN KEY (module_id) REFERENCES fieldkit.station_module(id)
+);
+CREATE UNIQUE INDEX module_sensor_module_id_sensor_index_idx ON fieldkit.module_sensor USING btree (module_id, sensor_index);
+
+
+-- fieldkit.sensor_meta definition
+
+-- Drop table
+
+-- DROP TABLE fieldkit.sensor_meta;
+
+CREATE TABLE fieldkit.sensor_meta (
+	id serial4 NOT NULL,
+	module_id int4 NOT NULL,
+	"ordering" int4 NOT NULL,
+	sensor_key text NOT NULL,
+	firmware_key text NOT NULL,
+	full_key text NOT NULL,
+	internal bool NOT NULL,
+	uom text NOT NULL,
+	strings json NOT NULL,
+	viz json NOT NULL,
+	ranges json NOT NULL,
+	aggregation_function text NULL,
+	aliases _text NULL,
+	CONSTRAINT sensor_meta_pkey PRIMARY KEY (id),
+	CONSTRAINT sensor_meta_module_id_fkey FOREIGN KEY (module_id) REFERENCES fieldkit.module_meta(id)
+);
+
+
+-- fieldkit.configuration_module definition
+
+-- Drop table
+
+-- DROP TABLE fieldkit.configuration_module;
+
+CREATE TABLE fieldkit.configuration_module (
+	configuration_id int4 NOT NULL,
+	module_id int4 NOT NULL,
+	"position" int4 NOT NULL,
+	module_index int4 NOT NULL,
+	"label" text NULL
+);
+CREATE UNIQUE INDEX configuration_module_idx ON fieldkit.configuration_module USING btree (configuration_id, module_id);
+
+
+-- fieldkit.station definition
+
+-- Drop table
+
+-- DROP TABLE fieldkit.station;
+
+CREATE TABLE fieldkit.station (
+	id serial4 NOT NULL,
+	owner_id int4 NOT NULL,
+	device_id bytea NOT NULL,
+	created_at timestamp DEFAULT now() NOT NULL,
+	"name" text NOT NULL,
+	battery float8 NULL,
+	recording_started_at timestamp NULL,
+	memory_used int4 NULL,
+	memory_available int4 NULL,
+	firmware_number int4 NULL,
+	firmware_time int4 NULL,
+	"location" public.geometry(point, 4326) NULL,
+	location_name text NULL,
+	updated_at timestamp NOT NULL,
+	place_other text NULL,
+	place_native text NULL,
+	photo_id int4 NULL,
+	synced_at timestamp NULL,
+	ingestion_at timestamp NULL,
+	model_id int4 NOT NULL,
+	hidden bool NULL,
+	status text NULL,
+	description text NULL,
+	CONSTRAINT station_pkey PRIMARY KEY (id)
+);
+CREATE UNIQUE INDEX station_device_id_idx ON fieldkit.station USING btree (device_id);
+
+
+-- fieldkit.station_configuration definition
+
+-- Drop table
+
+-- DROP TABLE fieldkit.station_configuration;
+
+CREATE TABLE fieldkit.station_configuration (
+	id serial4 NOT NULL,
+	provision_id int4 NOT NULL,
+	meta_record_id int4 NULL,
+	source_id int4 NULL,
+	updated_at timestamp NOT NULL,
+	CONSTRAINT station_configuration_pkey PRIMARY KEY (id)
+);
+CREATE UNIQUE INDEX station_configuration_provision_id_meta_record_id_idx ON fieldkit.station_configuration USING btree (provision_id, meta_record_id);
+CREATE UNIQUE INDEX station_configuration_provision_id_source_id_idx ON fieldkit.station_configuration USING btree (provision_id, source_id);
+
+
+-- fieldkit.visible_configuration definition
+
+-- Drop table
+
+-- DROP TABLE fieldkit.visible_configuration;
+
+CREATE TABLE fieldkit.visible_configuration (
+	station_id int4 NOT NULL,
+	configuration_id int4 NOT NULL,
+	CONSTRAINT visible_configuration_pkey PRIMARY KEY (station_id)
+);
+
+
+-- fieldkit.configuration_module foreign keys
+
+ALTER TABLE fieldkit.configuration_module ADD CONSTRAINT configuration_module_configuration_id_fkey FOREIGN KEY (configuration_id) REFERENCES fieldkit.station_configuration(id);
+ALTER TABLE fieldkit.configuration_module ADD CONSTRAINT configuration_module_module_id_fkey FOREIGN KEY (module_id) REFERENCES fieldkit.station_module(id);
+
+
+-- fieldkit.station foreign keys
+
+ALTER TABLE fieldkit.station ADD CONSTRAINT station_model_id_fkey FOREIGN KEY (model_id) REFERENCES fieldkit.station_model(id);
+ALTER TABLE fieldkit.station ADD CONSTRAINT station_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES fieldkit."user"(id);
+ALTER TABLE fieldkit.station ADD CONSTRAINT station_photo_id_fkey FOREIGN KEY (photo_id) REFERENCES fieldkit.notes_media(id);
+
+
+-- fieldkit.station_configuration foreign keys
+
+ALTER TABLE fieldkit.station_configuration ADD CONSTRAINT station_configuration_meta_record_id_fkey FOREIGN KEY (meta_record_id) REFERENCES fieldkit.meta_record(id);
+ALTER TABLE fieldkit.station_configuration ADD CONSTRAINT station_configuration_provision_id_fkey FOREIGN KEY (provision_id) REFERENCES fieldkit.provision(id);
+
+
+-- fieldkit.visible_configuration foreign keys
+
+ALTER TABLE fieldkit.visible_configuration ADD CONSTRAINT visible_configuration_configuration_id_fkey FOREIGN KEY (configuration_id) REFERENCES fieldkit.station_configuration(id);
+ALTER TABLE fieldkit.visible_configuration ADD CONSTRAINT visible_configuration_station_id_fkey FOREIGN KEY (station_id) REFERENCES fieldkit.station(id);

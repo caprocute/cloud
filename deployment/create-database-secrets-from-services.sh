@@ -184,22 +184,28 @@ else
     echo "💡 Generated PostgreSQL password"
 fi
 
-# Kiểm tra TimescaleDB password
+# Vì đã gộp về 1 database, TimescaleDB password = PostgreSQL password
+# (Giữ lại logic này để backward compatibility, nhưng thực tế không dùng nữa)
 if aws secretsmanager describe-secret --secret-id "${TIMESCALE_PASSWORD_SECRET}" --region ${AWS_REGION} &>/dev/null; then
     TIMESCALE_PASSWORD=$(aws secretsmanager get-secret-value \
         --secret-id "${TIMESCALE_PASSWORD_SECRET}" \
         --region ${AWS_REGION} \
         --query 'SecretString' \
         --output text)
-    echo "✅ Đã lấy TimescaleDB password từ secret"
+    echo "✅ Đã lấy TimescaleDB password từ secret (sẽ không dùng vì đã gộp về 1 database)"
 else
-    TIMESCALE_PASSWORD=$(openssl rand -base64 32 | tr -d "=+/" | cut -c1-25)
-    echo "💡 Generated TimescaleDB password"
+    # Set bằng PostgreSQL password vì cùng database
+    TIMESCALE_PASSWORD="${POSTGRES_PASSWORD}"
+    echo "💡 TimescaleDB password được set bằng PostgreSQL password (cùng database)"
 fi
 
 # Tạo connection strings
 POSTGRES_URL="postgres://fieldkit:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:5432/fieldkit?sslmode=disable"
-TIMESCALE_URL="postgres://postgres:${TIMESCALE_PASSWORD}@${TIMESCALE_HOST}:5432/fk?sslmode=disable"
+
+# Vì đã gộp về 1 database (PostgreSQL với TimescaleDB extension), 
+# TimescaleDB URL trỏ về cùng database với PostgreSQL
+TIMESCALE_URL="${POSTGRES_URL}"
+echo "💡 TimescaleDB URL được set bằng PostgreSQL URL (đã gộp về 1 database)"
 
 # Function để tạo hoặc cập nhật secret
 create_or_update_secret() {
@@ -242,11 +248,11 @@ create_or_update_secret \
     "${POSTGRES_URL}" \
     "PostgreSQL connection URL for FieldKit ${NAMESPACE}"
 
-# TimescaleDB Password
+# TimescaleDB Password (set bằng PostgreSQL password vì cùng database)
 create_or_update_secret \
     "fieldkit/${NAMESPACE}/database/timescale/password" \
-    "${TIMESCALE_PASSWORD}" \
-    "TimescaleDB password for FieldKit ${NAMESPACE}"
+    "${POSTGRES_PASSWORD}" \
+    "TimescaleDB password for FieldKit ${NAMESPACE} (cùng với PostgreSQL vì đã gộp về 1 database)"
 
 # TimescaleDB Connection URL
 create_or_update_secret \
@@ -267,6 +273,8 @@ echo "  - fieldkit/${NAMESPACE}/database/timescale"
 echo ""
 echo "Connection URLs:"
 echo "  PostgreSQL: ${POSTGRES_URL}"
-echo "  TimescaleDB: ${TIMESCALE_URL}"
+echo "  TimescaleDB: ${TIMESCALE_URL} (trỏ về cùng database với PostgreSQL)"
+echo ""
+echo "Lưu ý: Vì đã gộp về 1 database, TimescaleDB URL trỏ về cùng database với PostgreSQL."
 echo ""
 
